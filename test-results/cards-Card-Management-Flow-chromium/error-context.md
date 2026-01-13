@@ -1,0 +1,51 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - alert [ref=e4]
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - heading "Adicionar Novo Cartão" [level=3] [ref=e8]
+          - paragraph [ref=e9]: Cadastre seus cartões de crédito.
+        - generic [ref=e11]:
+          - generic [ref=e12]:
+            - text: Nome do Cartão
+            - textbox "Nome do Cartão" [ref=e13]:
+              - /placeholder: "Ex: Nubank Ultravioleta"
+          - generic [ref=e14]:
+            - text: Limite (R$)
+            - spinbutton "Limite (R$)" [ref=e15]: "0"
+          - generic [ref=e16]:
+            - text: Dia Fechamento
+            - spinbutton "Dia Fechamento" [ref=e17]: "1"
+          - generic [ref=e18]:
+            - text: Dia Vencimento
+            - spinbutton "Dia Vencimento" [ref=e19]: "10"
+          - button "Salvar" [ref=e21] [cursor=pointer]
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - heading "Test Card" [level=3] [ref=e25]
+          - button [ref=e26] [cursor=pointer]:
+            - img [ref=e27]
+        - generic [ref=e30]:
+          - generic [ref=e31]: R$ 10.000,00
+          - paragraph [ref=e32]: Fecha dia 10 • Vence dia 17
+  - generic:
+    - img
+  - generic:
+    - generic:
+      - generic:
+        - button "Go to parent" [disabled]
+        - button "Open in editor"
+        - button "Close"
+  - generic [ref=e33]:
+    - button "Toggle Nuxt DevTools" [ref=e34] [cursor=pointer]:
+      - img [ref=e35]
+    - generic "Page load time" [ref=e38]:
+      - generic [ref=e39]: "21"
+      - generic [ref=e40]: ms
+    - button "Toggle Component Inspector" [ref=e42] [cursor=pointer]:
+      - img [ref=e43]
+```

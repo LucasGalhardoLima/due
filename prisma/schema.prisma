@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model CreditCard {
+  id          String   @id @default(uuid())
+  name        String   // Ex: "Nubank Ultravioleta"
+  limit       Float
+  closingDay  Int      // Dia que fecha a fatura (ex: 25)
+  dueDay      Int      // Dia que vence (ex: 01)
+  
+  transactions Transaction[]
+  invoices     Invoice[] // Opcional, mas ajuda em cache/fechamento
+}
+
+model Category {
+  id           String        @id @default(uuid())
+  name         String        // Ex: Alimentação, Tech, Assinaturas
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String   @id @default(uuid())
+  description   String
+  amount        Float    // Valor TOTAL da compra
+  purchaseDate  DateTime @default(now())
+  
+  // Controle de Parcelamento
+  installmentsCount Int @default(1) // Em quantas vezes foi (ex: 10)
+  
+  cardId        String
+  card          CreditCard @relation(fields: [cardId], references: [id])
+  
+  categoryId    String
+  category      Category   @relation(fields: [categoryId], references: [id])
+
+  // Aqui está o segredo para performance e análise rápida
+  // Ao invés de calcular na leitura, criamos os registros das parcelas
+  installments  Installment[] 
+}
+
+model Installment {
+  id            String      @id @default(uuid())
+  number        Int         // Parcela 1, 2, 3...
+  amount        Float       // Valor desta parcela específica
+  dueDate       DateTime    // Data teórica que essa parcela cai na fatura
+  
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([dueDate]) // Índice para buscar rápido "fatura de agosto"
+}
+
+// Invoice model for caching/tracking invoice status
+model Invoice {
+  id          String   @id @default(uuid())
+  month       Int
+  year        Int
+  status      String   // OPEN, CLOSED, PAID
+  cardId      String
+  card        CreditCard @relation(fields: [cardId], references: [id])
+
+  @@unique([cardId, month, year])
+}
