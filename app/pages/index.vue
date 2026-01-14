@@ -62,6 +62,8 @@ function prevMonth() {
 
 import TransactionList from '@/components/transaction/TransactionList.vue'
 import InsightCard from '@/components/dashboard/InsightCard.vue'
+import AdvisorCard from '@/components/dashboard/AdvisorCard.vue'
+import { Sparkles, Loader2 } from 'lucide-vue-next'
 
 const isDrawerOpen = ref(false)
 function onSaved() {
@@ -115,6 +117,39 @@ async function handlePayInvoice() {
         toast.error('Erro ao pagar fatura')
     }
 }
+
+// Advisor Logic
+const showAdvisor = ref(false)
+const advisorLoading = ref(false)
+const advisorResult = ref(null)
+
+async function runAnalysis() {
+    if (showAdvisor.value && advisorResult.value) {
+        showAdvisor.value = false // Toggle off
+        return
+    }
+
+    showAdvisor.value = true
+    advisorLoading.value = true
+    advisorResult.value = null // Reset
+
+    try {
+        const result = await $fetch('/api/advisor/analyze', {
+            method: 'POST',
+            body: {
+                month: getMonth(currentDate.value) + 1,
+                year: getYear(currentDate.value),
+                cardId: selectedCardId.value === 'all' ? undefined : selectedCardId.value
+            }
+        })
+        advisorResult.value = result
+    } catch (e) {
+        toast.error('Não foi possível analisar a fatura.')
+        showAdvisor.value = false
+    } finally {
+        advisorLoading.value = false
+    }
+}
 </script>
 
 <template>
@@ -144,7 +179,17 @@ async function handlePayInvoice() {
     <!-- Main Dashboard Content -->
     <template v-else>
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-      <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+      <div class="flex items-center gap-3">
+          <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <button 
+            @click="runAnalysis"
+            class="flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-sm font-medium transition-colors hover:bg-indigo-200 dark:hover:bg-indigo-900/50"
+          >
+            <Sparkles v-if="!advisorLoading" class="w-4 h-4" />
+            <Loader2 v-else class="w-4 h-4 animate-spin" />
+            {{ showAdvisor ? 'Fechar Análise' : 'Analisar' }}
+          </button>
+      </div>
       
       <!-- Card Filter -->
       <div class="w-full md:w-[200px]">
@@ -166,7 +211,12 @@ async function handlePayInvoice() {
     <div class="flex flex-col items-center space-y-4">
         <!-- Insight Card (Full Width) -->
         <div class="w-full max-w-md">
-            <InsightCard :month="summary?.month || 1" :year="summary?.year || 2024" />
+            <div v-if="!showAdvisor">
+                <InsightCard :month="summary?.month || 1" :year="summary?.year || 2024" />
+            </div>
+            <div v-else>
+                <AdvisorCard :analysis="advisorResult" :loading="advisorLoading" />
+            </div>
         </div>
 
         <div class="flex items-center space-x-4 bg-muted/30 p-2 rounded-full">
