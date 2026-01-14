@@ -67,14 +67,7 @@ function onSaved() {
   <div class="container mx-auto px-4 py-8 space-y-8 pb-24">
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
-      <div class="flex gap-4">
-        <NuxtLink to="/legacy" class="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-            Importar Legado
-        </NuxtLink>
-        <NuxtLink to="/cards" class="text-sm font-medium text-primary hover:underline">
-            Gerenciar Cartões
-        </NuxtLink>
-      </div>
+
     </div>
 
     <!-- Month Navigation & Main KPI -->
