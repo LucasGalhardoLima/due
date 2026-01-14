@@ -22,20 +22,7 @@ async function main() {
     }
   }
 
-  console.log('Seeding default card...')
-  const defaultCard = await prisma.creditCard.upsert({
-    where: { id: '00000000-0000-0000-0000-000000000001' },
-    update: {},
-    create: {
-      id: '00000000-0000-0000-0000-000000000001',
-      name: 'Nubank Principal',
-      limit: 5000,
-      closingDay: 10,
-      dueDay: 17
-    }
-  })
 
-  console.log({ defaultCard })
 }
 
 main()

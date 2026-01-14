@@ -64,7 +64,7 @@ function onSaved() {
 </script>
 
 <template>
-  <div class="container mx-auto py-8 space-y-8 pb-24">
+  <div class="container mx-auto px-4 py-8 space-y-8 pb-24">
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
       <div class="flex gap-4">
