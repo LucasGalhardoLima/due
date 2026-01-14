@@ -16,17 +16,10 @@ async function main() {
 
   console.log('Seeding categories...')
   for (const name of categories) {
-    await prisma.category.upsert({
-      where: { id: name }, // This won't work because name is not ID, but we want to avoid duplicates
-      update: {},
-      create: { name }
-    }).catch(async (e) => {
-      // If ID is uuid, we check by name
-      const existing = await prisma.category.findFirst({ where: { name } })
-      if (!existing) {
-        await prisma.category.create({ data: { name } })
-      }
-    })
+    const existing = await prisma.category.findFirst({ where: { name } })
+    if (!existing) {
+      await prisma.category.create({ data: { name } })
+    }
   }
 
   console.log('Seeding default card...')
