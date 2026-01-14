@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import CurrencyInput from '@/components/ui/CurrencyInput.vue'
+import { toast } from 'vue-sonner'
 
 const amountPerInstallment = ref(0)
 const remainingInstallments = ref(1)
@@ -50,9 +51,10 @@ async function save() {
     
     // Redirect to dashboard
     await navigateTo('/')
+    toast.success('Dívida importada com sucesso!')
   } catch (e) {
     console.error(e)
-    alert('Erro ao importar')
+    toast.error('Erro ao importar dívida')
   }
 }
 </script>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import { toast } from 'vue-sonner'
 import {
   Drawer,
   DrawerContent,
@@ -130,10 +131,11 @@ async function save() {
     // 5. Revalidation (Background)
     // Refresh to get the real ID, real category name, real calculations
     await refreshNuxtData('dashboard-summary')
+    toast.success('Despesa salva com sucesso!')
 
   } catch (e) {
     console.error(e)
-    alert('Erro ao salvar. Revertendo...')
+    toast.error('Erro ao salvar despesa. Revertendo...')
 
     // 6. Rollback on Error
     if (summaryCache.value && previousData) {

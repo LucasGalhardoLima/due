@@ -5,12 +5,15 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     // '@nuxtjs/supabase', // Not needed for MVP with local SQLite
   ],
-  supabase: {
-    redirect: false, // We'll handle auth redirect manually if needed
-  },
+  // supabase: {
+  //   redirect: false, // We'll handle auth redirect manually if needed
+  // },
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   build: {
-    transpile: ['lucide-vue-next']
+    transpile: ['lucide-vue-next', 'vue-sonner']
+  },
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' }
   }
 })
