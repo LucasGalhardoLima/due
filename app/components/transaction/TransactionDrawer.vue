@@ -33,8 +33,19 @@ const paymentType = ref<'cash' | 'installment'>('cash')
 const purchaseDate = ref(new Date().toISOString().split('T')[0]) // YYYY-MM-DD format
 
 // Data Fetching
-const { data: cards } = await useFetch<any[]>('/api/cards')
-const { data: categories } = await useFetch<any[]>('/api/categories') 
+interface Card {
+  id: string
+  name: string
+  isDefault: boolean
+}
+
+interface Category {
+  id: string
+  name: string
+}
+
+const { data: cards } = await useFetch<Card[]>('/api/cards')
+const { data: categories } = await useFetch<Category[]>('/api/categories') 
 
 // Auto-select default card when cards load
 watch(cards, (newCards) => {
@@ -44,7 +55,8 @@ watch(cards, (newCards) => {
       selectedCardId.value = defaultCard.id
     } else {
       // If no default, select first card
-      selectedCardId.value = newCards[0].id
+      const firstCard = newCards[0]
+      if (firstCard) selectedCardId.value = firstCard.id
     }
   }
 }, { immediate: true })
@@ -62,16 +74,36 @@ async function save() {
   const payload = {
     amount: amount.value,
     description: description.value,
-    installmentsCount: installments.value[0],
+    installmentsCount: installments.value[0] ?? 1,
     cardId: selectedCardId.value,
     categoryId: selectedCategoryId.value || undefined, 
-    purchaseDate: new Date(purchaseDate.value).toISOString()
+    purchaseDate: purchaseDate.value ? new Date(purchaseDate.value + 'T12:00:00Z').toISOString() : new Date().toISOString()
   }
 
   // 2. OPTIMISTIC UPDATE SETUP
   // Access the dashboard cache
-  const { data: summaryCache } = useNuxtData('dashboard-summary')
-  let previousData = null
+  interface Transaction {
+    id: string
+    description: string
+    amount: number
+    category: string
+    categoryIcon: string
+    installmentNumber: number
+    totalInstallments: number
+    cardName: string
+    purchaseDate: string
+    isOptimistic?: boolean
+  }
+
+  interface SummaryResponse {
+    total: number
+    limit: number
+    available: number
+    transactions: Record<string, Transaction[]>
+  }
+
+  const { data: summaryCache } = useNuxtData<SummaryResponse>('dashboard-summary')
+  let previousData: SummaryResponse | null = null
 
   // 3. Apply Optimistic Changes
   if (summaryCache.value) {
@@ -87,25 +119,27 @@ async function save() {
     // Note: purchaseDate is in YYYY-MM-DD format from the input
     const pDateKey = purchaseDate.value
     
-    // Create a "Optimistic Transaction" object
-    const optimisticTx = {
-       id: 'temp-' + Date.now(),
-       description: payload.description,
-       amount: payload.amount,
-       category: 'Processando...', // We don't have the category name resolved yet easily
-       categoryIcon: 'clock',
-       installmentNumber: 1,
-       totalInstallments: payload.installmentsCount,
-       cardName: '', // Could resolve from props, but keep simple
-       purchaseDate: payload.purchaseDate,
-       isOptimistic: true // Flag for UI to show spinner or opacity
-    }
+    if (pDateKey) {
+      // Create a "Optimistic Transaction" object
+      const optimisticTx: Transaction = {
+         id: 'temp-' + Date.now(),
+         description: payload.description,
+         amount: payload.amount,
+         category: 'Processando...',
+         categoryIcon: 'clock',
+         installmentNumber: 1,
+         totalInstallments: payload.installmentsCount,
+         cardName: '',
+         purchaseDate: payload.purchaseDate,
+         isOptimistic: true
+      }
 
-    if (!summaryCache.value.transactions[pDateKey]) {
-        summaryCache.value.transactions[pDateKey] = []
+      if (!summaryCache.value.transactions[pDateKey]) {
+          summaryCache.value.transactions[pDateKey] = []
+      }
+      // Add to beginning of list
+      summaryCache.value.transactions[pDateKey].unshift(optimisticTx)
     }
-    // Add to beginning of list
-    summaryCache.value.transactions[pDateKey].unshift(optimisticTx)
   }
 
   // Close UI immediately for "Native Feel"

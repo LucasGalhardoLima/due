@@ -3,8 +3,21 @@ import { toast } from 'vue-sonner'
 // Quick Expense Add Page
 
 const router = useRouter()
-const { data: cards } = await useFetch('/api/cards')
-const { data: categories } = await useFetch('/api/categories')
+
+interface Card {
+  id: string
+  name: string
+  closingDay: number
+  dueDay: number
+}
+
+interface Category {
+  id: string
+  name: string
+}
+
+const { data: cards } = await useFetch<Card[]>('/api/cards')
+const { data: categories } = await useFetch<Category[]>('/api/categories')
 
 const form = reactive({
   description: '',
@@ -18,14 +31,16 @@ const form = reactive({
 // Set defaults if available
 watchEffect(() => {
   if (cards.value && cards.value.length > 0 && !form.cardId) {
-    form.cardId = cards.value[0].id
+    const firstCard = cards.value[0]
+    if (firstCard) form.cardId = firstCard.id
   }
   if (categories.value && categories.value.length > 0 && !form.categoryId) {
     const defaultCat = categories.value.find(c => c.name === 'Outros')
     if (defaultCat) {
       form.categoryId = defaultCat.id
     } else {
-      form.categoryId = categories.value[0].id
+      const firstCat = categories.value[0]
+      if (firstCat) form.categoryId = firstCat.id
     }
   }
 })
@@ -39,7 +54,7 @@ async function onSubmit() {
       body: {
         description: form.description,
         amount: form.amount,
-        purchaseDate: form.date ? new Date(form.date).toISOString() : new Date().toISOString(),
+        purchaseDate: form.date ? new Date(form.date + 'T12:00:00Z').toISOString() : new Date().toISOString(),
         installmentsCount: form.installments,
         cardId: form.cardId,
         categoryId: form.categoryId || undefined
