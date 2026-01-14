@@ -93,9 +93,31 @@ export default defineEventHandler(async (event) => {
     })
   })
 
+  // Determine Invoice Status
+  let status = 'OPEN'
+  if (result.data.cardId) {
+    const invoiceRecord = await prisma.invoice.findUnique({
+      where: {
+        cardId_month_year: {
+          cardId: result.data.cardId,
+          month,
+          year
+        }
+      }
+    })
+    
+    if (invoiceRecord) {
+        status = invoiceRecord.status
+    } else {
+        // Optional: Check if it's past due to mark as CLOSED/OVERDUE?
+        // For MVP, if it doesn't exist, it's OPEN.
+    }
+  }
+
   return {
     month,
     year,
+    status, // New field
     total: totalInvoice,
     limit: totalLimit,
     available: totalLimit - totalInvoice,

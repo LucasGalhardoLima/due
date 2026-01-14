@@ -1,15 +1,20 @@
-<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { addMonths, subMonths, getMonth, getYear } from 'date-fns'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { toast } from 'vue-sonner'
+import { Check, AlertCircle } from 'lucide-vue-next'
 
 // Global State
 const currentDate = ref(new Date())
+const selectedCardId = ref<string>('all')
 
 // API Query Params
 const queryParams = computed(() => ({
     month: getMonth(currentDate.value) + 1,
-    year: getYear(currentDate.value)
+    year: getYear(currentDate.value),
+    cardId: selectedCardId.value === 'all' ? undefined : selectedCardId.value
 }))
 
 interface SummaryResponse {
@@ -19,6 +24,7 @@ interface SummaryResponse {
     limit: number
     available: number
     transactions: Record<string, any[]>
+    status?: 'OPEN' | 'PAID' | 'CLOSED'
 }
 
 // Fetch Data
@@ -80,6 +86,35 @@ const progressColor = computed(() => {
 })
 
 const showAlert = computed(() => usagePercentage.value >= 80)
+
+// Payment Logic
+const showPayConfirm = ref(false)
+
+function onPayClick() {
+    showPayConfirm.value = true
+}
+
+async function handlePayInvoice() {
+    if (selectedCardId.value === 'all') return
+
+    try {
+        await $fetch('/api/invoices/pay', {
+            method: 'POST',
+            body: {
+                cardId: selectedCardId.value,
+                month: getMonth(currentDate.value) + 1,
+                year: getYear(currentDate.value)
+            }
+        })
+        
+        // Optimistic Update / Refresh
+        await refreshSummary()
+        toast.success('Fatura paga com sucesso!')
+    } catch (e) {
+        console.error(e)
+        toast.error('Erro ao pagar fatura')
+    }
+}
 </script>
 
 <template>
@@ -108,9 +143,23 @@ const showAlert = computed(() => usagePercentage.value >= 80)
 
     <!-- Main Dashboard Content -->
     <template v-else>
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
       <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
-
+      
+      <!-- Card Filter -->
+      <div class="w-full md:w-[200px]">
+        <Select v-model="selectedCardId">
+          <SelectTrigger>
+            <SelectValue placeholder="Todos os Cartões" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os Cartões</SelectItem>
+            <SelectItem v-for="card in cards" :key="card.id" :value="card.id">
+              {{ card.name }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
 
     <!-- Month Navigation & Main KPI -->
@@ -141,6 +190,17 @@ const showAlert = computed(() => usagePercentage.value >= 80)
                 <span>Disponível: <span class="text-green-600 font-medium">{{ formatCurrency(summary?.available || 0) }}</span></span>
             </div>
             
+            <!-- Invoice Status Badge (Only for specific card) -->
+            <div v-if="selectedCardId !== 'all' && summary?.status" class="flex justify-center mt-2">
+                <span 
+                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    :class="summary.status === 'PAID' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'"
+                >
+                    <component :is="summary.status === 'PAID' ? Check : AlertCircle" class="w-3 h-3" />
+                    {{ summary.status === 'PAID' ? 'Fatura Paga' : 'Fatura Aberta' }}
+                </span>
+            </div>
+            
             <!-- Alert Badge -->
             <div v-if="showAlert" class="flex items-center justify-center gap-2 mt-2" :class="usagePercentage >= 100 ? 'text-red-600' : 'text-yellow-600'">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -165,6 +225,20 @@ const showAlert = computed(() => usagePercentage.value >= 80)
             <!-- Percentage display -->
             <div class="text-xs text-muted-foreground mt-1">
               {{ usagePercentage.toFixed(1) }}% do limite utilizado
+            </div>
+
+            <!-- Pay Button (Only if specific card and NOT paid) -->
+            <div v-if="selectedCardId !== 'all' && summary?.status !== 'PAID'" class="pt-4">
+                <button 
+                    @click="onPayClick"
+                    class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+                >
+                    Pagar Fatura
+                </button>
+            </div>
+            
+            <div v-else-if="selectedCardId !== 'all' && summary?.status === 'PAID'" class="pt-4 text-center text-sm text-green-600 font-medium">
+                Esta fatura já foi paga em {{ new Date().toLocaleDateString() /* TODO: Store pay date */ }}
             </div>
         </div>
     </div>
@@ -224,6 +298,14 @@ const showAlert = computed(() => usagePercentage.value >= 80)
     </div>
 
     <TransactionDrawer v-model:open="isDrawerOpen" @saved="onSaved" />
+
+    <ConfirmDialog 
+      v-model:open="showPayConfirm"
+      title="Pagar Fatura?"
+      description="Isso marcará a fatura deste mês como paga. O limite será liberado no próximo ciclo (simulação)."
+      confirm-text="Confirmar Pagamento"
+      @confirm="handlePayInvoice"
+    />
 
     </template>
   </div>
