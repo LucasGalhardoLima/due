@@ -83,17 +83,17 @@ async function onSubmit() {
         <p class="text-sm text-muted-foreground">Cadastre o que falta pagar das suas compras antigas.</p>
       </div>
       <div class="p-6 pt-0">
-        <form @submit.prevent="onSubmit" class="space-y-4">
+        <form class="space-y-4" @submit.prevent="onSubmit">
           
           <div class="space-y-2">
             <label class="text-sm font-medium" for="description">O que você comprou?</label>
             <input 
               id="description"
-              type="text" 
-              v-model="form.description"
+              v-model="form.description" 
+              type="text"
               placeholder="Ex: TV Sala" 
               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            />
+            >
             <p v-if="errors.description" class="text-sm text-destructive">{{ errors.description }}</p>
           </div>
 
@@ -102,12 +102,12 @@ async function onSubmit() {
               <label class="text-sm font-medium" for="installmentValue">Valor da Parcela</label>
               <input 
                 id="installmentValue"
+                v-model.number="form.installmentValue" 
                 type="number" 
-                step="0.01" 
-                v-model.number="form.installmentValue"
+                step="0.01"
                 placeholder="R$ 100,00" 
                 class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              />
+              >
               <p v-if="errors.installmentValue" class="text-sm text-destructive">{{ errors.installmentValue }}</p>
             </div>
 
@@ -115,11 +115,11 @@ async function onSubmit() {
               <label class="text-sm font-medium" for="remainingInstallments">Faltam quantas?</label>
               <input 
                 id="remainingInstallments"
-                type="number" 
-                v-model.number="form.remainingInstallments"
+                v-model.number="form.remainingInstallments" 
+                type="number"
                 placeholder="Ex: 4" 
                 class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              />
+              >
               <p v-if="errors.remainingInstallments" class="text-sm text-destructive">{{ errors.remainingInstallments }}</p>
             </div>
           </div>

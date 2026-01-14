@@ -84,7 +84,7 @@ async function onSubmit() {
       <NuxtLink to="/cards" class="font-medium underline mt-2 block">Cadastrar Cartão</NuxtLink>
     </div>
 
-    <form v-else @submit.prevent="onSubmit" class="space-y-6">
+    <form v-else class="space-y-6" @submit.prevent="onSubmit">
       
       <!-- Descrição -->
       <div class="space-y-2">
@@ -95,7 +95,7 @@ async function onSubmit() {
           placeholder="Ex: Almoço, Uber, Assinatura" 
           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           required
-        />
+        >
       </div>
 
       <!-- Valor -->
@@ -103,13 +103,13 @@ async function onSubmit() {
         <label class="text-sm font-medium leading-none" for="amount">Valor Total (R$)</label>
         <input 
           id="amount" 
-          type="number" 
-          step="0.01"
           v-model.number="form.amount" 
+          type="number"
+          step="0.01" 
           placeholder="0,00" 
           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           required
-        />
+        >
       </div>
 
       <div class="grid grid-cols-2 gap-4">
@@ -118,11 +118,11 @@ async function onSubmit() {
           <label class="text-sm font-medium leading-none" for="date">Data da Compra</label>
           <input 
             id="date" 
-            type="date" 
             v-model="form.date" 
+            type="date" 
             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             required
-          />
+          >
         </div>
 
         <!-- Parcelas -->
@@ -130,12 +130,12 @@ async function onSubmit() {
           <label class="text-sm font-medium leading-none" for="installments">Parcelas</label>
           <input 
             id="installments" 
+            v-model.number="form.installments" 
             type="number" 
             min="1" 
             max="24" 
-            v-model.number="form.installments" 
             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          />
+          >
         </div>
       </div>
 

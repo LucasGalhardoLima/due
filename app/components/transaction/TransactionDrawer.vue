@@ -220,8 +220,8 @@ function togglePaymentType(type: 'cash' | 'installment') {
           <div>
             <Label class="text-sm text-muted-foreground">Data da Compra</Label>
             <Input 
-              type="date" 
               v-model="purchaseDate" 
+              type="date" 
               :max="new Date().toISOString().split('T')[0]"
               class="mt-1"
             />
@@ -261,16 +261,16 @@ function togglePaymentType(type: 'cash' | 'installment') {
               <Button 
                 type="button"
                 :variant="paymentType === 'cash' ? 'default' : 'outline'"
-                @click="togglePaymentType('cash')"
                 class="w-full"
+                @click="togglePaymentType('cash')"
               >
                 À Vista
               </Button>
               <Button 
                 type="button"
                 :variant="paymentType === 'installment' ? 'default' : 'outline'"
-                @click="togglePaymentType('installment')"
                 class="w-full"
+                @click="togglePaymentType('installment')"
               >
                 Parcelado
               </Button>
@@ -301,7 +301,7 @@ function togglePaymentType(type: 'cash' | 'installment') {
         </div>
 
         <DrawerFooter>
-          <Button @click="save" size="lg" class="w-full text-lg h-12">
+          <Button size="lg" class="w-full text-lg h-12" @click="save">
             Confirmar R$ {{ amount.toFixed(2) }}
           </Button>
           <DrawerClose as-child>

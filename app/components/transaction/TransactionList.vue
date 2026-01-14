@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { LucideShoppingBag, LucideCreditCard, LucideUtensils, LucideCar, LucideHome } from 'lucide-vue-next'
 
-const props = defineProps<{
+const { transactions } = defineProps<{
     transactions: Record<string, any[]>
 }>()
 

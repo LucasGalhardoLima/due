@@ -110,7 +110,7 @@ async function save() {
             </div>
         </div>
 
-        <Button @click="save" class="w-full">
+        <Button class="w-full" @click="save">
             Importar
         </Button>
     </div>

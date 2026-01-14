@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
+    '@nuxt/eslint',
     // '@nuxtjs/supabase', // Not needed for MVP with local SQLite
   ],
   // supabase: {

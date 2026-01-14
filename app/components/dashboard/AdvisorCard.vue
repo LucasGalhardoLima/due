@@ -35,11 +35,12 @@ const iconColors = {
 
 <template>
   <div v-if="loading" class="animate-pulse rounded-xl border p-6 space-y-3">
-    <div class="h-4 w-1/3 bg-muted rounded"></div>
-    <div class="h-16 w-full bg-muted rounded"></div>
+    <div class="h-4 w-1/3 bg-muted rounded"/>
+    <div class="h-16 w-full bg-muted rounded"/>
   </div>
 
-  <div v-else-if="analysis" 
+  <div
+v-else-if="analysis" 
     class="rounded-xl border p-6 relative overflow-hidden transition-all duration-300"
     :class="bgColors[analysis.severity]"
   >

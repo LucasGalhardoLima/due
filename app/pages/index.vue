@@ -1,10 +1,15 @@
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { addMonths, subMonths, getMonth, getYear } from 'date-fns'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'vue-sonner'
-import { Check, AlertCircle } from 'lucide-vue-next'
+import { Check, AlertCircle, Sparkles, Loader2  } from 'lucide-vue-next'
+
+import TransactionList from '@/components/transaction/TransactionList.vue'
+import InsightCard from '@/components/dashboard/InsightCard.vue'
+import AdvisorCard from '@/components/dashboard/AdvisorCard.vue'
 
 // Global State
 const currentDate = ref(new Date())
@@ -60,11 +65,6 @@ function prevMonth() {
     currentDate.value = subMonths(currentDate.value, 1)
 }
 
-import TransactionList from '@/components/transaction/TransactionList.vue'
-import InsightCard from '@/components/dashboard/InsightCard.vue'
-import AdvisorCard from '@/components/dashboard/AdvisorCard.vue'
-import { Sparkles, Loader2 } from 'lucide-vue-next'
-
 const isDrawerOpen = ref(false)
 function onSaved() {
   // Optimistic update handles the immediate feedback.
@@ -119,9 +119,17 @@ async function handlePayInvoice() {
 }
 
 // Advisor Logic
+interface AdvisorAnalysis {
+    verdict: string
+    severity: 'info' | 'warning' | 'critical'
+    title: string
+    message: string
+    action: string
+}
+
 const showAdvisor = ref(false)
 const advisorLoading = ref(false)
-const advisorResult = ref(null)
+const advisorResult = ref<AdvisorAnalysis | null>(null)
 
 async function runAnalysis() {
     if (showAdvisor.value && advisorResult.value) {
@@ -134,7 +142,7 @@ async function runAnalysis() {
     advisorResult.value = null // Reset
 
     try {
-        const result = await $fetch('/api/advisor/analyze', {
+        const result = await $fetch<AdvisorAnalysis>('/api/advisor/analyze', {
             method: 'POST',
             body: {
                 month: getMonth(currentDate.value) + 1,
@@ -182,8 +190,8 @@ async function runAnalysis() {
       <div class="flex items-center gap-3">
           <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
           <button 
-            @click="runAnalysis"
             class="flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-sm font-medium transition-colors hover:bg-indigo-200 dark:hover:bg-indigo-900/50"
+            @click="runAnalysis"
           >
             <Sparkles v-if="!advisorLoading" class="w-4 h-4" />
             <Loader2 v-else class="w-4 h-4 animate-spin" />
@@ -220,13 +228,13 @@ async function runAnalysis() {
         </div>
 
         <div class="flex items-center space-x-4 bg-muted/30 p-2 rounded-full">
-            <button @click="prevMonth" class="p-2 hover:bg-muted rounded-full transition-colors">
+            <button class="p-2 hover:bg-muted rounded-full transition-colors" @click="prevMonth">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </button>
             <span class="font-semibold text-lg min-w-[120px] text-center">
                 {{ getMonthName(summary?.month || 1) }}/{{ summary?.year }}
             </span>
-            <button @click="nextMonth" class="p-2 hover:bg-muted rounded-full transition-colors">
+            <button class="p-2 hover:bg-muted rounded-full transition-colors" @click="nextMonth">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </button>
         </div>
@@ -280,8 +288,8 @@ async function runAnalysis() {
             <!-- Pay Button (Only if specific card and NOT paid) -->
             <div v-if="selectedCardId !== 'all' && summary?.status !== 'PAID'" class="pt-4">
                 <button 
-                    @click="onPayClick"
                     class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+                    @click="onPayClick"
                 >
                     Pagar Fatura
                 </button>
@@ -300,7 +308,8 @@ async function runAnalysis() {
       </div>
       <div class="p-6 pt-0">
         <div class="grid gap-4 md:grid-cols-3">
-          <div v-for="proj in futureProjection?.projections" :key="`${proj.month}-${proj.year}`" 
+          <div
+v-for="proj in futureProjection?.projections" :key="`${proj.month}-${proj.year}`" 
                class="flex flex-col p-4 rounded-lg bg-muted/50 border">
             <span class="text-sm font-medium text-muted-foreground uppercase">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
             <span class="text-xl font-bold mt-1">{{ formatCurrency(proj.total || 0) }}</span>
@@ -323,7 +332,7 @@ async function runAnalysis() {
             <span class="text-muted-foreground">{{ formatCurrency(cat.total) }} ({{ cat.percentage }}%)</span>
           </div>
           <div class="h-2 w-full rounded-full bg-secondary">
-            <div class="h-2 rounded-full bg-primary" :style="{ width: `${cat.percentage}%` }"></div>
+            <div class="h-2 rounded-full bg-primary" :style="{ width: `${cat.percentage}%` }"/>
           </div>
         </div>
         <div v-if="!pareto?.categories?.length" class="text-sm text-muted-foreground py-4">
@@ -342,7 +351,7 @@ async function runAnalysis() {
     <!-- Quick Add Button (Floating or Inline) -->
     <!-- We will add functionality later, for now just a link/button placeholder -->
     <div class="fixed bottom-8 right-8">
-      <button @click="isDrawerOpen = true" class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors">
+      <button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors" @click="isDrawerOpen = true">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
       </button>
     </div>
