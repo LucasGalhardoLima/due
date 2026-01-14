@@ -14,7 +14,7 @@ import Toaster from '@/components/ui/Toaster.vue'
 
 <style>
 /* Import via CSS to ensure it loads */
-@import 'vue-sonner/lib/styles.css';
+@import 'vue-sonner/lib/index.css';
 
 .page-enter-active,
 .page-leave-active {
