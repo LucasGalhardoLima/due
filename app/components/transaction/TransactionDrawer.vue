@@ -27,10 +27,25 @@ const description = ref('')
 const installments = ref([1])
 const selectedCategoryId = ref<string>('')
 const selectedCardId = ref<string>('')
+const paymentType = ref<'cash' | 'installment'>('cash')
+const purchaseDate = ref(new Date().toISOString().split('T')[0]) // YYYY-MM-DD format
 
 // Data Fetching
 const { data: cards } = await useFetch<any[]>('/api/cards')
 const { data: categories } = await useFetch<any[]>('/api/categories') 
+
+// Auto-select default card when cards load
+watch(cards, (newCards) => {
+  if (newCards && newCards.length > 0 && !selectedCardId.value) {
+    const defaultCard = newCards.find(c => c.isDefault)
+    if (defaultCard) {
+      selectedCardId.value = defaultCard.id
+    } else {
+      // If no default, select first card
+      selectedCardId.value = newCards[0].id
+    }
+  }
+}, { immediate: true })
 
 // Computed
 const isOpen = computed({
@@ -50,7 +65,7 @@ async function save() {
         installmentsCount: installments.value[0],
         cardId: selectedCardId.value,
         categoryId: selectedCategoryId.value || undefined, // Backend handles default
-        purchaseDate: new Date().toISOString()
+        purchaseDate: new Date(purchaseDate.value).toISOString()
       }
     })
     
@@ -58,6 +73,8 @@ async function save() {
     amount.value = 0
     description.value = ''
     installments.value = [1]
+    paymentType.value = 'cash'
+    purchaseDate.value = new Date().toISOString().split('T')[0]
     isOpen.value = false
     emit('saved')
   } catch (e) {
@@ -70,6 +87,15 @@ async function save() {
 function setInstallments(n: number) {
     installments.value = [n]
 }
+
+// Toggle payment type
+function togglePaymentType(type: 'cash' | 'installment') {
+  paymentType.value = type
+  if (type === 'cash') {
+    installments.value = [1]
+  }
+}
+
 
 </script>
 
@@ -92,6 +118,17 @@ function setInstallments(n: number) {
           <!-- Description -->
           <div>
             <Input v-model="description" placeholder="Descrição (ex: Almoço)" />
+          </div>
+
+          <!-- Date -->
+          <div>
+            <Label class="text-sm text-muted-foreground">Data da Compra</Label>
+            <Input 
+              type="date" 
+              v-model="purchaseDate" 
+              :max="new Date().toISOString().split('T')[0]"
+              class="mt-1"
+            />
           </div>
 
           <!-- Card & Category -->
@@ -121,8 +158,31 @@ function setInstallments(n: number) {
             </Select>
           </div>
 
-          <!-- Installments -->
-          <div class="space-y-4">
+          <!-- Payment Type Toggle -->
+          <div class="space-y-3">
+            <Label>Tipo de Pagamento</Label>
+            <div class="grid grid-cols-2 gap-2">
+              <Button 
+                type="button"
+                :variant="paymentType === 'cash' ? 'default' : 'outline'"
+                @click="togglePaymentType('cash')"
+                class="w-full"
+              >
+                À Vista
+              </Button>
+              <Button 
+                type="button"
+                :variant="paymentType === 'installment' ? 'default' : 'outline'"
+                @click="togglePaymentType('installment')"
+                class="w-full"
+              >
+                Parcelado
+              </Button>
+            </div>
+          </div>
+
+          <!-- Installments (only if parcelado) -->
+          <div v-if="paymentType === 'installment'" class="space-y-4">
             <div class="flex justify-between items-center">
                 <Label>Parcelas</Label>
                 <span class="font-bold text-lg">{{ installments[0] }}x</span>
