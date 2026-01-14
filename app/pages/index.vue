@@ -65,6 +65,21 @@ function onSaved() {
   // but here we just added a transaction, so maybe we need to force update?
   // Ideally use a global store or event bus, but for now it's fine.
 }
+
+// Progress bar computed properties
+const usagePercentage = computed(() => {
+  if (!summary.value || !summary.value.limit) return 0
+  return Math.min((summary.value.total / summary.value.limit) * 100, 100)
+})
+
+const progressColor = computed(() => {
+  const pct = usagePercentage.value
+  if (pct >= 100) return 'bg-red-600'
+  if (pct >= 80) return 'bg-yellow-500'
+  return 'bg-green-600'
+})
+
+const showAlert = computed(() => usagePercentage.value >= 80)
 </script>
 
 <template>
@@ -126,11 +141,30 @@ function onSaved() {
                 <span>Disponível: <span class="text-green-600 font-medium">{{ formatCurrency(summary?.available || 0) }}</span></span>
             </div>
             
-            <!-- Safe gauge bar -->
+            <!-- Alert Badge -->
+            <div v-if="showAlert" class="flex items-center justify-center gap-2 mt-2" :class="usagePercentage >= 100 ? 'text-red-600' : 'text-yellow-600'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                <path d="M12 9v4"/>
+                <path d="M12 17h.01"/>
+              </svg>
+              <span class="text-sm font-medium">
+                {{ usagePercentage >= 100 ? 'Limite ultrapassado!' : 'Atenção ao limite' }}
+              </span>
+            </div>
+
+            <!-- Dynamic gauge bar -->
             <div class="w-full bg-secondary h-2 rounded-full mt-4 overflow-hidden">
-                <div class="bg-primary h-full transition-all duration-500" 
-                     :style="{ width: `${Math.min(((summary?.total || 0) / (summary?.limit || 1)) * 100, 100)}%` }">
-                </div>
+                <div 
+                  :class="progressColor" 
+                  class="h-full transition-all duration-500" 
+                  :style="{ width: `${usagePercentage}%` }"
+                />
+            </div>
+            
+            <!-- Percentage display -->
+            <div class="text-xs text-muted-foreground mt-1">
+              {{ usagePercentage.toFixed(1) }}% do limite utilizado
             </div>
         </div>
     </div>
