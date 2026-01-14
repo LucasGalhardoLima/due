@@ -23,6 +23,7 @@ interface SummaryResponse {
 
 // Fetch Data
 const { data: summary, refresh: refreshSummary } = await useFetch<SummaryResponse>('/api/invoices/summary', {
+    key: 'dashboard-summary', // Enable global access for optimistic updates
     query: queryParams
 })
 
@@ -58,12 +59,11 @@ import InsightCard from '@/components/dashboard/InsightCard.vue'
 
 const isDrawerOpen = ref(false)
 function onSaved() {
-  refreshSummary()
+  // Optimistic update handles the immediate feedback.
+  // We can let the background refresh happen naturally or trigger validaton here if needed.
+  // But strictly speaking, the Drawer will trigger the 'dashboard-summary' refresh.
   refreshFuture()
   refreshPareto()
-  // Insight component watches props, so it might auto update if month changes, 
-  // but here we just added a transaction, so maybe we need to force update?
-  // Ideally use a global store or event bus, but for now it's fine.
 }
 
 // Progress bar computed properties

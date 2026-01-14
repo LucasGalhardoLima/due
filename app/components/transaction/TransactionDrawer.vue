@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import CurrencyInput from '@/components/ui/CurrencyInput.vue'
+import { format } from 'date-fns'
 
 const props = defineProps<{
   open: boolean
@@ -50,36 +51,95 @@ watch(cards, (newCards) => {
 // Computed
 const isOpen = computed({
   get: () => props.open,
-  set: (val) => emit('update:open', val)
+  set: (val: boolean) => emit('update:open', val)
 })
 
 async function save() {
   if (amount.value <= 0 || !selectedCardId.value || !description.value) return
 
+  // 1. Prepare Payload
+  const payload = {
+    amount: amount.value,
+    description: description.value,
+    installmentsCount: installments.value[0],
+    cardId: selectedCardId.value,
+    categoryId: selectedCategoryId.value || undefined, 
+    purchaseDate: new Date(purchaseDate.value).toISOString()
+  }
+
+  // 2. OPTIMISTIC UPDATE SETUP
+  // Access the dashboard cache
+  const { data: summaryCache } = useNuxtData('dashboard-summary')
+  let previousData = null
+
+  // 3. Apply Optimistic Changes
+  if (summaryCache.value) {
+    // Snapshot for rollback
+    previousData = JSON.parse(JSON.stringify(summaryCache.value))
+
+    // Mutate KPIs
+    summaryCache.value.total += payload.amount
+    summaryCache.value.available -= payload.amount
+    
+    // Mutate List (Add temporary item)
+    // We try to find the date key. If not found, we create it.
+    // Note: purchaseDate is in YYYY-MM-DD format from the input
+    const pDateKey = purchaseDate.value
+    
+    // Create a "Optimistic Transaction" object
+    const optimisticTx = {
+       id: 'temp-' + Date.now(),
+       description: payload.description,
+       amount: payload.amount,
+       category: 'Processando...', // We don't have the category name resolved yet easily
+       categoryIcon: 'clock',
+       installmentNumber: 1,
+       totalInstallments: payload.installmentsCount,
+       cardName: '', // Could resolve from props, but keep simple
+       purchaseDate: payload.purchaseDate,
+       isOptimistic: true // Flag for UI to show spinner or opacity
+    }
+
+    if (!summaryCache.value.transactions[pDateKey]) {
+        summaryCache.value.transactions[pDateKey] = []
+    }
+    // Add to beginning of list
+    summaryCache.value.transactions[pDateKey].unshift(optimisticTx)
+  }
+
+  // Close UI immediately for "Native Feel"
+  const currentAmount = amount.value // save for reset
+  
+  // Reset Form
+  amount.value = 0
+  description.value = ''
+  installments.value = [1]
+  paymentType.value = 'cash'
+  purchaseDate.value = new Date().toISOString().split('T')[0]
+  isOpen.value = false
+
   try {
+    // 4. API Call
     await $fetch('/api/transactions', {
       method: 'POST',
-      body: {
-        amount: amount.value,
-        description: description.value,
-        installmentsCount: installments.value[0],
-        cardId: selectedCardId.value,
-        categoryId: selectedCategoryId.value || undefined, // Backend handles default
-        purchaseDate: new Date(purchaseDate.value).toISOString()
-      }
+      body: payload
     })
     
-    // Reset & Close
-    amount.value = 0
-    description.value = ''
-    installments.value = [1]
-    paymentType.value = 'cash'
-    purchaseDate.value = new Date().toISOString().split('T')[0]
-    isOpen.value = false
     emit('saved')
+    
+    // 5. Revalidation (Background)
+    // Refresh to get the real ID, real category name, real calculations
+    await refreshNuxtData('dashboard-summary')
+
   } catch (e) {
     console.error(e)
-    alert('Erro ao salvar')
+    alert('Erro ao salvar. Revertendo...')
+
+    // 6. Rollback on Error
+    if (summaryCache.value && previousData) {
+        summaryCache.value = previousData // Restore snapshot
+    }
+    // Re-open drawer or handle error UI
   }
 }
 
