@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Trash2 } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
 const form = reactive({
   name: '',
@@ -8,7 +9,16 @@ const form = reactive({
   dueDay: 10,
 })
 
-const { data: cards, refresh } = await useFetch('/api/cards')
+interface Card {
+  id: string
+  name: string
+  limit: number
+  closingDay: number
+  dueDay: number
+  isDefault: boolean
+}
+
+const { data: cards, refresh } = await useFetch<Card[]>('/api/cards')
 
 async function onSubmit() {
   await $fetch('/api/cards', {
@@ -23,7 +33,7 @@ async function onSubmit() {
   form.dueDay = 10
   
   await refresh()
-  alert('Cartão adicionado!')
+  toast.success('Cartão adicionado!')
 }
 
 async function deleteCard(id: string) {

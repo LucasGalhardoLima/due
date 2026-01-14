@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
 // Using Vue reactive instead of vee-validate to avoid SSR issues
 const form = reactive({
   description: '',
@@ -64,7 +65,7 @@ async function onSubmit() {
     }
   })
   
-  alert('Despesa legada adicionada!')
+  toast.success('Despesa legada adicionada!')
   
   // Reset form
   form.description = ''

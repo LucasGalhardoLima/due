@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { toast } from 'vue-sonner'
 // Quick Expense Add Page
 
 const router = useRouter()
@@ -16,14 +17,15 @@ const form = reactive({
 
 // Set defaults if available
 watchEffect(() => {
-  if (cards.value?.length && !form.cardId) {
+  if (cards.value && cards.value.length > 0 && !form.cardId) {
     form.cardId = cards.value[0].id
   }
-  if (categories.value?.length && !form.categoryId) {
-    if (categories.value.some(c => c.name === 'Outros')) {
-      form.categoryId = categories.value.find(c => c.name === 'Outros')!.id
+  if (categories.value && categories.value.length > 0 && !form.categoryId) {
+    const defaultCat = categories.value.find(c => c.name === 'Outros')
+    if (defaultCat) {
+      form.categoryId = defaultCat.id
     } else {
-        form.categoryId = categories.value[0].id
+      form.categoryId = categories.value[0].id
     }
   }
 })
@@ -37,18 +39,18 @@ async function onSubmit() {
       body: {
         description: form.description,
         amount: form.amount,
-        purchaseDate: new Date(form.date).toISOString(),
+        purchaseDate: form.date ? new Date(form.date).toISOString() : new Date().toISOString(),
         installmentsCount: form.installments,
         cardId: form.cardId,
         categoryId: form.categoryId || undefined
       }
     })
     
-    alert('Despesa adicionada com sucesso!')
+    toast.success('Despesa adicionada com sucesso!')
     router.push('/')
   } catch (e) {
     console.error(e)
-    alert('Erro ao adicionar despesa')
+    toast.error('Erro ao adicionar despesa')
   }
 }
 </script>
