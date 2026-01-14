@@ -15,6 +15,19 @@ const selectedCategoryId = ref<string>('')
 const { data: cards } = await useFetch<any[]>('/api/cards')
 const { data: categories } = await useFetch<any[]>('/api/categories')
 
+// Auto-select default card when cards load
+watch(cards, (newCards) => {
+  if (newCards && newCards.length > 0 && !selectedCardId.value) {
+    const defaultCard = newCards.find(c => c.isDefault)
+    if (defaultCard) {
+      selectedCardId.value = defaultCard.id
+    } else {
+      // If no default, select first card
+      selectedCardId.value = newCards[0].id
+    }
+  }
+}, { immediate: true })
+
 async function save() {
   if (amountPerInstallment.value <= 0 || remainingInstallments.value < 1 || !selectedCardId.value) return
 
@@ -34,7 +47,9 @@ async function save() {
     amountPerInstallment.value = 0
     remainingInstallments.value = 1
     description.value = ''
-    alert('Dívida legada importada!')
+    
+    // Redirect to dashboard
+    await navigateTo('/')
   } catch (e) {
     console.error(e)
     alert('Erro ao importar')
