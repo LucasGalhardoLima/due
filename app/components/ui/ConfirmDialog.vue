@@ -10,24 +10,25 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-const props = defineProps<{
-  open: boolean
+const isOpen = defineModel<boolean>('open')
+
+defineProps<{
   title?: string
   description?: string
   confirmText?: string
   cancelText?: string
 }>()
 
-const emit = defineEmits(['update:open', 'confirm'])
+const emit = defineEmits(['confirm'])
 
 function onConfirm() {
   emit('confirm')
-  emit('update:open', false)
+  isOpen.value = false
 }
 </script>
 
 <template>
-  <AlertDialog :open="open" @update:open="(val) => emit('update:open', val)">
+  <AlertDialog :open="isOpen" @update:open="(val) => isOpen = val">
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>{{ title || 'Tem certeza?' }}</AlertDialogTitle>

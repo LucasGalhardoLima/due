@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
       where: { id }
     })
     return deletedCard
-  } catch (error) {
+  } catch {
     throw createError({
       statusCode: 404, // or 500 depending on error, assuming not found or constraint
       statusMessage: 'Card not found or could not be deleted',

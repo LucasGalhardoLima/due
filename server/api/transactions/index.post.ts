@@ -8,7 +8,8 @@ const createTransactionSchema = z.object({
   purchaseDate: z.string().datetime(), // ISO string
   installmentsCount: z.number().int().min(1).default(1),
   cardId: z.string().uuid(),
-  categoryId: z.string().uuid().optional() // Make optional for legacy load maybe? Or default 'Outros'
+  categoryId: z.string().uuid().optional(),
+  isSubscription: z.boolean().default(false)
 })
 
 export default defineEventHandler(async (event) => {
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { description, amount, purchaseDate, installmentsCount, cardId, categoryId } = result.data
+  const { description, amount, purchaseDate, installmentsCount, cardId, categoryId, isSubscription } = result.data
   const pDate = new Date(purchaseDate)
 
   // Fetch card to get closing date
@@ -68,7 +69,8 @@ export default defineEventHandler(async (event) => {
       purchaseDate: pDate,
       installmentsCount,
       cardId,
-      categoryId: finalCategoryId!, 
+      categoryId: finalCategoryId!,
+      isSubscription,
       installments: {
         create: plan.map(p => ({
             number: p.number,

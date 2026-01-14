@@ -1,5 +1,5 @@
 import prisma from '../../utils/prisma'
-import { startOfMonth, endOfMonth, addMonths, getMonth, getYear } from 'date-fns'
+import { startOfMonth, endOfMonth, getMonth, getYear } from 'date-fns'
 
 export default defineEventHandler(async () => {
   const now = new Date()

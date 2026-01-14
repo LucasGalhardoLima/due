@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { addMonths, subMonths, getMonth, getYear } from 'date-fns'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
@@ -28,7 +28,7 @@ interface SummaryResponse {
     total: number
     limit: number
     available: number
-    transactions: Record<string, any[]>
+    transactions: Record<string, unknown[]>
     status?: 'OPEN' | 'PAID' | 'CLOSED'
 }
 
@@ -152,7 +152,9 @@ async function runAnalysis() {
         })
         advisorResult.value = result
     } catch (e) {
-        toast.error('Não foi possível analisar a fatura.')
+        console.error(e)
+        const errorMessage = e instanceof Error ? e.message : 'Unknown error'
+        toast.error('Não foi possível analisar a fatura: ' + errorMessage)
         showAdvisor.value = false
     } finally {
         advisorLoading.value = false

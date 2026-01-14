@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { LucideShoppingBag, LucideCreditCard, LucideUtensils, LucideCar, LucideHome } from 'lucide-vue-next'
+import { LucideShoppingBag, LucideUtensils, LucideCar, LucideHome } from 'lucide-vue-next'
 
 const { transactions } = defineProps<{
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     transactions: Record<string, any[]>
 }>()
 
 function formatDate(dateStr: string) {
-    const d = new Date(dateStr)
     // Add timezone offset correction if needed, but split('T')[0] in backend + new Date here might interpret as UTC -> Local
     // For MVP simple logic:
     // If we receive "2023-01-01", input is YYYY-MM-DD.
@@ -25,6 +25,7 @@ function formatCurrency(val: number) {
 }
 
 // Icon Mapping
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const iconMap: Record<string, any> = {
     'Alimentação': LucideUtensils,
     'Transporte': LucideCar,

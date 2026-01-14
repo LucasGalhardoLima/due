@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps<{
   modelValue: number
@@ -8,38 +8,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 
-const formattedValue = computed(() => {
-  if (props.modelValue === 0 && !isFocused.value) return ''
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(props.modelValue)
-})
 
-const isFocused = ref(false)
-const rawInput = ref('')
-
-watch(() => props.modelValue, (val) => {
-    // If external change happens
-    if (val === 0) rawInput.value = ''
-})
-
-const handleInput = (e: Event) => {
-  const input = e.target as HTMLInputElement
-  const raw = input.value.replace(/\D/g, '')
-  
-  // Convert raw string of digits to number (cents)
-  const numberValue = Number(raw) / 100
-  
-  emit('update:modelValue', numberValue)
-  
-  // Force update display to keep formatting consistent while typing? 
-  // Usually better to show formatted value.
-  // Simple "Shift Left" logic:
-  // User types '1' -> 0,01
-  // Types '0' -> 0,10
-  // Types '0' -> 1,00
-}
 
 // Better approach for Vue:
 // Use a computed getter/setter or just direct input handling.

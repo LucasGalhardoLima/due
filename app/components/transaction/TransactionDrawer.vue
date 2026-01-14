@@ -15,7 +15,6 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import CurrencyInput from '@/components/ui/CurrencyInput.vue'
-import { format } from 'date-fns'
 
 const props = defineProps<{
   open: boolean
@@ -29,7 +28,7 @@ const description = ref('')
 const installments = ref([1])
 const selectedCategoryId = ref<string>('')
 const selectedCardId = ref<string>('')
-const paymentType = ref<'cash' | 'installment'>('cash')
+const paymentType = ref<'cash' | 'installment' | 'subscription'>('cash')
 const purchaseDate = ref(new Date().toISOString().split('T')[0]) // YYYY-MM-DD format
 
 // Data Fetching
@@ -77,7 +76,8 @@ async function save() {
     installmentsCount: installments.value[0] ?? 1,
     cardId: selectedCardId.value,
     categoryId: selectedCategoryId.value || undefined, 
-    purchaseDate: purchaseDate.value ? new Date(purchaseDate.value + 'T12:00:00Z').toISOString() : new Date().toISOString()
+    purchaseDate: purchaseDate.value ? new Date(purchaseDate.value + 'T12:00:00Z').toISOString() : new Date().toISOString(),
+    isSubscription: paymentType.value === 'subscription'
   }
 
   // 2. OPTIMISTIC UPDATE SETUP
@@ -143,7 +143,6 @@ async function save() {
   }
 
   // Close UI immediately for "Native Feel"
-  const currentAmount = amount.value // save for reset
   
   // Reset Form
   amount.value = 0
@@ -185,9 +184,9 @@ function setInstallments(n: number) {
 }
 
 // Toggle payment type
-function togglePaymentType(type: 'cash' | 'installment') {
+function togglePaymentType(type: 'cash' | 'installment' | 'subscription') {
   paymentType.value = type
-  if (type === 'cash') {
+  if (type === 'cash' || type === 'subscription') {
     installments.value = [1]
   }
 }
@@ -257,11 +256,11 @@ function togglePaymentType(type: 'cash' | 'installment') {
           <!-- Payment Type Toggle -->
           <div class="space-y-3">
             <Label>Tipo de Pagamento</Label>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-3 gap-2">
               <Button 
                 type="button"
                 :variant="paymentType === 'cash' ? 'default' : 'outline'"
-                class="w-full"
+                class="w-full text-xs px-1"
                 @click="togglePaymentType('cash')"
               >
                 À Vista
@@ -269,10 +268,18 @@ function togglePaymentType(type: 'cash' | 'installment') {
               <Button 
                 type="button"
                 :variant="paymentType === 'installment' ? 'default' : 'outline'"
-                class="w-full"
+                class="w-full text-xs px-1"
                 @click="togglePaymentType('installment')"
               >
                 Parcelado
+              </Button>
+              <Button 
+                type="button"
+                :variant="paymentType === 'subscription' ? 'default' : 'outline'"
+                class="w-full text-xs px-1"
+                @click="togglePaymentType('subscription')"
+              >
+                Assinatura
               </Button>
             </div>
           </div>

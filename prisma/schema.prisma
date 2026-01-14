@@ -43,6 +43,11 @@ model Transaction {
   categoryId    String
   category      Category   @relation(fields: [categoryId], references: [id])
 
+  // Controle de Recorrência (Assinaturas)
+  isSubscription    Boolean   @default(false)
+  active            Boolean   @default(true)
+  lastProcessedDate DateTime? 
+
   // Aqui está o segredo para performance e análise rápida
   // Ao invés de calcular na leitura, criamos os registros das parcelas
   installments  Installment[] 

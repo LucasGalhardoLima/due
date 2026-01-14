@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import prisma from '../../utils/prisma'
-import { startOfMonth, endOfMonth, parseISO, startOfDay, endOfDay } from 'date-fns'
+import { endOfMonth } from 'date-fns'
 
 const querySchema = z.object({
   month: z.string().optional(), // 1-12
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
   // But if it's an installment of a purchase made 5 months ago, showing "Jan 15" (purchase date) might be confusing if we are in June.
   // However, usually for the current invoice, we show the items.
   // Let's grouped by Purchase Date for context, but clarifying it's "Parcela X/Y".
-  const groupedTransactions: Record<string, any[]> = {}
+  const groupedTransactions: Record<string, unknown[]> = {}
   
   installments.forEach(inst => {
     // We group by Purchase Date (Day)

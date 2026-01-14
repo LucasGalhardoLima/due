@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import prisma from '../../utils/prisma'
-import { startOfMonth, endOfMonth } from 'date-fns'
+import { endOfMonth } from 'date-fns'
 
 const bodySchema = z.object({
   month: z.number().int().min(1).max(12),

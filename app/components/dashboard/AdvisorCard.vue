@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Bot, AlertTriangle, CheckCircle, Info } from 'lucide-vue-next'
+import { Bot } from 'lucide-vue-next'
 
-const props = defineProps<{
+defineProps<{
   analysis: {
     verdict: string
     severity: 'info' | 'warning' | 'critical'
@@ -12,7 +12,6 @@ const props = defineProps<{
   loading?: boolean
 }>()
 
-const emit = defineEmits(['close'])
 
 const bgColors = {
   info: 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900',

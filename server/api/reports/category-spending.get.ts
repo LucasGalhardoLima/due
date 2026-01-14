@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import prisma from '../../utils/prisma'
-import { startOfMonth, endOfMonth, subMonths } from 'date-fns'
+import { endOfMonth } from 'date-fns'
 
 const querySchema = z.object({
   month: z.string(), // 1-12
@@ -22,23 +22,8 @@ export default defineEventHandler(async (event) => {
   const startDate = new Date(year, month - 1, 1)
   const endDate = endOfMonth(startDate)
 
-  // 2. Fetch Aggregated Data (Prisma GroupBy is cleaner)
-  const categoryStats = await prisma.installment.groupBy({
-    by: ['transactionId'], // We need to reach transaction -> category
-    where: {
-        dueDate: {
-            gte: startDate,
-            lte: endDate
-        }
-    },
-    _sum: {
-        amount: true
-    }
-  })
-  
-  // Note: Prisma groupBy on relation fields (like Category) is tricky in SQLite/standard Prisma.
-  // Standard workaround: Fetch all installments with include, then aggregate in JS. 
-  // For MVP scale this is fine. For larger scale, raw query is better.
+  // 1. Fetch Installments with Include (Standard Method for SQLite/MVP)
+  // Instead of Prisma GroupBy which has limitations on relations
 
   const installments = await prisma.installment.findMany({
     where: {

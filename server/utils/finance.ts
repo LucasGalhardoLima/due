@@ -1,4 +1,4 @@
-import { addMonths, setDate, getDate, isAfter, setMonth, setYear, getMonth, getYear, startOfDay } from 'date-fns'
+import { addMonths, getDate, getMonth, getYear, startOfDay } from 'date-fns'
 
 interface InstallmentPlan {
   number: number
@@ -60,7 +60,6 @@ export const FinanceUtils = {
     closingDay: number,
     dueDay: number
   ): InstallmentPlan[] {
-    const installmentValue = Number((totalAmount / installmentsCount).toFixed(2))
     // Fix rounding issues on last installment if needed, but for MVP simpler is fine.
     // Better approach: Calculate remainder and add to first or last.
     // Let's do simple division for now, risking 0.01 cents diff.
