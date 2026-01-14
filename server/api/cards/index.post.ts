@@ -22,12 +22,17 @@ export default defineEventHandler(async (event) => {
 
   const { name, limit, closingDay, dueDay } = result.data
 
+  // Check if this is the first card - if so, make it default
+  const existingCardsCount = await prisma.creditCard.count()
+  const isDefault = existingCardsCount === 0
+
   const card = await prisma.creditCard.create({
     data: {
       name,
       limit,
       closingDay,
       dueDay,
+      isDefault,
     }
   })
 

@@ -25,6 +25,10 @@ interface SummaryResponse {
 const { data: summary, refresh: refreshSummary } = await useFetch<SummaryResponse>('/api/invoices/summary', {
     query: queryParams
 })
+
+// Fetch cards to check if user has any
+const { data: cards } = await useFetch('/api/cards')
+
 // Keep existing for now, but eventually replace with consolidated logic?
 // Keeping futureProjection and pareto for now as they are "Global" or "Future" insights not tied strictly to "Current Selection"
 // actually future projection is always "Next 3 months from NOW", so independent of selection.
@@ -65,6 +69,30 @@ function onSaved() {
 
 <template>
   <div class="container mx-auto px-4 py-8 space-y-8 pb-24">
+    <!-- Empty State: No Cards -->
+    <div v-if="!cards || cards.length === 0" class="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
+      <div class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+          <rect width="20" height="14" x="2" y="5" rx="2"/>
+          <line x1="2" x2="22" y1="10" y2="10"/>
+        </svg>
+      </div>
+      <div class="text-center space-y-2 max-w-md">
+        <h2 class="text-2xl font-bold">Vamos configurar seu cartão principal?</h2>
+        <p class="text-muted-foreground">
+          Para começar a controlar suas despesas, você precisa cadastrar pelo menos um cartão de crédito.
+        </p>
+      </div>
+      <NuxtLink 
+        to="/cards" 
+        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
+      >
+        Adicionar Primeiro Cartão
+      </NuxtLink>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <template v-else>
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
 
@@ -163,5 +191,6 @@ function onSaved() {
 
     <TransactionDrawer v-model:open="isDrawerOpen" @saved="onSaved" />
 
+    </template>
   </div>
 </template>
