@@ -13,6 +13,9 @@ import Toaster from '@/components/ui/Toaster.vue'
 </template>
 
 <style>
+/* Import via CSS to ensure it loads */
+@import 'vue-sonner/lib/styles.css';
+
 .page-enter-active,
 .page-leave-active {
   transition: all 0.2s;

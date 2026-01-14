@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Trash2 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 
 const form = reactive({
   name: '',
@@ -36,10 +37,29 @@ async function onSubmit() {
   toast.success('Cartão adicionado!')
 }
 
-async function deleteCard(id: string) {
-  if (!confirm('Tem certeza que deseja remover este cartão?')) return
-  await $fetch(`/api/cards/${id}`, { method: 'DELETE' })
-  await refresh()
+// Confirm Dialog State
+const showConfirm = ref(false)
+const cardToDelete = ref<string | null>(null)
+
+function confirmDelete(id: string) {
+  cardToDelete.value = id
+  showConfirm.value = true
+}
+
+async function handleDelete() {
+  if (!cardToDelete.value) return
+  
+  try {
+    await $fetch(`/api/cards/${cardToDelete.value}`, { method: 'DELETE' })
+    await refresh()
+    toast.success('Cartão removido com sucesso')
+  } catch (e) {
+    console.error(e)
+    toast.error('Erro ao remover cartão')
+  } finally {
+    showConfirm.value = false
+    cardToDelete.value = null
+  }
 }
 </script>
 
@@ -123,7 +143,7 @@ async function deleteCard(id: string) {
               Padrão
             </span>
           </div>
-          <button @click="deleteCard(card.id)" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+          <button @click="confirmDelete(card.id)" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
             <Trash2 class="h-4 w-4 text-destructive" />
           </button>
         </div>
@@ -135,6 +155,16 @@ async function deleteCard(id: string) {
         </div>
       </div>
     </div>
+    
+    <!-- Confirm Dialog -->
+    <ConfirmDialog 
+      v-model:open="showConfirm"
+      title="Remover cartão?"
+      description="Esta ação removerá o cartão e não poderá ser desfeita. Transações vinculadas poderão ficar sem cartão associado."
+      confirm-text="Sim, remover"
+      cancel-text="Cancelar"
+      @confirm="handleDelete"
+    />
     
   </div>
 </template>
