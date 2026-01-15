@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { addMonths, subMonths, getMonth, getYear } from 'date-fns'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
@@ -28,6 +28,7 @@ interface SummaryResponse {
     year: number
     total: number
     limit: number
+    budget?: number
     available: number
     transactions: Record<string, unknown[]>
     status?: 'OPEN' | 'PAID' | 'CLOSED'
@@ -42,9 +43,7 @@ const { data: summary, refresh: refreshSummary } = await useFetch<SummaryRespons
 // Fetch cards to check if user has any
 const { data: cards } = await useFetch('/api/cards')
 
-// Keep existing for now, but eventually replace with consolidated logic?
-// Keeping futureProjection and pareto for now as they are "Global" or "Future" insights not tied strictly to "Current Selection"
-// actually future projection is always "Next 3 months from NOW", so independent of selection.
+// Keeping futureProjection and pareto for now
 const { data: futureProjection, refresh: refreshFuture } = await useFetch('/api/dashboard/future-projection')
 const { data: pareto, refresh: refreshPareto } = await useFetch('/api/dashboard/pareto')
 
@@ -76,7 +75,6 @@ function handleEdit(tx: any) {
 // Reset ID when drawer closes
 watch(isDrawerOpen, (val) => {
   if (!val) {
-    // Small delay to allow animation to finish if needed, or immediate.
     setTimeout(() => {
         editingTransactionId.value = null
     }, 300)
@@ -84,27 +82,36 @@ watch(isDrawerOpen, (val) => {
 })
 
 function onSaved() {
-  // Optimistic update handles the immediate feedback.
-  // We can let the background refresh happen naturally or trigger validaton here if needed.
-  // But strictly speaking, the Drawer will trigger the 'dashboard-summary' refresh.
   refreshFuture()
   refreshPareto()
 }
 
 // Progress bar computed properties
 const usagePercentage = computed(() => {
-  if (!summary.value || !summary.value.limit) return 0
-  return Math.min((summary.value.total / summary.value.limit) * 100, 100)
+  if (!summary.value) return 0
+  // Use Budget if exists and > 0, otherwise Limit
+  const base = (summary.value.budget && summary.value.budget > 0) ? summary.value.budget : summary.value.limit
+  if (!base || base === 0) return 0
+  return Math.min((summary.value.total / base) * 100, 100)
+})
+
+const isOverBudget = computed(() => {
+    if (!summary.value || !summary.value.budget) return false
+    return summary.value.total > summary.value.budget
 })
 
 const progressColor = computed(() => {
   const pct = usagePercentage.value
-  if (pct >= 100) return 'bg-red-600'
-  if (pct >= 80) return 'bg-yellow-500'
+  // Game Logic:
+  // 90%+ : Red (Danger)
+  // 70-90% : Yellow (Warning)
+  // 0-70% : Green (Safe)
+  if (pct >= 90) return 'bg-red-600'
+  if (pct >= 70) return 'bg-yellow-500'
   return 'bg-green-600'
 })
 
-const showAlert = computed(() => usagePercentage.value >= 80)
+const showAlert = computed(() => usagePercentage.value >= 70)
 
 // Payment Logic
 const showPayConfirm = ref(false)
@@ -126,7 +133,6 @@ async function handlePayInvoice() {
             }
         })
         
-        // Optimistic Update / Refresh
         await refreshSummary()
         toast.success('Fatura paga com sucesso!')
     } catch (e) {
@@ -262,7 +268,11 @@ async function runAnalysis() {
             <div class="text-sm text-muted-foreground uppercase tracking-wide">Fatura Estimada</div>
             <div class="text-4xl font-bold text-primary">{{ formatCurrency(summary?.total || 0) }}</div>
             <div class="text-xs text-muted-foreground flex justify-center gap-2">
-                <span>Limite: {{ formatCurrency(summary?.limit || 0) }}</span>
+                <span v-if="summary?.budget && summary.budget > 0" class="font-medium text-indigo-600">
+                    Meta: {{ formatCurrency(summary.budget) }}
+                </span>
+                <span v-else>Limite: {{ formatCurrency(summary?.limit || 0) }}</span>
+                
                 <span>•</span>
                 <span>Disponível: <span class="text-green-600 font-medium">{{ formatCurrency(summary?.available || 0) }}</span></span>
             </div>
@@ -279,29 +289,25 @@ async function runAnalysis() {
             </div>
             
             <!-- Alert Badge -->
-            <div v-if="showAlert" class="flex items-center justify-center gap-2 mt-2" :class="usagePercentage >= 100 ? 'text-red-600' : 'text-yellow-600'">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                <path d="M12 9v4"/>
-                <path d="M12 17h.01"/>
-              </svg>
+            <div v-if="showAlert" class="flex items-center justify-center gap-2 mt-2" :class="usagePercentage >= 90 ? 'text-red-600' : 'text-yellow-600'">
+              <component :is="usagePercentage >= 90 ? AlertCircle : Sparkles" class="w-4 h-4" />
               <span class="text-sm font-medium">
-                {{ usagePercentage >= 100 ? 'Limite ultrapassado!' : 'Atenção ao limite' }}
+                {{ usagePercentage >= 100 ? (isOverBudget ? 'Meta estourada!' : 'Limite atingido!') : (usagePercentage >= 90 ? 'Zona de Perigo (90%+)' : 'Atenção (70%+)') }}
               </span>
             </div>
 
             <!-- Dynamic gauge bar -->
-            <div class="w-full bg-secondary h-2 rounded-full mt-4 overflow-hidden">
+            <div class="w-full bg-secondary h-2 rounded-full mt-4 overflow-hidden relative">
                 <div 
-                  :class="progressColor" 
-                  class="h-full transition-all duration-500" 
+                  :class="[progressColor, usagePercentage >= 90 && 'animate-pulse']" 
+                  class="h-full transition-all duration-700 ease-out" 
                   :style="{ width: `${usagePercentage}%` }"
                 />
             </div>
             
             <!-- Percentage display -->
             <div class="text-xs text-muted-foreground mt-1">
-              {{ usagePercentage.toFixed(1) }}% do limite utilizado
+              {{ usagePercentage.toFixed(1) }}% da {{ (summary?.budget && summary.budget > 0) ? 'meta' : 'fatura' }} utilizada
             </div>
 
             <!-- Pay Button (Only if specific card and NOT paid) -->

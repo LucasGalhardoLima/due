@@ -58,12 +58,17 @@ export default defineEventHandler(async (event) => {
   // If no cardId, we sum limits of ALL cards? Or just show "N/A"?
   // Let's sum all cards limits for "Global View" logic.
   let totalLimit = 0
+  let totalBudget = 0
+
   if (result.data.cardId) {
     const card = await prisma.creditCard.findUnique({ where: { id: result.data.cardId } })
     totalLimit = card?.limit || 0
+    totalBudget = card?.budget || 0
   } else {
     const cards = await prisma.creditCard.findMany()
     totalLimit = cards.reduce((acc, c) => acc + c.limit, 0)
+    // Sum budgets, treating null as 0
+    totalBudget = cards.reduce((acc, c) => acc + (c.budget || 0), 0)
   }
 
   // Group Transactions by Date
@@ -123,6 +128,7 @@ export default defineEventHandler(async (event) => {
     status, // New field
     total: totalInvoice,
     limit: totalLimit,
+    budget: totalBudget,
     available: totalLimit - totalInvoice,
     transactions: groupedTransactions
   }

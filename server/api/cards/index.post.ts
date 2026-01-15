@@ -4,6 +4,7 @@ import prisma from '../../utils/prisma'
 const createCardSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   limit: z.number().min(0, 'Limite deve ser positivo'),
+  budget: z.number().min(0).optional(),
   closingDay: z.number().min(1).max(31),
   dueDay: z.number().min(1).max(31),
 })
@@ -20,7 +21,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { name, limit, closingDay, dueDay } = result.data
+  const { name, limit, budget, closingDay, dueDay } = result.data
 
   // Check if this is the first card - if so, make it default
   const existingCardsCount = await prisma.creditCard.count()
@@ -30,6 +31,7 @@ export default defineEventHandler(async (event) => {
     data: {
       name,
       limit,
+      budget,
       closingDay,
       dueDay,
       isDefault,

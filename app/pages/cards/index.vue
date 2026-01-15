@@ -6,6 +6,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 const form = reactive({
   name: '',
   limit: 0,
+  budget: null as number | null,
   closingDay: 1,
   dueDay: 10,
 })
@@ -14,6 +15,7 @@ interface Card {
   id: string
   name: string
   limit: number
+  budget?: number
   closingDay: number
   dueDay: number
   isDefault: boolean
@@ -30,6 +32,7 @@ async function onSubmit() {
   // Reset form
   form.name = ''
   form.limit = 0
+  form.budget = null
   form.closingDay = 1
   form.dueDay = 10
   

@@ -14,6 +14,7 @@ model CreditCard {
   id          String   @id @default(uuid())
   name        String   // Ex: "Nubank Ultravioleta"
   limit       Float
+  budget      Float?   // Meta de gastos (opcional)
   closingDay  Int      // Dia que fecha a fatura (ex: 25)
   dueDay      Int      // Dia que vence (ex: 01)
   isDefault   Boolean  @default(false) // Marca o cartão padrão
