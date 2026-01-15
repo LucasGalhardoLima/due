@@ -214,15 +214,30 @@ async function runAnalysis() {
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
       <div class="flex items-center gap-3">
           <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <button 
-            class="flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-sm font-medium transition-colors hover:bg-indigo-200 dark:hover:bg-indigo-900/50"
-            @click="runAnalysis"
-          >
-            <Sparkles v-if="!advisorLoading" class="w-4 h-4" />
-            <Loader2 v-else class="w-4 h-4 animate-spin" />
-            {{ showAdvisor ? 'Fechar Análise' : 'Analisar' }}
-          </button>
+          <div class="flex items-center gap-2">
+              <button 
+                class="flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-sm font-medium transition-colors hover:bg-indigo-200 dark:hover:bg-indigo-900/50"
+                @click="runAnalysis"
+              >
+                <Sparkles v-if="!advisorLoading" class="w-4 h-4" />
+                <Loader2 v-else class="w-4 h-4 animate-spin" />
+                {{ showAdvisor ? 'Fechar Análise' : 'Analisar' }}
+              </button>
+              
+              <NuxtLink 
+                to="/import"
+                class="flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm font-medium transition-colors hover:bg-green-200 dark:hover:bg-green-900/50"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" x2="12" y1="3" y2="15"/>
+                </svg>
+                Importar CSV
+              </NuxtLink>
+          </div>
       </div>
+      
       
       <!-- Card Filter -->
       <div class="w-full md:w-[200px]">
