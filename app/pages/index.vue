@@ -14,6 +14,7 @@ import AdvisorCard from '@/components/dashboard/AdvisorCard.vue'
 // Global State
 const currentDate = ref(new Date())
 const selectedCardId = ref<string>('all')
+const editingTransactionId = ref<string | null>(null)
 
 // API Query Params
 const queryParams = computed(() => ({
@@ -66,6 +67,22 @@ function prevMonth() {
 }
 
 const isDrawerOpen = ref(false)
+
+function handleEdit(tx: any) {
+  editingTransactionId.value = tx.transactionId
+  isDrawerOpen.value = true
+}
+
+// Reset ID when drawer closes
+watch(isDrawerOpen, (val) => {
+  if (!val) {
+    // Small delay to allow animation to finish if needed, or immediate.
+    setTimeout(() => {
+        editingTransactionId.value = null
+    }, 300)
+  }
+})
+
 function onSaved() {
   // Optimistic update handles the immediate feedback.
   // We can let the background refresh happen naturally or trigger validaton here if needed.
@@ -347,7 +364,7 @@ v-for="proj in futureProjection?.projections" :key="`${proj.month}-${proj.year}`
     <div class="rounded-xl border bg-card text-card-foreground shadow p-6">
         <h3 class="text-lg font-semibold mb-4">Lançamentos</h3>
         <!-- Pass empty object if undefined to avoid errors -->
-        <TransactionList :transactions="summary?.transactions || {}" />
+        <TransactionList :transactions="summary?.transactions || {}" @edit="handleEdit" />
     </div>
 
     <!-- Quick Add Button (Floating or Inline) -->
@@ -358,7 +375,7 @@ v-for="proj in futureProjection?.projections" :key="`${proj.month}-${proj.year}`
       </button>
     </div>
 
-    <TransactionDrawer v-model:open="isDrawerOpen" @saved="onSaved" />
+    <TransactionDrawer v-model:open="isDrawerOpen" :transaction-id="editingTransactionId" @saved="onSaved" />
 
     <ConfirmDialog 
       v-model:open="showPayConfirm"

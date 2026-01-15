@@ -60,18 +60,19 @@ export default defineEventHandler(async (event) => {
     if (amount > topCategory.amount) topCategory = { name, amount }
   })
   
-  const topCatPct = (topCategory.amount / total) * 100
+  const topCatPct = total > 0 ? (topCategory.amount / total) * 100 : 0
 
   // Find Largest Single Transaction
-  const largestTx = installments.reduce((max, curr) => curr.amount > max.amount ? curr : max, installments[0])
-  const largestTxPct = (largestTx.amount / total) * 100
+  // We already checked length > 0, so installments[0] is safe.
+  const largestTx = installments.reduce((max, curr) => curr.amount > max.amount ? curr : max, installments[0]!)
+  const largestTxPct = total > 0 ? (largestTx.amount / total) * 100 : 0
 
   // 4. "Ruthless Logic" Rules
   let verdict = 'Neutral'
   let title = 'Fatura sob controle'
   let message = `Seus gastos totalizam ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)}.`
   let action = 'Continue assim.'
-  let severity = 'info' // info, warning, destiny (critical)
+  let severity: 'info' | 'warning' | 'critical' = 'info'
 
   // Rule 1: The Category Black Hole (> 40%)
   if (topCatPct > 40) {
@@ -90,7 +91,7 @@ export default defineEventHandler(async (event) => {
     action = 'Evite novas compras grandes até quitar esta.'
   }
   // Rule 3: Death by a Thousand Cuts (Many small txs)
-  else if (installments.length > 20 && (total / installments.length) < 50) {
+  else if (installments.length > 20 && total > 0 && (total / installments.length) < 50) {
     verdict = 'Concern'
     severity = 'warning'
     title = 'Muitos pequenos gastos'

@@ -77,11 +77,13 @@ export default defineEventHandler(async (event) => {
   installments.forEach(inst => {
     // We group by Purchase Date (Day)
     const pDate = new Date(inst.transaction.purchaseDate).toISOString().split('T')[0]
-    if (!groupedTransactions[pDate]) {
+    if (pDate && !groupedTransactions[pDate]) {
         groupedTransactions[pDate] = []
     }
-    groupedTransactions[pDate].push({
+    if (pDate) {
+      groupedTransactions[pDate]!.push({
         id: inst.id,
+        transactionId: inst.transaction.id,
         description: inst.transaction.description,
         amount: inst.amount,
         category: inst.transaction.category.name,
@@ -90,7 +92,8 @@ export default defineEventHandler(async (event) => {
         totalInstallments: inst.transaction.installmentsCount,
         cardName: inst.transaction.card.name,
         purchaseDate: inst.transaction.purchaseDate
-    })
+      })
+    }
   })
 
   // Determine Invoice Status

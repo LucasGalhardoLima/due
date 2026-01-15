@@ -18,6 +18,7 @@ import CurrencyInput from '@/components/ui/CurrencyInput.vue'
 
 const props = defineProps<{
   open: boolean
+  transactionId?: string | null
 }>()
 
 const emit = defineEmits(['update:open', 'saved'])
@@ -46,9 +47,9 @@ interface Category {
 const { data: cards } = await useFetch<Card[]>('/api/cards')
 const { data: categories } = await useFetch<Category[]>('/api/categories') 
 
-// Auto-select default card when cards load
+// Auto-select default card when cards load (only if NEW)
 watch(cards, (newCards) => {
-  if (newCards && newCards.length > 0 && !selectedCardId.value) {
+  if (newCards && newCards.length > 0 && !selectedCardId.value && !props.transactionId) {
     const defaultCard = newCards.find(c => c.isDefault)
     if (defaultCard) {
       selectedCardId.value = defaultCard.id
@@ -59,6 +60,36 @@ watch(cards, (newCards) => {
     }
   }
 }, { immediate: true })
+
+// Edit Mode Logic
+watch(() => props.open, async (isOpen) => {
+    if (isOpen && props.transactionId) {
+        try {
+            const tx = await $fetch<any>(`/api/transactions/${props.transactionId}`)
+            amount.value = tx.amount
+            description.value = tx.description
+            selectedCardId.value = tx.cardId
+            selectedCategoryId.value = tx.categoryId
+            purchaseDate.value = tx.purchaseDate.split('T')[0]
+            installments.value = [tx.installmentsCount]
+            paymentType.value = tx.isSubscription ? 'subscription' : (tx.installmentsCount > 1 ? 'installment' : 'cash')
+        } catch (e) {
+            toast.error('Erro ao carregar despesa')
+            emit('update:open', false)
+        }
+    } else if (isOpen && !props.transactionId) {
+        // Reset for new entry
+        amount.value = 0
+        description.value = ''
+        installments.value = [1]
+        paymentType.value = 'cash'
+        purchaseDate.value = new Date().toISOString().split('T')[0]
+        if (cards.value && cards.value.length) {
+             const defaultCard = cards.value.find(c => c.isDefault) || cards.value[0]
+             if (defaultCard) selectedCardId.value = defaultCard.id
+        }
+    }
+})
 
 // Computed
 const isOpen = computed({
@@ -154,17 +185,27 @@ async function save() {
 
   try {
     // 4. API Call
-    await $fetch('/api/transactions', {
-      method: 'POST',
-      body: payload
-    })
+    if (props.transactionId) {
+        await $fetch(`/api/transactions/${props.transactionId}`, {
+            method: 'PUT',
+            body: payload
+        })
+        toast.success('Despesa atualizada!')
+    } else {
+        await $fetch('/api/transactions', {
+            method: 'POST',
+            body: payload
+        })
+        toast.success('Despesa salva com sucesso!')
+    }
     
     emit('saved')
     
     // 5. Revalidation (Background)
     // Refresh to get the real ID, real category name, real calculations
     await refreshNuxtData('dashboard-summary')
-    toast.success('Despesa salva com sucesso!')
+    await refreshNuxtData('dashboard-summary')
+    // toast handled above
 
   } catch (e) {
     console.error(e)
@@ -191,6 +232,22 @@ function togglePaymentType(type: 'cash' | 'installment' | 'subscription') {
   }
 }
 
+async function handleDelete() {
+    if (!props.transactionId) return
+    if (!confirm('Tem certeza que deseja excluir esta despesa?')) return
+
+    try {
+        await $fetch(`/api/transactions/${props.transactionId}`, {
+            method: 'DELETE'
+        })
+        toast.success('Despesa excluída')
+        isOpen.value = false
+        emit('saved')
+        await refreshNuxtData('dashboard-summary')
+    } catch (e) {
+        toast.error('Erro ao excluir')
+    }
+}
 
 </script>
 
@@ -199,7 +256,7 @@ function togglePaymentType(type: 'cash' | 'installment' | 'subscription') {
     <DrawerContent>
       <div class="mx-auto w-full max-w-sm">
         <DrawerHeader>
-          <DrawerTitle class="text-center">Nova Despesa</DrawerTitle>
+          <DrawerTitle class="text-center">{{ transactionId ? 'Editar Despesa' : 'Nova Despesa' }}</DrawerTitle>
         </DrawerHeader>
 
         <div class="p-4 space-y-6">
@@ -309,8 +366,13 @@ function togglePaymentType(type: 'cash' | 'installment' | 'subscription') {
 
         <DrawerFooter>
           <Button size="lg" class="w-full text-lg h-12" @click="save">
-            Confirmar R$ {{ amount.toFixed(2) }}
+            {{ transactionId ? 'Salvar Alterações' : `Confirmar R$ ${amount.toFixed(2)}` }}
           </Button>
+          
+          <Button v-if="transactionId" variant="destructive" class="w-full" @click="handleDelete">
+            Excluir Despesa
+          </Button>
+          
           <DrawerClose as-child>
             <Button variant="outline">Cancelar</Button>
           </DrawerClose>

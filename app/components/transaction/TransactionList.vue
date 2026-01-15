@@ -6,6 +6,8 @@ const { transactions } = defineProps<{
     transactions: Record<string, any[]>
 }>()
 
+const emit = defineEmits(['edit'])
+
 function formatDate(dateStr: string) {
     // Add timezone offset correction if needed, but split('T')[0] in backend + new Date here might interpret as UTC -> Local
     // For MVP simple logic:
@@ -50,7 +52,12 @@ function getIcon(categoryName: string) {
         </h4>
         
         <div class="rounded-lg border bg-card text-card-foreground shadow-sm divide-y">
-            <div v-for="tx in items" :key="tx.id" class="p-4 flex items-center justify-between">
+            <div 
+              v-for="tx in items" 
+              :key="tx.id" 
+              class="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/50 transition-colors active:bg-muted"
+              @click="$emit('edit', tx)"
+            >
                  <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-primary">
                         <component :is="getIcon(tx.category)" class="h-5 w-5" />
