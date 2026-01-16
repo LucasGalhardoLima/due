@@ -68,7 +68,7 @@ function formatCurrency(val: number) {
         <Button 
           @click="analyzeFinances" 
           :disabled="isLoading"
-          class="bg-white/90 text-primary hover:bg-white font-bold h-12 px-8 shadow-xl"
+          class="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-bold h-12 px-8 shadow-xl border border-primary/20"
         >
           <Loader2 v-if="isLoading" class="w-5 h-5 mr-2 animate-spin" />
           <Sparkles v-else class="w-5 h-5 mr-2" />

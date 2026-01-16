@@ -48,7 +48,7 @@ v-else-if="analysis"
 
     <div class="relative z-10 flex gap-4">
       <div 
-        class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-white/50 dark:bg-black/20"
+        class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-muted/50 border border-border/50"
         :class="iconColors[analysis.severity]"
       >
         <Bot class="w-6 h-6" />
