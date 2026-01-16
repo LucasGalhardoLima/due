@@ -6,45 +6,33 @@ const colorMode = useColorMode()
 
 const features = [
   {
-    icon: Shield,
-    title: 'Autenticação Blindada',
-    description: 'Login seguro com Clerk. Seus dados isolados e criptografados.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: Sparkles,
-    title: 'Inteligência Artificial',
-    description: 'Diagnósticos financeiros precisos e planos de ação práticos.',
-    colSpan: 'md:col-span-2'
-  },
-  {
     icon: Upload,
-    title: 'Importação Mágica',
-    description: 'Arraste seu CSV e deixe a IA classificar tudo automaticamente.',
+    title: 'Importação Inteligente',
+    description: 'Arraste seu CSV do banco e deixe o sistema categorizar tudo para você via IA.',
     colSpan: 'md:col-span-2'
   },
   {
     icon: TrendingUp,
-    title: 'Metas Dinâmicas',
-    description: 'Visualize seu progresso em tempo real com alertas visuais.',
+    title: 'Visão de Futuro',
+    description: 'Veja a projeção das suas faturas para os próximos 3 meses baseada nas suas parcelas.',
     colSpan: 'md:col-span-1'
   },
   {
-    icon: PieChart,
-    title: 'Visão de Pareto',
-    description: 'Descubra onde 80% do seu dinheiro está realmente indo.',
+    icon: Sparkles,
+    title: 'Advisor AI',
+    description: 'Um consultor financeiro embutido que analisa seus gastos e sugere cortes inteligentes.',
     colSpan: 'md:col-span-1'
   },
   {
-    icon: Users,
-    title: 'Sem Limites',
-    description: 'Crie categorias, cartões e tags sem restrições.',
+    icon: Shield,
+    title: 'Privacidade Isolada',
+    description: 'Seus dados são seus. Banco de dados isolado via Supabase e Clerk Auth.',
     colSpan: 'md:col-span-1'
   },
   {
-    icon: Calendar,
-    title: 'Recorrentes',
-    description: 'Controle de assinaturas e contas fixas automatizado.',
+    icon: Globe,
+    title: 'Mobile First',
+    description: 'Instale como PWA no seu celular e tenha o controle na palma da mão.',
     colSpan: 'md:col-span-1'
   }
 ]
@@ -86,16 +74,16 @@ const faqs = [
     answer: 'Sim! A versão atual do Due é 100% gratuita. No futuro, podemos introduzir recursos premium opcionais.'
   },
   {
-    question: 'Meus dados estão seguros?',
-    answer: 'Absolutamente. Utilizamos Clerk para autenticação enterprise-grade e criptografia de ponta.'
+    question: 'Meus dados são meus de verdade?',
+    answer: 'Sim. Seus dados são isolados em um banco de dados Supabase via políticas de Row Level Security. Não vendemos nem compartilhamos nenhuma informação.'
   },
   {
-    question: 'Preciso conectar banco?',
-    answer: 'Não! Funciona com importação manual de CSV ou lançamentos manuais. Total privacidade.'
+    question: 'Como funciona a importação de CSV?',
+    answer: 'Basta exportar o CSV do seu banco (Nubank, XP, Inter, etc) e arrastar para o Due. Nossa IA identifica as categorias e o cartão automaticamente.'
   },
   {
-    question: 'Como funciona a IA?',
-    answer: 'Utilizamos GPT-4o para analisar padrões, sem reter seus dados pessoais.'
+    question: 'Como a IA analisa meus gastos?',
+    answer: 'Utilizamos o GPT-4o para processar os textos das suas transações e gerar insights financeiros. O processamento é efêmero e seus dados não são usados para treinamento.'
   }
 ]
 
@@ -159,7 +147,7 @@ definePageMeta({
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="relative pt-32 pb-32 md:pt-48 md:pb-64 overflow-hidden">
+    <section id="home" class="relative pt-32 pb-32 md:pt-48 md:pb-32 overflow-hidden">
       <!-- Background Blobs -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] -z-10">
         <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
@@ -170,30 +158,29 @@ definePageMeta({
       <div class="container mx-auto px-6 text-center space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase backdrop-blur-md shadow-sm">
           <span class="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          Finanças Reimaginadas
+          Poderoso no Desktop, Perfeito no Mobile
         </div>
         
         <h1 class="text-6xl md:text-8xl font-black tracking-tight max-w-5xl mx-auto leading-[0.9] text-foreground transition-all duration-700">
-          Domine suas finanças com <span class="text-transparent bg-clip-text bg-gradient-to-br from-primary via-cyan-400 to-emerald-500">clareza total.</span>
+          Domine sua <span class="text-transparent bg-clip-text bg-gradient-to-br from-primary via-cyan-400 to-emerald-500">fatura,</span> não sua planilha.
         </h1>
         
         <p class="text-xl md:text-2xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-          O gerenciador financeiro que une design de ponta, 
-          IA avançada e privacidade absoluta.
+          Controle inteligente de cartão de crédito com projeção futura, análise de IA e importação automática. <span class="text-foreground">Instalável como app, poderoso como sistema.</span>
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
           <NuxtLink 
             v-if="userId"
             to="/dashboard" 
-            class="h-14 px-10 inline-flex items-center justify-center rounded-full bg-foreground text-background font-bold text-lg shadow-xl hover:scale-105 transition-all w-full sm:w-auto"
+            class="h-14 px-10 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-lg shadow-xl shadow-primary/20 hover:scale-105 transition-all w-full sm:w-auto"
           >
             Acessar Dashboard
           </NuxtLink>
           <NuxtLink 
             v-else
             to="/sign-up" 
-            class="h-14 px-10 inline-flex items-center justify-center rounded-full bg-foreground text-background font-bold text-lg shadow-xl hover:scale-105 transition-all w-full sm:w-auto"
+            class="h-14 px-10 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-lg shadow-xl shadow-primary/20 hover:scale-105 transition-all w-full sm:w-auto"
           >
             Começar Gratuitamente
           </NuxtLink>
@@ -203,6 +190,32 @@ definePageMeta({
           >
             Explorar Features
           </a>
+        </div>
+
+        <!-- Showcase Mockup -->
+        <div class="pt-24 max-w-5xl mx-auto">
+          <div class="relative group">
+            <div class="absolute inset-0 bg-primary/20 rounded-[3rem] blur-3xl -z-10 group-hover:bg-primary/30 transition-all duration-700" />
+            <img 
+              src="/Users/lucasgalhardo/.gemini/antigravity/brain/b08abdc6-ec51-43e5-a3e3-e2dc61b6abc9/due_app_mockup_iphone_1768596452356.png" 
+              alt="Due App Mockup" 
+              class="w-[320px] md:w-[400px] mx-auto drop-shadow-2xl animate-in fade-in zoom-in duration-1000 delay-300 pointer-events-none"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section class="py-20 border-y border-border/40 bg-secondary/5 overflow-hidden">
+      <div class="container mx-auto px-6">
+        <p class="text-center text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-12 italic">Powered by Industry Standards</p>
+        <div class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 hover:opacity-100 transition-opacity duration-700 font-black text-2xl tracking-tighter">
+          <span>Nuxt 4</span>
+          <span>Supabase</span>
+          <span>Tailwind</span>
+          <span>Prisma</span>
+          <span>Clerk</span>
         </div>
       </div>
     </section>
@@ -215,7 +228,7 @@ definePageMeta({
       <div class="container mx-auto px-6">
         <div class="mb-20">
            <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-6">Poder sem <span class="text-primary/80">complexidade.</span></h2>
-           <p class="text-xl text-muted-foreground max-w-2xl font-medium">Ferramentas de elite, simplificadas para você.</p>
+           <p class="text-xl text-muted-foreground max-w-2xl font-medium italic">Ferramentas de elite, simplificadas para você.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -297,6 +310,32 @@ definePageMeta({
           </div>
         </div>
        </div>
+    </section>
+
+    <!-- Privacy Section -->
+    <section class="py-32 relative">
+      <div class="container mx-auto px-6">
+        <div class="max-w-4xl mx-auto rounded-[3rem] bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 p-12 text-center space-y-8 backdrop-blur-sm">
+          <div class="w-20 h-20 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto text-primary">
+            <Shield class="w-10 h-10" />
+          </div>
+          <h2 class="text-3xl md:text-5xl font-black tracking-tight">Privacidade por Design.</h2>
+          <p class="text-xl text-muted-foreground leading-relaxed">
+            Seus dados financeiros são sensíveis demais para serem tratados com descuido. Por isso, construímos o Due com <span class="text-foreground font-bold italic">isolamento total de banco de dados</span> e sem qualquer rastreamento invasivo.
+          </p>
+          <div class="flex flex-wrap justify-center gap-4 pt-4">
+            <div class="px-4 py-2 rounded-full bg-background border border-border/50 text-sm font-bold flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500" /> Supabase Isolated DB
+            </div>
+            <div class="px-4 py-2 rounded-full bg-background border border-border/50 text-sm font-bold flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-500" /> Enterprise Clerk Auth
+            </div>
+            <div class="px-4 py-2 rounded-full bg-background border border-border/50 text-sm font-bold flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-primary" /> No Third-party Tracking
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- FAQ Section -->
