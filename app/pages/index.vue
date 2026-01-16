@@ -99,6 +99,20 @@ const faqs = [
   }
 ]
 
+const authMode = ref<'none' | 'sign-in' | 'sign-up'>('none')
+
+function openSignIn() {
+  authMode.value = 'sign-in'
+}
+
+function openSignUp() {
+  authMode.value = 'sign-up'
+}
+
+function closeAuth() {
+  authMode.value = 'none'
+}
+
 function toggleTheme() {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
 }
@@ -135,10 +149,10 @@ definePageMeta({
               <Sun v-else class="w-5 h-5" />
             </button>
             <div class="h-6 w-px bg-border/50 hidden md:block"></div>
-            <NuxtLink to="/sign-in" class="text-sm font-bold hover:text-primary transition-colors">Entrar</NuxtLink>
-            <NuxtLink to="/sign-up" class="hidden md:inline-flex h-9 px-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-all">
+            <button @click="openSignIn" class="text-sm font-bold hover:text-primary transition-colors">Entrar</button>
+            <button @click="openSignUp" class="hidden md:inline-flex h-9 px-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-all">
               Criar Conta
-            </NuxtLink>
+            </button>
           </div>
         </div>
       </div>
@@ -226,35 +240,53 @@ definePageMeta({
       </div>
     </section>
 
-    <!-- Roadmap Section -->
-    <section id="roadmap" class="py-32">
+    <!-- Roadmap Section (Timeline) -->
+    <section id="roadmap" class="py-32 relative">
+       <!-- timeline bar -->
+       <div class="absolute left-1/2 -translate-x-1/2 top-48 bottom-32 w-px bg-gradient-to-b from-primary/30 via-border/40 to-transparent hidden md:block" />
+       
        <div class="container mx-auto px-6">
-        <div class="mb-20">
+        <div class="mb-20 text-center">
            <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-6">O futuro é brilhante.</h2>
-           <p class="text-xl text-muted-foreground max-w-2xl">Transparência radical sobre nossos próximos passos.</p>
+           <p class="text-xl text-muted-foreground mx-auto max-w-2xl">Transparência radical sobre nossos próximos passos.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="space-y-24 relative">
           <div 
-            v-for="item in roadmap" 
+            v-for="(item, index) in roadmap" 
             :key="item.title"
-            class="relative p-6 rounded-3xl border border-border/40 bg-background/30 backdrop-blur-sm"
+            class="flex flex-col md:flex-row items-center gap-8 md:gap-0"
+            :class="index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'"
           >
-            <div class="absolute top-6 right-6">
-               <span 
-                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border"
-                  :class="item.status === 'soon' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-blue-500/10 text-blue-500 border-blue-500/20'"
-                >
-                  {{ item.status === 'soon' ? 'Q2 2026' : 'Q3 2026' }}
-                </span>
-            </div>
-            <div class="pt-8">
-               <div class="mb-4 text-foreground/80">
-                  <component :is="item.icon" class="w-8 h-8" />
+            <!-- Content -->
+            <div class="flex-1 w-full md:w-auto">
+               <div 
+                class="p-8 rounded-3xl border border-border/40 bg-background/50 backdrop-blur-sm group hover:border-primary/40 transition-all duration-500"
+                :class="index % 2 === 0 ? 'md:mr-16' : 'md:ml-16'"
+              >
+                  <div class="flex items-center justify-between mb-6">
+                    <div class="p-3 rounded-2xl bg-secondary/50 text-foreground/80 group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-500">
+                      <component :is="item.icon" class="w-6 h-6" />
+                    </div>
+                    <span 
+                      class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border"
+                      :class="item.status === 'soon' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-blue-500/10 text-blue-500 border-blue-500/20'"
+                    >
+                      {{ item.eta }}
+                    </span>
+                  </div>
+                  <h4 class="text-2xl font-bold mb-3 tracking-tight">{{ item.title }}</h4>
+                  <p class="text-muted-foreground leading-relaxed">{{ item.description }}</p>
                </div>
-               <h4 class="text-xl font-bold mb-2">{{ item.title }}</h4>
-               <p class="text-sm text-muted-foreground">{{ item.description }}</p>
             </div>
+
+            <!-- Timeline Marker -->
+            <div class="relative z-10 flex items-center justify-center w-12">
+               <div class="w-4 h-4 rounded-full bg-background border-4 border-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+            </div>
+
+            <!-- Spacer -->
+            <div class="flex-1 hidden md:block" />
           </div>
         </div>
        </div>
@@ -299,6 +331,58 @@ definePageMeta({
         </div>
       </div>
     </footer>
+
+    <!-- Auth Modals -->
+    <Transition 
+      enter-active-class="transition duration-300 ease-out" 
+      enter-from-class="opacity-0 scale-95" 
+      enter-to-class="opacity-100 scale-100" 
+      leave-active-class="transition duration-200 ease-in" 
+      leave-from-class="opacity-100 scale-100" 
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div v-if="authMode !== 'none'" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div class="absolute inset-0 bg-background/80 backdrop-blur-sm" @click="closeAuth" />
+        
+        <div class="relative w-full max-w-md bg-card border border-border/50 rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+          <button 
+            @click="closeAuth" 
+            class="absolute top-6 right-6 p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground z-10"
+          >
+            <ChevronDown class="w-5 h-5 rotate-90 md:rotate-0" />
+          </button>
+
+          <div class="flex items-center justify-center p-8 pt-16">
+            <SignIn 
+              v-if="authMode === 'sign-in'" 
+              after-sign-in-url="/dashboard" 
+              sign-up-url="#"
+              @click.capture="(e: MouseEvent) => {
+                const target = e.target as HTMLElement;
+                if (target.innerText?.includes('Sign up')) {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  openSignUp();
+                }
+              }"
+            />
+            <SignUp 
+              v-if="authMode === 'sign-up'" 
+              after-sign-up-url="/dashboard" 
+              sign-in-url="#"
+              @click.capture="(e: MouseEvent) => {
+                const target = e.target as HTMLElement;
+                if (target.innerText?.includes('Sign in')) {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  openSignIn();
+                }
+              }"
+            />
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
