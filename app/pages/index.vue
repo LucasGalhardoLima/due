@@ -205,6 +205,11 @@ definePageMeta({
           </a>
         </div>
       </div>
+
+      <!-- Scroll Indicator -->
+      <div class="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
+        <ChevronDown class="w-6 h-6" />
+      </div>
     </section>
 
     <!-- Bento Grid Features -->
