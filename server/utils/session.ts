@@ -1,8 +1,8 @@
-import { clerkClient, H3EventContextWithClerk } from 'h3-clerk'
 import type { H3Event } from 'h3'
 
 export const getUser = (event: H3Event) => {
-  const { auth } = event.context as H3EventContextWithClerk
+  // @clerk/nuxt populates event.context.auth
+  const auth = event.context.auth
 
   if (!auth?.userId) {
     throw createError({
