@@ -30,6 +30,7 @@
     "date-fns": "^4.1.0",
     "lucide-vue-next": "^0.562.0",
     "nuxt": "^4.2.2",
+    "openai": "^6.16.0",
     "papaparse": "^5.5.3",
     "pinia": "^3.0.4",
     "reka-ui": "^2.7.0",

@@ -10,6 +10,7 @@ import { Check, AlertCircle, Sparkles, Loader2  } from 'lucide-vue-next'
 import TransactionList from '@/components/transaction/TransactionList.vue'
 import InsightCard from '@/components/dashboard/InsightCard.vue'
 import AdvisorCard from '@/components/dashboard/AdvisorCard.vue'
+import AIInsights from '@/components/dashboard/AIInsights.vue'
 
 // Global State
 const currentDate = ref(new Date())
@@ -340,6 +341,10 @@ async function runAnalysis() {
             </div>
         </div>
     </div>
+    
+    <!-- AI Insights Section -->
+    <AIInsights />
+    
     <!-- Future Projection -->
     <div class="rounded-xl border bg-card text-card-foreground shadow">
       <div class="p-6 pb-4">
