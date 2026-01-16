@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { Sparkles, Upload, CheckCircle, ArrowRight } from 'lucide-vue-next'
 const { userId } = useAuth()
+
+definePageMeta({
+  layout: false // Landing page doesn't need the internal header
+})
 </script>
 
 <template>
@@ -153,12 +158,7 @@ const { userId } = useAuth()
   </div>
 </template>
 
-<script setup lang="ts">
-import { Sparkles, Upload, CheckCircle, ArrowRight } from 'lucide-vue-next'
-definePageMeta({
-  layout: false // Landing page doesn't need the internal header
-})
-</script>
+
 
 <style scoped>
 .container {
