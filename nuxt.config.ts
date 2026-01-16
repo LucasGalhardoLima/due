@@ -5,8 +5,14 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxt/eslint',
     '@clerk/nuxt',
+    '@nuxtjs/color-mode',
     // '@nuxtjs/supabase', // Not needed for MVP with local SQLite
   ],
+  colorMode: {
+    classSuffix: '',
+    preference: 'dark', // Default to Dark Mode
+    fallback: 'dark',
+  },
   // supabase: {
   //   redirect: false, // We'll handle auth redirect manually if needed
   // },

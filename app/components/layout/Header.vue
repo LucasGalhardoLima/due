@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Menu } from 'lucide-vue-next'
+import { Menu, Moon, Sun } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -9,6 +9,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+
+const colorMode = useColorMode()
+
+function toggleTheme() {
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+}
 
 const routes = [
   { name: 'Dashboard', path: '/dashboard' },
@@ -44,6 +50,14 @@ const isOpen = ref(false)
           {{ route.name }}
         </NuxtLink>
         <div class="ml-4 flex items-center gap-4">
+             <button 
+              @click="toggleTheme" 
+              class="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              aria-label="Toggle Theme"
+            >
+              <Moon v-if="colorMode.value === 'light'" class="w-5 h-5" />
+              <Sun v-else class="w-5 h-5" />
+            </button>
              <UserButton after-sign-out-url="/sign-in" />
         </div>
       </nav>
@@ -79,7 +93,17 @@ const isOpen = ref(false)
               </NuxtLink>
               
               <div class="mt-4 pt-4 border-t border-border flex items-center justify-between">
-                <span class="text-sm text-muted-foreground">Minha Conta</span>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-muted-foreground">Minha Conta</span>
+                    <button 
+                      @click="toggleTheme" 
+                      class="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                      aria-label="Toggle Theme"
+                    >
+                      <Moon v-if="colorMode.value === 'light'" class="w-5 h-5" />
+                      <Sun v-else class="w-5 h-5" />
+                    </button>
+                </div>
                 <UserButton after-sign-out-url="/sign-in" />
               </div>
             </nav>

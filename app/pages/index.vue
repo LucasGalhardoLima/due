@@ -1,48 +1,51 @@
 <script setup lang="ts">
-import { Sparkles, Upload, CheckCircle, ArrowRight, Check, Clock, Shield, TrendingUp, PieChart, Users, Calendar, Bell, FileText, Smartphone, Building2, DollarSign, Share2, Globe, ChevronDown } from 'lucide-vue-next'
+import { Sparkles, Upload, CheckCircle, ArrowRight, Check, Clock, Shield, TrendingUp, PieChart, Users, Calendar, Bell, FileText, Smartphone, Building2, DollarSign, Share2, Globe, ChevronDown, Moon, Sun } from 'lucide-vue-next'
 
 const { userId } = useAuth()
+const colorMode = useColorMode()
 
 const features = [
   {
     icon: Shield,
-    title: 'Autenticação Multi-Usuário',
-    description: 'Sistema de login seguro com Clerk. Cada conta é isolada e protegida com criptografia de ponta.',
+    title: 'Autenticação Blindada',
+    description: 'Login seguro com Clerk. Seus dados isolados e criptografados.',
+    colSpan: 'md:col-span-1'
   },
   {
     icon: Sparkles,
-    title: 'Insights com IA (GPT-4o)',
-    description: 'Receba diagnósticos precisos sobre seus gastos e ações práticas para reduzir despesas.',
+    title: 'Inteligência Artificial',
+    description: 'Diagnósticos financeiros precisos e planos de ação práticos.',
+    colSpan: 'md:col-span-2'
   },
   {
     icon: Upload,
-    title: 'Importação Inteligente de CSV',
-    description: 'O "Matador de Preguiça". Arraste seu extrato e a IA classifica automaticamente cada transação.',
+    title: 'Importação Mágica',
+    description: 'Arraste seu CSV e deixe a IA classificar tudo automaticamente.',
+    colSpan: 'md:col-span-2'
   },
   {
     icon: TrendingUp,
-    title: 'Metas de Gastos Personalizadas',
-    description: 'Defina metas para cada cartão e visualize seu progresso em tempo real com alertas coloridos.',
+    title: 'Metas Dinâmicas',
+    description: 'Visualize seu progresso em tempo real com alertas visuais.',
+    colSpan: 'md:col-span-1'
   },
   {
     icon: PieChart,
-    title: 'Análise de Pareto',
-    description: 'Identifique instantaneamente onde 80% do seu dinheiro está indo com gráficos intuitivos.',
+    title: 'Visão de Pareto',
+    description: 'Descubra onde 80% do seu dinheiro está realmente indo.',
+    colSpan: 'md:col-span-1'
   },
   {
     icon: Users,
-    title: 'Gerenciamento de Categorias',
-    description: 'Crie, edite e organize categorias com autocomplete inteligente. Sem limites, sem fricção.',
+    title: 'Sem Limites',
+    description: 'Crie categorias, cartões e tags sem restrições.',
+    colSpan: 'md:col-span-1'
   },
   {
     icon: Calendar,
-    title: 'Assinaturas Recorrentes',
-    description: 'Automatize lançamentos mensais de serviços recorrentes como Netflix, academia e etc.',
-  },
-  {
-    icon: FileText,
-    title: 'Painel de Auditoria',
-    description: 'Visualize o histórico completo de lançamentos para identificar erros e inconsistências.',
+    title: 'Recorrentes',
+    description: 'Controle de assinaturas e contas fixas automatizado.',
+    colSpan: 'md:col-span-1'
   }
 ]
 
@@ -50,73 +53,55 @@ const roadmap = [
   {
     status: 'soon',
     icon: Smartphone,
-    title: 'Aplicativo Mobile',
-    description: 'Apps nativos para iOS e Android com notificações push e sincronização em tempo real.',
+    title: 'App Mobile',
+    description: 'iOS e Android.',
     eta: 'Q2 2026'
   },
   {
     status: 'soon',
     icon: Building2,
-    title: 'Integração Bancária',
-    description: 'Conecte suas contas via Open Banking e sincronize transações automaticamente, sem CSV.',
+    title: 'Open Banking',
+    description: 'Sincronização automática.',
     eta: 'Q2 2026'
   },
   {
     status: 'planned',
     icon: DollarSign,
-    title: 'Controle de Investimentos',
-    description: 'Acompanhe ações, fundos e criptomoedas em um só lugar com consolidação de patrimônio.',
+    title: 'Investimentos',
+    description: 'Ações e Cripto.',
     eta: 'Q3 2026'
   },
   {
     status: 'planned',
     icon: Share2,
-    title: 'Compartilhamento Familiar',
-    description: 'Compartilhe dashboards com família mantendo privacidade de dados sensíveis.',
+    title: 'Família',
+    description: 'Compartilhamento.',
     eta: 'Q3 2026'
-  },
-  {
-    status: 'planned',
-    icon: Bell,
-    title: 'Alertas Inteligentes',
-    description: 'Notificações via WhatsApp/Email quando atingir 70%, 90% ou 100% da meta.',
-    eta: 'Q4 2026'
-  },
-  {
-    status: 'planned',
-    icon: Globe,
-    title: 'Multi-Moeda',
-    description: 'Gerencie gastos em dólar, euro e outras moedas com conversão automática.',
-    eta: 'Q4 2026'
   }
 ]
 
 const faqs = [
   {
     question: 'O Due é gratuito?',
-    answer: 'Sim! A versão atual do Due é 100% gratuita. No futuro, podemos introduzir recursos premium opcionais, mas o core sempre será gratuito.'
+    answer: 'Sim! A versão atual do Due é 100% gratuita. No futuro, podemos introduzir recursos premium opcionais.'
   },
   {
     question: 'Meus dados estão seguros?',
-    answer: 'Absolutamente. Utilizamos Clerk para autenticação enterprise-grade e todos os dados são isolados por usuário com criptografia. Nunca compartilhamos suas informações financeiras.'
+    answer: 'Absolutamente. Utilizamos Clerk para autenticação enterprise-grade e criptografia de ponta.'
   },
   {
-    question: 'Preciso conectar minha conta bancária?',
-    answer: 'Não! O Due funciona com importação manual de CSV ou entrada manual de transações. No futuro, ofereceremos integração via Open Banking como opção.'
+    question: 'Preciso conectar banco?',
+    answer: 'Não! Funciona com importação manual de CSV ou lançamentos manuais. Total privacidade.'
   },
   {
     question: 'Como funciona a IA?',
-    answer: 'Utilizamos GPT-4o da OpenAI para analisar seus padrões de gastos e fornecer insights personalizados. A IA nunca armazena seus dados - apenas processa temporariamente para análise.'
-  },
-  {
-    question: 'Posso usar em múltiplos dispositivos?',
-    answer: 'Sim! Seus dados são sincronizados na nuvem. Acesse de qualquer navegador fazendo login com sua conta. Apps mobile estão no roadmap.'
-  },
-  {
-    question: 'Vocês suportam parcelamento?',
-    answer: 'Sim! O Due calcula automaticamente parcelas de compras e gera um plano de pagamento completo com vencimentos por fatura.'
+    answer: 'Utilizamos GPT-4o para analisar padrões, sem reter seus dados pessoais.'
   }
 ]
+
+function toggleTheme() {
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+}
 
 definePageMeta({
   layout: false
@@ -124,177 +109,115 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="min-h-screen bg-background selection:bg-primary/30 selection:text-primary overflow-x-hidden scroll-smooth">
-    <!-- Hero Section -->
-    <section id="home" class="relative pt-20 pb-32 md:pt-32 md:pb-48">
-      <!-- Background Decorations -->
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent -z-10 blur-3xl" />
-      <div class="absolute top-20 right-[10%] w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -z-10 animate-pulse" />
-      <div class="absolute top-40 left-[10%] w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10 animate-pulse" style="animation-delay: 2s" />
+  <div class="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary overflow-x-hidden font-sans antialiased transition-colors duration-300">
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/60 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+      <div class="container mx-auto px-6 h-20 flex items-center justify-between">
+        <NuxtLink to="/" class="font-bold text-2xl flex items-center gap-3 tracking-tighter">
+          <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-sm font-black shadow-lg shadow-primary/20">
+            D
+          </div>
+          Due
+        </NuxtLink>
+        <div class="flex items-center gap-6 md:gap-8">
+          <div class="hidden md:flex items-center gap-8">
+            <a href="#features" class="text-sm font-medium hover:text-primary transition-colors">Funcionalidades</a>
+            <a href="#roadmap" class="text-sm font-medium hover:text-primary transition-colors">Roadmap</a>
+          </div>
+          <div class="flex items-center gap-4">
+             <button 
+              @click="toggleTheme" 
+              class="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              aria-label="Toggle Theme"
+            >
+              <Moon v-if="colorMode.value === 'light'" class="w-5 h-5" />
+              <Sun v-else class="w-5 h-5" />
+            </button>
+            <div class="h-6 w-px bg-border/50 hidden md:block"></div>
+            <NuxtLink to="/sign-in" class="text-sm font-bold hover:text-primary transition-colors">Entrar</NuxtLink>
+            <NuxtLink to="/sign-up" class="hidden md:inline-flex h-9 px-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-all">
+              Criar Conta
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+    </nav>
 
-      <div class="container mx-auto px-4 text-center space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase border border-primary/20">
-          <Sparkles class="w-3 h-3" />
-          Financeiro Inteligente
+    <!-- Hero Section -->
+    <section id="home" class="relative pt-32 pb-32 md:pt-48 md:pb-64 overflow-hidden">
+      <!-- Glow Effects -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-gradient-to-b from-primary/10 via-transparent to-transparent -z-10 blur-[120px]" />
+      
+      <div class="container mx-auto px-6 text-center space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/50 border border-border/50 text-secondary-foreground text-xs font-bold tracking-widest uppercase backdrop-blur-md shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          Disponível Agora
         </div>
         
-        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight max-w-4xl mx-auto leading-[1.1]">
-          Domine suas finanças com <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">clareza total</span>
+        <h1 class="text-6xl md:text-8xl font-black tracking-tight max-w-5xl mx-auto leading-[0.9] text-foreground">
+          Domine suas finanças com <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-500">clareza total.</span>
         </h1>
         
-        <p class="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          O Due é o gerenciador financeiro que não te faz perder tempo. 
-          Importação inteligente, insights em tempo real e controle absoluto do seu orçamento.
+        <p class="text-xl md:text-2xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
+          O gerenciador financeiro para quem valoriza design, privacidade e eficiência.
+          Sem planilhas, sem anúncios, apenas controle.
         </p>
 
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
           <NuxtLink 
             v-if="userId"
             to="/dashboard" 
-            class="h-12 px-8 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:scale-105 transition-all w-full sm:w-auto"
+            class="h-14 px-10 inline-flex items-center justify-center rounded-full bg-foreground text-background font-bold text-lg shadow-xl hover:scale-105 transition-all w-full sm:w-auto"
           >
-            Ir para o Dashboard
+            Acessar Dashboard
           </NuxtLink>
           <NuxtLink 
             v-else
             to="/sign-up" 
-            class="h-12 px-8 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:scale-105 transition-all w-full sm:w-auto"
+            class="h-14 px-10 inline-flex items-center justify-center rounded-full bg-foreground text-background font-bold text-lg shadow-xl hover:scale-105 transition-all w-full sm:w-auto"
           >
-            Começar Agora Grátis
+            Começar Gratuitamente
           </NuxtLink>
           <a 
             href="#features"
-            class="h-12 px-8 inline-flex items-center justify-center rounded-full border border-border bg-background/50 backdrop-blur-sm hover:bg-muted/50 transition-all w-full sm:w-auto"
+            class="h-14 px-10 inline-flex items-center justify-center rounded-full border border-border/50 bg-background/50 backdrop-blur-md hover:bg-muted/50 transition-all w-full sm:w-auto font-semibold"
           >
-            Ver Features
+            Explorar Features
           </a>
-        </div>
-
-        <!-- Scroll Indicator -->
-        <div class="pt-12 animate-bounce">
-          <ChevronDown class="w-6 h-6 mx-auto text-muted-foreground" />
-        </div>
-
-        <!-- Dashboard Preview -->
-        <div class="mt-20 relative px-4 max-w-5xl mx-auto">
-          <div class="absolute inset-0 bg-primary/20 rounded-2xl blur-2xl -z-10 translate-y-8" />
-          <div class="rounded-2xl border bg-card/50 backdrop-blur-xl shadow-2xl overflow-hidden aspect-video relative group border-primary/20">
-             <div class="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent pointer-events-none" />
-             <div class="p-8 h-full flex flex-col gap-6 opacity-80 scale-95 group-hover:scale-100 transition-transform duration-700">
-                <div class="h-8 w-48 bg-muted rounded-md" />
-                <div class="grid grid-cols-3 gap-6">
-                    <div class="h-32 bg-primary/10 rounded-xl border border-primary/20 flex flex-col items-center justify-center gap-2">
-                        <div class="w-12 h-1 bg-primary/40 rounded-full" />
-                        <div class="w-8 h-1 bg-primary/20 rounded-full" />
-                    </div>
-                    <div class="h-32 bg-muted rounded-xl" />
-                    <div class="h-32 bg-muted rounded-xl" />
-                </div>
-                <div class="flex-grow bg-card/50 rounded-xl border border-border p-6 space-y-4">
-                    <div class="flex justify-between items-center"><div class="h-4 w-32 bg-muted rounded" /><div class="h-4 w-16 bg-muted rounded" /></div>
-                    <div class="h-2 w-full bg-muted rounded-full overflow-hidden"><div class="h-full w-2/3 bg-primary" /></div>
-                    <div class="space-y-3 pt-4">
-                        <div v-for="i in 3" :key="i" class="flex justify-between items-center py-2 border-b border-border/50">
-                            <div class="flex gap-3 items-center">
-                                <div class="w-8 h-8 rounded-lg bg-muted" />
-                                <div class="h-4 w-24 bg-muted rounded" />
-                            </div>
-                            <div class="h-4 w-16 bg-muted rounded" />
-                        </div>
-                    </div>
-                </div>
-             </div>
-             <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/20 backdrop-blur-[2px]">
-                <div class="bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold flex items-center gap-2">
-                    Design Moderno <ArrowRight class="w-4 h-4" />
-                </div>
-             </div>
-          </div>
         </div>
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-24 bg-muted/30">
-      <div class="container mx-auto px-4">
-        <div class="text-center space-y-4 mb-16">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase">
-            <Check class="w-3 h-3" />
-            Disponível Agora
-          </div>
-          <h2 class="text-3xl md:text-4xl font-bold">Tudo que você precisa para <span class="text-primary">prosperar</span></h2>
-          <p class="text-muted-foreground max-w-2xl mx-auto">Funcionalidades pensadas para quem odeia planilhas complexas, mas ama controle absoluto.</p>
+    <!-- Bento Grid Features -->
+    <section id="features" class="py-32 relative">
+      <div class="container mx-auto px-6">
+        <div class="mb-20">
+           <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-6">Poder sem complexidade.</h2>
+           <p class="text-xl text-muted-foreground max-w-2xl">Ferramentas essenciais reformuladas para a era moderna.</p>
         </div>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div 
             v-for="feature in features" 
             :key="feature.title"
-            class="p-6 rounded-2xl bg-card border hover:border-primary/50 transition-all group hover:shadow-lg"
+            :class="[
+              feature.colSpan,
+              'group relative p-8 rounded-3xl bg-secondary/20 dark:bg-zinc-900/40 border border-border/50 backdrop-blur-sm hover:border-primary/50 transition-all duration-500 overflow-hidden'
+            ]"
           >
-            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
-              <component :is="feature.icon" class="w-6 h-6" />
-            </div>
-            <h3 class="text-lg font-bold mb-2">{{ feature.title }}</h3>
-            <p class="text-sm text-muted-foreground leading-relaxed">
-              {{ feature.description }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Roadmap Section -->
-    <section id="roadmap" class="py-24">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase mb-4">
-            <Clock class="w-3 h-3" />
-            Roadmap Público
-          </div>
-          <h2 class="text-3xl md:text-4xl font-bold mb-4">O que vem por aí</h2>
-          <p class="text-muted-foreground max-w-2xl mx-auto">
-            Transparência total. Veja exatamente o que estamos construindo e quando esperamos lançar.
-          </p>
-        </div>
-
-        <div class="max-w-4xl mx-auto space-y-4">
-          <div 
-            v-for="(item, index) in roadmap" 
-            :key="item.title"
-            class="group relative p-6 rounded-2xl bg-card border hover:border-primary/50 transition-all"
-          >
-            <div 
-              v-if="index !== roadmap.length - 1"
-              class="absolute left-[35px] top-[60px] w-0.5 h-[calc(100%+16px)] bg-gradient-to-b from-primary/50 to-transparent"
-            />
+            <!-- Hover Glow -->
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            <div class="flex gap-4">
-              <div class="flex-shrink-0">
-                <div 
-                  class="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform"
-                  :class="item.status === 'soon' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'"
-                >
-                  <component :is="item.icon" class="w-6 h-6" />
-                </div>
+            <div class="relative z-10 h-full flex flex-col justify-between space-y-8">
+              <div class="w-14 h-14 rounded-2xl bg-background/80 flex items-center justify-center text-primary shadow-lg border border-border/50 group-hover:scale-110 transition-transform duration-500">
+                <component :is="feature.icon" class="w-7 h-7" />
               </div>
               
-              <div class="flex-grow">
-                <div class="flex items-start justify-between mb-2 flex-wrap gap-2">
-                  <h3 class="text-xl font-bold">{{ item.title }}</h3>
-                  <div class="flex items-center gap-2">
-                    <span 
-                      class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap"
-                      :class="item.status === 'soon' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'"
-                    >
-                      <Clock class="w-2.5 h-2.5" />
-                      {{ item.status === 'soon' ? 'Em Breve' : 'Planejado' }}
-                    </span>
-                    <span class="text-xs text-muted-foreground font-mono">{{ item.eta }}</span>
-                  </div>
-                </div>
-                <p class="text-sm text-muted-foreground leading-relaxed">
-                  {{ item.description }}
+              <div>
+                <h3 class="text-2xl font-bold mb-3 tracking-tight">{{ feature.title }}</h3>
+                <p class="text-muted-foreground font-medium leading-relaxed">
+                  {{ feature.description }}
                 </p>
               </div>
             </div>
@@ -303,27 +226,56 @@ definePageMeta({
       </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section id="faq" class="py-24 bg-muted/30">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold mb-4">Perguntas Frequentes</h2>
-          <p class="text-muted-foreground max-w-2xl mx-auto">
-            Respostas rápidas para as dúvidas mais comuns sobre o Due.
-          </p>
+    <!-- Roadmap Section -->
+    <section id="roadmap" class="py-32">
+       <div class="container mx-auto px-6">
+        <div class="mb-20">
+           <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-6">O futuro é brilhante.</h2>
+           <p class="text-xl text-muted-foreground max-w-2xl">Transparência radical sobre nossos próximos passos.</p>
         </div>
 
-        <div class="max-w-3xl mx-auto space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div 
+            v-for="item in roadmap" 
+            :key="item.title"
+            class="relative p-6 rounded-3xl border border-border/40 bg-background/30 backdrop-blur-sm"
+          >
+            <div class="absolute top-6 right-6">
+               <span 
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border"
+                  :class="item.status === 'soon' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-blue-500/10 text-blue-500 border-blue-500/20'"
+                >
+                  {{ item.status === 'soon' ? 'Q2 2026' : 'Q3 2026' }}
+                </span>
+            </div>
+            <div class="pt-8">
+               <div class="mb-4 text-foreground/80">
+                  <component :is="item.icon" class="w-8 h-8" />
+               </div>
+               <h4 class="text-xl font-bold mb-2">{{ item.title }}</h4>
+               <p class="text-sm text-muted-foreground">{{ item.description }}</p>
+            </div>
+          </div>
+        </div>
+       </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-32 bg-secondary/10">
+      <div class="container mx-auto px-6 max-w-4xl">
+        <h2 class="text-3xl md:text-5xl font-black tracking-tight mb-16 text-center">Dúvidas Frequentes</h2>
+
+        <div class="space-y-4">
           <details 
             v-for="faq in faqs" 
             :key="faq.question"
-            class="group p-6 rounded-2xl bg-card border hover:border-primary/50 transition-all"
+            class="group p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm open:bg-card/80 transition-all"
           >
             <summary class="font-bold text-lg cursor-pointer list-none flex items-center justify-between">
               {{ faq.question }}
-              <ChevronDown class="w-5 h-5 transition-transform group-open:rotate-180" />
+              <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-300 group-open:rotate-180" />
             </summary>
-            <p class="mt-4 text-muted-foreground leading-relaxed">
+            <p class="mt-4 text-muted-foreground leading-relaxed animate-in slide-in-from-top-2 fade-in duration-300">
               {{ faq.answer }}
             </p>
           </details>
@@ -331,52 +283,19 @@ definePageMeta({
       </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-24">
-      <div class="container mx-auto px-4 text-center">
-        <div class="max-w-3xl mx-auto space-y-6">
-          <h2 class="text-4xl md:text-5xl font-bold">
-            Pronto para tomar <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">controle total</span> das suas finanças?
-          </h2>
-          <p class="text-lg text-muted-foreground">
-            Junte-se a centenas de usuários que já estão transformando a forma como gerenciam seu dinheiro.
-          </p>
-          <NuxtLink 
-            to="/sign-up"
-            class="inline-flex items-center gap-2 h-14 px-10 rounded-full bg-primary text-primary-foreground font-bold text-lg hover:scale-105 transition-all shadow-xl shadow-primary/30"
-          >
-            Começar Gratuitamente
-            <ArrowRight class="w-5 h-5" />
-          </NuxtLink>
-          <p class="text-sm text-muted-foreground">Sem cartão de crédito. Sem truques. Apenas finanças sob controle.</p>
-        </div>
-      </div>
-    </section>
-
     <!-- Footer -->
-    <footer class="py-12 border-t bg-muted/20">
-      <div class="container mx-auto px-4">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+    <footer class="py-12 border-t border-border/40">
+      <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-8 opacity-60 hover:opacity-100 transition-opacity">
           <div class="flex items-center gap-2 font-bold text-xl">
-            <div class="w-6 h-6 bg-primary rounded flex items-center justify-center text-primary-foreground text-sm">
+            <div class="w-6 h-6 bg-foreground rounded flex items-center justify-center text-background text-xs font-black">
               D
             </div>
             Due
           </div>
-          <div class="flex items-center gap-6 flex-wrap justify-center">
-            <a href="#home" class="text-sm hover:text-primary transition-colors">Home</a>
-            <a href="#features" class="text-sm hover:text-primary transition-colors">Features</a>
-            <a href="#roadmap" class="text-sm hover:text-primary transition-colors">Roadmap</a>
-            <a href="#faq" class="text-sm hover:text-primary transition-colors">FAQ</a>
-          </div>
-          <div class="flex items-center gap-4">
-            <NuxtLink to="/sign-in" class="text-sm hover:text-primary transition-colors">Entrar</NuxtLink>
-            <NuxtLink to="/sign-up" class="text-sm px-4 py-2 border rounded-full hover:bg-muted transition-colors">Cadastrar</NuxtLink>
-          </div>
-        </div>
-        <div class="text-center text-sm text-muted-foreground border-t pt-8">
-          <p>&copy; {{ new Date().getFullYear() }} Due Finance. Todos os direitos reservados.</p>
-          <p class="mt-2">Feito com ❤️ para quem leva finanças a sério.</p>
+          <p class="text-sm text-muted-foreground font-medium">
+            &copy; {{ new Date().getFullYear() }} Due Finance.
+          </p>
         </div>
       </div>
     </footer>
@@ -385,15 +304,13 @@ definePageMeta({
 
 <style scoped>
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
 }
 
-/* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
 }
 
-/* Custom styling for details/summary */
 details summary::-webkit-details-marker {
   display: none;
 }
