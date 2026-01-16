@@ -14,21 +14,21 @@ defineProps<{
 
 
 const bgColors = {
-  info: 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900',
-  warning: 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900',
-  critical: 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900'
+  info: 'bg-primary/10 border-primary/20',
+  warning: 'bg-amber-500/10 border-amber-500/20',
+  critical: 'bg-destructive/10 border-destructive/20'
 }
 
 const textColors = {
-  info: 'text-blue-800 dark:text-blue-300',
-  warning: 'text-amber-800 dark:text-amber-300',
-  critical: 'text-red-800 dark:text-red-300'
+  info: 'text-primary',
+  warning: 'text-amber-500 dark:text-amber-400',
+  critical: 'text-destructive dark:text-red-400'
 }
 
 const iconColors = {
-  info: 'text-blue-600 dark:text-blue-400',
-  warning: 'text-amber-600 dark:text-amber-400',
-  critical: 'text-red-600 dark:text-red-400'
+  info: 'text-primary',
+  warning: 'text-amber-500',
+  critical: 'text-destructive'
 }
 </script>
 

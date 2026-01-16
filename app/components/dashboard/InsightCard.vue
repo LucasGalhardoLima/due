@@ -36,13 +36,13 @@ function getRandomTip() {
 </script>
 
 <template>
-  <div v-if="insight?.hasData" class="rounded-xl border bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950 dark:to-background p-6 shadow-sm relative overflow-hidden">
-     <div class="absolute top-0 right-0 p-4 opacity-10">
-        <LucideLightbulb class="h-16 w-16" />
+  <div v-if="insight?.hasData" class="rounded-xl border bg-gradient-to-br from-primary/10 to-transparent dark:from-primary/5 dark:to-background p-6 shadow-sm relative overflow-hidden group hover:border-primary/40 transition-colors duration-300">
+     <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+        <LucideLightbulb class="h-16 w-16 text-primary" />
      </div>
      
      <div class="relative z-10 space-y-2">
-        <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-sm uppercase tracking-wide">
+        <div class="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
             <LucideLightbulb class="h-4 w-4" />
             Insight Financeiro
         </div>
@@ -55,7 +55,7 @@ function getRandomTip() {
             Esta categoria representa <span class="font-bold text-foreground">{{ insight.topCategory.percentage }}%</span> da sua fatura atual ({{ new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(insight.topCategory.amount) }}).
         </p>
         
-        <div class="pt-2 text-xs font-medium text-indigo-600 dark:text-indigo-400">
+        <div class="pt-2 text-xs font-semibold text-primary/80">
             Dica: {{ getRandomTip() }}
         </div>
      </div>

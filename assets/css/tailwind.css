@@ -37,19 +37,19 @@
   }
 
   .dark {
-    --background: 285 6% 10%;
-    /* Shadow Grey #1A181B */
+    --background: 240 10% 2%;
+    /* Deep Black */
     --foreground: 180 20% 98%;
 
-    --card: 285 6% 12%;
+    --card: 240 10% 4%;
     --card-foreground: 180 20% 98%;
 
-    --popover: 285 6% 10%;
+    --popover: 240 10% 2%;
     --popover-foreground: 180 20% 98%;
 
     --primary: 180 62% 66%;
     /* Pearl Aqua #75DDDD */
-    --primary-foreground: 285 6% 10%;
+    --primary-foreground: 240 10% 2%;
 
     --secondary: 187 30% 18%;
     /* Darker Frosted Blue */

@@ -52,25 +52,27 @@ function formatCurrency(val: number) {
 <template>
   <div class="space-y-4">
     <!-- Trigger Button -->
-    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
-      <div class="flex items-start justify-between">
-        <div class="space-y-2">
-          <div class="flex items-center gap-2">
-            <Sparkles class="w-5 h-5" />
-            <h3 class="text-lg font-bold">Consultor Financeiro IA</h3>
+    <div class="bg-gradient-to-br from-primary via-primary/80 to-cyan-600 rounded-xl p-6 text-primary-foreground shadow-lg relative overflow-hidden group">
+      <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
+      
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+        <div class="space-y-2 text-center md:text-left">
+          <div class="flex items-center justify-center md:justify-start gap-2">
+            <Sparkles class="w-6 h-6 animate-pulse" />
+            <h3 class="text-xl font-bold tracking-tight">AI Financial Advisor</h3>
           </div>
-          <p class="text-sm text-indigo-100 max-w-md">
-            Descubra por que sua fatura está alta e receba sugestões personalizadas para economizar.
+          <p class="text-primary-foreground/80 max-w-sm font-medium">
+            Diagnóstico profundo dos seus gastos com sugestões práticas acionadas por IA.
           </p>
         </div>
         <Button 
           @click="analyzeFinances" 
           :disabled="isLoading"
-          class="bg-white text-indigo-600 hover:bg-indigo-50 font-semibold"
+          class="bg-white/90 text-primary hover:bg-white font-bold h-12 px-8 shadow-xl"
         >
-          <Loader2 v-if="isLoading" class="w-4 h-4 mr-2 animate-spin" />
-          <Sparkles v-else class="w-4 h-4 mr-2" />
-          {{ isLoading ? 'Analisando...' : 'Analisar Gastos' }}
+          <Loader2 v-if="isLoading" class="w-5 h-5 mr-2 animate-spin" />
+          <Sparkles v-else class="w-5 h-5 mr-2" />
+          {{ isLoading ? 'Analisando...' : 'Gerar Insights' }}
         </Button>
       </div>
     </div>
@@ -92,8 +94,9 @@ function formatCurrency(val: number) {
       </div>
 
       <!-- Future Relief Card -->
-      <div class="bg-card rounded-xl border p-6 space-y-3">
-        <div class="flex items-center gap-2 text-green-600">
+      <div class="bg-card rounded-xl border border-primary/20 p-6 space-y-3 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full -mr-8 -mt-8" />
+        <div class="flex items-center gap-2 text-primary">
           <Calendar class="w-5 h-5" />
           <h4 class="font-bold text-foreground">Alívio Futuro</h4>
         </div>
@@ -103,8 +106,8 @@ function formatCurrency(val: number) {
       </div>
 
       <!-- Quick Actions Card -->
-      <div class="bg-card rounded-xl border p-6 space-y-3">
-        <div class="flex items-center gap-2 text-blue-600">
+      <div class="bg-card rounded-xl border border-primary/20 p-6 space-y-3">
+        <div class="flex items-center gap-2 text-primary">
           <TrendingDown class="w-5 h-5" />
           <h4 class="font-bold text-foreground">Ações Imediatas</h4>
         </div>
@@ -114,7 +117,7 @@ function formatCurrency(val: number) {
             :key="idx"
             class="flex gap-2 text-sm"
           >
-            <span class="text-blue-600 font-bold">{{idx + 1}}.</span>
+            <span class="text-primary font-bold">{{idx + 1}}.</span>
             <span class="text-muted-foreground">{{ action }}</span>
           </li>
         </ul>

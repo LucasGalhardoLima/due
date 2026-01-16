@@ -217,7 +217,7 @@ async function runAnalysis() {
           <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
           <div class="flex items-center gap-2">
               <button 
-                class="flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-sm font-medium transition-colors hover:bg-indigo-200 dark:hover:bg-indigo-900/50"
+                class="flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold transition-colors hover:bg-primary/20 border border-primary/20"
                 @click="runAnalysis"
               >
                 <Sparkles v-if="!advisorLoading" class="w-4 h-4" />
@@ -284,20 +284,20 @@ async function runAnalysis() {
             <div class="text-sm text-muted-foreground uppercase tracking-wide">Fatura Estimada</div>
             <div class="text-4xl font-bold text-primary">{{ formatCurrency(summary?.total || 0) }}</div>
             <div class="text-xs text-muted-foreground flex justify-center gap-2">
-                <span v-if="summary?.budget && summary.budget > 0" class="font-medium text-indigo-600">
+                <span v-if="summary?.budget && summary.budget > 0" class="font-bold text-primary">
                     Meta: {{ formatCurrency(summary.budget) }}
                 </span>
                 <span v-else>Limite: {{ formatCurrency(summary?.limit || 0) }}</span>
                 
                 <span>•</span>
-                <span>Disponível: <span class="text-green-600 font-medium">{{ formatCurrency(summary?.available || 0) }}</span></span>
+                <span>Disponível: <span class="text-emerald-500 font-bold">{{ formatCurrency(summary?.available || 0) }}</span></span>
             </div>
             
             <!-- Invoice Status Badge (Only for specific card) -->
             <div v-if="selectedCardId !== 'all' && summary?.status" class="flex justify-center mt-2">
                 <span 
-                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    :class="summary.status === 'PAID' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold"
+                    :class="summary.status === 'PAID' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-primary/10 text-primary'"
                 >
                     <component :is="summary.status === 'PAID' ? Check : AlertCircle" class="w-3 h-3" />
                     {{ summary.status === 'PAID' ? 'Fatura Paga' : 'Fatura Aberta' }}
