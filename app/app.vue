@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Toaster from '@/components/ui/Toaster.vue'
+// @ts-ignore
 import { Analytics } from '@vercel/analytics/nuxt'
 </script>
 
