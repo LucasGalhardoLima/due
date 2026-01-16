@@ -163,18 +163,18 @@ definePageMeta({
       <!-- Background Blobs -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] -z-10">
         <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
-        <div class="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-indigo-500/10 rounded-full blur-[140px] animate-pulse duration-[10s]" />
-        <div class="absolute bottom-0 left-[20%] w-[30%] h-[30%] bg-violet-600/10 rounded-full blur-[100px]" />
+        <div class="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-primary/10 rounded-full blur-[140px] animate-pulse duration-[10s]" />
+        <div class="absolute bottom-0 left-[20%] w-[30%] h-[30%] bg-cyan-500/10 rounded-full blur-[100px]" />
       </div>
       
       <div class="container mx-auto px-6 text-center space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase backdrop-blur-md shadow-sm">
           <span class="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          Revolucionando Finanças
+          Finanças Reimaginadas
         </div>
         
         <h1 class="text-6xl md:text-8xl font-black tracking-tight max-w-5xl mx-auto leading-[0.9] text-foreground transition-all duration-700">
-          Domine suas finanças com <span class="text-transparent bg-clip-text bg-gradient-to-br from-primary via-indigo-500 to-violet-600">clareza total.</span>
+          Domine suas finanças com <span class="text-transparent bg-clip-text bg-gradient-to-br from-primary via-cyan-400 to-emerald-500">clareza total.</span>
         </h1>
         
         <p class="text-xl md:text-2xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
@@ -250,7 +250,7 @@ definePageMeta({
     <!-- Roadmap Section (Timeline) -->
     <section id="roadmap" class="py-32 relative">
        <!-- timeline bar -->
-       <div class="absolute left-1/2 -translate-x-1/2 top-48 bottom-32 w-px bg-gradient-to-b from-primary/30 via-border/40 to-transparent hidden md:block" />
+       <div class="absolute left-1/2 -translate-x-1/2 top-48 bottom-32 w-px bg-gradient-to-b from-primary/40 via-border/40 to-transparent hidden md:block" />
        
        <div class="container mx-auto px-6">
         <div class="mb-20 text-center">
