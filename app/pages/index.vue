@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Sparkles, Upload, CheckCircle, ArrowRight, Check, Clock, Shield, TrendingUp, PieChart, Users, Calendar, Bell, FileText, Smartphone, Building2, DollarSign, Share2, Globe, ChevronDown, Moon, Sun } from 'lucide-vue-next'
+import { Sparkles, Upload, CheckCircle, ArrowRight, Check, Clock, Shield, TrendingUp, PieChart, Users, Calendar, Bell, FileText, Smartphone, Building2, DollarSign, MessageSquare, Target, Globe, ChevronDown, Moon, Sun } from 'lucide-vue-next'
 
 const { userId } = useAuth()
 const colorMode = useColorMode()
@@ -41,29 +41,43 @@ const roadmap = [
   {
     status: 'soon',
     icon: TrendingUp,
-    title: 'Maestria de Fluxo',
-    description: 'Controle absoluto de entradas e saídas com projeção de caixa inteligente.',
+    title: 'Fluxo de Caixa 360º',
+    description: 'Suporte completo para contas correntes, receitas e gastos no débito/Pix.',
     eta: 'Q1 2026'
   },
   {
     status: 'soon',
-    icon: Share2,
-    title: 'Due Family',
-    description: 'Compartilhamento colaborativo com multi-perfis e controle de acesso granular.',
+    icon: Smartphone,
+    title: 'App Instalável (PWA)',
+    description: 'Instale o Due direto na home do seu celular para uma experiência nativa.',
+    eta: 'Q1 2026'
+  },
+  {
+    status: 'soon',
+    icon: Bell,
+    title: 'Orçamentos Granulares',
+    description: 'Defina limites de gastos por categoria e receba alertas inteligentes.',
     eta: 'Q2 2026'
   },
   {
     status: 'planned',
-    icon: Sparkles,
-    title: 'Deep IA Insights',
-    description: 'Diagnósticos preditivos de comportamento e seu tutor financeiro pessoal.',
+    icon: Building2,
+    title: 'Open Finance',
+    description: 'Conexão direta com bancos para importar transações automaticamente.',
     eta: 'Q3 2026'
   },
   {
     status: 'planned',
-    icon: Building2,
-     title: 'Open Banking',
-    description: 'Conexão direta com suas instituições financeira em tempo real.',
+    icon: MessageSquare,
+    title: 'Advisor AI 2.0',
+    description: 'Chat interativo para tirar dúvidas e analisar histórico de gastos.',
+    eta: 'Q4 2026'
+  },
+  {
+    status: 'planned',
+    icon: Target,
+    title: 'Metas de Economia',
+    description: 'Cofres virtuais para planejar viagens, compras ou sua reserva.',
     eta: 'Q4 2026'
   }
 ]
