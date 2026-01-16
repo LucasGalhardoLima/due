@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { AlertCircle, Edit2, ArrowLeft, Clock, Calendar } from 'lucide-vue-next'
+import { AlertCircle, Edit2, ArrowLeft, Clock, Calendar, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
+import { Button } from '@/components/ui/button'
 
 interface Transaction {
   id: string
@@ -14,7 +15,19 @@ interface Transaction {
   category: { name: string }
 }
 
-const { data: transactions, refresh } = await useFetch<Transaction[]>('/api/admin/transactions')
+interface AdminTransactionsResponse {
+  transactions: Transaction[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+const currentPage = ref(1)
+const { data: response, refresh } = await useFetch<AdminTransactionsResponse>('/api/admin/transactions', {
+  query: {
+    page: currentPage
+  }
+})
 
 const isDrawerOpen = ref(false)
 const editingTransactionId = ref<string | null>(null)
@@ -35,6 +48,21 @@ function formatDate(dateStr: string) {
 function formatDateShort(dateStr: string) {
   return format(new Date(dateStr), 'dd/MM/yyyy', { locale: ptBR })
 }
+
+const transactions = computed(() => response.value?.transactions || [])
+const totalPages = computed(() => Math.ceil((response.value?.total || 0) / (response.value?.pageSize || 50)))
+
+function nextPage() {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+  }
+}
+
+function prevPage() {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
 </script>
 
 <template>
@@ -46,7 +74,7 @@ function formatDateShort(dateStr: string) {
             </div>
             <div>
                 <h1 class="text-3xl font-bold tracking-tight">Auditoria</h1>
-                <p class="text-muted-foreground">Últimas 50 transações criadas no sistema.</p>
+                <p class="text-muted-foreground">Analise as transações por ordem de criação.</p>
             </div>
         </div>
         
@@ -113,6 +141,38 @@ function formatDateShort(dateStr: string) {
                     </tr>
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div class="flex items-center justify-between px-4 py-4 border-t bg-muted/20">
+            <div class="text-sm text-muted-foreground">
+                Mostrando <span class="font-medium">{{ transactions.length }}</span> de <span class="font-medium">{{ response?.total || 0 }}</span> transações
+            </div>
+            <div class="flex items-center gap-2">
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    :disabled="currentPage === 1"
+                    @click="prevPage"
+                    class="gap-1 px-2"
+                >
+                    <ChevronLeft class="w-4 h-4" />
+                    Anterior
+                </Button>
+                <div class="text-sm font-medium px-2">
+                    Página {{ currentPage }} de {{ totalPages }}
+                </div>
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    :disabled="currentPage === totalPages"
+                    @click="nextPage"
+                    class="gap-1 px-2"
+                >
+                    Próximo
+                    <ChevronRight class="w-4 h-4" />
+                </Button>
+            </div>
         </div>
     </div>
 

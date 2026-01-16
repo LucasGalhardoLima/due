@@ -1,10 +1,26 @@
+import { z } from 'zod'
 import prisma from '../../utils/prisma'
 
+const querySchema = z.object({
+  page: z.string().optional().default('1'),
+  limit: z.string().optional().default('50')
+})
+
 export default defineEventHandler(async (event) => {
-  // Fetch latest 50 transactions based on creation date
-  // This is purely for administrative auditing
+  const query = getQuery(event)
+  const { page, limit } = querySchema.parse(query)
+  
+  const pageNumber = parseInt(page)
+  const pageSize = parseInt(limit)
+  const skip = (pageNumber - 1) * pageSize
+
+  // Fetch total count for pagination metadata
+  const total = await prisma.transaction.count()
+
+  // Fetch slice of transactions
   const transactions = await prisma.transaction.findMany({
-    take: 50,
+    skip,
+    take: pageSize,
     orderBy: {
       createdAt: 'desc'
     },
@@ -22,5 +38,10 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return transactions
+  return {
+    transactions,
+    total,
+    page: pageNumber,
+    pageSize
+  }
 })
