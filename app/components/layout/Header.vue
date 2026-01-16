@@ -15,6 +15,7 @@ const routes = [
   { name: 'Cartões', path: '/cards' },
   { name: 'Categorias', path: '/categories' },
   { name: 'Importar', path: '/import' },
+  { name: 'Auditoria', path: '/admin/transactions' },
 ]
 
 const isOpen = ref(false)
