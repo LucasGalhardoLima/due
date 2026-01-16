@@ -1,416 +1,167 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { addMonths, subMonths, getMonth, getYear } from 'date-fns'
-import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
-import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { toast } from 'vue-sonner'
-import { Check, AlertCircle, Sparkles, Loader2  } from 'lucide-vue-next'
-
-import TransactionList from '@/components/transaction/TransactionList.vue'
-import InsightCard from '@/components/dashboard/InsightCard.vue'
-import AdvisorCard from '@/components/dashboard/AdvisorCard.vue'
-import AIInsights from '@/components/dashboard/AIInsights.vue'
-
-// Global State
-const currentDate = ref(new Date())
-const selectedCardId = ref<string>('all')
-const editingTransactionId = ref<string | null>(null)
-
-// API Query Params
-const queryParams = computed(() => ({
-    month: getMonth(currentDate.value) + 1,
-    year: getYear(currentDate.value),
-    cardId: selectedCardId.value === 'all' ? undefined : selectedCardId.value
-}))
-
-interface SummaryResponse {
-    month: number
-    year: number
-    total: number
-    limit: number
-    budget?: number
-    available: number
-    transactions: Record<string, unknown[]>
-    status?: 'OPEN' | 'PAID' | 'CLOSED'
-}
-
-// Fetch Data
-const { data: summary, refresh: refreshSummary } = await useFetch<SummaryResponse>('/api/invoices/summary', {
-    key: 'dashboard-summary', // Enable global access for optimistic updates
-    query: queryParams
-})
-
-// Fetch cards to check if user has any
-const { data: cards } = await useFetch('/api/cards')
-
-// Keeping futureProjection and pareto for now
-const { data: futureProjection, refresh: refreshFuture } = await useFetch('/api/dashboard/future-projection')
-const { data: pareto, refresh: refreshPareto } = await useFetch('/api/dashboard/pareto')
-
-const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-
-function formatCurrency(val: number) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)
-}
-
-function getMonthName(monthIndex: number) {
-  return months[monthIndex - 1]
-}
-
-function nextMonth() {
-    currentDate.value = addMonths(currentDate.value, 1)
-}
-
-function prevMonth() {
-    currentDate.value = subMonths(currentDate.value, 1)
-}
-
-const isDrawerOpen = ref(false)
-
-function handleEdit(tx: any) {
-  editingTransactionId.value = tx.transactionId
-  isDrawerOpen.value = true
-}
-
-// Reset ID when drawer closes
-watch(isDrawerOpen, (val) => {
-  if (!val) {
-    setTimeout(() => {
-        editingTransactionId.value = null
-    }, 300)
-  }
-})
-
-function onSaved() {
-  refreshFuture()
-  refreshPareto()
-}
-
-// Progress bar computed properties
-const usagePercentage = computed(() => {
-  if (!summary.value) return 0
-  // Use Budget if exists and > 0, otherwise Limit
-  const base = (summary.value.budget && summary.value.budget > 0) ? summary.value.budget : summary.value.limit
-  if (!base || base === 0) return 0
-  return Math.min((summary.value.total / base) * 100, 100)
-})
-
-const isOverBudget = computed(() => {
-    if (!summary.value || !summary.value.budget) return false
-    return summary.value.total > summary.value.budget
-})
-
-const progressColor = computed(() => {
-  const pct = usagePercentage.value
-  // Game Logic:
-  // 90%+ : Red (Danger)
-  // 70-90% : Yellow (Warning)
-  // 0-70% : Green (Safe)
-  if (pct >= 90) return 'bg-red-600'
-  if (pct >= 70) return 'bg-yellow-500'
-  return 'bg-green-600'
-})
-
-const showAlert = computed(() => usagePercentage.value >= 70)
-
-// Payment Logic
-const showPayConfirm = ref(false)
-
-function onPayClick() {
-    showPayConfirm.value = true
-}
-
-async function handlePayInvoice() {
-    if (selectedCardId.value === 'all') return
-
-    try {
-        await $fetch('/api/invoices/pay', {
-            method: 'POST',
-            body: {
-                cardId: selectedCardId.value,
-                month: getMonth(currentDate.value) + 1,
-                year: getYear(currentDate.value)
-            }
-        })
-        
-        await refreshSummary()
-        toast.success('Fatura paga com sucesso!')
-    } catch (e) {
-        console.error(e)
-        toast.error('Erro ao pagar fatura')
-    }
-}
-
-// Advisor Logic
-interface AdvisorAnalysis {
-    verdict: string
-    severity: 'info' | 'warning' | 'critical'
-    title: string
-    message: string
-    action: string
-}
-
-const showAdvisor = ref(false)
-const advisorLoading = ref(false)
-const advisorResult = ref<AdvisorAnalysis | null>(null)
-
-async function runAnalysis() {
-    if (showAdvisor.value && advisorResult.value) {
-        showAdvisor.value = false // Toggle off
-        return
-    }
-
-    showAdvisor.value = true
-    advisorLoading.value = true
-    advisorResult.value = null // Reset
-
-    try {
-        const result = await $fetch<AdvisorAnalysis>('/api/advisor/analyze', {
-            method: 'POST',
-            body: {
-                month: getMonth(currentDate.value) + 1,
-                year: getYear(currentDate.value),
-                cardId: selectedCardId.value === 'all' ? undefined : selectedCardId.value
-            }
-        })
-        advisorResult.value = result
-    } catch (e) {
-        console.error(e)
-        const errorMessage = e instanceof Error ? e.message : 'Unknown error'
-        toast.error('Não foi possível analisar a fatura: ' + errorMessage)
-        showAdvisor.value = false
-    } finally {
-        advisorLoading.value = false
-    }
-}
+const { userId } = useAuth()
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8 space-y-8 pb-24">
-    <!-- Empty State: No Cards -->
-    <div v-if="!cards || cards.length === 0" class="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
-      <div class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-          <rect width="20" height="14" x="2" y="5" rx="2"/>
-          <line x1="2" x2="22" y1="10" y2="10"/>
-        </svg>
-      </div>
-      <div class="text-center space-y-2 max-w-md">
-        <h2 class="text-2xl font-bold">Vamos configurar seu cartão principal?</h2>
-        <p class="text-muted-foreground">
-          Para começar a controlar suas despesas, você precisa cadastrar pelo menos um cartão de crédito.
+  <div class="min-h-screen bg-background selection:bg-primary/30 selection:text-primary overflow-x-hidden">
+    <!-- Hero Section -->
+    <section class="relative pt-20 pb-32 md:pt-32 md:pb-48">
+      <!-- Background Decorations -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent -z-10 blur-3xl" />
+      <div class="absolute top-20 right-[10%] w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -z-10 animate-pulse" />
+      <div class="absolute top-40 left-[10%] w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10 animate-pulse" style="animation-delay: 2s" />
+
+      <div class="container mx-auto px-4 text-center space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase border border-primary/20">
+          <Sparkles class="w-3 h-3" />
+          Financeiro Inteligente
+        </div>
+        
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight max-w-4xl mx-auto leading-[1.1]">
+          Domine suas finanças com <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-600">clareza total</span>
+        </h1>
+        
+        <p class="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          O Due é o gerenciador financeiro que não te faz perder tempo. 
+          Importação inteligente, insights em tempo real e controle absoluto do seu orçamento.
         </p>
-      </div>
-      <NuxtLink 
-        to="/cards" 
-        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
-      >
-        Adicionar Primeiro Cartão
-      </NuxtLink>
-    </div>
 
-    <!-- Main Dashboard Content -->
-    <template v-else>
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-      <div class="flex items-center gap-3">
-          <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <div class="flex items-center gap-2">
-              <button 
-                class="flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-sm font-medium transition-colors hover:bg-indigo-200 dark:hover:bg-indigo-900/50"
-                @click="runAnalysis"
-              >
-                <Sparkles v-if="!advisorLoading" class="w-4 h-4" />
-                <Loader2 v-else class="w-4 h-4 animate-spin" />
-                {{ showAdvisor ? 'Fechar Análise' : 'Analisar' }}
-              </button>
-              
-              <NuxtLink 
-                to="/import"
-                class="flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm font-medium transition-colors hover:bg-green-200 dark:hover:bg-green-900/50"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" x2="12" y1="3" y2="15"/>
-                </svg>
-                Importar CSV
-              </NuxtLink>
-          </div>
-      </div>
-      
-      
-      <!-- Card Filter -->
-      <div class="w-full md:w-[200px]">
-        <Select v-model="selectedCardId">
-          <SelectTrigger>
-            <SelectValue placeholder="Todos os Cartões" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os Cartões</SelectItem>
-            <SelectItem v-for="card in cards" :key="card.id" :value="card.id">
-              {{ card.name }}
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-
-    <!-- Month Navigation & Main KPI -->
-    <div class="flex flex-col items-center space-y-4">
-        <!-- Insight Card (Full Width) -->
-        <div class="w-full max-w-md">
-            <div v-if="!showAdvisor">
-                <InsightCard :month="summary?.month || 1" :year="summary?.year || 2024" />
-            </div>
-            <div v-else>
-                <AdvisorCard :analysis="advisorResult" :loading="advisorLoading" />
-            </div>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          <NuxtLink 
+            v-if="userId"
+            to="/dashboard" 
+            class="h-12 px-8 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:scale-105 transition-all w-full sm:w-auto"
+          >
+            Ir para o Dashboard
+          </NuxtLink>
+          <NuxtLink 
+            v-else
+            to="/sign-up" 
+            class="h-12 px-8 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:scale-105 transition-all w-full sm:w-auto"
+          >
+            Começar Agora Grátis
+          </NuxtLink>
+          <NuxtLink 
+            to="/dashboard"
+            class="h-12 px-8 inline-flex items-center justify-center rounded-full border border-border bg-background/50 backdrop-blur-sm hover:bg-muted/50 transition-all w-full sm:w-auto"
+          >
+            Ver Demonstração
+          </NuxtLink>
         </div>
 
-        <div class="flex items-center space-x-4 bg-muted/30 p-2 rounded-full">
-            <button class="p-2 hover:bg-muted rounded-full transition-colors" @click="prevMonth">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            <span class="font-semibold text-lg min-w-[120px] text-center">
-                {{ getMonthName(summary?.month || 1) }}/{{ summary?.year }}
-            </span>
-            <button class="p-2 hover:bg-muted rounded-full transition-colors" @click="nextMonth">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-        </div>
-
-        <div class="w-full max-w-md rounded-xl border bg-card text-card-foreground shadow p-6 text-center space-y-2">
-            <div class="text-sm text-muted-foreground uppercase tracking-wide">Fatura Estimada</div>
-            <div class="text-4xl font-bold text-primary">{{ formatCurrency(summary?.total || 0) }}</div>
-            <div class="text-xs text-muted-foreground flex justify-center gap-2">
-                <span v-if="summary?.budget && summary.budget > 0" class="font-medium text-indigo-600">
-                    Meta: {{ formatCurrency(summary.budget) }}
-                </span>
-                <span v-else>Limite: {{ formatCurrency(summary?.limit || 0) }}</span>
-                
-                <span>•</span>
-                <span>Disponível: <span class="text-green-600 font-medium">{{ formatCurrency(summary?.available || 0) }}</span></span>
-            </div>
-            
-            <!-- Invoice Status Badge (Only for specific card) -->
-            <div v-if="selectedCardId !== 'all' && summary?.status" class="flex justify-center mt-2">
-                <span 
-                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    :class="summary.status === 'PAID' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'"
-                >
-                    <component :is="summary.status === 'PAID' ? Check : AlertCircle" class="w-3 h-3" />
-                    {{ summary.status === 'PAID' ? 'Fatura Paga' : 'Fatura Aberta' }}
-                </span>
-            </div>
-            
-            <!-- Alert Badge -->
-            <div v-if="showAlert" class="flex items-center justify-center gap-2 mt-2" :class="usagePercentage >= 90 ? 'text-red-600' : 'text-yellow-600'">
-              <component :is="usagePercentage >= 90 ? AlertCircle : Sparkles" class="w-4 h-4" />
-              <span class="text-sm font-medium">
-                {{ usagePercentage >= 100 ? (isOverBudget ? 'Meta estourada!' : 'Limite atingido!') : (usagePercentage >= 90 ? 'Zona de Perigo (90%+)' : 'Atenção (70%+)') }}
-              </span>
-            </div>
-
-            <!-- Dynamic gauge bar -->
-            <div class="w-full bg-secondary h-2 rounded-full mt-4 overflow-hidden relative">
-                <div 
-                  :class="[progressColor, usagePercentage >= 90 && 'animate-pulse']" 
-                  class="h-full transition-all duration-700 ease-out" 
-                  :style="{ width: `${usagePercentage}%` }"
-                />
-            </div>
-            
-            <!-- Percentage display -->
-            <div class="text-xs text-muted-foreground mt-1">
-              {{ usagePercentage.toFixed(1) }}% da {{ (summary?.budget && summary.budget > 0) ? 'meta' : 'fatura' }} utilizada
-            </div>
-
-            <!-- Pay Button (Only if specific card and NOT paid) -->
-            <div v-if="selectedCardId !== 'all' && summary?.status !== 'PAID'" class="pt-4">
-                <button 
-                    class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
-                    @click="onPayClick"
-                >
-                    Pagar Fatura
-                </button>
-            </div>
-            
-            <div v-else-if="selectedCardId !== 'all' && summary?.status === 'PAID'" class="pt-4 text-center text-sm text-green-600 font-medium">
-                Esta fatura já foi paga em {{ new Date().toLocaleDateString() /* TODO: Store pay date */ }}
-            </div>
-        </div>
-    </div>
-    
-    <!-- AI Insights Section -->
-    <AIInsights />
-    
-    <!-- Future Projection -->
-    <div class="rounded-xl border bg-card text-card-foreground shadow">
-      <div class="p-6 pb-4">
-        <h3 class="text-lg font-semibold">Projeção Futura (Danos Contratados)</h3>
-        <p class="text-sm text-muted-foreground">O que já está parcelado para os próximos meses.</p>
-      </div>
-      <div class="p-6 pt-0">
-        <div class="grid gap-4 md:grid-cols-3">
-          <div
-v-for="proj in futureProjection?.projections" :key="`${proj.month}-${proj.year}`" 
-               class="flex flex-col p-4 rounded-lg bg-muted/50 border">
-            <span class="text-sm font-medium text-muted-foreground uppercase">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
-            <span class="text-xl font-bold mt-1">{{ formatCurrency(proj.total || 0) }}</span>
-            <span class="text-xs text-muted-foreground mt-1">{{ proj.installmentsCount }} parcelas</span>
+        <!-- Dashboard Preview -->
+        <div class="mt-20 relative px-4 max-w-5xl mx-auto">
+          <div class="absolute inset-0 bg-primary/20 rounded-2xl blur-2xl -z-10 translate-y-8" />
+          <div class="rounded-2xl border bg-card/50 backdrop-blur-xl shadow-2xl overflow-hidden aspect-video relative group border-primary/20">
+             <div class="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent pointer-events-none" />
+             <!-- Mock UI elements for the image -->
+             <div class="p-8 h-full flex flex-col gap-6 opacity-80 scale-95 group-hover:scale-100 transition-transform duration-700">
+                <div class="h-8 w-48 bg-muted rounded-md" />
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="h-32 bg-primary/10 rounded-xl border border-primary/20 flex flex-col items-center justify-center gap-2">
+                        <div class="w-12 h-1 bg-primary/40 rounded-full" />
+                        <div class="w-8 h-1 bg-primary/20 rounded-full" />
+                    </div>
+                    <div class="h-32 bg-muted rounded-xl" />
+                    <div class="h-32 bg-muted rounded-xl" />
+                </div>
+                <div class="flex-grow bg-card/50 rounded-xl border border-border p-6 space-y-4">
+                    <div class="flex justify-between items-center"><div class="h-4 w-32 bg-muted rounded" /><div class="h-4 w-16 bg-muted rounded" /></div>
+                    <div class="h-2 w-full bg-muted rounded-full overflow-hidden"><div class="h-full w-2/3 bg-primary" /></div>
+                    <div class="space-y-3 pt-4">
+                        <div v-for="i in 3" :key="i" class="flex justify-between items-center py-2 border-b border-border/50">
+                            <div class="flex gap-3 items-center">
+                                <div class="w-8 h-8 rounded-lg bg-muted" />
+                                <div class="h-4 w-24 bg-muted rounded" />
+                            </div>
+                            <div class="h-4 w-16 bg-muted rounded" />
+                        </div>
+                    </div>
+                </div>
+             </div>
+             <!-- Overlay for "Check out our UI" vibe -->
+             <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/20 backdrop-blur-[2px]">
+                <div class="bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold flex items-center gap-2">
+                    Design Moderno <ArrowRight class="w-4 h-4" />
+                </div>
+             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Pareto Analysis -->
-    <div class="rounded-xl border bg-card text-card-foreground shadow">
-      <div class="p-6 pb-4">
-        <h3 class="text-lg font-semibold">Análise de Pareto</h3>
-        <p class="text-sm text-muted-foreground">Onde seu dinheiro está indo (Top Categorias).</p>
-      </div>
-      <div class="p-6 pt-0 space-y-4">
-        <div v-for="cat in pareto?.categories.slice(0, 5)" :key="cat.name" class="space-y-1">
-          <div class="flex justify-between text-sm">
-            <span class="font-medium">{{ cat.name }}</span>
-            <span class="text-muted-foreground">{{ formatCurrency(cat.total) }} ({{ cat.percentage }}%)</span>
+    <!-- Features Section -->
+    <section class="py-24 bg-muted/30 relative">
+      <div class="container mx-auto px-4">
+        <div class="text-center space-y-4 mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold">Tudo que você precisa para <span class="text-primary">prosperar</span></h2>
+          <p class="text-muted-foreground max-w-2xl mx-auto">Funcionalidades pensadas para quem odeia planilhas complexas, mas ama controle absoluto.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="p-8 rounded-2xl bg-card border hover:border-primary/50 transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
+              <Sparkles class="w-6 h-6" />
+            </div>
+            <h3 class="text-xl font-bold mb-3">Insights com IA</h3>
+            <p class="text-muted-foreground leading-relaxed">
+              Receba diagnósticos precisos sobre seus gastos e planos de ação práticos gerados por inteligência artificial.
+            </p>
           </div>
-          <div class="h-2 w-full rounded-full bg-secondary">
-            <div class="h-2 rounded-full bg-primary" :style="{ width: `${cat.percentage}%` }"/>
+
+          <div class="p-8 rounded-2xl bg-card border hover:border-primary/50 transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 mb-6 group-hover:scale-110 transition-transform">
+              <Upload class="w-6 h-6" />
+            </div>
+            <h3 class="text-xl font-bold mb-3">Importação Inteligente</h3>
+            <p class="text-muted-foreground leading-relaxed">
+              O "Matador de Preguiça". Arraste seu CSV e deixe que nossa IA classifique automaticamente cada transação.
+            </p>
+          </div>
+
+          <div class="p-8 rounded-2xl bg-card border hover:border-primary/50 transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500 mb-6 group-hover:scale-110 transition-transform">
+              <CheckCircle class="w-6 h-6" />
+            </div>
+            <h3 class="text-xl font-bold mb-3">Isolamento Seguro</h3>
+            <p class="text-muted-foreground leading-relaxed">
+              Cada conta é um bunker. Seus dados são criptografados e isolados, acessíveis apenas por você via Clerk Auth.
+            </p>
           </div>
         </div>
-        <div v-if="!pareto?.categories?.length" class="text-sm text-muted-foreground py-4">
-          Nenhuma despesa registrada ainda.
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t">
+      <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-2 font-bold text-xl">
+          <div class="w-6 h-6 bg-primary rounded flex items-center justify-center text-primary-foreground text-sm">
+            D
+          </div>
+          Due
+        </div>
+        <div class="text-sm text-muted-foreground">
+          &copy; {{ new Date().getFullYear() }} Due Finance. Todos os direitos reservados.
+        </div>
+        <div class="flex items-center gap-6">
+          <NuxtLink to="/sign-in" class="text-sm hover:text-primary transition-colors">Entrar</NuxtLink>
+          <NuxtLink to="/sign-up" class="text-sm border px-4 py-2 rounded-full hover:bg-muted transition-colors">Cadastrar</NuxtLink>
         </div>
       </div>
-    </div>
-    
-    <!-- Transaction List -->
-    <div class="rounded-xl border bg-card text-card-foreground shadow p-6">
-        <h3 class="text-lg font-semibold mb-4">Lançamentos</h3>
-        <!-- Pass empty object if undefined to avoid errors -->
-        <TransactionList :transactions="summary?.transactions || {}" @edit="handleEdit" />
-    </div>
-
-    <!-- Quick Add Button (Floating or Inline) -->
-    <!-- We will add functionality later, for now just a link/button placeholder -->
-    <div class="fixed bottom-8 right-8">
-      <button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors" @click="isDrawerOpen = true">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-      </button>
-    </div>
-
-    <TransactionDrawer v-model:open="isDrawerOpen" :transaction-id="editingTransactionId" @saved="onSaved" />
-
-    <ConfirmDialog 
-      v-model:open="showPayConfirm"
-      title="Pagar Fatura?"
-      description="Isso marcará a fatura deste mês como paga. O limite será liberado no próximo ciclo (simulação)."
-      confirm-text="Confirmar Pagamento"
-      @confirm="handlePayInvoice"
-    />
-
-    </template>
+    </footer>
   </div>
 </template>
+
+<script setup lang="ts">
+import { Sparkles, Upload, CheckCircle, ArrowRight } from 'lucide-vue-next'
+definePageMeta({
+  layout: false // Landing page doesn't need the internal header
+})
+</script>
+
+<style scoped>
+.container {
+  max-width: 1200px;
+}
+</style>

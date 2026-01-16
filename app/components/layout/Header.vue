@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/sheet'
 
 const routes = [
-  { name: 'Dashboard', path: '/' },
+  { name: 'Dashboard', path: '/dashboard' },
   { name: 'Cartões', path: '/cards' },
   { name: 'Categorias', path: '/categories' },
   { name: 'Importar', path: '/import' },
