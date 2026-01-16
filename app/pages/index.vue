@@ -197,7 +197,7 @@ definePageMeta({
           <div class="relative group">
             <div class="absolute inset-0 bg-primary/20 rounded-[3rem] blur-3xl -z-10 group-hover:bg-primary/30 transition-all duration-700" />
             <img 
-              src="/Users/lucasgalhardo/.gemini/antigravity/brain/b08abdc6-ec51-43e5-a3e3-e2dc61b6abc9/due_app_mockup_iphone_1768596452356.png" 
+              src="/img/mockup.png" 
               alt="Due App Mockup" 
               class="w-[320px] md:w-[400px] mx-auto drop-shadow-2xl animate-in fade-in zoom-in duration-1000 delay-300 pointer-events-none"
             />
