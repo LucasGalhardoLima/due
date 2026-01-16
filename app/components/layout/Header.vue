@@ -32,7 +32,7 @@ const isOpen = ref(false)
     <div class="container mx-auto px-4 h-16 flex items-center justify-between">
       <!-- Logo -->
       <NuxtLink to="/" class="font-bold text-xl flex items-center gap-2">
-        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
+        <div class="w-8 h-8 bg-primary rounded-[10px] flex items-center justify-center text-primary-foreground">
           D
         </div>
         <span>Due</span>

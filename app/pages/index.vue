@@ -129,7 +129,7 @@ definePageMeta({
     <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/60 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <div class="container mx-auto px-6 h-20 flex items-center justify-between">
         <NuxtLink to="/" class="font-bold text-2xl flex items-center gap-3 tracking-tighter">
-          <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground text-sm font-black shadow-lg shadow-primary/20">
+          <div class="w-8 h-8 bg-primary rounded-[10px] flex items-center justify-center text-primary-foreground text-sm font-black shadow-lg shadow-primary/20">
             D
           </div>
           Due
@@ -331,7 +331,7 @@ definePageMeta({
       <div class="container mx-auto px-6">
         <div class="flex flex-col md:flex-row justify-between items-center gap-8 opacity-60 hover:opacity-100 transition-opacity">
           <div class="flex items-center gap-2 font-bold text-xl">
-            <div class="w-6 h-6 bg-primary rounded flex items-center justify-center text-primary-foreground text-xs font-black shadow-lg shadow-primary/20">
+            <div class="w-6 h-6 bg-primary rounded-[6px] flex items-center justify-center text-primary-foreground text-[10px] font-black shadow-lg shadow-primary/20">
               D
             </div>
             Due
