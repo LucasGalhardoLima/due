@@ -160,22 +160,26 @@ definePageMeta({
 
     <!-- Hero Section -->
     <section id="home" class="relative pt-32 pb-32 md:pt-48 md:pb-64 overflow-hidden">
-      <!-- Glow Effects -->
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-gradient-to-b from-primary/10 via-transparent to-transparent -z-10 blur-[120px]" />
+      <!-- Background Blobs -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] -z-10">
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
+        <div class="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-indigo-500/10 rounded-full blur-[140px] animate-pulse duration-[10s]" />
+        <div class="absolute bottom-0 left-[20%] w-[30%] h-[30%] bg-violet-600/10 rounded-full blur-[100px]" />
+      </div>
       
       <div class="container mx-auto px-6 text-center space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/50 border border-border/50 text-secondary-foreground text-xs font-bold tracking-widest uppercase backdrop-blur-md shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          Disponível Agora
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase backdrop-blur-md shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          Revolucionando Finanças
         </div>
         
-        <h1 class="text-6xl md:text-8xl font-black tracking-tight max-w-5xl mx-auto leading-[0.9] text-foreground">
-          Domine suas finanças com <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-500">clareza total.</span>
+        <h1 class="text-6xl md:text-8xl font-black tracking-tight max-w-5xl mx-auto leading-[0.9] text-foreground transition-all duration-700">
+          Domine suas finanças com <span class="text-transparent bg-clip-text bg-gradient-to-br from-primary via-indigo-500 to-violet-600">clareza total.</span>
         </h1>
         
         <p class="text-xl md:text-2xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-          O gerenciador financeiro para quem valoriza design, privacidade e eficiência.
-          Sem planilhas, sem anúncios, apenas controle.
+          O gerenciador financeiro que une design de ponta, 
+          IA avançada e privacidade absoluta.
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
@@ -204,11 +208,14 @@ definePageMeta({
     </section>
 
     <!-- Bento Grid Features -->
-    <section id="features" class="py-32 relative">
+    <section id="features" class="py-32 relative overflow-hidden">
+      <!-- Glow -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10" />
+      
       <div class="container mx-auto px-6">
         <div class="mb-20">
-           <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-6">Poder sem complexidade.</h2>
-           <p class="text-xl text-muted-foreground max-w-2xl">Ferramentas essenciais reformuladas para a era moderna.</p>
+           <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-6">Poder sem <span class="text-primary/80">complexidade.</span></h2>
+           <p class="text-xl text-muted-foreground max-w-2xl font-medium">Ferramentas de elite, simplificadas para você.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -293,7 +300,9 @@ definePageMeta({
     </section>
 
     <!-- FAQ Section -->
-    <section id="faq" class="py-32 bg-secondary/10">
+    <section id="faq" class="py-32 relative overflow-hidden bg-secondary/5 dark:bg-zinc-950/20">
+      <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] -z-10" />
+      
       <div class="container mx-auto px-6 max-w-4xl">
         <h2 class="text-3xl md:text-5xl font-black tracking-tight mb-16 text-center">Dúvidas Frequentes</h2>
 
@@ -301,11 +310,11 @@ definePageMeta({
           <details 
             v-for="faq in faqs" 
             :key="faq.question"
-            class="group p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm open:bg-card/80 transition-all"
+            class="group p-6 rounded-2xl bg-card border border-border/50 backdrop-blur-sm open:bg-card/80 open:border-primary/30 transition-all duration-300"
           >
             <summary class="font-bold text-lg cursor-pointer list-none flex items-center justify-between">
               {{ faq.question }}
-              <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-300 group-open:rotate-180" />
+              <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-300 group-open:rotate-180 group-open:text-primary" />
             </summary>
             <p class="mt-4 text-muted-foreground leading-relaxed animate-in slide-in-from-top-2 fade-in duration-300">
               {{ faq.answer }}
@@ -316,11 +325,13 @@ definePageMeta({
     </section>
 
     <!-- Footer -->
-    <footer class="py-12 border-t border-border/40">
+    <footer class="py-12 border-t border-border/40 relative overflow-hidden">
+      <div class="absolute bottom-[-100px] left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-primary/10 rounded-full blur-[80px] -z-10" />
+      
       <div class="container mx-auto px-6">
         <div class="flex flex-col md:flex-row justify-between items-center gap-8 opacity-60 hover:opacity-100 transition-opacity">
           <div class="flex items-center gap-2 font-bold text-xl">
-            <div class="w-6 h-6 bg-foreground rounded flex items-center justify-center text-background text-xs font-black">
+            <div class="w-6 h-6 bg-primary rounded flex items-center justify-center text-primary-foreground text-xs font-black shadow-lg shadow-primary/20">
               D
             </div>
             Due
