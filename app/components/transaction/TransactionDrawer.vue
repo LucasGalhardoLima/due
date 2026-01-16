@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import CurrencyInput from '@/components/ui/CurrencyInput.vue'
+import CategoryAutocomplete from '@/components/ui/CategoryAutocomplete.vue'
 
 const props = defineProps<{
   open: boolean
@@ -45,7 +46,7 @@ interface Category {
 }
 
 const { data: cards } = await useFetch<Card[]>('/api/cards')
-const { data: categories } = await useFetch<Category[]>('/api/categories') 
+const { data: categories, refresh: refreshCategories } = await useFetch<Category[]>('/api/categories') 
 
 // Auto-select default card when cards load (only if NEW)
 watch(cards, (newCards) => {
@@ -296,18 +297,11 @@ async function handleDelete() {
                 </SelectContent>
             </Select>
 
-             <Select v-model="selectedCategoryId">
-                <SelectTrigger>
-                    <SelectValue placeholder="Categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem v-for="cat in (categories || [])" :key="cat.id" :value="cat.id">
-                        {{ cat.name }}
-                    </SelectItem>
-                    <!-- Fallback if empty -->
-                    <SelectItem value="new">Outros</SelectItem>
-                </SelectContent>
-            </Select>
+            <CategoryAutocomplete 
+                v-model="selectedCategoryId" 
+                :categories="categories || []" 
+                @refresh="refreshCategories"
+            />
           </div>
 
           <!-- Payment Type Toggle -->

@@ -13,7 +13,8 @@ import {
 const routes = [
   { name: 'Dashboard', path: '/' },
   { name: 'Cartões', path: '/cards' },
-  { name: 'Importar Legado', path: '/legacy' },
+  { name: 'Categorias', path: '/categories' },
+  { name: 'Importar', path: '/import' },
 ]
 
 const isOpen = ref(false)
