@@ -6,45 +6,33 @@ const colorMode = useColorMode()
 
 const features = [
   {
-    icon: Shield,
-    title: 'Autenticação Blindada',
-    description: 'Login seguro com Clerk. Seus dados isolados e criptografados.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: Sparkles,
-    title: 'Inteligência Artificial',
-    description: 'Diagnósticos financeiros precisos e planos de ação práticos.',
-    colSpan: 'md:col-span-2'
-  },
-  {
     icon: Upload,
-    title: 'Importação Mágica',
-    description: 'Arraste seu CSV e deixe a IA classificar tudo automaticamente.',
+    title: 'Importação Inteligente',
+    description: 'Arraste seu CSV do banco e deixe o sistema categorizar tudo para você via IA.',
     colSpan: 'md:col-span-2'
   },
   {
     icon: TrendingUp,
-    title: 'Metas Dinâmicas',
-    description: 'Visualize seu progresso em tempo real com alertas visuais.',
+    title: 'Visão de Futuro',
+    description: 'Veja a projeção das suas faturas para os próximos 3 meses baseada nas suas parcelas.',
     colSpan: 'md:col-span-1'
   },
   {
-    icon: PieChart,
-    title: 'Visão de Pareto',
-    description: 'Descubra onde 80% do seu dinheiro está realmente indo.',
+    icon: Sparkles,
+    title: 'Advisor AI',
+    description: 'Um consultor financeiro embutido que analisa seus gastos e sugere cortes inteligentes.',
     colSpan: 'md:col-span-1'
   },
   {
-    icon: Users,
-    title: 'Sem Limites',
-    description: 'Crie categorias, cartões e tags sem restrições.',
+    icon: Shield,
+    title: 'Privacidade Isolada',
+    description: 'Seus dados são seus. Banco de dados isolado via Supabase e Clerk Auth.',
     colSpan: 'md:col-span-1'
   },
   {
-    icon: Calendar,
-    title: 'Recorrentes',
-    description: 'Controle de assinaturas e contas fixas automatizado.',
+    icon: Smartphone,
+    title: 'Mobile First',
+    description: 'Instale como PWA no seu celular e tenha o controle na palma da mão.',
     colSpan: 'md:col-span-1'
   }
 ]
@@ -174,12 +162,11 @@ definePageMeta({
         </div>
         
         <h1 class="text-6xl md:text-8xl font-black tracking-tight max-w-5xl mx-auto leading-[0.9] text-foreground transition-all duration-700">
-          Domine suas finanças com <span class="text-transparent bg-clip-text bg-gradient-to-br from-primary via-cyan-400 to-emerald-500">clareza total.</span>
+          Domine sua <span class="text-transparent bg-clip-text bg-gradient-to-br from-primary via-cyan-400 to-emerald-500">fatura,</span> não sua planilha.
         </h1>
         
         <p class="text-xl md:text-2xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-          O gerenciador financeiro que une design de ponta, 
-          IA avançada e privacidade absoluta.
+          Controle inteligente de cartão de crédito com projeção futura, Advisor IA e importação automática. <span class="text-foreground italic">Poderoso no desktop, perfeito no mobile.</span>
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
