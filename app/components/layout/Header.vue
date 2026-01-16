@@ -43,6 +43,9 @@ const isOpen = ref(false)
         >
           {{ route.name }}
         </NuxtLink>
+        <div class="ml-4 flex items-center gap-4">
+             <UserButton after-sign-out-url="/sign-in" />
+        </div>
       </nav>
 
       <!-- Mobile Navigation -->
@@ -74,6 +77,11 @@ const isOpen = ref(false)
               >
                 {{ route.name }}
               </NuxtLink>
+              
+              <div class="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                <span class="text-sm text-muted-foreground">Minha Conta</span>
+                <UserButton after-sign-out-url="/sign-in" />
+              </div>
             </nav>
           </SheetContent>
         </Sheet>

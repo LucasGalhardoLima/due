@@ -20,6 +20,8 @@ model CreditCard {
   isDefault   Boolean  @default(false) // Marca o cartão padrão
   createdAt   DateTime @default(now())
   
+  userId      String   @default("migration_temp") // Multi-tenancy
+
   transactions Transaction[]
   invoices     Invoice[] // Opcional, mas ajuda em cache/fechamento
 }
@@ -27,6 +29,7 @@ model CreditCard {
 model Category {
   id           String        @id @default(uuid())
   name         String        // Ex: Alimentação, Tech, Assinaturas
+  userId       String        @default("migration_temp") // Multi-tenancy
   transactions Transaction[]
 }
 
@@ -44,6 +47,8 @@ model Transaction {
   
   categoryId    String
   category      Category   @relation(fields: [categoryId], references: [id])
+  
+  userId        String   @default("migration_temp") // Multi-tenancy
 
   // Controle de Recorrência (Assinaturas)
   isSubscription    Boolean   @default(false)
@@ -75,6 +80,8 @@ model Invoice {
   status      String   // OPEN, CLOSED, PAID
   cardId      String
   card        CreditCard @relation(fields: [cardId], references: [id])
+  
+  userId      String   @default("migration_temp") // Multi-tenancy
 
   @@unique([cardId, month, year])
 }

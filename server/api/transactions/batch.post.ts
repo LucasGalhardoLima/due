@@ -15,6 +15,7 @@ import prisma from '../../utils/prisma'
 // ...
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   const body = await readBody(event)
   const result = batchCreateSchema.safeParse(body)
 
@@ -31,13 +32,23 @@ export default defineEventHandler(async (event) => {
   // Cache for cards
   const cardCache = new Map<string, any>()
   
-  // Fetch Default Category (Outros)
+  // Fetch Default Category (Outros) for User
   let defaultCategoryId = ''
-  const defaultCat = await prisma.category.findFirst({ where: { name: 'Outros' } })
+  const defaultCat = await prisma.category.findFirst({ 
+    where: { 
+      name: 'Outros',
+      userId
+    } 
+  })
   if (defaultCat) {
       defaultCategoryId = defaultCat.id
   } else {
-      const newCat = await prisma.category.create({ data: { name: 'Outros' } })
+      const newCat = await prisma.category.create({ 
+        data: { 
+          name: 'Outros',
+          userId
+        } 
+      })
       defaultCategoryId = newCat.id
   }
 
@@ -47,8 +58,19 @@ export default defineEventHandler(async (event) => {
       let card = cardCache.get(t.cardId)
       if (!card) {
           card = await prisma.creditCard.findUnique({ where: { id: t.cardId } })
-          if (card) cardCache.set(t.cardId, card)
+          // Verify Ownership
+          if (card && card.userId === userId) {
+            cardCache.set(t.cardId, card)
+          } else {
+            // If card not found or not owned, skip or error? 
+            // For batch, maybe skip or fail. Let's skip for safety or fail.
+            // Let's assume frontend sent valid cards, but if not owned, we can't use it.
+            continue
+          }
       }
+
+      // If we still don't have a card (because it didn't exist or wasn't owned), skip this tx
+      if (!card) continue
 
       const purchaseDate = new Date(t.date)
       let dueDate = purchaseDate
@@ -75,6 +97,7 @@ export default defineEventHandler(async (event) => {
               cardId: t.cardId,
               categoryId: t.categoryId || defaultCategoryId, // Fallback
               isSubscription: false,
+              userId, // Inject User ID
               installments: {
                   create: {
                       number: 1,

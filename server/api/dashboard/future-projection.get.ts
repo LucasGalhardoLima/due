@@ -1,7 +1,8 @@
 import prisma from '../../utils/prisma'
 import { startOfMonth, endOfMonth, addMonths, getMonth, getYear } from 'date-fns'
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   const now = new Date()
   const projections = []
   
@@ -13,6 +14,9 @@ export default defineEventHandler(async () => {
     
     const installments = await prisma.installment.findMany({
       where: {
+        transaction: {
+          userId
+        },
         dueDate: {
           gte: startDate,
           lte: endDate,

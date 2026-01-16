@@ -8,6 +8,7 @@ const querySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event) 
   const query = getQuery(event)
   const { month, year } = querySchema.parse(query)
   
@@ -21,6 +22,7 @@ export default defineEventHandler(async (event) => {
 
   const transactions = await prisma.transaction.findMany({
     where: {
+      userId, // Filter by user
       purchaseDate: {
         gte: startDate,
         lte: endDate
@@ -67,7 +69,8 @@ export default defineEventHandler(async (event) => {
     where: {
       dueDate: {
         gt: endDate
-      }
+      },
+      transaction: { userId } // Filter by user
     },
     include: {
       transaction: {

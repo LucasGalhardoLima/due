@@ -6,6 +6,7 @@ const createCategorySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   const body = await readBody(event)
   const result = createCategorySchema.safeParse(body)
 
@@ -19,13 +20,14 @@ export default defineEventHandler(async (event) => {
 
   const { name } = result.data
 
-  // Check if category already exists (case-insensitive)
+  // Check if category already exists for this user (case-insensitive)
   const existing = await prisma.category.findFirst({
     where: {
       name: {
         equals: name,
         mode: 'insensitive'
-      }
+      },
+      userId
     }
   })
 
@@ -34,7 +36,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const category = await prisma.category.create({
-    data: { name }
+    data: { 
+      name,
+      userId
+    }
   })
 
   return category

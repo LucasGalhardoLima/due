@@ -1,6 +1,7 @@
 import prisma from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   const id = getRouterParam(event, 'id')
 
   if (!id) {
@@ -10,9 +11,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Find the category
-  const category = await prisma.category.findUnique({
-    where: { id }
+  // Find the category ensuring it belongs to the user
+  const category = await prisma.category.findFirst({
+    where: { id, userId }
   })
 
   if (!category) {
@@ -30,26 +31,29 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Find or create "Outros" category
+  // Find or create "Outros" category for this user
   let defaultCat = await prisma.category.findFirst({
-    where: { name: { equals: 'Outros', mode: 'insensitive' } }
+    where: { 
+      name: { equals: 'Outros', mode: 'insensitive' },
+      userId 
+    }
   })
 
   if (!defaultCat) {
       defaultCat = await prisma.category.create({
-          data: { name: 'Outros' }
+          data: { name: 'Outros', userId }
       })
   }
 
   // Reassign transactions to "Outros" before deleting
   await prisma.transaction.updateMany({
-    where: { categoryId: id },
+    where: { categoryId: id, userId },
     data: { categoryId: defaultCat.id }
   })
 
   // Delete the category
   await prisma.category.delete({
-    where: { id }
+    where: { id } // Unique ID is sufficient, but ownership was verified above
   })
 
   return { success: true }

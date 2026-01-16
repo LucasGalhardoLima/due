@@ -3,6 +3,9 @@
 // Let's rely on relative path for safety: '../../utils/prisma'
 import prisma from '../../utils/prisma'
 
-export default defineEventHandler(async () => {
-  return await prisma.creditCard.findMany()
+export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
+  return await prisma.creditCard.findMany({
+    where: { userId }
+  })
 })

@@ -9,6 +9,7 @@ const querySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   const query = await getQuery(event)
   const result = querySchema.safeParse(query)
 
@@ -33,6 +34,7 @@ export default defineEventHandler(async (event) => {
         lte: endDate
       },
       transaction: {
+        userId, // Filter by user
         cardId: result.data.cardId // Optional filter
       }
     },
@@ -61,11 +63,18 @@ export default defineEventHandler(async (event) => {
   let totalBudget = 0
 
   if (result.data.cardId) {
-    const card = await prisma.creditCard.findUnique({ where: { id: result.data.cardId } })
+    const card = await prisma.creditCard.findFirst({ 
+      where: { 
+        id: result.data.cardId,
+        userId
+      } 
+    })
     totalLimit = card?.limit || 0
     totalBudget = card?.budget || 0
   } else {
-    const cards = await prisma.creditCard.findMany()
+    const cards = await prisma.creditCard.findMany({
+      where: { userId }
+    })
     totalLimit = cards.reduce((acc, c) => acc + c.limit, 0)
     // Sum budgets, treating null as 0
     totalBudget = cards.reduce((acc, c) => acc + (c.budget || 0), 0)

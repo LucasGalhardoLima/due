@@ -6,6 +6,7 @@ const updateCategorySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   const id = getRouterParam(event, 'id')
   const body = await readBody(event)
   const result = updateCategorySchema.safeParse(body)
@@ -22,6 +23,18 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'Missing ID',
+    })
+  }
+
+  // Verify ownership before update
+  const existing = await prisma.category.findFirst({
+    where: { id, userId }
+  })
+
+  if (!existing) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Category not found',
     })
   }
 

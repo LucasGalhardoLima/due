@@ -13,6 +13,7 @@ const updateSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event) // 1. Get User
   const id = event.context.params?.id
   const body = await readBody(event)
   
@@ -30,9 +31,12 @@ export default defineEventHandler(async (event) => {
   const { description, amount, purchaseDate, installmentsCount, cardId, categoryId, isSubscription } = result.data
   const pDate = new Date(purchaseDate)
 
-  // 1. Fetch Existing
-  const existing = await prisma.transaction.findUnique({
-    where: { id },
+  // 1. Fetch Existing AND Verify Ownership
+  const existing = await prisma.transaction.findFirst({
+    where: { 
+      id,
+      userId
+    },
     include: { installments: true }
   })
 

@@ -13,6 +13,7 @@ const createTransactionSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event) // 1. Get User
   const body = await readBody(event)
   const result = createTransactionSchema.safeParse(body)
 
@@ -27,12 +28,13 @@ export default defineEventHandler(async (event) => {
   const { description, amount, purchaseDate, installmentsCount, cardId, categoryId, isSubscription } = result.data
   const pDate = new Date(purchaseDate)
 
-  // Fetch card to get closing date
+  // Fetch card to get closing date AND verify ownership
   const card = await prisma.creditCard.findUnique({
     where: { id: cardId }
   })
 
-  if (!card) {
+  // Ensure card belongs to user
+  if (!card || card.userId !== userId) {
     throw createError({ statusCode: 404, statusMessage: 'Card not found' })
   }
 
@@ -49,15 +51,27 @@ export default defineEventHandler(async (event) => {
   let finalCategoryId = categoryId
   
   if (!finalCategoryId) {
-    const defaultCat = await prisma.category.findFirst({ where: { name: 'Outros' } })
+    const defaultCat = await prisma.category.findFirst({ 
+      where: { 
+        name: 'Outros',
+        userId // Scope to user
+      } 
+    })
     if (defaultCat) {
       finalCategoryId = defaultCat.id
     } else {
-      // Create 'Outros' if it doesn't exist
+      // Create 'Outros' if it doesn't exist for this user
       const newCat = await prisma.category.create({
-        data: { name: 'Outros' }
+        data: { name: 'Outros', userId }
       })
       finalCategoryId = newCat.id
+    }
+  } else {
+    // Verify that the provided category belongs to the user
+    const cat = await prisma.category.findUnique({ where: { id: finalCategoryId } })
+    if (!cat || cat.userId !== userId) {
+         // Fallback or error? Let's error to be safe
+         throw createError({ statusCode: 400, statusMessage: 'Invalid Category' })
     }
   }
   
@@ -71,6 +85,7 @@ export default defineEventHandler(async (event) => {
       cardId,
       categoryId: finalCategoryId!,
       isSubscription,
+      userId, // Assign to user
       installments: {
         create: plan.map(p => ({
             number: p.number,

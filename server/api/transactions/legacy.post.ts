@@ -11,6 +11,12 @@ const createLegacySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  /* 
+     NOTE: We are using getUser(event) which is auto-imported.
+     If linter complains, it's safe to ignore as long as build passes.
+  */
+  const { userId } = getUser(event) // 1. Get User
+
   const body = await readBody(event)
   const result = createLegacySchema.safeParse(body)
 
@@ -30,8 +36,11 @@ export default defineEventHandler(async (event) => {
   const purchaseDate = new Date() // We assume "Impact starts now"
 
   // Fetch card
-  const card = await prisma.creditCard.findUnique({
-    where: { id: cardId }
+  const card = await prisma.creditCard.findFirst({
+    where: { 
+      id: cardId,
+      userId // 2. Verify Ownership
+    }
   })
 
   if (!card) {
@@ -50,15 +59,33 @@ export default defineEventHandler(async (event) => {
   // Resolve Category
   let finalCategoryId = categoryId
   if (!finalCategoryId) {
-    const defaultCat = await prisma.category.findFirst({ where: { name: 'Outros' } })
+    // 3. Scope Category to User
+    const defaultCat = await prisma.category.findFirst({ 
+      where: { 
+        name: 'Outros',
+        userId
+      } 
+    })
+    
     if (defaultCat) {
       finalCategoryId = defaultCat.id
     } else {
       const newCat = await prisma.category.create({
-        data: { name: 'Outros' }
+        data: { 
+          name: 'Outros',
+          userId 
+        }
       })
       finalCategoryId = newCat.id
     }
+  } else {
+    // Verify category ownership if provided
+     const cat = await prisma.category.findFirst({
+        where: { id: finalCategoryId, userId }
+     })
+     if (!cat) {
+        throw createError({ statusCode: 400, statusMessage: 'Invalid Category' })
+     }
   }
 
   // Create Transaction
@@ -70,6 +97,7 @@ export default defineEventHandler(async (event) => {
       installmentsCount: remainingInstallments,
       cardId,
       categoryId: finalCategoryId!,
+      userId, // 4. Assign Owner
       installments: {
         create: plan.map(p => ({
             number: p.number,

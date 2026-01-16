@@ -9,6 +9,7 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   const body = await readBody(event)
   const result = bodySchema.safeParse(body)
 
@@ -26,7 +27,10 @@ export default defineEventHandler(async (event) => {
   const installments = await prisma.installment.findMany({
     where: {
       dueDate: { gte: startDate, lte: endDate },
-      transaction: cardId ? { cardId } : undefined
+      transaction: { 
+        userId, // Filter by user
+        cardId: cardId || undefined // Optional card filter
+      }
     },
     include: {
       transaction: {

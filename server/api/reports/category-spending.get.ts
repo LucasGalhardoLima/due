@@ -8,6 +8,7 @@ const querySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   const query = await getQuery(event)
   const result = querySchema.safeParse(query)
 
@@ -27,7 +28,8 @@ export default defineEventHandler(async (event) => {
 
   const installments = await prisma.installment.findMany({
     where: {
-        dueDate: { gte: startDate, lte: endDate }
+        dueDate: { gte: startDate, lte: endDate },
+        transaction: { userId }
     },
     include: {
         transaction: {

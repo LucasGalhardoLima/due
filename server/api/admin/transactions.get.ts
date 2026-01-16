@@ -7,6 +7,7 @@ const querySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   const query = getQuery(event)
   const { page, limit } = querySchema.parse(query)
   
@@ -15,12 +16,15 @@ export default defineEventHandler(async (event) => {
   const skip = (pageNumber - 1) * pageSize
 
   // Fetch total count for pagination metadata
-  const total = await prisma.transaction.count()
+  const total = await prisma.transaction.count({
+    where: { userId }
+  })
 
   // Fetch slice of transactions
   const transactions = await prisma.transaction.findMany({
     skip,
     take: pageSize,
+    where: { userId },
     orderBy: {
       createdAt: 'desc'
     },
