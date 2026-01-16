@@ -52,31 +52,31 @@ const features = [
 const roadmap = [
   {
     status: 'soon',
-    icon: Smartphone,
-    title: 'App Mobile',
-    description: 'iOS e Android.',
-    eta: 'Q2 2026'
+    icon: TrendingUp,
+    title: 'Maestria de Fluxo',
+    description: 'Controle absoluto de entradas e saídas com projeção de caixa inteligente.',
+    eta: 'Q1 2026'
   },
   {
     status: 'soon',
-    icon: Building2,
-    title: 'Open Banking',
-    description: 'Sincronização automática.',
+    icon: Share2,
+    title: 'Due Family',
+    description: 'Compartilhamento colaborativo com multi-perfis e controle de acesso granular.',
     eta: 'Q2 2026'
   },
   {
     status: 'planned',
-    icon: DollarSign,
-    title: 'Investimentos',
-    description: 'Ações e Cripto.',
+    icon: Sparkles,
+    title: 'Deep IA Insights',
+    description: 'Diagnósticos preditivos de comportamento e seu tutor financeiro pessoal.',
     eta: 'Q3 2026'
   },
   {
     status: 'planned',
-    icon: Share2,
-    title: 'Família',
-    description: 'Compartilhamento.',
-    eta: 'Q3 2026'
+    icon: Building2,
+     title: 'Open Banking',
+    description: 'Conexão direta com suas instituições financeira em tempo real.',
+    eta: 'Q4 2026'
   }
 ]
 
