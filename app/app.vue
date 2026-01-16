@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Toaster from '@/components/ui/Toaster.vue'
+import { Analytics } from '@vercel/analytics/nuxt'
 </script>
 
 <template>
@@ -9,6 +10,7 @@ import Toaster from '@/components/ui/Toaster.vue'
       <NuxtPage />
     </NuxtLayout>
     <Toaster />
+    <Analytics />
   </div>
 </template>
 
