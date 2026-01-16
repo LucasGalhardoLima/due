@@ -47,10 +47,10 @@ definePageMeta({
             Começar Agora Grátis
           </NuxtLink>
           <NuxtLink 
-            to="/dashboard"
+            to="/features"
             class="h-12 px-8 inline-flex items-center justify-center rounded-full border border-border bg-background/50 backdrop-blur-sm hover:bg-muted/50 transition-all w-full sm:w-auto"
           >
-            Ver Demonstração
+            Ver Todas as Features
           </NuxtLink>
         </div>
 
@@ -150,6 +150,7 @@ definePageMeta({
           &copy; {{ new Date().getFullYear() }} Due Finance. Todos os direitos reservados.
         </div>
         <div class="flex items-center gap-6">
+          <NuxtLink to="/features" class="text-sm hover:text-primary transition-colors">Features</NuxtLink>
           <NuxtLink to="/sign-in" class="text-sm hover:text-primary transition-colors">Entrar</NuxtLink>
           <NuxtLink to="/sign-up" class="text-sm border px-4 py-2 rounded-full hover:bg-muted transition-colors">Cadastrar</NuxtLink>
         </div>
