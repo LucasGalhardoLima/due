@@ -17,6 +17,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.0.0",
     "@clerk/nuxt": "^1.13.12",
     "@nuxtjs/supabase": "^2.0.3",
     "@nuxtjs/tailwindcss": "^6.14.0",
@@ -27,6 +28,7 @@
     "@vee-validate/zod": "^4.15.1",
     "@vercel/analytics": "^1.6.1",
     "@vueuse/core": "^14.1.0",
+    "ai": "^4.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "d3-hierarchy": "^3.1.2",
@@ -34,7 +36,6 @@
     "date-fns": "^4.1.0",
     "lucide-vue-next": "^0.562.0",
     "nuxt": "^4.2.2",
-    "openai": "^6.16.0",
     "papaparse": "^5.5.3",
     "pinia": "^3.0.4",
     "reka-ui": "^2.7.0",

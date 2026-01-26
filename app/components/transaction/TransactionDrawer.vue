@@ -16,6 +16,10 @@ import { Slider } from '@/components/ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import CurrencyInput from '@/components/ui/CurrencyInput.vue'
 import CategoryAutocomplete from '@/components/ui/CategoryAutocomplete.vue'
+import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
+
+// Proactive Advisor for post_transaction trigger
+const advisor = useProactiveAdvisor()
 
 const props = defineProps<{
   open: boolean
@@ -198,8 +202,21 @@ async function save() {
             body: payload
         })
         toast.success('Despesa salva com sucesso!')
+
+        // Trigger proactive advisor for significant transactions (>=R$100)
+        if (payload.amount >= 100) {
+          const categoryName = categories.value?.find(c => c.id === payload.categoryId)?.name || 'Outros'
+          advisor.trigger('post_transaction', {
+            cardId: payload.cardId,
+            transactionData: {
+              amount: payload.amount,
+              description: payload.description,
+              categoryName
+            }
+          })
+        }
     }
-    
+
     emit('saved')
     
     // 5. Revalidation (Background)

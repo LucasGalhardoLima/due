@@ -13,6 +13,10 @@ import { Button } from '@/components/ui/button'
 import { Sparkles, X } from 'lucide-vue-next'
 import AIInsights from '@/components/dashboard/AIInsights.vue'
 import PurchaseSimulator from '@/components/dashboard/PurchaseSimulator.vue'
+import ProactiveAdvisor from '@/components/dashboard/ProactiveAdvisor.vue'
+import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
+
+const advisor = useProactiveAdvisor()
 
 const props = defineProps<{
   open: boolean
@@ -54,6 +58,9 @@ const isOpen = computed({
         </DrawerHeader>
 
         <div class="p-4 space-y-6 overflow-y-auto flex-1">
+          <!-- Proactive Advisor (Mobile) -->
+          <ProactiveAdvisor v-if="advisor.hasMessage.value || advisor.isLoading.value" compact />
+
           <!-- AI Insights -->
           <div class="space-y-2">
             <h4 class="text-small font-black text-muted-foreground uppercase tracking-wider ml-1">Análise Geral</h4>

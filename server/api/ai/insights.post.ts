@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import OpenAI from 'openai'
+import { generateText } from 'ai'
+import { gateway } from '../../utils/ai'
 import prisma from '../../utils/prisma'
 
 const querySchema = z.object({
@@ -117,32 +118,26 @@ REGRAS DE RESPOSTA (JSON):
 
 Seja honesto, direto e use um tom profissional porém amigável (estilo Due/NuBank).`
 
-  // Call OpenAI
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-  })
-
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        { 
-          role: 'system', 
-          content: 'Você é um consultor financeiro especialista em análise de faturas. Responda sempre em JSON válido e português do Brasil.'
-        },
-        { role: 'user', content: aiPrompt }
-      ],
-      response_format: { type: 'json_object' },
+    const { text } = await generateText({
+      model: gateway('gpt-4o'),
+      system: 'Você é um consultor financeiro especialista em análise de faturas. Responda sempre em JSON válido e português do Brasil. Não use blocos de código markdown, retorne apenas o JSON puro.',
+      prompt: aiPrompt,
       temperature: 0.7,
-      max_tokens: 1000
+      maxTokens: 1000,
+      experimental_telemetry: {
+        isEnabled: true,
+        functionId: 'quick-insights',
+        metadata: {
+          userId,
+          feature: 'monthly-summary'
+        }
+      }
     })
 
-    const messageContent = completion.choices[0]?.message?.content
-    if (!messageContent) {
-      throw new Error('No response from AI')
-    }
-
-    const insights = JSON.parse(messageContent)
+    // Clean markdown code blocks if present
+    const cleanedText = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
+    const insights = JSON.parse(cleanedText)
 
     return {
       success: true,
@@ -154,7 +149,7 @@ Seja honesto, direto e use um tom profissional porém amigável (estilo Due/NuBa
       }
     }
   } catch (error: any) {
-    console.error('OpenAI API Error:', error)
+    console.error('AI Gateway Error:', error)
     throw createError({
       statusCode: 500,
       statusMessage: 'Erro ao gerar insights',

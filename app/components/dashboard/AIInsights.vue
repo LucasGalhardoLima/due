@@ -34,22 +34,22 @@ const currentDate = new Date()
                 <div class="h-9 w-9 rounded-xl bg-primary/20 flex items-center justify-center text-primary shadow-glass ring-1 ring-primary/30">
                   <Sparkles class="w-4.5 h-4.5" />
                 </div>
-                <h3 class="text-h3 font-black tracking-tight">AI Financial Advisor</h3>
+                <h3 class="text-h3 font-black tracking-tight">Consultor IA</h3>
                 <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black tracking-wider bg-primary text-primary-foreground shadow-primary-glow animate-pulse">
                   BETA
                 </span>
               </div>
               <p class="text-small text-muted-foreground leading-relaxed">
-                Diagnóstico profundo dos seus gastos com sugestões práticas.
+                Análise rápida do mês ou profunda com 6 meses de histórico.
               </p>
            </div>
 
            <!-- Action Button -->
-           <Button 
+           <Button
             size="default"
             class="w-full font-bold shadow-primary-glow h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all pointer-events-none"
            >
-            Gerar Insights
+            Abrir Consultor
            </Button>
         </div>
       </Card>

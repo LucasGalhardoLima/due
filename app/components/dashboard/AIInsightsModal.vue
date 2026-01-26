@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,19 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Sparkles, TrendingDown, AlertTriangle, Loader2 } from 'lucide-vue-next'
+import {
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+  Minus,
+  AlertTriangle,
+  Loader2,
+  Target,
+  Lightbulb,
+  Heart,
+  ChevronRight,
+  Zap
+} from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 
 const props = defineProps<{
@@ -25,6 +37,11 @@ const isOpen = computed({
   set: (val: boolean) => emit('update:open', val)
 })
 
+// Tab state
+type TabType = 'resumo' | 'profunda'
+const activeTab = ref<TabType>('resumo')
+
+// Quick insights types
 interface AIInsights {
   diagnostico: string
   acoes_imediatas: string[]
@@ -42,29 +59,93 @@ interface InsightsResponse {
   }
 }
 
-const isLoading = ref(false)
-const insights = ref<InsightsResponse | null>(null)
-const hasAnalyzed = ref(false)
+// Deep insights types
+interface DeepInsights {
+  trend_analysis: {
+    direction: 'crescente' | 'estável' | 'decrescente'
+    monthly_change_pct: number
+    categories_driving_change: { name: string; change_pct: number }[]
+  }
+  forecast: {
+    next_month_prediction: number
+    confidence: number
+    factors: string[]
+  }
+  optimization_opportunities: {
+    category: string
+    current_spending: number
+    potential_saving: number
+    difficulty: 'fácil' | 'médio' | 'difícil'
+    suggestion: string
+  }[]
+  health_score: {
+    score: number
+    factors: { label: string; impact: 'positive' | 'negative' }[]
+  }
+}
+
+interface DeepInsightsResponse {
+  success: boolean
+  insights: DeepInsights
+  metadata: {
+    periodStart: string
+    periodEnd: string
+    totalAnalyzed: number
+    monthlyAverage: number
+    monthlyData: { month: string; total: number; change_pct: number | null }[]
+    categoryTrends: { name: string; sixMonthAvg: number; lastMonth: number; change_pct: number }[]
+  }
+}
+
+// Loading states
+const isLoadingQuick = ref(false)
+const isLoadingDeep = ref(false)
+
+// Results
+const quickInsights = ref<InsightsResponse | null>(null)
+const deepInsights = ref<DeepInsightsResponse | null>(null)
+
+const hasAnalyzedQuick = ref(false)
+const hasAnalyzedDeep = ref(false)
 
 const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 const monthName = computed(() => months[props.month - 1])
 
-async function analyzeFinances() {
-  isLoading.value = true
-  hasAnalyzed.value = false
-  
+async function analyzeQuick() {
+  isLoadingQuick.value = true
+  hasAnalyzedQuick.value = false
+
   try {
     const response = await $fetch<InsightsResponse>('/api/ai/insights', {
       method: 'POST' as any
     })
-    
-    insights.value = response
-    hasAnalyzed.value = true
+
+    quickInsights.value = response
+    hasAnalyzedQuick.value = true
   } catch (error: any) {
     console.error('AI Insights Error:', error)
     toast.error('Erro ao gerar insights. Verifique sua API Key.')
   } finally {
-    isLoading.value = false
+    isLoadingQuick.value = false
+  }
+}
+
+async function analyzeDeep() {
+  isLoadingDeep.value = true
+  hasAnalyzedDeep.value = false
+
+  try {
+    const response = await $fetch<DeepInsightsResponse>('/api/ai/deep-insights', {
+      method: 'POST' as any
+    })
+
+    deepInsights.value = response
+    hasAnalyzedDeep.value = true
+  } catch (error: any) {
+    console.error('Deep AI Insights Error:', error)
+    toast.error('Erro ao gerar análise profunda.')
+  } finally {
+    isLoadingDeep.value = false
   }
 }
 
@@ -72,122 +153,365 @@ function formatCurrency(val: number) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)
 }
 
-// Auto-analyze when opened (optional, user might prefer to click)
-// But to match previous flow of "Generate Insights", we'll keep the button.
+function getTrendIcon(direction: string) {
+  if (direction === 'crescente') return TrendingUp
+  if (direction === 'decrescente') return TrendingDown
+  return Minus
+}
+
+function getTrendColor(direction: string) {
+  if (direction === 'crescente') return 'text-destructive'
+  if (direction === 'decrescente') return 'text-emerald-500'
+  return 'text-muted-foreground'
+}
+
+function getDifficultyBadgeClass(difficulty: string) {
+  if (difficulty === 'fácil') return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+  if (difficulty === 'médio') return 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+  return 'bg-destructive/10 text-destructive border-destructive/20'
+}
+
+function getHealthScoreColor(score: number) {
+  if (score >= 70) return 'text-emerald-500'
+  if (score >= 40) return 'text-amber-500'
+  return 'text-destructive'
+}
+
+function getHealthScoreGradient(score: number) {
+  if (score >= 70) return 'from-emerald-500 to-emerald-400'
+  if (score >= 40) return 'from-amber-500 to-amber-400'
+  return 'from-destructive to-red-400'
+}
+
+// Reset state when modal closes
+watch(isOpen, (val) => {
+  if (!val) {
+    activeTab.value = 'resumo'
+  }
+})
 </script>
 
 <template>
   <Dialog v-model:open="isOpen">
-    <DialogContent class="sm:max-w-xl bg-background border-border">
+    <DialogContent class="sm:max-w-xl bg-background border-border max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <div class="flex items-center gap-3 mb-2">
-            <div class="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary shadow-glass ring-1 ring-primary/30">
-              <Sparkles class="w-5 h-5" />
-            </div>
-            <div>
-                <DialogTitle class="text-h3">AI Financial Advisor</DialogTitle>
-                <DialogDescription>
-                    Analisando fatura de <span class="font-bold text-foreground">{{ monthName }}/{{ year }}</span>
-                </DialogDescription>
-            </div>
+          <div class="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary shadow-glass ring-1 ring-primary/30">
+            <Sparkles class="w-5 h-5" />
+          </div>
+          <div>
+            <DialogTitle class="text-h3">Consultor IA</DialogTitle>
+            <DialogDescription>
+              Análise inteligente de <span class="font-bold text-foreground">{{ monthName }}/{{ year }}</span>
+            </DialogDescription>
+          </div>
         </div>
       </DialogHeader>
 
+      <!-- Tab Buttons -->
+      <div class="flex gap-2 p-1 bg-secondary/30 rounded-xl border border-border">
+        <button
+          @click="activeTab = 'resumo'"
+          :class="[
+            'flex-1 px-4 py-2 text-small font-semibold rounded-lg transition-all',
+            activeTab === 'resumo'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          ]"
+        >
+          Resumo Rápido
+        </button>
+        <button
+          @click="activeTab = 'profunda'"
+          :class="[
+            'flex-1 px-4 py-2 text-small font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5',
+            activeTab === 'profunda'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          ]"
+        >
+          <Zap class="w-3.5 h-3.5" />
+          Análise Profunda
+        </button>
+      </div>
+
       <div class="space-y-6 py-2">
-        <!-- Initial State / Loading -->
-        <div v-if="!hasAnalyzed" class="flex flex-col items-center justify-center py-8 text-center space-y-4">
-             <div class="p-4 rounded-full bg-primary/5 border border-primary/10 relative">
-                <Sparkles class="w-8 h-8 text-primary" :class="isLoading ? 'animate-pulse' : ''" />
-                <div v-if="isLoading" class="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
-             </div>
-             
-             <div class="space-y-2 max-w-sm mx-auto">
-                <h4 class="text-h4 font-bold" v-if="!isLoading">Pronto para analisar?</h4>
-                <h4 class="text-h4 font-bold" v-else>Analisando padrões de consumo...</h4>
-                
-                <p class="text-body text-muted-foreground" v-if="!isLoading">
-                    Nossa IA vai varrer seus lançamentos deste mês para encontrar oportunidades de economia e alertas de risco.
-                </p>
-                <p class="text-body text-muted-foreground" v-else>
-                    Isso pode levar alguns segundos. Estamos verificando categorias, recorrências e limites.
-                </p>
-             </div>
+        <!-- ==================== QUICK INSIGHTS TAB ==================== -->
+        <template v-if="activeTab === 'resumo'">
+          <!-- Initial State / Loading -->
+          <div v-if="!hasAnalyzedQuick" class="flex flex-col items-center justify-center py-8 text-center space-y-4">
+            <div class="p-4 rounded-full bg-primary/5 border border-primary/10 relative">
+              <Sparkles class="w-8 h-8 text-primary" :class="isLoadingQuick ? 'animate-pulse' : ''" />
+              <div v-if="isLoadingQuick" class="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+            </div>
 
-             <Button 
-                v-if="!isLoading" 
-                size="lg" 
-                class="w-full max-w-xs font-bold shadow-primary-glow mt-4" 
-                @click="analyzeFinances"
+            <div class="space-y-2 max-w-sm mx-auto">
+              <h4 class="text-h4 font-bold" v-if="!isLoadingQuick">Diagnóstico Rápido</h4>
+              <h4 class="text-h4 font-bold" v-else>Analisando padrões de consumo...</h4>
+
+              <p class="text-body text-muted-foreground" v-if="!isLoadingQuick">
+                Análise do mês atual com ações práticas e alertas de risco.
+              </p>
+              <p class="text-body text-muted-foreground" v-else>
+                Isso pode levar alguns segundos. Estamos verificando categorias e limites.
+              </p>
+            </div>
+
+            <Button
+              v-if="!isLoadingQuick"
+              size="lg"
+              class="w-full max-w-xs font-bold shadow-primary-glow mt-4"
+              @click="analyzeQuick"
             >
-                <Sparkles class="w-4 h-4 mr-2" />
-                Gerar Diagnóstico
-             </Button>
-        </div>
+              <Sparkles class="w-4 h-4 mr-2" />
+              Gerar Diagnóstico
+            </Button>
+          </div>
 
-        <!-- Results -->
-        <div v-else-if="insights" class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <!-- Diagnosis Card -->
-             <Card variant="glass-warning" class="p-5 space-y-3 border-amber-500/20 bg-amber-500/5">
-                <div class="flex items-center gap-2 text-amber-500">
-                    <AlertTriangle class="w-5 h-5" />
-                    <h4 class="text-small font-black uppercase tracking-wide">Diagnóstico</h4>
-                </div>
-                <p class="text-body text-foreground leading-relaxed font-medium">
-                    {{ insights.insights.diagnostico }}
-                </p>
-             </Card>
+          <!-- Quick Results -->
+          <div v-else-if="quickInsights" class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <!-- Diagnosis Card -->
+            <Card variant="glass-warning" class="p-5 space-y-3 border-amber-500/20 bg-amber-500/5">
+              <div class="flex items-center gap-2 text-amber-500">
+                <AlertTriangle class="w-5 h-5" />
+                <h4 class="text-small font-black uppercase tracking-wide">Diagnóstico</h4>
+              </div>
+              <p class="text-body text-foreground leading-relaxed font-medium">
+                {{ quickInsights.insights.diagnostico }}
+              </p>
+            </Card>
 
-             <!-- Quick Actions -->
-             <div class="space-y-3">
-                <h4 class="text-small font-black text-muted-foreground uppercase tracking-wider ml-1">Ações Recomendadas</h4>
-                <div class="space-y-2">
-                    <div 
-                        v-for="(action, idx) in insights.insights.acoes_imediatas" :key="idx"
-                        class="p-4 rounded-xl bg-secondary/30 border border-border flex gap-3 items-start group hover:bg-secondary/50 transition-colors"
-                    >
-                        <div class="h-6 w-6 rounded-full bg-background flex items-center justify-center shrink-0 border border-border text-[10px] font-bold text-muted-foreground group-hover:border-primary/50 group-hover:text-primary transition-colors">
-                            {{ idx + 1 }}
-                        </div>
-                        <p class="text-small text-foreground/90 pt-0.5">{{ action }}</p>
-                    </div>
+            <!-- Quick Actions -->
+            <div class="space-y-3">
+              <h4 class="text-small font-black text-muted-foreground uppercase tracking-wider ml-1">Ações Recomendadas</h4>
+              <div class="space-y-2">
+                <div
+                  v-for="(action, idx) in quickInsights.insights.acoes_imediatas" :key="idx"
+                  class="p-4 rounded-xl bg-secondary/30 border border-border flex gap-3 items-start group hover:bg-secondary/50 transition-colors"
+                >
+                  <div class="h-6 w-6 rounded-full bg-background flex items-center justify-center shrink-0 border border-border text-[10px] font-bold text-muted-foreground group-hover:border-primary/50 group-hover:text-primary transition-colors">
+                    {{ idx + 1 }}
+                  </div>
+                  <p class="text-small text-foreground/90 pt-0.5">{{ action }}</p>
                 </div>
-             </div>
+              </div>
+            </div>
 
-             <!-- Future Outlook -->
-             <div class="p-4 rounded-xl border border-dashed border-primary/20 bg-primary/5 space-y-2">
-                <div class="flex items-center gap-2 text-primary">
-                    <TrendingDown class="w-4 h-4" />
-                    <h4 class="text-micro font-bold uppercase">Previsão e Próximos Passos</h4>
-                </div>
-                <p class="text-small text-muted-foreground leading-relaxed">
-                    {{ insights.insights.alivio_futuro }}
-                </p>
-             </div>
+            <!-- Future Outlook -->
+            <div class="p-4 rounded-xl border border-dashed border-primary/20 bg-primary/5 space-y-2">
+              <div class="flex items-center gap-2 text-primary">
+                <TrendingDown class="w-4 h-4" />
+                <h4 class="text-micro font-bold uppercase">Previsão e Próximos Passos</h4>
+              </div>
+              <p class="text-small text-muted-foreground leading-relaxed">
+                {{ quickInsights.insights.alivio_futuro }}
+              </p>
+            </div>
 
-             <!-- Alerts -->
-             <div v-if="insights.insights.alertas?.length" class="space-y-2">
-                <div v-for="(alerta, idx) in insights.insights.alertas" :key="idx" class="flex items-center gap-2 text-destructive bg-destructive/5 p-2 rounded-lg border border-destructive/10 text-micro">
-                    <div class="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse"></div>
-                    {{ alerta }}
-                </div>
-             </div>
+            <!-- Alerts -->
+            <div v-if="quickInsights.insights.alertas?.length" class="space-y-2">
+              <div v-for="(alerta, idx) in quickInsights.insights.alertas" :key="idx" class="flex items-center gap-2 text-destructive bg-destructive/5 p-2 rounded-lg border border-destructive/10 text-micro">
+                <div class="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse"></div>
+                {{ alerta }}
+              </div>
+            </div>
 
-             <!-- Footer Stats -->
-             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-border">
-                <div>
-                    <span class="text-micro text-muted-foreground block mb-0.5">Fatura Analisada</span>
-                    <span class="text-h3 font-black">{{ formatCurrency(insights.metadata.totalSpent) }}</span>
+            <!-- Footer Stats -->
+            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+              <div>
+                <span class="text-micro text-muted-foreground block mb-0.5">Fatura Analisada</span>
+                <span class="text-h3 font-black">{{ formatCurrency(quickInsights.metadata.totalSpent) }}</span>
+              </div>
+              <div class="text-right">
+                <span class="text-micro text-muted-foreground block mb-0.5">Transações</span>
+                <span class="text-h3 font-black">{{ quickInsights.metadata.transactionCount }}</span>
+              </div>
+            </div>
+
+            <Button class="w-full" variant="outline" @click="hasAnalyzedQuick = false">
+              Nova Análise
+            </Button>
+          </div>
+        </template>
+
+        <!-- ==================== DEEP INSIGHTS TAB ==================== -->
+        <template v-if="activeTab === 'profunda'">
+          <!-- Initial State / Loading -->
+          <div v-if="!hasAnalyzedDeep" class="flex flex-col items-center justify-center py-8 text-center space-y-4">
+            <div class="p-4 rounded-full bg-primary/5 border border-primary/10 relative">
+              <Zap class="w-8 h-8 text-primary" :class="isLoadingDeep ? 'animate-pulse' : ''" />
+              <div v-if="isLoadingDeep" class="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+            </div>
+
+            <div class="space-y-2 max-w-sm mx-auto">
+              <h4 class="text-h4 font-bold" v-if="!isLoadingDeep">Análise Profunda</h4>
+              <h4 class="text-h4 font-bold" v-else>Processando 6 meses de dados...</h4>
+
+              <p class="text-body text-muted-foreground" v-if="!isLoadingDeep">
+                Análise de tendências com 6 meses de histórico, previsões e oportunidades de economia.
+              </p>
+              <p class="text-body text-muted-foreground" v-else>
+                Nossa IA está analisando padrões, tendências e gerando previsões personalizadas.
+              </p>
+            </div>
+
+            <Button
+              v-if="!isLoadingDeep"
+              size="lg"
+              class="w-full max-w-xs font-bold shadow-primary-glow mt-4"
+              @click="analyzeDeep"
+            >
+              <Zap class="w-4 h-4 mr-2" />
+              Iniciar Análise Profunda
+            </Button>
+          </div>
+
+          <!-- Deep Results -->
+          <div v-else-if="deepInsights" class="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+            <!-- Health Score -->
+            <Card class="p-5 border-border bg-secondary/20">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <Heart class="w-5 h-5 text-primary" />
+                  <h4 class="text-small font-black uppercase tracking-wide">Saúde Financeira</h4>
                 </div>
-                 <div class="text-right">
-                    <span class="text-micro text-muted-foreground block mb-0.5">Transações</span>
-                    <span class="text-h3 font-black">{{ insights.metadata.transactionCount }}</span>
+                <span :class="['text-h2 font-black', getHealthScoreColor(deepInsights.insights.health_score.score)]">
+                  {{ deepInsights.insights.health_score.score }}
+                </span>
+              </div>
+
+              <!-- Score Bar -->
+              <div class="h-3 bg-secondary rounded-full overflow-hidden mb-4">
+                <div
+                  :class="['h-full rounded-full bg-gradient-to-r transition-all duration-1000', getHealthScoreGradient(deepInsights.insights.health_score.score)]"
+                  :style="{ width: `${deepInsights.insights.health_score.score}%` }"
+                ></div>
+              </div>
+
+              <!-- Factors -->
+              <div class="flex flex-wrap gap-2">
+                <span
+                  v-for="(factor, idx) in deepInsights.insights.health_score.factors.slice(0, 4)"
+                  :key="idx"
+                  :class="[
+                    'text-micro px-2 py-1 rounded-full border',
+                    factor.impact === 'positive'
+                      ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                      : 'bg-destructive/10 text-destructive border-destructive/20'
+                  ]"
+                >
+                  {{ factor.impact === 'positive' ? '+' : '-' }} {{ factor.label }}
+                </span>
+              </div>
+            </Card>
+
+            <!-- Trend Analysis -->
+            <Card class="p-5 border-border bg-secondary/20">
+              <div class="flex items-center gap-2 mb-3">
+                <component :is="getTrendIcon(deepInsights.insights.trend_analysis.direction)" :class="['w-5 h-5', getTrendColor(deepInsights.insights.trend_analysis.direction)]" />
+                <h4 class="text-small font-black uppercase tracking-wide">Tendência de Gastos</h4>
+              </div>
+
+              <div class="flex items-baseline gap-2 mb-4">
+                <span :class="['text-h2 font-black capitalize', getTrendColor(deepInsights.insights.trend_analysis.direction)]">
+                  {{ deepInsights.insights.trend_analysis.direction }}
+                </span>
+                <span class="text-body text-muted-foreground">
+                  ({{ deepInsights.insights.trend_analysis.monthly_change_pct > 0 ? '+' : '' }}{{ deepInsights.insights.trend_analysis.monthly_change_pct.toFixed(1) }}% ao mês)
+                </span>
+              </div>
+
+              <!-- Category Drivers -->
+              <div class="space-y-2">
+                <span class="text-micro text-muted-foreground uppercase font-bold">Categorias em destaque</span>
+                <div class="space-y-1.5">
+                  <div
+                    v-for="cat in deepInsights.insights.trend_analysis.categories_driving_change.slice(0, 3)"
+                    :key="cat.name"
+                    class="flex items-center justify-between text-small"
+                  >
+                    <span class="text-foreground/80">{{ cat.name }}</span>
+                    <span :class="cat.change_pct > 0 ? 'text-destructive' : 'text-emerald-500'">
+                      {{ cat.change_pct > 0 ? '+' : '' }}{{ cat.change_pct.toFixed(0) }}%
+                    </span>
+                  </div>
                 </div>
-             </div>
-             
-             <Button class="w-full" variant="outline" @click="hasAnalyzed = false">
-                Nova Análise
-             </Button>
-        </div>
+              </div>
+            </Card>
+
+            <!-- Forecast -->
+            <Card class="p-5 border-primary/20 bg-primary/5">
+              <div class="flex items-center gap-2 mb-3">
+                <Target class="w-5 h-5 text-primary" />
+                <h4 class="text-small font-black uppercase tracking-wide text-primary">Previsão Próximo Mês</h4>
+              </div>
+
+              <div class="flex items-baseline gap-3 mb-3">
+                <span class="text-h2 font-black">{{ formatCurrency(deepInsights.insights.forecast.next_month_prediction) }}</span>
+                <div class="flex items-center gap-1.5">
+                  <div class="w-16 h-2 bg-secondary rounded-full overflow-hidden">
+                    <div
+                      class="h-full bg-primary rounded-full"
+                      :style="{ width: `${deepInsights.insights.forecast.confidence}%` }"
+                    ></div>
+                  </div>
+                  <span class="text-micro text-muted-foreground">{{ deepInsights.insights.forecast.confidence }}% confiança</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap gap-1.5">
+                <span
+                  v-for="(factor, idx) in deepInsights.insights.forecast.factors"
+                  :key="idx"
+                  class="text-micro px-2 py-0.5 rounded-full bg-primary/10 text-primary/80"
+                >
+                  {{ factor }}
+                </span>
+              </div>
+            </Card>
+
+            <!-- Optimization Opportunities -->
+            <div class="space-y-3">
+              <div class="flex items-center gap-2 ml-1">
+                <Lightbulb class="w-4 h-4 text-amber-500" />
+                <h4 class="text-small font-black text-muted-foreground uppercase tracking-wider">Oportunidades de Economia</h4>
+              </div>
+
+              <div class="space-y-2">
+                <div
+                  v-for="(opp, idx) in deepInsights.insights.optimization_opportunities"
+                  :key="idx"
+                  class="p-4 rounded-xl bg-secondary/30 border border-border space-y-2 hover:bg-secondary/50 transition-colors"
+                >
+                  <div class="flex items-center justify-between">
+                    <span class="font-semibold text-foreground">{{ opp.category }}</span>
+                    <span :class="['text-micro px-2 py-0.5 rounded-full border', getDifficultyBadgeClass(opp.difficulty)]">
+                      {{ opp.difficulty }}
+                    </span>
+                  </div>
+                  <p class="text-small text-muted-foreground">{{ opp.suggestion }}</p>
+                  <div class="flex items-center justify-between pt-2 border-t border-border/50 text-small">
+                    <span class="text-muted-foreground">Gasto atual: <span class="text-foreground">{{ formatCurrency(opp.current_spending) }}</span></span>
+                    <span class="text-emerald-500 font-semibold">Economia: {{ formatCurrency(opp.potential_saving) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Period Info -->
+            <div class="pt-4 border-t border-border text-center">
+              <span class="text-micro text-muted-foreground">
+                Período analisado: {{ deepInsights.metadata.periodStart }} a {{ deepInsights.metadata.periodEnd }} |
+                Média mensal: <span class="font-semibold text-foreground">{{ formatCurrency(deepInsights.metadata.monthlyAverage) }}</span>
+              </span>
+            </div>
+
+            <Button class="w-full" variant="outline" @click="hasAnalyzedDeep = false">
+              Nova Análise Profunda
+            </Button>
+          </div>
+        </template>
       </div>
     </DialogContent>
   </Dialog>

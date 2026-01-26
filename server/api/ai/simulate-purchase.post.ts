@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import OpenAI from 'openai'
+import { generateText } from 'ai'
+import { gateway } from '../../utils/ai'
 import prisma from '../../utils/prisma'
 import { startOfMonth, endOfMonth, subMonths, addMonths } from 'date-fns'
 
@@ -175,32 +176,18 @@ Responda APENAS com JSON válido neste formato exato:
   "alternatives": ["Sugestão prática 1", "Sugestão prática 2"]
 }`
 
-  // 5. CALL OPENAI
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-  })
-
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'Você é um consultor financeiro conservador que fornece análises objetivas e práticas em português do Brasil. Sempre responda em JSON válido.'
-        },
-        { role: 'user', content: aiPrompt }
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.5, // Lower temperature for more consistent, conservative advice
-      max_tokens: 800
+    const { text } = await generateText({
+      model: gateway('gpt-4o-mini'),
+      system: 'Você é um consultor financeiro conservador que fornece análises objetivas e práticas em português do Brasil. Sempre responda em JSON válido. Não use blocos de código markdown, retorne apenas o JSON puro.',
+      prompt: aiPrompt,
+      temperature: 0.5,
+      maxTokens: 800
     })
 
-    const messageContent = completion.choices[0]?.message?.content
-    if (!messageContent) {
-      throw new Error('No response from AI')
-    }
-
-    const analysis = JSON.parse(messageContent)
+    // Clean markdown code blocks if present
+    const cleanedText = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
+    const analysis = JSON.parse(cleanedText)
 
     return {
       success: true,
@@ -220,7 +207,7 @@ Responda APENAS com JSON válido neste formato exato:
       }
     }
   } catch (error: any) {
-    console.error('OpenAI API Error:', error)
+    console.error('AI Gateway Error:', error)
     throw createError({
       statusCode: 500,
       statusMessage: 'Erro ao processar análise de compra',

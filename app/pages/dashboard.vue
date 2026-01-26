@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { addMonths, subMonths, getMonth, getYear, differenceInDays, parseISO } from 'date-fns'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
@@ -14,9 +14,14 @@ import AIMobileDrawer from '@/components/dashboard/AIMobileDrawer.vue'
 import SummaryCards from '@/components/dashboard/SummaryCards.vue'
 import CategoryBubbleChart from '@/components/dashboard/CategoryBubbleChart.vue'
 import PurchaseSimulator from '@/components/dashboard/PurchaseSimulator.vue'
+import ProactiveAdvisor from '@/components/dashboard/ProactiveAdvisor.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import { Card } from '@/components/ui/card'
 import { Calendar as CalendarIcon } from 'lucide-vue-next'
+import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
+
+// Proactive Advisor
+const advisor = useProactiveAdvisor()
 
 // Global State
 const currentDate = ref(new Date())
@@ -67,6 +72,23 @@ watch(cards, (newCards) => {
   if (newCards && newCards.length > 0 && !selectedCardId.value) {
     const defaultCard = newCards.find(c => (c as any).isDefault) || newCards[0]
     if (defaultCard) selectedCardId.value = defaultCard.id
+  }
+}, { immediate: true })
+
+// Proactive Advisor Triggers
+onMounted(() => {
+  // Morning check - only once per session
+  if (advisor.shouldShowForTrigger('morning_check')) {
+    advisor.trigger('morning_check', { cardId: selectedCardId.value || undefined })
+  }
+})
+
+// Watch for pre-fechamento trigger (when <=5 days to closing)
+watch(daysToDue, (days) => {
+  if (days !== null && days <= 5 && days > 0) {
+    if (advisor.shouldShowForTrigger('pre_fechamento')) {
+      advisor.trigger('pre_fechamento', { cardId: selectedCardId.value || undefined })
+    }
   }
 }, { immediate: true })
 
@@ -266,10 +288,10 @@ const showPayConfirm = ref(false)
       </div>
 
       <!-- Content Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Left Column: Main Stats & Insights (2/3 width) -->
-        <div class="lg:col-span-2 space-y-8">
-          <!-- Hero Summary Cards (NEW) -->
+      <div class="grid grid-cols-1 gap-8">
+        <!-- Main Content Area (Full Width) -->
+        <div class="space-y-8">
+          <!-- Hero Summary Cards -->
           <SummaryCards 
             :total="summary.total"
             :limit="summary.limit"
@@ -281,54 +303,55 @@ const showPayConfirm = ref(false)
             @pay="showPayConfirm = true"
           />
 
-
-
-
-
-          <!-- Transaction List -->
-          <Card class="p-6 overflow-hidden">
-              <div class="flex items-center justify-between mb-6">
-                  <h2 class="text-h2">Lançamentos</h2>
-              </div>
-              <TransactionList :transactions="summary.transactions || {}" @edit="handleEdit" />
-          </Card>
-        </div>
-
-        <!-- Right Column: Sidebar (1/3 width) -->
-        <div class="space-y-8">
-
-            <!-- Future Projection -->
-            <Card class="overflow-hidden p-0" v-if="futureProjection">
-              <div class="p-4 border-b border-white/10 bg-white/10 dark:bg-black/10">
-                <h3 class="text-micro text-muted-foreground">Projeção Futura</h3>
-              </div>
-              <div class="p-4 space-y-3">
-                  <div
-                      v-for="proj in futureProjection.projections" :key="`${proj.month}-${proj.year}`"
-                      class="flex justify-between items-center p-3 rounded-xl bg-white/5 dark:bg-black/20 border border-white/5 hover:border-primary/20 transition-colors group"
-                  >
-                      <div class="flex flex-col">
-                          <span class="text-micro text-muted-foreground">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
-                          <span class="text-small text-muted-foreground">{{ proj.installmentsCount }} parcelas</span>
-                      </div>
-                      <span class="text-body font-black group-hover:text-primary transition-colors">{{ formatCurrency(proj.total || 0) }}</span>
-                  </div>
-                  <div v-if="!futureProjection.projections?.length" class="text-small text-muted-foreground text-center py-4">
-                      Nenhuma projeção futura.
-                  </div>
-              </div>
+          <!-- Two Column Layout: Transactions + Sidebar -->
+          <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
+            <!-- Transaction List -->
+            <Card class="p-6 overflow-hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-h2">Lançamentos</h2>
+                </div>
+                <TransactionList :transactions="summary.transactions || {}" @edit="handleEdit" />
             </Card>
 
-            <!-- AI Tools Group (Hidden on Mobile) -->
-            <div class="hidden lg:flex flex-col gap-6">
-              <AIInsights :month="summary.month" :year="summary.year" />
-              
-              <PurchaseSimulator 
-                v-if="selectedCardId && cards && cards.length > 0"
-                :cardId="selectedCardId"
-                :cardName="cards.find(c => c.id === selectedCardId)?.name || ''"
-              />
+            <!-- Right Sidebar -->
+            <div class="space-y-6">
+                <!-- Proactive Advisor (Desktop) -->
+                <ProactiveAdvisor v-if="advisor.hasMessage.value || advisor.isLoading.value" class="hidden lg:block" />
+
+                <!-- Future Projection -->
+                <Card class="overflow-hidden p-0 hidden lg:block" v-if="futureProjection">
+                  <div class="p-4 border-b border-white/10 bg-white/10 dark:bg-black/10">
+                    <h3 class="text-micro text-muted-foreground">Projeção Futura</h3>
+                  </div>
+                  <div class="p-4 space-y-3">
+                      <div
+                          v-for="proj in futureProjection.projections" :key="`${proj.month}-${proj.year}`"
+                          class="flex justify-between items-center p-3 rounded-xl bg-white/5 dark:bg-black/20 border border-white/5 hover:border-primary/20 transition-colors group"
+                      >
+                          <div class="flex flex-col">
+                              <span class="text-micro text-muted-foreground">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
+                              <span class="text-small text-muted-foreground">{{ proj.installmentsCount }} parcelas</span>
+                          </div>
+                          <span class="text-body font-black group-hover:text-primary transition-colors">{{ formatCurrency(proj.total || 0) }}</span>
+                      </div>
+                      <div v-if="!futureProjection.projections?.length" class="text-small text-muted-foreground text-center py-4">
+                          Nenhuma projeção futura.
+                      </div>
+                  </div>
+                </Card>
+
+                <!-- AI Tools Group (Hidden on Mobile) -->
+                <div class="hidden lg:flex flex-col gap-6">
+                  <AIInsights :month="summary.month" :year="summary.year" />
+                  
+                  <PurchaseSimulator 
+                    v-if="selectedCardId && cards && cards.length > 0"
+                    :cardId="selectedCardId"
+                    :cardName="cards.find(c => c.id === selectedCardId)?.name || ''"
+                  />
+                </div>
             </div>
+          </div>
         </div>
       </div>
     </template>
