@@ -43,11 +43,15 @@ export default defineEventHandler(async (event) => {
   
   // Convert to array and sort descending
   const categories = Array.from(categoryTotals.values())
-    .map(cat => ({
-      name: cat.name,
-      total: Math.round(cat.total * 100) / 100,
-      percentage: grandTotal > 0 ? Math.round((cat.total / grandTotal) * 10000) / 100 : 0
-    }))
+    .map(cat => {
+      const relatedInst = installments.find(i => i.transaction.category.name === cat.name)
+      return {
+        name: cat.name,
+        total: Math.round(cat.total * 100) / 100,
+        percentage: grandTotal > 0 ? Math.round((cat.total / grandTotal) * 10000) / 100 : 0,
+        color: (relatedInst?.transaction.category as any)?.color || '#333'
+      }
+    })
     .sort((a, b) => b.total - a.total)
   
   return {

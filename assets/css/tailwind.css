@@ -34,6 +34,27 @@
     --ring: 180 70% 45%;
 
     --radius: 1rem;
+
+    /* Status Colors */
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 160 60% 95%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 10%;
+    --warning-muted: 38 90% 95%;
+
+    --info: 221 83% 53%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 221 80% 95%;
+
+    --danger: 0 84% 60%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 0 80% 95%;
+
+    /* Glassmorphism tokens */
+    --glass-bg: 0 0% 100% / 0.7;
+    --glass-border: 0 0% 100% / 0.2;
   }
 
   .dark {
@@ -67,6 +88,23 @@
     --border: 187 30% 20%;
     --input: 187 30% 20%;
     --ring: 180 62% 66%;
+
+    /* Status Colors - Dark Mode */
+    --success: 160 72% 45%;
+    --success-muted: 160 40% 15%;
+
+    --warning: 38 85% 55%;
+    --warning-muted: 38 50% 15%;
+
+    --info: 221 75% 60%;
+    --info-muted: 221 50% 15%;
+
+    --danger: 0 72% 50%;
+    --danger-muted: 0 50% 15%;
+
+    /* Glassmorphism tokens - Dark Mode */
+    --glass-bg: 240 10% 4% / 0.8;
+    --glass-border: 0 0% 100% / 0.1;
   }
 }
 
@@ -80,4 +118,17 @@
   body {
     @apply bg-background text-foreground h-full overscroll-y-none;
   }
+}
+
+@layer components {
+  /* Typography utility classes */
+  .text-display { @apply text-4xl md:text-5xl font-black tracking-tight leading-none; }
+  .text-h1 { @apply text-3xl font-black tracking-tight leading-tight; }
+  .text-h2 { @apply text-xl md:text-2xl font-bold tracking-tight; }
+  .text-h3 { @apply text-lg font-bold; }
+  .text-h4 { @apply text-base font-semibold; }
+  .text-body { @apply text-sm font-normal leading-relaxed; }
+  .text-small { @apply text-xs font-medium; }
+  .text-micro { @apply text-[10px] font-bold uppercase tracking-widest; }
+  .text-stat { @apply text-2xl md:text-3xl lg:text-4xl font-black tabular-nums tracking-tighter; }
 }

@@ -4,6 +4,7 @@ import { ptBR } from 'date-fns/locale'
 import { AlertCircle, Edit2, ArrowLeft, Clock, Calendar, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
 import { Button } from '@/components/ui/button'
+import PageHeader from '@/components/ui/PageHeader.vue'
 
 interface Transaction {
   id: string
@@ -66,23 +67,13 @@ function prevPage() {
 </script>
 
 <template>
-  <div class="container mx-auto py-10 px-4 space-y-8">
-    <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-full text-indigo-600 dark:text-indigo-400">
-                <AlertCircle class="w-6 h-6 " />
-            </div>
-            <div>
-                <h1 class="text-3xl font-bold tracking-tight">Auditoria</h1>
-                <p class="text-muted-foreground">Analise as transações por ordem de criação.</p>
-            </div>
-        </div>
-        
-        <NuxtLink to="/" class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft class="w-4 h-4" />
-            Voltar ao Dashboard
-        </NuxtLink>
-    </div>
+  <div class="mx-auto max-w-5xl py-10 px-4 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <PageHeader 
+      title="Auditoria" 
+      subtitle="Analise as transações por ordem de criação."
+      :icon="AlertCircle"
+      backTo="/"
+    />
 
     <!-- Latest Transactions Table -->
     <div class="rounded-xl border bg-card shadow-sm overflow-hidden">
@@ -117,8 +108,8 @@ function prevPage() {
                         </td>
                         <td class="px-4 py-4">
                             <div class="flex flex-col">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ tx.card.name }}</span>
-                                <span class="text-xs">{{ tx.category.name }}</span>
+                                <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ tx.card?.name || 'Sem Cartão' }}</span>
+                                <span class="text-xs">{{ tx.category?.name || 'Sem Categoria' }}</span>
                             </div>
                         </td>
                         <td class="px-4 py-4 text-right font-bold">

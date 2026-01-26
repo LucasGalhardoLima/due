@@ -46,11 +46,51 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Status colors
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+          muted: "hsl(var(--success-muted))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+          muted: "hsl(var(--warning-muted))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+          muted: "hsl(var(--info-muted))",
+        },
+        danger: {
+          DEFAULT: "hsl(var(--danger))",
+          foreground: "hsl(var(--danger-foreground))",
+          muted: "hsl(var(--danger-muted))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        // Elevation system
+        "elevation-1": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "elevation-2": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "elevation-3": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "elevation-4": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "elevation-5": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        // Glow shadows
+        "success-glow": "0 0 20px -5px hsl(var(--success) / 0.4)",
+        "warning-glow": "0 0 20px -5px hsl(var(--warning) / 0.4)",
+        "danger-glow": "0 0 20px -5px hsl(var(--danger) / 0.4)",
+        "primary-glow": "0 0 20px -5px hsl(var(--primary) / 0.4)",
+        "info-glow": "0 0 20px -5px hsl(var(--info) / 0.4)",
+        // Glass shadow
+        "glass": "0 8px 32px 0 rgb(0 0 0 / 0.08)",
+      },
+      backdropBlur: {
+        glass: "16px",
       },
     },
   },

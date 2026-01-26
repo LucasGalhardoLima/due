@@ -8,42 +8,68 @@ const features = [
   {
     icon: Upload,
     title: 'Importação Inteligente',
-    description: 'Arraste seu CSV do banco e deixe o sistema categorizar tudo para você via IA.',
+    description: 'Arraste seu CSV do Nubank, Inter e outros. Nossa IA organiza e categoriza tudo instantaneamente.',
     colSpan: 'md:col-span-2'
   },
   {
-    icon: TrendingUp,
-    title: 'Visão de Futuro',
-    description: 'Veja a projeção das suas faturas para os próximos 3 meses baseada nas suas parcelas.',
+    icon: Sparkles,
+    title: 'Simulador de Compra IA',
+    description: 'Antes de passar o cartão, pergunte ao Due. Nossa IA analisa seu limite e faturas para dar o sinal verde.',
     colSpan: 'md:col-span-1'
   },
   {
-    icon: Sparkles,
-    title: 'Advisor AI',
-    description: 'Um consultor financeiro embutido que analisa seus gastos e sugere cortes inteligentes.',
+    icon: PieChart,
+    title: 'Raio-X das Categorias',
+    description: 'Visualize com precisão cirúrgica para onde seu dinheiro está indo com gráficos inteligentes e interativos.',
+    colSpan: 'md:col-span-1'
+  },
+  {
+    icon: MessageSquare,
+    title: 'AI Advisor',
+    description: 'Seu copiloto financeiro. Receba diagnósticos profundos e sugestões de economia baseadas no seu perfil.',
+    colSpan: 'md:col-span-1'
+  },
+  {
+    icon: Target,
+    title: 'Metas e Orçamentos',
+    description: 'Defina limites por cartão e acompanhe sua evolução mensal com metas claras e visuais.',
+    colSpan: 'md:col-span-1'
+  },
+  {
+    icon: TrendingUp,
+    title: 'Projeção de Faturas',
+    description: 'Prepare-se para o futuro. Veja o impacto das suas parcelas nos próximos meses com precisão.',
     colSpan: 'md:col-span-1'
   },
   {
     icon: Shield,
-    title: 'Privacidade Isolada',
-    description: 'Seus dados são seus. Banco de dados isolado via Supabase e Clerk Auth.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: Smartphone,
-    title: 'Mobile First',
-    description: 'Instale como PWA no seu celular e tenha o controle na palma da mão.',
-    colSpan: 'md:col-span-1'
+    title: 'Privacidade Total',
+    description: 'Seus dados financeiros são sagrados. Banco de dados isolado e autenticação via Clerk.',
+    colSpan: 'md:col-span-2'
   }
 ]
 
 const roadmap = [
   {
-    status: 'soon',
-    icon: TrendingUp,
-    title: 'Fluxo de Caixa 360º',
-    description: 'Suporte completo para contas correntes, receitas e gastos no débito/Pix.',
-    eta: 'Q1 2026'
+    status: 'done',
+    icon: Shield,
+    title: 'Módulo de Auditoria',
+    description: 'Histórico completo e detalhado de todas as transações criadas, com filtros avançados.',
+    eta: 'Concluído'
+  },
+  {
+    status: 'done',
+    icon: Target,
+    title: 'Metas por Cartão',
+    description: 'Sistema de budget individual para cada cartão de crédito com alertas visuais.',
+    eta: 'Concluído'
+  },
+  {
+    status: 'done',
+    icon: Sparkles,
+    title: 'Simulador IA v1',
+    description: 'Motor de análise preditiva para avaliar a viabilidade de novas compras.',
+    eta: 'Concluído'
   },
   {
     status: 'soon',
@@ -51,20 +77,6 @@ const roadmap = [
     title: 'App Instalável (PWA)',
     description: 'Instale o Due direto na home do seu celular para uma experiência nativa.',
     eta: 'Q1 2026'
-  },
-  {
-    status: 'soon',
-    icon: Bell,
-    title: 'Orçamentos Granulares',
-    description: 'Defina limites de gastos por categoria e receba alertas inteligentes.',
-    eta: 'Q2 2026'
-  },
-  {
-    status: 'planned',
-    icon: Building2,
-    title: 'Open Finance',
-    description: 'Conexão direta com bancos para importar transações automaticamente.',
-    eta: 'Q3 2026'
   },
   {
     status: 'planned',
@@ -75,9 +87,9 @@ const roadmap = [
   },
   {
     status: 'planned',
-    icon: Target,
-    title: 'Metas de Economia',
-    description: 'Cofres virtuais para planejar viagens, compras ou sua reserva.',
+    icon: Building2,
+    title: 'Open Finance',
+    description: 'Conexão direta com bancos para importar transações automaticamente.',
     eta: 'Q4 2026'
   }
 ]
@@ -128,10 +140,10 @@ definePageMeta({
   <div class="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary overflow-x-hidden font-sans antialiased transition-colors duration-300">
     
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/60 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-      <div class="container mx-auto px-6 h-20 flex items-center justify-between">
-        <NuxtLink to="/" class="font-bold text-2xl flex items-center gap-3 tracking-tighter">
-          <div class="w-8 h-8 bg-primary rounded-[10px] flex items-center justify-center text-primary-foreground text-sm font-black shadow-lg shadow-primary/20">
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/10 backdrop-blur-xl bg-background/70 shadow-glass supports-[backdrop-filter]:bg-background/60">
+      <div class="container mx-auto px-8 h-20 flex items-center justify-between">
+        <NuxtLink to="/" class="font-black text-2xl flex items-center gap-3 tracking-tighter group">
+          <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-card text-xl font-black shadow-elevation-3 shadow-primary/25 transition-transform group-hover:scale-105">
             D
           </div>
           Due
@@ -152,7 +164,7 @@ definePageMeta({
             </button>
             <div class="h-6 w-px bg-border/50 hidden md:block"></div>
             <button @click="openSignIn" class="text-sm font-bold hover:text-primary transition-colors">Entrar</button>
-            <button @click="openSignUp" class="hidden md:inline-flex h-9 px-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-all">
+            <button @click="openSignUp" class="hidden md:inline-flex h-9 px-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-elevation-3 shadow-primary/25 hover:scale-105 active:scale-[0.98] transition-all">
               Criar Conta
             </button>
           </div>
@@ -161,15 +173,15 @@ definePageMeta({
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="relative pt-32 pb-32 md:pt-48 md:pb-64 overflow-hidden">
+    <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
       <!-- Background Blobs -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] -z-10">
         <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
-        <div class="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-primary/10 rounded-full blur-[140px] animate-pulse duration-[10s]" />
+        <div class="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-primary/10 rounded-full blur-[140px] animate-pulse duration-&lsqb;10s&lsqb;" />
         <div class="absolute bottom-0 left-[20%] w-[30%] h-[30%] bg-cyan-500/10 rounded-full blur-[100px]" />
       </div>
       
-      <div class="container mx-auto px-6 text-center space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+      <div class="container mx-auto px-8 text-center space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase backdrop-blur-md shadow-sm">
           <span class="w-2 h-2 rounded-full bg-primary animate-pulse" />
           Finanças Reimaginadas
@@ -208,42 +220,42 @@ definePageMeta({
       </div>
 
       <!-- Scroll Indicator -->
-      <div class="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
-        <ChevronDown class="w-6 h-6" />
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce opacity-20 z-20">
+        <ChevronDown class="w-5 h-5" />
       </div>
     </section>
 
     <!-- Bento Grid Features -->
-    <section id="features" class="py-32 relative overflow-hidden">
+    <section id="features" class="py-16 relative overflow-hidden">
       <!-- Glow -->
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10" />
       
-      <div class="container mx-auto px-6">
+      <div class="container mx-auto px-8">
         <div class="mb-20">
            <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-6">Poder sem <span class="text-primary/80">complexidade.</span></h2>
            <p class="text-xl text-muted-foreground max-w-2xl font-medium">Ferramentas de elite, simplificadas para você.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div 
-            v-for="feature in features" 
+          <div
+            v-for="feature in features"
             :key="feature.title"
             :class="[
               feature.colSpan,
-              'group relative p-8 rounded-3xl bg-secondary/20 dark:bg-zinc-900/40 border border-border/50 backdrop-blur-sm hover:border-primary/50 transition-all duration-500 overflow-hidden'
+              'group relative p-8 rounded-2xl bg-secondary/20 dark:bg-zinc-900/40 border border-border/50 backdrop-blur-xl shadow-elevation-2 hover:shadow-elevation-4 hover:border-primary/50 transition-all duration-500 overflow-hidden'
             ]"
           >
             <!-- Hover Glow -->
-            <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
             <div class="relative z-10 h-full flex flex-col justify-between space-y-8">
-              <div class="w-14 h-14 rounded-2xl bg-background/80 flex items-center justify-center text-primary shadow-lg border border-border/50 group-hover:scale-110 transition-transform duration-500">
+              <div class="w-14 h-14 rounded-2xl bg-background/80 flex items-center justify-center text-primary shadow-elevation-2 border border-border/50 group-hover:scale-110 transition-transform duration-500">
                 <component :is="feature.icon" class="w-7 h-7" />
               </div>
-              
+
               <div>
-                <h3 class="text-2xl font-bold mb-3 tracking-tight">{{ feature.title }}</h3>
-                <p class="text-muted-foreground font-medium leading-relaxed">
+                <h3 class="text-h2 mb-3">{{ feature.title }}</h3>
+                <p class="text-body text-muted-foreground">
                   {{ feature.description }}
                 </p>
               </div>
@@ -254,11 +266,11 @@ definePageMeta({
     </section>
 
     <!-- Roadmap Section (Timeline) -->
-    <section id="roadmap" class="py-32 relative">
+    <section id="roadmap" class="py-16 relative">
        <!-- timeline bar -->
        <div class="absolute left-1/2 -translate-x-1/2 top-48 bottom-32 w-px bg-gradient-to-b from-primary/40 via-border/40 to-transparent hidden md:block" />
        
-       <div class="container mx-auto px-6">
+       <div class="container mx-auto px-8">
         <div class="mb-20 text-center">
            <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-6">O futuro é brilhante.</h2>
            <p class="text-xl text-muted-foreground mx-auto max-w-2xl">Transparência radical sobre nossos próximos passos.</p>
@@ -273,29 +285,33 @@ definePageMeta({
           >
             <!-- Content -->
             <div class="flex-1 w-full md:w-auto">
-               <div 
-                class="p-8 rounded-3xl border border-border/40 bg-background/50 backdrop-blur-sm group hover:border-primary/40 transition-all duration-500"
+               <div
+                class="p-8 rounded-2xl border border-border/40 bg-background/50 backdrop-blur-xl shadow-elevation-2 group hover:shadow-elevation-4 hover:border-primary/40 transition-all duration-500"
                 :class="index % 2 === 0 ? 'md:mr-16' : 'md:ml-16'"
               >
                   <div class="flex items-center justify-between mb-6">
-                    <div class="p-3 rounded-2xl bg-secondary/50 text-foreground/80 group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-500">
+                    <div class="p-3 rounded-2xl bg-secondary/50 text-foreground/80 shadow-elevation-1 group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-500">
                       <component :is="item.icon" class="w-6 h-6" />
                     </div>
-                    <span 
-                      class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border"
-                      :class="item.status === 'soon' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-blue-500/10 text-blue-500 border-blue-500/20'"
+                    <span
+                      class="px-3 py-1 rounded-full text-micro border"
+                      :class="[
+                        item.status === 'done' ? 'bg-success-muted text-success border-success/20' :
+                        item.status === 'soon' ? 'bg-warning-muted text-warning border-warning/20' :
+                        'bg-info-muted text-info border-info/20'
+                      ]"
                     >
                       {{ item.eta }}
                     </span>
                   </div>
-                  <h4 class="text-2xl font-bold mb-3 tracking-tight">{{ item.title }}</h4>
-                  <p class="text-muted-foreground leading-relaxed">{{ item.description }}</p>
+                  <h4 class="text-h2 mb-3">{{ item.title }}</h4>
+                  <p class="text-body text-muted-foreground">{{ item.description }}</p>
                </div>
             </div>
 
             <!-- Timeline Marker -->
             <div class="relative z-10 flex items-center justify-center w-12">
-               <div class="w-4 h-4 rounded-full bg-background border-4 border-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+               <div :class="['w-4 h-4 rounded-full bg-background border-4 shadow-lg transition-colors duration-500', item.status === 'done' ? 'border-emerald-500 shadow-emerald-500/30' : 'border-primary shadow-primary/50']" />
             </div>
 
             <!-- Spacer -->
@@ -306,23 +322,23 @@ definePageMeta({
     </section>
 
     <!-- FAQ Section -->
-    <section id="faq" class="py-32 relative overflow-hidden bg-secondary/5 dark:bg-zinc-950/20">
+    <section id="faq" class="py-16 relative overflow-hidden bg-secondary/5 dark:bg-zinc-950/20">
       <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] -z-10" />
       
-      <div class="container mx-auto px-6 max-w-4xl">
+      <div class="container mx-auto px-8 max-w-4xl">
         <h2 class="text-3xl md:text-5xl font-black tracking-tight mb-16 text-center">Dúvidas Frequentes</h2>
 
         <div class="space-y-4">
-          <details 
-            v-for="faq in faqs" 
+          <details
+            v-for="faq in faqs"
             :key="faq.question"
-            class="group p-6 rounded-2xl bg-card border border-border/50 backdrop-blur-sm open:bg-card/80 open:border-primary/30 transition-all duration-300"
+            class="group p-6 rounded-2xl bg-card border border-border/50 backdrop-blur-xl shadow-elevation-1 open:shadow-elevation-3 open:bg-card/80 open:border-primary/30 transition-all duration-300"
           >
-            <summary class="font-bold text-lg cursor-pointer list-none flex items-center justify-between">
+            <summary class="text-h3 cursor-pointer list-none flex items-center justify-between">
               {{ faq.question }}
               <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-300 group-open:rotate-180 group-open:text-primary" />
             </summary>
-            <p class="mt-4 text-muted-foreground leading-relaxed animate-in slide-in-from-top-2 fade-in duration-300">
+            <p class="mt-4 text-body text-muted-foreground animate-in slide-in-from-top-2 fade-in duration-300">
               {{ faq.answer }}
             </p>
           </details>
@@ -331,13 +347,13 @@ definePageMeta({
     </section>
 
     <!-- Footer -->
-    <footer class="py-12 border-t border-border/40 relative overflow-hidden">
+    <footer class="py-16 border-t border-border/40 relative overflow-hidden">
       <div class="absolute bottom-[-100px] left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-primary/10 rounded-full blur-[80px] -z-10" />
       
-      <div class="container mx-auto px-6">
+      <div class="container mx-auto px-8">
         <div class="flex flex-col md:flex-row justify-between items-center gap-8 opacity-60 hover:opacity-100 transition-opacity">
-          <div class="flex items-center gap-2 font-bold text-xl">
-            <div class="w-6 h-6 bg-primary rounded-[6px] flex items-center justify-center text-primary-foreground text-[10px] font-black shadow-lg shadow-primary/20">
+          <div class="flex items-center gap-2 font-black text-xl tracking-tighter group">
+            <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-card text-sm font-black shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
               D
             </div>
             Due

@@ -16,61 +16,59 @@ export default defineEventHandler(async (event) => {
   const targetMonth = month ? parseInt(month) : now.getMonth() + 1
   const targetYear = year ? parseInt(year) : now.getFullYear()
 
-  // Fetch all transactions for the target month
+  // Define Date Range for "Invoiced Installments" (Current Month)
   const startDate = new Date(targetYear, targetMonth - 1, 1)
   const endDate = new Date(targetYear, targetMonth, 0, 23, 59, 59)
 
-  const transactions = await prisma.transaction.findMany({
+  // 1. Fetch ALL installments due in the current month (matches summary logic)
+  const installments = await prisma.installment.findMany({
     where: {
-      userId, // Filter by user
-      purchaseDate: {
+      dueDate: {
         gte: startDate,
         lte: endDate
+      },
+      transaction: {
+        userId
       }
     },
     include: {
-      card: { select: { name: true } },
-      category: { select: { name: true } },
-      installments: {
-        where: {
-          dueDate: {
-            gte: startDate,
-            lte: endDate
-          }
-        },
-        select: {
-          amount: true,
-          number: true
+      transaction: {
+        include: {
+          category: { select: { name: true } },
+          card: { select: { name: true, limit: true, budget: true } }
         }
       }
-    },
-    orderBy: {
-      purchaseDate: 'desc'
     }
   })
 
-  // Calculate category spending
+  // 2. Calculate category spending based on these installments
   const categorySpending: Record<string, number> = {}
   let totalSpent = 0
+  
+  // Get user's global context (limit/budget)
+  const userCards = await prisma.creditCard.findMany({ where: { userId } })
+  const totalBudget = userCards.reduce((acc, c) => acc + (c.budget || 0), 0)
+  const totalLimit = userCards.reduce((acc, c) => acc + c.limit, 0)
 
-  for (const tx of transactions) {
-    const categoryName = tx.category.name
-    const installmentTotal = tx.installments.reduce((sum, inst) => sum + inst.amount, 0)
+  for (const inst of installments) {
+    const categoryName = inst.transaction.category.name
     
     if (!categorySpending[categoryName]) {
       categorySpending[categoryName] = 0
     }
-    categorySpending[categoryName] += installmentTotal
-    totalSpent += installmentTotal
+    categorySpending[categoryName] += inst.amount
+    totalSpent += inst.amount
   }
 
-  // Get future installments (upcoming fixed costs)
+  // 3. Get future commitments (next 3 months) for better advice
+  const futureDate = new Date(targetYear, targetMonth + 2, 0) // End of 3 months from now
   const futureInstallments = await prisma.installment.findMany({
     where: {
       dueDate: {
-        gt: endDate
+        gt: endDate,
+        lte: futureDate
       },
-      transaction: { userId } // Filter by user
+      transaction: { userId }
     },
     include: {
       transaction: {
@@ -79,42 +77,45 @@ export default defineEventHandler(async (event) => {
         }
       }
     },
-    orderBy: {
-      dueDate: 'asc'
-    },
-    take: 50
+    orderBy: { dueDate: 'asc' }
   })
 
   // Prepare data for AI
   const categoryArray = Object.entries(categorySpending)
-    .map(([name, amount]) => ({ name, amount, percentage: (amount / totalSpent * 100).toFixed(1) }))
+    .map(([name, amount]) => ({ name, amount, percentage: totalSpent > 0 ? (amount / totalSpent * 100).toFixed(1) : '0' }))
     .sort((a, b) => b.amount - a.amount)
 
-  const aiPrompt = `Você é um consultor financeiro pessoal. Analise os dados abaixo e forneça insights PRÁTICOS e ACIONÁVEIS.
+  const aiPrompt = `Você é um consultor financeiro pessoal de elite. Analise os dados reais da fatura do usuário e forneça insights profundos.
+  
+CONTEXTO DO USUÁRIO (${targetMonth}/${targetYear}):
+- Fatura Atual Total: R$ ${totalSpent.toFixed(2)}
+- Orçamento Mensal (Meta): R$ ${totalBudget > 0 ? totalBudget.toFixed(2) : 'Não definido'}
+- Limite Total de Crédito: R$ ${totalLimit.toFixed(2)}
+- Quantidade de Itens na Fatura: ${installments.length}
 
-DADOS DO MÊS (${targetMonth}/${targetYear}):
-- Total gasto: R$ ${totalSpent.toFixed(2)}
-- Transações: ${transactions.length}
-
-GASTOS POR CATEGORIA:
+GASTOS POR CATEGORIA (Onde o dinheiro está indo):
 ${categoryArray.map(c => `- ${c.name}: R$ ${c.amount.toFixed(2)} (${c.percentage}%)`).join('\n')}
 
-PARCELAS FUTURAS (próximos meses):
-${futureInstallments.slice(0, 10).map(inst => 
-  `- ${inst.transaction.category.name}: R$ ${inst.amount.toFixed(2)} parcela ${inst.number} em ${new Date(inst.dueDate).toLocaleDateString('pt-BR')}`
-).join('\n')}
+COMPROMISSOS FUTUROS (Próximos 3 meses):
+${futureInstallments.length > 0 
+  ? futureInstallments.slice(0, 10).map(inst => `- ${inst.transaction.category.name}: R$ ${inst.amount.toFixed(2)} em ${new Date(inst.dueDate).toLocaleDateString('pt-BR')}`).join('\n')
+  : 'Nenhum compromisso futuro parcelado detectado.'}
 
-MISSÃO: Responda à pergunta crucial: "Por que minha fatura está alta e como reduzi-la no próximo mês?"
+MISSÃO: 
+1. Faça um diagnóstico real: O usuário estourou o orçamento? O limite está muito comprometido?
+2. Identifique tendências: Há gastos excessivos em categorias não essenciais?
+3. Dê 3 ações PRÁTICAS: "Corte X", "Ajuste Y", "Cuidado com Z".
+4. Previsão: O próximo mês tende a ser mais leve ou mais pesado baseado nas parcelas?
 
-Forneça EXATAMENTE 4 seções (use JSON):
+REGRAS DE RESPOSTA (JSON):
 {
-  "diagnostico": "Uma frase explicando o que mais contribuiu para o valor alto",
-  "acoes_imediatas": ["Ação 1", "Ação 2", "Ação 3"],
-  "alivio_futuro": "Quando parcelas vão terminar ou quando haverá alívio",
-  "alertas": ["Alerta sobre categoria X", "Alerta sobre hábito Y"]
+  "diagnostico": "Explicação curta e direta sobre a saúde financeira atual.",
+  "acoes_imediatas": ["Ação 1 com justificativa", "Ação 2 com justificativa", "Ação 3 com justificativa"],
+  "alivio_futuro": "Análise sobre os próximos meses baseada nas parcelas que vão vencer.",
+  "alertas": ["Alerta crítico baseado em dados realistas"]
 }
 
-Seja DIRETO, use números reais, e não seja genérico. Fale como um amigo que entende de finanças.`
+Seja honesto, direto e use um tom profissional porém amigável (estilo Due/NuBank).`
 
   // Call OpenAI
   const openai = new OpenAI({
@@ -127,7 +128,7 @@ Seja DIRETO, use números reais, e não seja genérico. Fale como um amigo que e
       messages: [
         { 
           role: 'system', 
-          content: 'Você é um consultor financeiro pessoal que fornece insights práticos e acionáveis em português do Brasil. Sempre responda em JSON válido.'
+          content: 'Você é um consultor financeiro especialista em análise de faturas. Responda sempre em JSON válido e português do Brasil.'
         },
         { role: 'user', content: aiPrompt }
       ],
@@ -148,7 +149,7 @@ Seja DIRETO, use números reais, e não seja genérico. Fale como um amigo que e
       insights,
       metadata: {
         totalSpent,
-        transactionCount: transactions.length,
+        transactionCount: installments.length,
         topCategories: categoryArray.slice(0, 3)
       }
     }

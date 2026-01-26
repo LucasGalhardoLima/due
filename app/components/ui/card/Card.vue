@@ -1,17 +1,35 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from "vue"
 import { cn } from "@/lib/utils"
+import { cardVariants, type CardVariants } from "."
 
-const props = defineProps<{
-  class?: HTMLAttributes["class"]
-}>()
+const props = withDefaults(
+  defineProps<{
+    class?: HTMLAttributes["class"]
+    variant?: CardVariants["variant"]
+    size?: CardVariants["size"]
+    interactive?: boolean
+    glow?: CardVariants["glow"]
+  }>(),
+  {
+    variant: "default",
+    size: "default",
+    interactive: false,
+    glow: "none",
+  }
+)
 </script>
 
 <template>
   <div
     :class="
       cn(
-        'rounded-xl border bg-card text-card-foreground shadow',
+        cardVariants({
+          variant: props.variant,
+          size: props.size,
+          interactive: props.interactive,
+          glow: props.glow,
+        }),
         props.class,
       )
     "

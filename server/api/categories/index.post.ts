@@ -35,11 +35,24 @@ export default defineEventHandler(async (event) => {
     return existing
   }
 
+  const colorPalette = [
+    '#00F2DE', // Pearl Aqua (Primary)
+    '#10b981', // Emerald 500
+    '#06b6d4', // Cyan 500
+    '#0d9488', // Teal 600
+    '#0ea5e9', // Sky 500
+    '#6366f1', // Indigo 500
+    '#f59e0b', // Amber 500
+    '#f43f5e', // Rose 500
+  ]
+  const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)]
+
   const category = await prisma.category.create({
     data: { 
       name,
+      color: randomColor,
       userId
-    }
+    } as any
   })
 
   return category

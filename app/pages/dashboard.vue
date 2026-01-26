@@ -1,27 +1,33 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { addMonths, subMonths, getMonth, getYear } from 'date-fns'
+import { addMonths, subMonths, getMonth, getYear, differenceInDays, parseISO } from 'date-fns'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'vue-sonner'
-import { Check, AlertCircle, Sparkles, Loader2  } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import { Check, AlertCircle, Sparkles, Loader2, PlusCircle, TrendingDown, Calculator, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Clock } from 'lucide-vue-next'
 
 import TransactionList from '@/components/transaction/TransactionList.vue'
-import InsightCard from '@/components/dashboard/InsightCard.vue'
-import AdvisorCard from '@/components/dashboard/AdvisorCard.vue'
 import AIInsights from '@/components/dashboard/AIInsights.vue'
+import AIMobileDrawer from '@/components/dashboard/AIMobileDrawer.vue'
+import SummaryCards from '@/components/dashboard/SummaryCards.vue'
+import CategoryBubbleChart from '@/components/dashboard/CategoryBubbleChart.vue'
+import PurchaseSimulator from '@/components/dashboard/PurchaseSimulator.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import { Card } from '@/components/ui/card'
+import { Calendar as CalendarIcon } from 'lucide-vue-next'
 
 // Global State
 const currentDate = ref(new Date())
-const selectedCardId = ref<string>('all')
+const selectedCardId = ref<string>('')
 const editingTransactionId = ref<string | null>(null)
 
 // API Query Params
 const queryParams = computed(() => ({
     month: getMonth(currentDate.value) + 1,
     year: getYear(currentDate.value),
-    cardId: selectedCardId.value === 'all' ? undefined : selectedCardId.value
+    cardId: selectedCardId.value || undefined
 }))
 
 interface SummaryResponse {
@@ -33,6 +39,7 @@ interface SummaryResponse {
     available: number
     transactions: Record<string, unknown[]>
     status?: 'OPEN' | 'PAID' | 'CLOSED'
+    dueDate?: string
 }
 
 // Fetch Data
@@ -41,12 +48,27 @@ const { data: summary, refresh: refreshSummary } = await useFetch<SummaryRespons
     query: queryParams
 })
 
+const daysToDue = computed(() => {
+    if (!summary.value?.dueDate) return null
+    const today = new Date()
+    const due = parseISO(summary.value.dueDate)
+    return differenceInDays(due, today)
+})
+
 // Fetch cards to check if user has any
 const { data: cards } = await useFetch('/api/cards')
 
 // Keeping futureProjection and pareto for now
 const { data: futureProjection, refresh: refreshFuture } = await useFetch('/api/dashboard/future-projection')
 const { data: pareto, refresh: refreshPareto } = await useFetch('/api/dashboard/pareto')
+
+// Select Default Card on Load
+watch(cards, (newCards) => {
+  if (newCards && newCards.length > 0 && !selectedCardId.value) {
+    const defaultCard = newCards.find(c => (c as any).isDefault) || newCards[0]
+    if (defaultCard) selectedCardId.value = defaultCard.id
+  }
+}, { immediate: true })
 
 const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 
@@ -67,6 +89,7 @@ function prevMonth() {
 }
 
 const isDrawerOpen = ref(false)
+const isAIDrawerOpen = ref(false)
 
 function handleEdit(tx: any) {
   editingTransactionId.value = tx.transactionId
@@ -87,24 +110,31 @@ function onSaved() {
   refreshPareto()
 }
 
+
+
 // Progress bar computed properties
 const usagePercentage = computed(() => {
   if (!summary.value) return 0
-  // Use Budget if exists and > 0, otherwise Limit
-  const base = (summary.value.budget && summary.value.budget > 0) ? summary.value.budget : summary.value.limit
+  const s = summary.value
+  // Prioritize Budget (Meta) for the gauge
+  const base = (s.budget && s.budget > 0) ? s.budget : s.limit
   if (!base || base === 0) return 0
-  return Math.min((summary.value.total / base) * 100, 100)
+  
+  // Allow > 100% to show overflow
+  return (s.total / base) * 100
 })
 
 const isOverBudget = computed(() => {
-    if (!summary.value || !summary.value.budget) return false
-    return summary.value.total > summary.value.budget
+    // True if usage > 100% (regardless if base is Budget or Limit)
+    return usagePercentage.value > 100
 })
 
 const progressColor = computed(() => {
   const pct = usagePercentage.value
+  if (!summary.value) return 'bg-green-600'
   // Game Logic:
-  // 90%+ : Red (Danger)
+  // > 100% : Red (Over Budget/Limit)
+  // 90-100% : Red (Danger Zone)
   // 70-90% : Yellow (Warning)
   // 0-70% : Green (Safe)
   if (pct >= 90) return 'bg-red-600'
@@ -114,295 +144,227 @@ const progressColor = computed(() => {
 
 const showAlert = computed(() => usagePercentage.value >= 70)
 
-// Payment Logic
-const showPayConfirm = ref(false)
+// Top spending category
+const topCategory = computed(() => {
+  if (!pareto.value?.categories || pareto.value.categories.length === 0) return null
+  const top = pareto.value.categories[0]
+  if (!top) return null
+  return {
+    name: top.name || 'Outros',
+    amount: top.total || 0,
+    color: (top as any).color
+  }
+})
 
-function onPayClick() {
-    showPayConfirm.value = true
-}
-
-async function handlePayInvoice() {
-    if (selectedCardId.value === 'all') return
-
+// Methods
+const handlePayInvoice = async () => {
+    if (!summary.value || !selectedCardId.value) return
     try {
         await $fetch('/api/invoices/pay', {
             method: 'POST',
             body: {
                 cardId: selectedCardId.value,
-                month: getMonth(currentDate.value) + 1,
-                year: getYear(currentDate.value)
+                month: summary.value.month,
+                year: summary.value.year
             }
         })
-        
-        await refreshSummary()
         toast.success('Fatura paga com sucesso!')
+        refreshSummary()
     } catch (e) {
-        console.error(e)
-        toast.error('Erro ao pagar fatura')
-    }
-}
-
-// Advisor Logic
-interface AdvisorAnalysis {
-    verdict: string
-    severity: 'info' | 'warning' | 'critical'
-    title: string
-    message: string
-    action: string
-}
-
-const showAdvisor = ref(false)
-const advisorLoading = ref(false)
-const advisorResult = ref<AdvisorAnalysis | null>(null)
-
-async function runAnalysis() {
-    if (showAdvisor.value && advisorResult.value) {
-        showAdvisor.value = false // Toggle off
-        return
-    }
-
-    showAdvisor.value = true
-    advisorLoading.value = true
-    advisorResult.value = null // Reset
-
-    try {
-        const result = await $fetch<AdvisorAnalysis>('/api/advisor/analyze', {
-            method: 'POST',
-            body: {
-                month: getMonth(currentDate.value) + 1,
-                year: getYear(currentDate.value),
-                cardId: selectedCardId.value === 'all' ? undefined : selectedCardId.value
-            }
-        })
-        advisorResult.value = result
-    } catch (e) {
-        console.error(e)
-        const errorMessage = e instanceof Error ? e.message : 'Unknown error'
-        toast.error('Não foi possível analisar a fatura: ' + errorMessage)
-        showAdvisor.value = false
+        toast.error('Erro ao pagar fatura.')
     } finally {
-        advisorLoading.value = false
+        showPayConfirm.value = false
     }
 }
+
+const showPayConfirm = ref(false)
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8 space-y-8 pb-24">
-    <!-- Empty State: No Cards -->
-    <div v-if="!cards || cards.length === 0" class="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
-      <div class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-          <rect width="20" height="14" x="2" y="5" rx="2"/>
-          <line x1="2" x2="22" y1="10" y2="10"/>
-        </svg>
-      </div>
-      <div class="text-center space-y-2 max-w-md">
-        <h2 class="text-2xl font-bold">Vamos configurar seu cartão principal?</h2>
-        <p class="text-muted-foreground">
-          Para começar a controlar suas despesas, você precisa cadastrar pelo menos um cartão de crédito.
-        </p>
-      </div>
-      <NuxtLink 
-        to="/cards" 
-        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8"
+  <div class="space-y-8 relative min-h-screen">
+
+    <template v-if="summary">
+      <!-- Desktop Header (Original) -->
+      <PageHeader 
+        :title="`${getMonthName(summary.month)} ${summary.year}`"
+        subtitle="Visão geral da sua saúde financeira."
+        :icon="CalendarIcon"
+        class="hidden lg:flex"
       >
-        Adicionar Primeiro Cartão
-      </NuxtLink>
-    </div>
-
-    <!-- Main Dashboard Content -->
-    <template v-else>
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-      <div class="flex items-center gap-3">
-          <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <template #actions>
           <div class="flex items-center gap-2">
-              <button 
-                class="flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold transition-colors hover:bg-primary/20 border border-primary/20"
-                @click="runAnalysis"
-              >
-                <Sparkles v-if="!advisorLoading" class="w-4 h-4" />
-                <Loader2 v-else class="w-4 h-4 animate-spin" />
-                {{ showAdvisor ? 'Fechar Análise' : 'Analisar' }}
+            <!-- Card Selector -->
+            <Select v-model="selectedCardId">
+              <SelectTrigger class="w-[180px] bg-card border-border/60">
+                <SelectValue placeholder="Todos os Cartões" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="card in cards" :key="card.id" :value="card.id">
+                  {{ card.name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <!-- Month Navigation Buttons -->
+            <div class="flex items-center bg-muted/30 rounded-xl p-1 border shadow-elevation-1">
+              <button @click="prevMonth" class="p-2 hover:bg-background rounded-lg transition-colors text-muted-foreground hover:text-foreground">
+                <span class="sr-only">Anterior</span>
+                <ChevronLeft class="w-4 h-4" />
               </button>
+              <button @click="nextMonth" class="p-2 hover:bg-background rounded-lg transition-colors text-muted-foreground hover:text-foreground">
+                <span class="sr-only">Proximo</span>
+                <ChevronRight class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </template>
+      </PageHeader>
+
+      <!-- Mobile Header & Navigation (New) -->
+      <div class="lg:hidden space-y-4 mb-6">
+        <div>
+          <h1 class="text-h1">Dashboard</h1>
+          <p class="text-body text-muted-foreground">Visao geral.</p>
+        </div>
+
+        <!-- Mobile Controls Row -->
+        <div class="flex items-center gap-3">
+           <!-- Card Selector (Mobile) -->
+            <Select v-model="selectedCardId">
+              <SelectTrigger class="flex-1 bg-card border-border/60 shadow-elevation-1 rounded-xl">
+                <div class="flex items-center gap-2 truncate">
+                  <span class="bg-primary/10 p-1 rounded-lg shrink-0">
+                    <CreditCardIcon class="w-3.5 h-3.5 text-primary" />
+                  </span>
+                  <span class="truncate text-small font-semibold">{{
+                    selectedCardId === ''
+                      ? 'Selecione um Cartao'
+                      : cards?.find(c => c.id === selectedCardId)?.name || 'Selecione um Cartao'
+                  }}</span>
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="card in cards" :key="card.id" :value="card.id">
+                  {{ card.name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <!-- Month Navigation (Pill) -->
+            <div class="flex items-center bg-zinc-900 border border-border/40 rounded-full h-10 shadow-elevation-2 shrink-0 px-1">
+               <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full hover:bg-white/10 text-white" @click="prevMonth">
+                <ChevronLeft class="w-4 h-4" />
+              </Button>
+               <span class="text-small font-bold px-2 whitespace-nowrap text-white min-w-[70px] text-center">
+                {{ months[summary.month - 1] }}/{{ summary.year }}
+               </span>
+              <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full hover:bg-white/10 text-white" @click="nextMonth">
+                <ChevronRight class="w-4 h-4" />
+              </Button>
+            </div>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Main Stats & Insights (2/3 width) -->
+        <div class="lg:col-span-2 space-y-8">
+          <!-- Hero Summary Cards (NEW) -->
+          <SummaryCards 
+            :total="summary.total"
+            :limit="summary.limit"
+            :budget="summary.budget"
+            :usage-percentage="usagePercentage"
+            :days-to-due="daysToDue"
+            :status="summary.status"
+            :top-category="topCategory || undefined"
+            @pay="showPayConfirm = true"
+          />
+
+
+
+
+
+          <!-- Transaction List -->
+          <Card class="p-6 overflow-hidden">
+              <div class="flex items-center justify-between mb-6">
+                  <h2 class="text-h2">Lançamentos</h2>
+              </div>
+              <TransactionList :transactions="summary.transactions || {}" @edit="handleEdit" />
+          </Card>
+        </div>
+
+        <!-- Right Column: Sidebar (1/3 width) -->
+        <div class="space-y-8">
+
+            <!-- Future Projection -->
+            <Card class="overflow-hidden p-0" v-if="futureProjection">
+              <div class="p-4 border-b border-white/10 bg-white/10 dark:bg-black/10">
+                <h3 class="text-micro text-muted-foreground">Projeção Futura</h3>
+              </div>
+              <div class="p-4 space-y-3">
+                  <div
+                      v-for="proj in futureProjection.projections" :key="`${proj.month}-${proj.year}`"
+                      class="flex justify-between items-center p-3 rounded-xl bg-white/5 dark:bg-black/20 border border-white/5 hover:border-primary/20 transition-colors group"
+                  >
+                      <div class="flex flex-col">
+                          <span class="text-micro text-muted-foreground">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
+                          <span class="text-small text-muted-foreground">{{ proj.installmentsCount }} parcelas</span>
+                      </div>
+                      <span class="text-body font-black group-hover:text-primary transition-colors">{{ formatCurrency(proj.total || 0) }}</span>
+                  </div>
+                  <div v-if="!futureProjection.projections?.length" class="text-small text-muted-foreground text-center py-4">
+                      Nenhuma projeção futura.
+                  </div>
+              </div>
+            </Card>
+
+            <!-- AI Tools Group (Hidden on Mobile) -->
+            <div class="hidden lg:flex flex-col gap-6">
+              <AIInsights :month="summary.month" :year="summary.year" />
               
-              <NuxtLink 
-                to="/import"
-                class="flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm font-medium transition-colors hover:bg-green-200 dark:hover:bg-green-900/50"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" x2="12" y1="3" y2="15"/>
-                </svg>
-                Importar CSV
-              </NuxtLink>
-          </div>
+              <PurchaseSimulator 
+                v-if="selectedCardId && cards && cards.length > 0"
+                :cardId="selectedCardId"
+                :cardName="cards.find(c => c.id === selectedCardId)?.name || ''"
+              />
+            </div>
+        </div>
       </div>
-      
-      
-      <!-- Card Filter -->
-      <div class="w-full md:w-[200px]">
-        <Select v-model="selectedCardId">
-          <SelectTrigger>
-            <SelectValue placeholder="Todos os Cartões" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os Cartões</SelectItem>
-            <SelectItem v-for="card in cards" :key="card.id" :value="card.id">
-              {{ card.name }}
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+    </template>
+
+    <div v-else class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+      <Loader2 class="w-10 h-10 animate-spin text-primary" />
+      <p class="text-muted-foreground animate-pulse">Carregando dados financeiros...</p>
     </div>
 
-    <!-- Month Navigation & Main KPI -->
-    <div class="flex flex-col items-center space-y-4">
-        <!-- Insight Card (Full Width) -->
-        <div class="w-full max-w-md">
-            <div v-if="!showAdvisor">
-                <InsightCard :month="summary?.month || 1" :year="summary?.year || 2024" />
-            </div>
-            <div v-else>
-                <AdvisorCard :analysis="advisorResult" :loading="advisorLoading" />
-            </div>
-        </div>
+    <!-- Quick Add Button (Floating - Desktop & Mobile) -->
+    <div class="fixed bottom-8 right-8 z-50 flex flex-col items-center gap-4">
+      <!-- AI FAB (Mobile Only) -->
+      <button 
+        class="lg:hidden flex h-12 w-12 items-center justify-center rounded-full bg-background/80 dark:bg-zinc-800/80 backdrop-blur-md text-primary border border-primary/20 shadow-glass hover:bg-primary/20 transition-all active:scale-95" 
+        @click="isAIDrawerOpen = true"
+      >
+        <Sparkles class="h-6 w-6" />
+      </button>
 
-        <div class="flex items-center space-x-4 bg-muted/30 p-2 rounded-full">
-            <button class="p-2 hover:bg-muted rounded-full transition-colors" @click="prevMonth">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            <span class="font-semibold text-lg min-w-[120px] text-center">
-                {{ getMonthName(summary?.month || 1) }}/{{ summary?.year }}
-            </span>
-            <button class="p-2 hover:bg-muted rounded-full transition-colors" @click="nextMonth">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-        </div>
-
-        <div class="w-full max-w-md rounded-xl border bg-card text-card-foreground shadow p-6 text-center space-y-2">
-            <div class="text-sm text-muted-foreground uppercase tracking-wide">Fatura Estimada</div>
-            <div class="text-4xl font-bold text-primary">{{ formatCurrency(summary?.total || 0) }}</div>
-            <div class="text-xs text-muted-foreground flex justify-center gap-2">
-                <span v-if="summary?.budget && summary.budget > 0" class="font-bold text-primary">
-                    Meta: {{ formatCurrency(summary.budget) }}
-                </span>
-                <span v-else>Limite: {{ formatCurrency(summary?.limit || 0) }}</span>
-                
-                <span>•</span>
-                <span>Disponível: <span class="text-emerald-500 font-bold">{{ formatCurrency(summary?.available || 0) }}</span></span>
-            </div>
-            
-            <!-- Invoice Status Badge (Only for specific card) -->
-            <div v-if="selectedCardId !== 'all' && summary?.status" class="flex justify-center mt-2">
-                <span 
-                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold"
-                    :class="summary.status === 'PAID' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-primary/10 text-primary'"
-                >
-                    <component :is="summary.status === 'PAID' ? Check : AlertCircle" class="w-3 h-3" />
-                    {{ summary.status === 'PAID' ? 'Fatura Paga' : 'Fatura Aberta' }}
-                </span>
-            </div>
-            
-            <!-- Alert Badge -->
-            <div v-if="showAlert" class="flex items-center justify-center gap-2 mt-2" :class="usagePercentage >= 90 ? 'text-red-600' : 'text-yellow-600'">
-              <component :is="usagePercentage >= 90 ? AlertCircle : Sparkles" class="w-4 h-4" />
-              <span class="text-sm font-medium">
-                {{ usagePercentage >= 100 ? (isOverBudget ? 'Meta estourada!' : 'Limite atingido!') : (usagePercentage >= 90 ? 'Zona de Perigo (90%+)' : 'Atenção (70%+)') }}
-              </span>
-            </div>
-
-            <!-- Dynamic gauge bar -->
-            <div class="w-full bg-secondary h-2 rounded-full mt-4 overflow-hidden relative">
-                <div 
-                  :class="[progressColor, usagePercentage >= 90 && 'animate-pulse']" 
-                  class="h-full transition-all duration-700 ease-out" 
-                  :style="{ width: `${usagePercentage}%` }"
-                />
-            </div>
-            
-            <!-- Percentage display -->
-            <div class="text-xs text-muted-foreground mt-1">
-              {{ usagePercentage.toFixed(1) }}% da {{ (summary?.budget && summary.budget > 0) ? 'meta' : 'fatura' }} utilizada
-            </div>
-
-            <!-- Pay Button (Only if specific card and NOT paid) -->
-            <div v-if="selectedCardId !== 'all' && summary?.status !== 'PAID'" class="pt-4">
-                <button 
-                    class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
-                    @click="onPayClick"
-                >
-                    Pagar Fatura
-                </button>
-            </div>
-            
-            <div v-else-if="selectedCardId !== 'all' && summary?.status === 'PAID'" class="pt-4 text-center text-sm text-green-600 font-medium">
-                Esta fatura já foi paga em {{ new Date().toLocaleDateString() /* TODO: Store pay date */ }}
-            </div>
-        </div>
-    </div>
-    
-    <!-- AI Insights Section -->
-    <AIInsights />
-    
-    <!-- Future Projection -->
-    <div class="rounded-xl border bg-card text-card-foreground shadow">
-      <div class="p-6 pb-4">
-        <h3 class="text-lg font-semibold">Projeção Futura (Danos Contratados)</h3>
-        <p class="text-sm text-muted-foreground">O que já está parcelado para os próximos meses.</p>
-      </div>
-      <div class="p-6 pt-0">
-        <div class="grid gap-4 md:grid-cols-3">
-          <div
-v-for="proj in futureProjection?.projections" :key="`${proj.month}-${proj.year}`" 
-               class="flex flex-col p-4 rounded-lg bg-muted/50 border">
-            <span class="text-sm font-medium text-muted-foreground uppercase">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
-            <span class="text-xl font-bold mt-1">{{ formatCurrency(proj.total || 0) }}</span>
-            <span class="text-xs text-muted-foreground mt-1">{{ proj.installmentsCount }} parcelas</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pareto Analysis -->
-    <div class="rounded-xl border bg-card text-card-foreground shadow">
-      <div class="p-6 pb-4">
-        <h3 class="text-lg font-semibold">Análise de Pareto</h3>
-        <p class="text-sm text-muted-foreground">Onde seu dinheiro está indo (Top Categorias).</p>
-      </div>
-      <div class="p-6 pt-0 space-y-4">
-        <div v-for="cat in pareto?.categories.slice(0, 5)" :key="cat.name" class="space-y-1">
-          <div class="flex justify-between text-sm">
-            <span class="font-medium">{{ cat.name }}</span>
-            <span class="text-muted-foreground">{{ formatCurrency(cat.total) }} ({{ cat.percentage }}%)</span>
-          </div>
-          <div class="h-2 w-full rounded-full bg-secondary">
-            <div class="h-2 rounded-full bg-primary" :style="{ width: `${cat.percentage}%` }"/>
-          </div>
-        </div>
-        <div v-if="!pareto?.categories?.length" class="text-sm text-muted-foreground py-4">
-          Nenhuma despesa registrada ainda.
-        </div>
-      </div>
-    </div>
-    
-    <!-- Transaction List -->
-    <div class="rounded-xl border bg-card text-card-foreground shadow p-6">
-        <h3 class="text-lg font-semibold mb-4">Lançamentos</h3>
-        <!-- Pass empty object if undefined to avoid errors -->
-        <TransactionList :transactions="summary?.transactions || {}" @edit="handleEdit" />
-    </div>
-
-    <!-- Quick Add Button (Floating or Inline) -->
-    <!-- We will add functionality later, for now just a link/button placeholder -->
-    <div class="fixed bottom-8 right-8">
-      <button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors" @click="isDrawerOpen = true">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      <!-- Main Add Button -->
+      <button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 hover:scale-110 transition-all duration-300" @click="isDrawerOpen = true">
+        <PlusCircle class="h-8 w-8" />
       </button>
     </div>
 
+    <!-- Drawer Component -->
     <TransactionDrawer v-model:open="isDrawerOpen" :transaction-id="editingTransactionId" @saved="onSaved" />
+    
+    <!-- AI Mobile Drawer -->
+    <AIMobileDrawer 
+      v-model:open="isAIDrawerOpen" 
+      :selected-card-id="selectedCardId"
+      :card-name="cards?.find(c => c.id === selectedCardId)?.name"
+    />
 
+    <!-- Confirm Dialog -->
     <ConfirmDialog 
       v-model:open="showPayConfirm"
       title="Pagar Fatura?"
@@ -410,7 +372,5 @@ v-for="proj in futureProjection?.projections" :key="`${proj.month}-${proj.year}`
       confirm-text="Confirmar Pagamento"
       @confirm="handlePayInvoice"
     />
-
-    </template>
   </div>
 </template>

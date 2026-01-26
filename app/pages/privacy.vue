@@ -16,7 +16,7 @@ definePageMeta({
   <div class="min-h-screen bg-background text-foreground font-sans antialiased transition-colors duration-300">
     <!-- Simple Header -->
     <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/60 backdrop-blur-xl">
-      <div class="container mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="container mx-auto px-8 h-16 flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center gap-2 font-bold text-lg hover:text-primary transition-colors">
           <ChevronLeft class="w-4 h-4" />
           Voltar
@@ -30,7 +30,7 @@ definePageMeta({
       </div>
     </nav>
 
-    <main class="pt-32 pb-24 container mx-auto px-6 max-w-4xl">
+    <main class="pt-32 pb-16 container mx-auto px-16 max-w-4xl">
       <div class="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
         <!-- Header Section -->
         <div class="space-y-4 text-center">

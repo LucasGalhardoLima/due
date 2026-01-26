@@ -29,6 +29,7 @@ model CreditCard {
 model Category {
   id           String        @id @default(uuid())
   name         String        // Ex: Alimentação, Tech, Assinaturas
+  color        String?       // Hex color para visualização
   userId       String        @default("migration_temp") // Multi-tenancy
   transactions Transaction[]
 }

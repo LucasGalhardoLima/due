@@ -104,7 +104,7 @@ export default defineEventHandler(async (event) => {
         categoryIcon: 'shopping-bag', // TODO: Map real icons
         installmentNumber: inst.number,
         totalInstallments: inst.transaction.installmentsCount,
-        cardName: inst.transaction.card.name,
+        cardName: inst.transaction.card?.name || 'N/A',
         purchaseDate: inst.transaction.purchaseDate
       })
     }
@@ -125,10 +125,14 @@ export default defineEventHandler(async (event) => {
     
     if (invoiceRecord) {
         status = invoiceRecord.status
+    } else if (year < 2026) {
+        status = 'PAID'
     } else {
         // Optional: Check if it's past due to mark as CLOSED/OVERDUE?
         // For MVP, if it doesn't exist, it's OPEN.
     }
+  } else if (year < 2026) {
+    status = 'PAID'
   }
 
   return {
@@ -139,6 +143,8 @@ export default defineEventHandler(async (event) => {
     limit: totalLimit,
     budget: totalBudget,
     available: totalLimit - totalInvoice,
-    transactions: groupedTransactions
+    transactions: groupedTransactions,
+    dueDate: result.data.cardId ? new Date(year, month - 1, (await prisma.creditCard.findFirst({where: {id: result.data.cardId}, select: {dueDay: true}}))?.dueDay || 10).toISOString() : null,
+    closingDate: result.data.cardId ? new Date(year, month - 1, (await prisma.creditCard.findFirst({where: {id: result.data.cardId}, select: {closingDay: true}}))?.closingDay || 3).toISOString() : null
   }
 })
