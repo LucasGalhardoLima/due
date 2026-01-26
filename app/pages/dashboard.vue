@@ -341,16 +341,17 @@ const showPayConfirm = ref(false)
     <!-- Quick Add Button (Floating - Desktop & Mobile) -->
     <div class="fixed bottom-8 right-8 z-50 flex flex-col items-center gap-4">
       <!-- AI FAB (Mobile Only) -->
-      <button 
-        class="lg:hidden flex h-12 w-12 items-center justify-center rounded-full bg-background/80 dark:bg-zinc-800/80 backdrop-blur-md text-primary border border-primary/20 shadow-glass hover:bg-primary/20 transition-all active:scale-95" 
+      <button
+        class="lg:hidden flex h-12 w-12 items-center justify-center rounded-full bg-background/80 dark:bg-zinc-800/80 backdrop-blur-md text-primary border border-primary/20 shadow-glass hover:bg-primary/20 transition-all active:scale-95"
         @click="isAIDrawerOpen = true"
+        aria-label="Abrir assistente IA"
       >
-        <Sparkles class="h-6 w-6" />
+        <Sparkles class="h-6 w-6" aria-hidden="true" />
       </button>
 
       <!-- Main Add Button -->
-      <button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 hover:scale-110 transition-all duration-300" @click="isDrawerOpen = true">
-        <PlusCircle class="h-8 w-8" />
+      <button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 hover:scale-110 transition-all duration-300" @click="isDrawerOpen = true" aria-label="Adicionar nova despesa">
+        <PlusCircle class="h-8 w-8" aria-hidden="true" />
       </button>
     </div>
 

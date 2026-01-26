@@ -105,9 +105,11 @@ async function onSubmit() {
         <label class="text-micro text-muted-foreground" for="description">O que voce comprou?</label>
         <input
           id="description"
+          name="expense-description"
+          autocomplete="off"
           v-model="form.description"
-          placeholder="Ex: Almoco, Uber, Assinatura"
-          class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm shadow-elevation-1 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all"
+          placeholder="Ex: Almoco, Uber, Assinatura…"
+          class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm shadow-elevation-1 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-colors transition-shadow"
           required
         >
       </div>
@@ -117,11 +119,13 @@ async function onSubmit() {
         <label class="text-micro text-muted-foreground" for="amount">Valor Total (R$)</label>
         <input
           id="amount"
+          name="expense-amount"
+          inputmode="decimal"
           v-model.number="form.amount"
           type="number"
           step="0.01"
           placeholder="0,00"
-          class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-lg font-bold shadow-elevation-1 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all"
+          class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-lg font-bold shadow-elevation-1 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-colors transition-shadow"
           required
         >
       </div>
@@ -132,9 +136,10 @@ async function onSubmit() {
           <label class="text-micro text-muted-foreground" for="date">Data da Compra</label>
           <input
             id="date"
+            name="expense-date"
             v-model="form.date"
             type="date"
-            class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm shadow-elevation-1 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all"
+            class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm shadow-elevation-1 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-colors transition-shadow"
             required
           >
         </div>
@@ -144,11 +149,13 @@ async function onSubmit() {
           <label class="text-micro text-muted-foreground" for="installments">Parcelas</label>
           <input
             id="installments"
+            name="expense-installments"
+            inputmode="numeric"
             v-model.number="form.installments"
             type="number"
             min="1"
             max="24"
-            class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm shadow-elevation-1 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all"
+            class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm shadow-elevation-1 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-colors transition-shadow"
           >
         </div>
       </div>

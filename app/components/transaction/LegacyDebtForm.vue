@@ -67,27 +67,27 @@ async function save() {
 
     <div class="space-y-4">
         <div>
-            <Label>Descrição</Label>
-            <Input v-model="description" placeholder="Ex: iPhone (Restante)" />
+            <Label for="legacy-description">Descrição</Label>
+            <Input id="legacy-description" name="legacy-description" autocomplete="off" v-model="description" placeholder="Ex: iPhone (Restante)…" />
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <Label>Valor da Parcela</Label>
-                <CurrencyInput v-model="amountPerInstallment" placeholder="R$ 0,00" />
+                <Label for="legacy-amount">Valor da Parcela</Label>
+                <CurrencyInput id="legacy-amount" v-model="amountPerInstallment" placeholder="R$ 0,00" />
             </div>
             <div>
-                <Label>Parcelas Restantes</Label>
-                <Input v-model="remainingInstallments" type="number" min="1" />
+                <Label for="legacy-installments">Parcelas Restantes</Label>
+                <Input id="legacy-installments" name="legacy-installments" inputmode="numeric" v-model="remainingInstallments" type="number" min="1" />
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                 <Label>Cartão</Label>
-                 <Select v-model="selectedCardId">
+                 <Label id="legacy-card-label">Cartão</Label>
+                 <Select v-model="selectedCardId" aria-labelledby="legacy-card-label">
                     <SelectTrigger>
-                        <SelectValue placeholder="Selecione" />
+                        <SelectValue placeholder="Selecione…" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem v-for="card in cards" :key="card.id" :value="card.id">
@@ -97,10 +97,10 @@ async function save() {
                 </Select>
             </div>
              <div>
-                 <Label>Categoria</Label>
-                 <Select v-model="selectedCategoryId">
+                 <Label id="legacy-category-label">Categoria</Label>
+                 <Select v-model="selectedCategoryId" aria-labelledby="legacy-category-label">
                     <SelectTrigger>
-                        <SelectValue placeholder="Opcional" />
+                        <SelectValue placeholder="Opcional…" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem v-for="cat in (categories || [])" :key="cat.id" :value="cat.id">

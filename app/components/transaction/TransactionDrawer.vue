@@ -264,21 +264,24 @@ async function handleDelete() {
           
           <!-- Amount -->
           <div class="text-center">
-             <Label class="sr-only">Valor</Label>
-             <CurrencyInput v-model="amount" class="text-center text-4xl h-16 border-none focus-visible:ring-0 shadow-none font-bold" placeholder="R$ 0,00" />
+             <Label for="drawer-amount" class="sr-only">Valor</Label>
+             <CurrencyInput id="drawer-amount" v-model="amount" class="text-center text-4xl h-16 border-none focus-visible:ring-0 shadow-none font-bold" placeholder="R$ 0,00" />
           </div>
 
           <!-- Description -->
           <div>
-            <Input v-model="description" placeholder="Descrição (ex: Almoço)" />
+            <Label for="drawer-description" class="sr-only">Descrição</Label>
+            <Input id="drawer-description" name="transaction-description" autocomplete="off" v-model="description" placeholder="Descrição (ex: Almoço)…" />
           </div>
 
           <!-- Date -->
           <div>
-            <Label class="text-sm text-muted-foreground">Data da Compra</Label>
-            <Input 
-              v-model="purchaseDate" 
-              type="date" 
+            <Label for="drawer-date" class="text-sm text-muted-foreground">Data da Compra</Label>
+            <Input
+              id="drawer-date"
+              name="transaction-date"
+              v-model="purchaseDate"
+              type="date"
               :max="new Date().toISOString().split('T')[0]"
               class="mt-1"
             />
@@ -348,11 +351,11 @@ async function handleDelete() {
                 :step="1"
             />
             <div class="flex justify-between text-xs text-muted-foreground">
-                <button @click="setInstallments(1)">1x</button>
-                <button @click="setInstallments(3)">3x</button>
-                <button @click="setInstallments(6)">6x</button>
-                <button @click="setInstallments(10)">10x</button>
-                <button @click="setInstallments(12)">12x</button>
+                <button type="button" @click="setInstallments(1)" aria-label="Definir 1 parcela">1x</button>
+                <button type="button" @click="setInstallments(3)" aria-label="Definir 3 parcelas">3x</button>
+                <button type="button" @click="setInstallments(6)" aria-label="Definir 6 parcelas">6x</button>
+                <button type="button" @click="setInstallments(10)" aria-label="Definir 10 parcelas">10x</button>
+                <button type="button" @click="setInstallments(12)" aria-label="Definir 12 parcelas">12x</button>
             </div>
           </div>
           

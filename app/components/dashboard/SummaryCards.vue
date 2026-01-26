@@ -99,7 +99,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
     <!-- Card 1: Invoice Total -->
     <div
       class="relative overflow-hidden rounded-2xl p-5 md:p-6 border shadow-elevation-4 transition-all hover:scale-[1.02] group backdrop-blur-xl"
-      :class="[invoiceGradient, { 'animate-pulse ring-1 ring-rose-500/50': shouldPulse && colorState === 'danger' }]"
+      :class="[invoiceGradient, { 'motion-safe:animate-pulse ring-1 ring-rose-500/50': shouldPulse && colorState === 'danger' }]"
     >
       <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
 
@@ -116,7 +116,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
           <p class="text-micro text-muted-foreground dark:text-white/50">Fatura Estimada</p>
           <p class="text-stat text-foreground dark:text-white mt-1.5">{{ formatCurrency(total) }}</p>
           <div class="flex items-center gap-2 mt-2">
-            <span class="text-small text-muted-foreground dark:text-white/40">{{ usagePercentage.toFixed(0) }}% do limite</span>
+            <span class="text-small text-muted-foreground dark:text-white/40 tabular-nums">{{ usagePercentage.toFixed(0) }}% do limite</span>
           </div>
         </div>
       </div>
@@ -138,7 +138,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
         <div>
           <p class="text-micro text-muted-foreground dark:text-white/50">Limite Comprometido</p>
           <div class="flex items-baseline gap-1 mt-1.5">
-            <p class="text-stat text-foreground dark:text-white">{{ usagePercentage.toFixed(1) }}</p>
+            <p class="text-stat text-foreground dark:text-white tabular-nums">{{ usagePercentage.toFixed(1) }}</p>
             <span class="text-lg font-bold text-muted-foreground dark:text-white/40">%</span>
           </div>
 
@@ -158,7 +158,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
     <!-- Card 3: Days to Due -->
     <div
       class="relative overflow-hidden rounded-2xl p-5 md:p-6 border shadow-elevation-4 transition-all hover:scale-[1.02] group backdrop-blur-xl"
-      :class="[dueGradient, { 'animate-pulse ring-1 ring-rose-500/50': shouldPulse && dueColorState === 'danger' }]"
+      :class="[dueGradient, { 'motion-safe:animate-pulse ring-1 ring-rose-500/50': shouldPulse && dueColorState === 'danger' }]"
     >
       <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
 

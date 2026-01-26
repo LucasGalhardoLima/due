@@ -307,6 +307,7 @@ async function handleImport() {
                 class="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                 :disabled="!selectedCardId"
                 @change="onFileSelect"
+                aria-label="Selecionar arquivo CSV para importação"
             />
 
             <p v-if="!selectedCardId" class="text-small text-red-500 font-medium absolute -bottom-6">
@@ -350,7 +351,7 @@ async function handleImport() {
                     <thead class="sticky top-0 bg-background border-b z-10">
                         <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                             <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground w-[50px]">
-                                <input type="checkbox" checked @change="(e) => parsedRows.forEach(r => r.selected = (e.target as HTMLInputElement).checked)" />
+                                <input type="checkbox" checked @change="(e) => parsedRows.forEach(r => r.selected = (e.target as HTMLInputElement).checked)" aria-label="Selecionar todas as transações" />
                             </th>
                             <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground">Data</th>
                             <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground">Descricao</th>
@@ -361,7 +362,7 @@ async function handleImport() {
                     <tbody>
                         <tr v-for="(row, idx) in parsedRows" :key="idx" class="border-b transition-colors hover:bg-muted/50">
                             <td class="p-4 align-middle">
-                                <input type="checkbox" v-model="row.selected" />
+                                <input type="checkbox" v-model="row.selected" :aria-label="`Selecionar transação: ${row.description}`" />
                             </td>
                             <td class="p-4 align-middle text-body">{{ new Date(row.date).toLocaleDateString() }}</td>
                             <td class="p-4 align-middle text-body font-medium">{{ row.description }}</td>

@@ -163,7 +163,7 @@ definePageMeta({
               <Sun v-else class="w-5 h-5" />
             </button>
             <div class="h-6 w-px bg-border/50 hidden md:block"></div>
-            <button @click="openSignIn" class="text-sm font-bold hover:text-primary transition-colors">Entrar</button>
+            <button @click="openSignIn" class="text-sm font-bold hover:text-primary transition-colors" aria-label="Entrar na conta">Entrar</button>
             <button @click="openSignUp" class="hidden md:inline-flex h-9 px-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-elevation-3 shadow-primary/25 hover:scale-105 active:scale-[0.98] transition-all">
               Criar Conta
             </button>
@@ -175,15 +175,15 @@ definePageMeta({
     <!-- Hero Section -->
     <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
       <!-- Background Blobs -->
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] -z-10">
-        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
-        <div class="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-primary/10 rounded-full blur-[140px] animate-pulse duration-&lsqb;10s&lsqb;" />
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] -z-10" aria-hidden="true">
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] motion-safe:animate-pulse" />
+        <div class="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-primary/10 rounded-full blur-[140px] motion-safe:animate-pulse duration-&lsqb;10s&lsqb;" />
         <div class="absolute bottom-0 left-[20%] w-[30%] h-[30%] bg-cyan-500/10 rounded-full blur-[100px]" />
       </div>
       
       <div class="container mx-auto px-8 text-center space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase backdrop-blur-md shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <span class="w-2 h-2 rounded-full bg-primary motion-safe:animate-pulse" aria-hidden="true" />
           Finanças Reimaginadas
         </div>
         
@@ -378,12 +378,13 @@ definePageMeta({
       leave-to-class="opacity-0 scale-95"
     >
       <div v-if="authMode !== 'none'" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-background/80 backdrop-blur-sm" @click="closeAuth" />
+        <div class="absolute inset-0 bg-background/80 backdrop-blur-sm overscroll-contain" @click="closeAuth" />
         
         <div class="relative w-full max-w-md bg-card border border-border/50 rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-          <button 
-            @click="closeAuth" 
+          <button
+            @click="closeAuth"
             class="absolute top-6 right-6 p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground z-10"
+            aria-label="Fechar modal"
           >
             <ChevronDown class="w-5 h-5 rotate-90 md:rotate-0" />
           </button>

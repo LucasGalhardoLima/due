@@ -74,10 +74,11 @@ function closeMobileMenu() {
 
           <!-- Actions -->
           <div class="ml-4 flex items-center gap-4">
-            <button 
-              @click="toggleTheme" 
+            <button
+              @click="toggleTheme"
               class="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
               title="Alternar Tema"
+              aria-label="Alternar tema claro/escuro"
             >
               <Sun v-if="colorMode.value === 'dark'" class="w-5 h-5" />
               <Moon v-else class="w-5 h-5" />
@@ -86,11 +87,11 @@ function closeMobileMenu() {
             <!-- Profile Section -->
             <div class="flex items-center gap-3 pl-2 border-l">
               <div class="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden shrink-0">
-                 <img v-if="user?.imageUrl" :src="user.imageUrl" class="h-full w-full object-cover" alt="Avatar" />
-                 <User v-else class="w-4 h-4 text-primary opacity-70" />
+                 <img v-if="user?.imageUrl" :src="user.imageUrl" width="32" height="32" class="h-full w-full object-cover" alt="Avatar do usuário" />
+                 <User v-else class="w-4 h-4 text-primary opacity-70" aria-hidden="true" />
               </div>
-              <button @click="handleSignOut" class="text-muted-foreground hover:text-red-500 transition-colors" title="Sair">
-                <LogOut class="w-4 h-4" />
+              <button @click="handleSignOut" class="text-muted-foreground hover:text-red-500 transition-colors" title="Sair" aria-label="Sair da conta">
+                <LogOut class="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -105,8 +106,8 @@ function closeMobileMenu() {
               <Sun v-if="colorMode.value === 'dark'" class="w-5 h-5" />
               <Moon v-else class="w-5 h-5" />
             </button>
-            <Button variant="ghost" size="icon" @click="isMobileMenuOpen = true">
-              <Menu class="w-6 h-6" />
+            <Button variant="ghost" size="icon" @click="isMobileMenuOpen = true" aria-label="Abrir menu">
+              <Menu class="w-6 h-6" aria-hidden="true" />
             </Button>
         </div>
       </div>
@@ -119,8 +120,9 @@ function closeMobileMenu() {
     >
       <!-- Overlay -->
       <div
-        class="absolute inset-0 bg-background/80 backdrop-blur-xl"
+        class="absolute inset-0 bg-background/80 backdrop-blur-xl overscroll-contain"
         @click="closeMobileMenu"
+        aria-hidden="true"
       />
 
       <!-- Drawer Panel -->
@@ -134,8 +136,8 @@ function closeMobileMenu() {
               <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-elevation-2">D</div>
               <span>Due</span>
             </NuxtLink>
-            <Button variant="ghost" size="icon" @click="closeMobileMenu">
-              <X class="w-5 h-5" />
+            <Button variant="ghost" size="icon" @click="closeMobileMenu" aria-label="Fechar menu">
+              <X class="w-5 h-5" aria-hidden="true" />
             </Button>
           </div>
 
@@ -158,8 +160,8 @@ function closeMobileMenu() {
           <div class="p-6 border-t bg-muted/20 shrink-0">
             <div class="flex items-center gap-3 mb-4">
               <div class="h-10 w-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden shrink-0">
-                <img v-if="user?.imageUrl" :src="user.imageUrl" class="h-full w-full object-cover" alt="Avatar" />
-                <User v-else class="w-5 h-5 text-primary opacity-70" />
+                <img v-if="user?.imageUrl" :src="user.imageUrl" width="40" height="40" class="h-full w-full object-cover" alt="Avatar do usuário" />
+                <User v-else class="w-5 h-5 text-primary opacity-70" aria-hidden="true" />
               </div>
               <div class="flex flex-col min-w-0">
                 <span class="text-sm font-bold truncate">{{ user?.firstName || 'Usuário' }}</span>
