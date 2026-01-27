@@ -110,6 +110,9 @@ Se não houver gastos nos últimos 7 dias ou nada relevante a destacar, retorne 
         } as AdvisorResponse
       }
 
+      const catVal = context.recentTransactions.last7Days.byCategory && context.recentTransactions.last7Days.byCategory[transactionData.categoryName]
+      const catText = catVal ? `R$ ${catVal.toFixed(2)} nos últimos 7 dias` : 'Primeiro gasto nesta categoria recentemente'
+
       systemPrompt = baseSystem
       prompt = `O usuário acabou de registrar um gasto. Dê feedback imediato se relevante.
 
@@ -126,9 +129,7 @@ CONTEXTO ATUAL:
 - Dias até fechar: ${context.invoiceTimeline.daysUntilClosing}
 
 GASTOS RECENTES NA MESMA CATEGORIA:
-${context.recentTransactions.last7Days.byCategory[transactionData.categoryName]
-  ? `R$ ${context.recentTransactions.last7Days.byCategory[transactionData.categoryName].toFixed(2)} nos últimos 7 dias`
-  : 'Primeiro gasto nesta categoria recentemente'}
+${catText}
 
 Se o gasto for normal/esperado sem nada especial a destacar, retorne should_display: false.
 Destaque apenas se: estourou orçamento, categoria com muitos gastos, valor alto, ou padrão preocupante.`

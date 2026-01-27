@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { 
   LayoutDashboard, 
+  CalendarRange,
   CreditCard, 
   Tags, 
   UploadCloud, 
@@ -35,6 +36,7 @@ const groups = [
     label: 'Principal',
     items: [
       { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+      { name: 'Parcelamentos', path: '/parcelamentos', icon: CalendarRange },
       { name: 'Adicionar Gasto', path: '/add-expense', icon: PlusCircle },
     ]
   },

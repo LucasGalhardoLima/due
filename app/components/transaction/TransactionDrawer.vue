@@ -16,6 +16,8 @@ import { Slider } from '@/components/ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import CurrencyInput from '@/components/ui/CurrencyInput.vue'
 import CategoryAutocomplete from '@/components/ui/CategoryAutocomplete.vue'
+import { Textarea } from '@/components/ui/textarea'
+import { Sparkles, Loader2, PlusCircle } from 'lucide-vue-next'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
 
 // Proactive Advisor for post_transaction trigger
@@ -36,6 +38,53 @@ const selectedCategoryId = ref<string>('')
 const selectedCardId = ref<string>('')
 const paymentType = ref<'cash' | 'installment' | 'subscription'>('cash')
 const purchaseDate = ref(new Date().toISOString().split('T')[0]) // YYYY-MM-DD format
+
+
+
+// AI Mode State
+const isAiMode = ref(false)
+const aiText = ref('')
+const isAnalyzing = ref(false)
+
+async function analyzeText() {
+  if (!aiText.value.trim()) return
+
+  isAnalyzing.value = true
+  try {
+    const res = await $fetch('/api/ai/parse-expense', {
+      method: 'POST',
+      body: {
+        text: aiText.value,
+        currentDate: new Date().toISOString()
+      }
+    })
+
+    // Populate form
+    amount.value = res.amount
+    description.value = res.description
+    purchaseDate.value = res.date
+    installments.value = [res.installments]
+    
+    if (res.cardId) selectedCardId.value = res.cardId
+    if (res.categoryId) selectedCategoryId.value = res.categoryId
+
+    // Logic for payment type based on installments
+    if (res.installments > 1) {
+        paymentType.value = 'installment'
+    } else {
+        paymentType.value = 'cash'
+    }
+    
+    // Switch back to manual for verification
+    isAiMode.value = false
+    toast.success('Dados preenchidos! Verifique e salve.')
+  } catch (e) {
+    console.error(e)
+    toast.error('Não entendi. Tente ser mais específico.')
+  } finally {
+    isAnalyzing.value = false
+  }
+}
 
 // Data Fetching
 interface Card {
@@ -93,6 +142,12 @@ watch(() => props.open, async (isOpen) => {
              const defaultCard = cards.value.find(c => c.isDefault) || cards.value[0]
              if (defaultCard) selectedCardId.value = defaultCard.id
         }
+    }
+    
+    // Reset AI Mode when opening
+    if (isOpen) {
+        isAiMode.value = false
+        aiText.value = ''
     }
 })
 
@@ -278,9 +333,53 @@ async function handleDelete() {
         </DrawerHeader>
 
         <div class="p-4 space-y-6">
+          <!-- Toggle Mode -->
+          <div v-if="!transactionId" class="bg-muted/30 p-1 rounded-xl flex gap-1">
+             <button 
+               class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-medium transition-all"
+               :class="!isAiMode ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:bg-background/50'"
+               @click="isAiMode = false"
+             >
+               <PlusCircle class="w-3 h-3" />
+               Manual
+             </button>
+             <button 
+               class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-medium transition-all"
+               :class="isAiMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'"
+               @click="isAiMode = true"
+             >
+               <Sparkles class="w-3 h-3" />
+               Mágica (IA)
+             </button>
+          </div>
+
+          <!-- AI Input -->
+          <div v-if="isAiMode" class="space-y-4 animate-in fade-in zoom-in-95 duration-200">
+             <div class="space-y-2">
+                <Textarea 
+                  v-model="aiText"
+                  placeholder="Ex: Uber de 25 reais ontem..."
+                  class="min-h-[100px] text-base resize-none"
+                  @keydown.enter.prevent="analyzeText"
+                />
+                <p class="text-[10px] text-muted-foreground text-center">Pressione Enter para processar</p>
+             </div>
+
+             <Button 
+               class="w-full" 
+               :disabled="!aiText || isAnalyzing"
+               @click="analyzeText"
+             >
+               <Loader2 v-if="isAnalyzing" class="w-4 h-4 animate-spin mr-2" />
+               <Sparkles v-else class="w-4 h-4 mr-2" />
+               {{ isAnalyzing ? 'Processando...' : 'Processar' }}
+             </Button>
+          </div>
           
-          <!-- Amount -->
-          <div class="text-center">
+          <!-- Manual Form (Shown if NOT AI Mode OR if Editing) -->
+          <div v-else class="space-y-6 animate-in fade-in zoom-in-95 duration-200">
+            <!-- Amount -->
+            <div class="text-center">
              <Label for="drawer-amount" class="sr-only">Valor</Label>
              <CurrencyInput id="drawer-amount" v-model="amount" class="text-center text-4xl h-16 border-none focus-visible:ring-0 shadow-none font-bold" placeholder="R$ 0,00" />
           </div>
@@ -374,6 +473,7 @@ async function handleDelete() {
                 <button type="button" @click="setInstallments(10)" aria-label="Definir 10 parcelas">10x</button>
                 <button type="button" @click="setInstallments(12)" aria-label="Definir 12 parcelas">12x</button>
             </div>
+          </div>
           </div>
           
         </div>

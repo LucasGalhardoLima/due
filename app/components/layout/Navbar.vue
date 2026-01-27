@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { 
   LayoutDashboard, 
+  CalendarRange,
   CreditCard, 
   Tags, 
   UploadCloud, 
@@ -36,6 +37,7 @@ function toggleTheme() {
 
 const navItems = [
   { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  { name: 'Prc.', path: '/parcelamentos', icon: CalendarRange },
   { name: 'Cartões', path: '/cards', icon: CreditCard },
   { name: 'Categorias', path: '/categories', icon: Tags },
   { name: 'Importar', path: '/import', icon: UploadCloud },

@@ -2,7 +2,9 @@
 import { toast } from 'vue-sonner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import PageHeader from '@/components/ui/PageHeader.vue'
-import { PlusCircle } from 'lucide-vue-next'
+import { PlusCircle, Sparkles, Loader2, ArrowRight } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button' 
+import { Textarea } from '@/components/ui/textarea'
 
 const router = useRouter()
 
@@ -29,6 +31,43 @@ const form = reactive({
   cardId: '',
   categoryId: ''
 })
+
+// AI Mode State
+const isAiMode = ref(false)
+const aiText = ref('')
+const isAnalyzing = ref(false)
+
+async function analyzeText() {
+  if (!aiText.value.trim()) return
+
+  isAnalyzing.value = true
+  try {
+    const res = await $fetch('/api/ai/parse-expense', {
+      method: 'POST',
+      body: {
+        text: aiText.value,
+        currentDate: new Date().toISOString()
+      }
+    })
+
+    // Populate form
+    form.description = res.description
+    form.amount = res.amount
+    form.date = res.date
+    form.installments = res.installments
+    if (res.cardId) form.cardId = res.cardId
+    if (res.categoryId) form.categoryId = res.categoryId
+    
+    // Switch back to manual for verification
+    isAiMode.value = false
+    toast.success('Dados preenchidos! Verifique e salve.')
+  } catch (e) {
+    console.error(e)
+    toast.error('Não entendi. Tente ser mais específico.')
+  } finally {
+    isAnalyzing.value = false
+  }
+}
 
 // Set defaults if available
 watchEffect(() => {
@@ -99,7 +138,51 @@ async function onSubmit() {
       </NuxtLink>
     </div>
 
-    <form v-else class="space-y-6 bg-card p-8 rounded-2xl border shadow-elevation-2" @submit.prevent="onSubmit">
+    <!-- Mode Toggle -->
+    <div v-else class="bg-muted/30 p-1 rounded-xl flex gap-1 mb-6">
+        <button 
+          class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all"
+          :class="!isAiMode ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:bg-background/50'"
+          @click="isAiMode = false"
+        >
+          <PlusCircle class="w-4 h-4" />
+          Manual
+        </button>
+        <button 
+          class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all"
+          :class="isAiMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'"
+          @click="isAiMode = true"
+        >
+          <Sparkles class="w-4 h-4" />
+          Mágica (IA)
+        </button>
+    </div>
+
+    <!-- AI Input Mode -->
+    <div v-if="isAiMode && cards?.length" class="space-y-6 bg-card p-8 rounded-2xl border shadow-elevation-2 animate-in fade-in slide-in-from-left-4 duration-300">
+        <div class="space-y-2">
+           <label class="text-sm font-medium">Descreva sua compra</label>
+           <Textarea 
+             v-model="aiText"
+             placeholder="Ex: Jantar no Outback 300 reais em 2x no Nubank..."
+             class="min-h-[120px] text-lg resize-none"
+             @keydown.enter.prevent="analyzeText"
+           />
+           <p class="text-xs text-muted-foreground">Pressione Enter para processar</p>
+        </div>
+
+        <Button 
+          class="w-full h-12 text-base" 
+          :disabled="!aiText || isAnalyzing"
+          @click="analyzeText"
+        >
+          <Loader2 v-if="isAnalyzing" class="w-5 h-5 animate-spin mr-2" />
+          <Sparkles v-else class="w-5 h-5 mr-2" />
+          {{ isAnalyzing ? 'Processando...' : 'Processar com IA' }}
+        </Button>
+    </div>
+
+    <form v-else-if="cards?.length" class="space-y-6 bg-card p-8 rounded-2xl border shadow-elevation-2 animate-in fade-in slide-in-from-right-4 duration-300" @submit.prevent="onSubmit">
       <!-- Descricao -->
       <div class="space-y-2">
         <label class="text-micro text-muted-foreground" for="description">O que voce comprou?</label>

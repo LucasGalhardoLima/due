@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Check, AlertCircle, Sparkles, Loader2, PlusCircle, TrendingDown, Calculator, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Clock } from 'lucide-vue-next'
 
 import TransactionList from '@/components/transaction/TransactionList.vue'
+import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton.vue'
 import AIInsights from '@/components/dashboard/AIInsights.vue'
 import AIMobileDrawer from '@/components/dashboard/AIMobileDrawer.vue'
 import SummaryCards from '@/components/dashboard/SummaryCards.vue'
@@ -48,7 +49,7 @@ interface SummaryResponse {
 }
 
 // Fetch Data
-const { data: summary, refresh: refreshSummary } = await useFetch<SummaryResponse>('/api/invoices/summary', {
+const { data: summary, refresh: refreshSummary, status: summaryStatus } = useFetch<SummaryResponse>('/api/invoices/summary', {
     key: 'dashboard-summary', // Enable global access for optimistic updates
     query: queryParams
 })
@@ -61,11 +62,13 @@ const daysToDue = computed(() => {
 })
 
 // Fetch cards to check if user has any
-const { data: cards } = await useFetch('/api/cards')
+const { data: cards, status: cardsStatus } = useFetch<any[]>('/api/cards')
 
 // Keeping futureProjection and pareto for now
-const { data: futureProjection, refresh: refreshFuture } = await useFetch('/api/dashboard/future-projection')
-const { data: pareto, refresh: refreshPareto } = await useFetch('/api/dashboard/pareto')
+const { data: futureProjection, refresh: refreshFuture, status: futureStatus } = useFetch<any>('/api/dashboard/future-projection')
+const { data: pareto, refresh: refreshPareto, status: paretoStatus } = useFetch<any>('/api/dashboard/pareto')
+
+const isLoading = computed(() => summaryStatus.value === 'pending' || cardsStatus.value === 'pending')
 
 // Select Default Card on Load
 watch(cards, (newCards) => {
@@ -205,7 +208,9 @@ const showPayConfirm = ref(false)
 <template>
   <div class="space-y-8 relative min-h-screen">
 
-    <template v-if="summary">
+    <DashboardSkeleton v-if="isLoading" />
+
+    <template v-else-if="summary">
       <!-- Desktop Header (Original) -->
       <PageHeader 
         :title="`${getMonthName(summary.month)} ${summary.year}`"
@@ -356,9 +361,13 @@ const showPayConfirm = ref(false)
       </div>
     </template>
 
-    <div v-else class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-      <Loader2 class="w-10 h-10 animate-spin text-primary" />
-      <p class="text-muted-foreground animate-pulse">Carregando dados financeiros...</p>
+    <div v-else-if="cardsStatus === 'success' && !cards?.length" class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+      <div class="p-6 rounded-3xl bg-card border border-primary/20 shadow-glass max-w-md">
+         <CreditCardIcon class="w-12 h-12 text-primary mx-auto mb-4" />
+         <h2 class="text-h2 mb-2">Nenhum cartão encontrado</h2>
+         <p class="text-muted-foreground mb-6">Você precisa cadastrar seu primeiro cartão para começar a gerenciar suas finanças.</p>
+         <Button @click="navigateTo('/cards')" class="w-full">Cadastrar Cartão</Button>
+      </div>
     </div>
 
     <!-- Quick Add Button (Floating - Desktop & Mobile) -->
