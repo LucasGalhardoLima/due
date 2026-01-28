@@ -133,7 +133,7 @@ function handleDismiss() {
             v-if="advisor.currentMessage.value?.action"
             variant="secondary"
             size="sm"
-            class="h-7 text-xs"
+            class="h-auto min-h-7 py-1 px-3 text-xs whitespace-normal text-left justify-start"
           >
             {{ advisor.currentMessage.value.action.text }}
           </Button>
