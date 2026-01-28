@@ -10,6 +10,7 @@ const createCardSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   const body = await readBody(event)
   const result = createCardSchema.safeParse(body)
 
@@ -23,8 +24,10 @@ export default defineEventHandler(async (event) => {
 
   const { name, limit, budget, closingDay, dueDay } = result.data
 
-  // Check if this is the first card - if so, make it default
-  const existingCardsCount = await prisma.creditCard.count()
+  // Check if this is the first card for THIS user - if so, make it default
+  const existingCardsCount = await prisma.creditCard.count({
+    where: { userId }
+  })
   const isDefault = existingCardsCount === 0
 
   const card = await prisma.creditCard.create({
@@ -35,6 +38,7 @@ export default defineEventHandler(async (event) => {
       closingDay,
       dueDay,
       isDefault,
+      userId,
     }
   })
 

@@ -31,6 +31,16 @@ function toggleTheme() {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
 }
 
+const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV
+const demoCookie = useCookie('demo_mode')
+const isDemoMode = computed(() => demoCookie.value === 'true')
+
+function toggleDemoMode() {
+  demoCookie.value = isDemoMode.value ? 'false' : 'true'
+  // Force reload to apply session changes
+  window.location.reload()
+}
+
 const groups = [
   {
     label: 'Principal',
@@ -147,12 +157,26 @@ function closeMobileMenu() {
               <span>{{ colorMode.value === 'light' ? 'Escuro' : 'Claro' }}</span>
             </button>
 
-            <button 
-              @click="handleSignOut" 
+            <button
+              @click="handleSignOut"
               class="flex items-center justify-center h-9 w-9 rounded-md bg-background border border-border hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-500 transition-all text-muted-foreground"
               title="Sair"
             >
               <LogOut class="w-4 h-4" />
+            </button>
+          </div>
+
+          <!-- Demo Mode Button (Dev Only) -->
+          <div v-if="isDev" class="px-2">
+            <button 
+              @click="toggleDemoMode" 
+              class="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-md transition-all text-xs font-bold border"
+              :class="isDemoMode 
+                ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20' 
+                : 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/20'"
+            >
+              <ShieldCheck class="w-3.5 h-3.5" />
+              <span>{{ isDemoMode ? 'Sair do Modo Demo' : 'Ativar Modo Demo' }}</span>
             </button>
           </div>
         </div>
