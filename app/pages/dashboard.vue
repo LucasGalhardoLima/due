@@ -16,6 +16,7 @@ import SummaryCards from '@/components/dashboard/SummaryCards.vue'
 import CategoryBubbleChart from '@/components/dashboard/CategoryBubbleChart.vue'
 import PurchaseSimulator from '@/components/dashboard/PurchaseSimulator.vue'
 import ProactiveAdvisor from '@/components/dashboard/ProactiveAdvisor.vue'
+import CrisisAlertCard from '@/components/dashboard/CrisisAlertCard.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import { Card } from '@/components/ui/card'
 import { Calendar as CalendarIcon } from 'lucide-vue-next'
@@ -67,6 +68,12 @@ const { data: cards, status: cardsStatus } = useFetch<any[]>('/api/cards')
 // Keeping futureProjection and pareto for now
 const { data: futureProjection, refresh: refreshFuture, status: futureStatus } = useFetch<any>('/api/dashboard/future-projection')
 const { data: pareto, refresh: refreshPareto, status: paretoStatus } = useFetch<any>('/api/dashboard/pareto')
+
+// Fetch Crisis Alerts
+const { data: crisisAlerts, refresh: refreshAlerts } = useFetch<any[]>('/api/reports/crisis-alerts', {
+  key: 'crisis-alerts',
+  query: computed(() => ({ cardId: selectedCardId.value || undefined }))
+})
 
 const isLoading = computed(() => summaryStatus.value === 'pending' || cardsStatus.value === 'pending')
 
@@ -296,6 +303,11 @@ const showPayConfirm = ref(false)
       <div class="grid grid-cols-1 gap-8">
         <!-- Main Content Area (Full Width) -->
         <div class="space-y-8">
+          <!-- Crisis Alerts (if any) -->
+          <div v-if="crisisAlerts && crisisAlerts.length > 0" class="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
+             <CrisisAlertCard v-for="(alert, idx) in crisisAlerts" :key="idx" :alert="alert" />
+          </div>
+
           <!-- Hero Summary Cards -->
           <SummaryCards 
             :total="summary.total"
