@@ -179,7 +179,7 @@ onMounted(() => {
 <template>
   <div class="mx-auto max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
     <PageHeader 
-      title="Auditoria & Insights" 
+      title="Auditoria & Balanço" 
       subtitle="Detecte erros na fatura e economize em assinaturas esquecidas."
       :icon="Search"
     />

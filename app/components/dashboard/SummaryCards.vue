@@ -95,7 +95,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 </script>
 
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
     <!-- Card 1: Invoice Total -->
     <div
       class="relative overflow-hidden rounded-2xl p-5 md:p-6 border shadow-elevation-4 transition-all hover:scale-[1.02] group backdrop-blur-xl"

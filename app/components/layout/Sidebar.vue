@@ -32,7 +32,7 @@ function toggleTheme() {
 }
 
 const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV
-const demoCookie = useCookie('demo_mode')
+const demoCookie = useCookie('demo_mode', { maxAge: 60 * 60 * 24 * 30, path: '/' })
 const isDemoMode = computed(() => demoCookie.value === 'true')
 
 function toggleDemoMode() {
@@ -56,7 +56,7 @@ const groups = [
       { name: 'Cartões', path: '/cards', icon: CreditCard },
       { name: 'Categorias', path: '/categories', icon: Tags },
       { name: 'Importar CSV', path: '/import', icon: UploadCloud },
-      { name: 'Auditoria & Insights', path: '/audit', icon: ShieldCheck },
+      { name: 'Auditoria & Balanço', path: '/audit', icon: ShieldCheck },
     ]
   },
   {
@@ -140,7 +140,7 @@ function closeMobileMenu() {
                 <User v-else class="w-5 h-5 text-primary opacity-70" />
               </div>
               <div class="flex flex-col min-w-0">
-                <span class="text-xs font-bold truncate">{{ user?.firstName || 'Usuário' }}</span>
+                <span class="text-xs font-bold truncate">{{ isDemoMode ? 'Usuário' : (user?.firstName || 'Usuário') }}</span>
                 <span class="text-[10px] text-muted-foreground truncate">{{ user?.primaryEmailAddress?.emailAddress || 'Conta Pessoal' }}</span>
               </div>
             </div>

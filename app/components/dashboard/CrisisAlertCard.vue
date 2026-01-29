@@ -112,15 +112,15 @@ const handleAction = (action: string) => {
                      <div class="relative w-full flex justify-center items-end flex-1">
                          <!-- Prediction Bar -->
                          <div 
-                            class="w-full max-w-[24px] rounded-t-md transition-all duration-500 relative"
-                            :class="{
-                                'bg-emerald-500/50': item.status === 'ok',
-                                'bg-amber-500/50': item.status === 'warning',
-                                'bg-red-500': item.status === 'critical'
-                            }"
-                            :style="{ height: `${Math.min(item.commitment, 100)}%` }"
+                             class="w-full max-w-[24px] rounded-t-md transition-all duration-500 relative"
+                             :class="{
+                                 'bg-emerald-500/60': item.status === 'ok',
+                                 'bg-amber-500/70': item.status === 'warning',
+                                 'bg-red-500': item.status === 'critical'
+                             }"
+                             :style="{ height: `${Math.max(8, Math.min(item.commitment, 100))}%` }"
                          >
-                            <!-- Tooltip -->
+                             <!-- Tooltip -->
                              <span class="absolute -top-8 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-foreground text-background px-2 py-0.5 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-20">
                                  {{ item.commitment.toFixed(0) }}%
                              </span>
@@ -128,12 +128,12 @@ const handleAction = (action: string) => {
                          <!-- Limit Line (approximate 100%) -->
                          <div v-if="item.commitment >= 100" class="absolute top-0 w-full border-t border-destructive border-dashed z-10"></div>
                      </div>
-                     <span 
-                        class="text-[10px] font-bold uppercase shrink-0"
-                        :class="item.status === 'critical' ? 'text-destructive' : 'text-muted-foreground'"
-                     >
-                        {{ item.monthName }}
-                     </span>
+                      <span 
+                         class="text-[10px] font-bold uppercase shrink-0"
+                         :class="item.status === 'critical' ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground'"
+                      >
+                         {{ item.monthName }}
+                      </span>
                  </div>
              </div>
              <p class="text-micro text-center text-muted-foreground mt-2">

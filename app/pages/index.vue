@@ -1,50 +1,80 @@
 <script setup lang="ts">
-import { Sparkles, Upload, CheckCircle, ArrowRight, Check, Clock, Shield, TrendingUp, PieChart, Users, Calendar, Bell, FileText, Smartphone, Building2, DollarSign, MessageSquare, Target, Globe, ChevronDown, Moon, Sun } from 'lucide-vue-next'
+import { Sparkles, Upload, CheckCircle, ArrowRight, Check, Clock, Shield, TrendingUp, PieChart, Users, Calendar, Bell, FileText, Smartphone, Building2, DollarSign, MessageSquare, Target, Globe, ChevronDown, Moon, Sun, ShieldCheck, Tags } from 'lucide-vue-next'
 
 const { userId } = useAuth()
 const colorMode = useColorMode()
 
 const features = [
   {
-    icon: Upload,
-    title: 'Importação Inteligente',
-    description: 'Arraste seu CSV do Nubank, Inter e outros. Nossa IA organiza e categoriza tudo instantaneamente.',
-    colSpan: 'md:col-span-2'
-  },
-  {
     icon: Sparkles,
-    title: 'Simulador de Compra IA',
-    description: 'Antes de passar o cartão, pergunte ao Due. Nossa IA analisa seu limite e faturas para dar o sinal verde.',
+    title: 'Simulador IA',
+    description: 'Analise a viabilidade de novas compras com IA preditiva. Saiba quando gastar.',
     colSpan: 'md:col-span-1'
   },
   {
-    icon: PieChart,
-    title: 'Raio-X das Categorias',
-    description: 'Visualize com precisão cirúrgica para onde seu dinheiro está indo com gráficos inteligentes e interativos.',
+    icon: Upload,
+    title: 'Importação Inteligente',
+    description: 'Arraste seu CSV do Nubank, Inter e outros. Nossa IA organiza tudo instantaneamente.',
+    colSpan: 'md:col-span-2'
+  },
+  {
+    icon: Bell,
+    title: 'Alertas de Crise',
+    description: 'O sistema que dorme com um olho aberto. Receba alertas antes de estourar seu limite.',
     colSpan: 'md:col-span-1'
   },
   {
     icon: MessageSquare,
     title: 'AI Advisor',
-    description: 'Seu copiloto financeiro. Receba diagnósticos profundos e sugestões de economia baseadas no seu perfil.',
+    description: 'Seu copiloto financeiro. Receba diagnósticos profundos e sugestões de economia.',
+    colSpan: 'md:col-span-1'
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Auditoria de Gastos',
+    description: 'Conciliação perfeita. Histórico completo e auditoria avançada de transações.',
+    colSpan: 'md:col-span-1'
+  },
+  {
+    icon: Globe,
+    title: 'Gestão Multi-Cartão',
+    description: 'Adicione quantos cartões quiser. Uma visão consolidada de todas as suas faturas.',
+    colSpan: 'md:col-span-2'
+  },
+  {
+    icon: Smartphone,
+    title: 'Mobile First',
+    description: 'O poder do dashboard na palma da sua mão. 100% responsivo para qualquer tela.',
     colSpan: 'md:col-span-1'
   },
   {
     icon: Target,
-    title: 'Metas e Orçamentos',
-    description: 'Defina limites por cartão e acompanhe sua evolução mensal com metas claras e visuais.',
+    title: 'Metas Inteligentes',
+    description: 'Defina limites por cartão ou categoria e acompanhe sua evolução mensal.',
+    colSpan: 'md:col-span-1'
+  },
+  {
+    icon: Tags,
+    title: 'Organização por Tags',
+    description: 'Categorize gastos com tags para análises geográficas ou específicas por evento.',
+    colSpan: 'md:col-span-1'
+  },
+  {
+    icon: PieChart,
+    title: 'Balanço Mensal',
+    description: 'Visualize sua saúde financeira com gráficos de fluxo de caixa e balanço simplificado.',
     colSpan: 'md:col-span-1'
   },
   {
     icon: TrendingUp,
     title: 'Projeção de Faturas',
-    description: 'Prepare-se para o futuro. Veja o impacto das suas parcelas nos próximos meses com precisão.',
+    description: 'Prepare-se para o futuro. Veja o impacto das suas parcelas nos próximos meses.',
     colSpan: 'md:col-span-1'
   },
   {
     icon: Shield,
     title: 'Privacidade Total',
-    description: 'Seus dados financeiros são sagrados. Banco de dados isolado e autenticação via Clerk.',
+    description: 'Seus dados financeiros são sagrados. Banco de dados isolado e segurança com Clerk.',
     colSpan: 'md:col-span-2'
   }
 ]
@@ -52,38 +82,38 @@ const features = [
 const roadmap = [
   {
     status: 'done',
-    icon: Shield,
+    icon: ShieldCheck,
     title: 'Módulo de Auditoria',
     description: 'Histórico completo e detalhado de todas as transações criadas, com filtros avançados.',
     eta: 'Concluído'
   },
   {
     status: 'done',
-    icon: Target,
-    title: 'Metas por Cartão',
-    description: 'Sistema de budget individual para cada cartão de crédito com alertas visuais.',
-    eta: 'Concluído'
-  },
-  {
-    status: 'done',
-    icon: Sparkles,
-    title: 'Simulador IA v1',
-    description: 'Motor de análise preditiva para avaliar a viabilidade de novas compras.',
+    icon: Bell,
+    title: 'Alertas de Crise',
+    description: 'Sistema de notificações inteligentes para avisar sobre gastos anômalos ou proximidade do limite.',
     eta: 'Concluído'
   },
   {
     status: 'soon',
-    icon: Smartphone,
-    title: 'App Instalável (PWA)',
-    description: 'Instale o Due direto na home do seu celular para uma experiência nativa.',
+    icon: Clock,
+    title: 'Detecção de Assinaturas',
+    description: 'Identificação inteligente de gastos recorrentes (Netflix, Spotify) para evitar cobranças indesejadas.',
     eta: 'Q1 2026'
   },
   {
     status: 'planned',
-    icon: MessageSquare,
-    title: 'Advisor AI 2.0',
-    description: 'Chat interativo para tirar dúvidas e analisar histórico de gastos.',
-    eta: 'Q4 2026'
+    icon: FileText,
+    title: 'Relatórios & Exportação',
+    description: 'Gere PDFs profissionais e planilhas detalhadas dos seus gastos mensais com um clique.',
+    eta: 'Q2 2026'
+  },
+  {
+    status: 'planned',
+    icon: Users,
+    title: 'Compartilhamento Familiar',
+    description: 'Gerencie as finanças da casa com múltiplos usuários e orçamentos compartilhados.',
+    eta: 'Q3 2026'
   },
   {
     status: 'planned',

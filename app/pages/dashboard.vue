@@ -55,10 +55,22 @@ const { data: summary, refresh: refreshSummary, status: summaryStatus } = useFet
     query: queryParams
 })
 
+const demoCookie = useCookie('demo_mode', { maxAge: 60 * 60 * 24 * 30, path: '/' })
+const isDemoMode = computed(() => String(demoCookie.value) === 'true')
+
 const daysToDue = computed(() => {
-    if (!summary.value?.dueDate) return null
+    let dueDateStr = summary.value?.dueDate
+    
+    // Fallback for Demo Mode if dueDate is missing (e.g. in Global View)
+    if (!dueDateStr && isDemoMode.value) {
+        const fallbackDate = new Date()
+        fallbackDate.setDate(fallbackDate.getDate() + 5)
+        dueDateStr = fallbackDate.toISOString()
+    }
+
+    if (!dueDateStr) return null
     const today = new Date()
-    const due = parseISO(summary.value.dueDate)
+    const due = parseISO(dueDateStr)
     return differenceInDays(due, today)
 })
 
