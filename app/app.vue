@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Toaster from '@/components/ui/Toaster.vue'
-// @ts-ignore
+// @ts-expect-error Nuxt injects analytics types at build time.
 import { Analytics } from '@vercel/analytics/nuxt'
 </script>
 

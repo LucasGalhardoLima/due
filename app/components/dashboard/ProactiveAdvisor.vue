@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { X, MessageCircle, AlertTriangle, PartyPopper, Bot } from 'lucide-vue-next'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
 
-const props = defineProps<{
+defineProps<{
   compact?: boolean
 }>()
 
@@ -98,9 +98,9 @@ function handleDismiss() {
     >
       <!-- Dismiss Button -->
       <button
-        @click="handleDismiss"
         class="absolute top-2 right-2 p-1.5 rounded-full bg-background/50 hover:bg-background/80 text-muted-foreground hover:text-foreground transition-colors z-10"
         aria-label="Fechar"
+        @click="handleDismiss"
       >
         <X class="w-3.5 h-3.5" />
       </button>

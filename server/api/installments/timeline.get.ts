@@ -1,8 +1,9 @@
 import { z } from 'zod'
-import { startOfMonth, endOfMonth, addMonths, format, isBefore, getYear, getMonth } from 'date-fns'
+import { startOfMonth, endOfMonth, addMonths, format, getYear, getMonth } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import prisma from '../../utils/prisma'
 import { getUser } from '../../utils/session'
+import { moneyToCents, moneyToNumber } from '../../utils/money'
 
 const querySchema = z.object({
   months: z.coerce.number().min(1).max(24).default(12),
@@ -82,14 +83,14 @@ export default defineEventHandler(async (event) => {
   if (cardId) {
     const card = await prisma.creditCard.findUnique({ where: { id: cardId } })
     if (card) {
-      totalLimit = card.limit
-      totalBudget = card.budget || 0
+      totalLimit = moneyToNumber(card.limit)
+      totalBudget = card.budget ? moneyToNumber(card.budget) : 0
     }
   } else {
     // If multiple cards, sum their limits
     const cards = await prisma.creditCard.findMany({ where: { userId } })
-    totalLimit = cards.reduce((sum: number, c) => sum + c.limit, 0)
-    totalBudget = cards.reduce((sum: number, c) => sum + (c.budget || 0), 0)
+    totalLimit = cards.reduce((sum: number, c) => sum + moneyToNumber(c.limit), 0)
+    totalBudget = cards.reduce((sum: number, c) => sum + (c.budget ? moneyToNumber(c.budget) : 0), 0)
   }
 
   // Group by YYYY-MM
@@ -129,7 +130,7 @@ export default defineEventHandler(async (event) => {
     // Look ahead only within our timeline
     if (monthsMap.has(key)) {
       const entry = monthsMap.get(key)!
-      entry.totalCommitted += inst.amount
+      entry.totalCommitted += moneyToCents(inst.amount) / 100
       entry.installmentCount++
       
       // Top transactions list - keep all for now, maybe filter top 5 in frontend or here?

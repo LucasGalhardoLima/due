@@ -15,11 +15,9 @@ import {
   TrendingUp,
   Minus,
   AlertTriangle,
-  Loader2,
   Target,
   Lightbulb,
   Heart,
-  ChevronRight,
   Zap
 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
@@ -117,12 +115,12 @@ async function analyzeQuick() {
 
   try {
     const response = await $fetch<InsightsResponse>('/api/ai/insights', {
-      method: 'POST' as any
+      method: 'POST'
     })
 
     quickInsights.value = response
     hasAnalyzedQuick.value = true
-  } catch (error: any) {
+  } catch (error) {
     console.error('AI Insights Error:', error)
     toast.error('Erro ao gerar insights. Verifique sua API Key.')
   } finally {
@@ -136,12 +134,12 @@ async function analyzeDeep() {
 
   try {
     const response = await $fetch<DeepInsightsResponse>('/api/ai/deep-insights', {
-      method: 'POST' as any
+      method: 'POST'
     })
 
     deepInsights.value = response
     hasAnalyzedDeep.value = true
-  } catch (error: any) {
+  } catch (error) {
     console.error('Deep AI Insights Error:', error)
     toast.error('Erro ao gerar análise profunda.')
   } finally {
@@ -211,24 +209,24 @@ watch(isOpen, (val) => {
       <!-- Tab Buttons -->
       <div class="flex gap-2 p-1 bg-secondary/30 rounded-xl border border-border">
         <button
-          @click="activeTab = 'resumo'"
           :class="[
             'flex-1 px-4 py-2 text-small font-semibold rounded-lg transition-all',
             activeTab === 'resumo'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
           ]"
+          @click="activeTab = 'resumo'"
         >
           Resumo Rápido
         </button>
         <button
-          @click="activeTab = 'profunda'"
           :class="[
             'flex-1 px-4 py-2 text-small font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5',
             activeTab === 'profunda'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
           ]"
+          @click="activeTab = 'profunda'"
         >
           <Zap class="w-3.5 h-3.5" />
           Análise Profunda
@@ -242,17 +240,17 @@ watch(isOpen, (val) => {
           <div v-if="!hasAnalyzedQuick" class="flex flex-col items-center justify-center py-8 text-center space-y-4">
             <div class="p-4 rounded-full bg-primary/5 border border-primary/10 relative">
               <Sparkles class="w-8 h-8 text-primary" :class="isLoadingQuick ? 'animate-pulse' : ''" />
-              <div v-if="isLoadingQuick" class="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+              <div v-if="isLoadingQuick" class="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin"/>
             </div>
 
             <div class="space-y-2 max-w-sm mx-auto">
-              <h4 class="text-h4 font-bold" v-if="!isLoadingQuick">Diagnóstico Rápido</h4>
-              <h4 class="text-h4 font-bold" v-else>Analisando padrões de consumo...</h4>
+              <h4 v-if="!isLoadingQuick" class="text-h4 font-bold">Diagnóstico Rápido</h4>
+              <h4 v-else class="text-h4 font-bold">Analisando padrões de consumo...</h4>
 
-              <p class="text-body text-muted-foreground" v-if="!isLoadingQuick">
+              <p v-if="!isLoadingQuick" class="text-body text-muted-foreground">
                 Análise do mês atual com ações práticas e alertas de risco.
               </p>
-              <p class="text-body text-muted-foreground" v-else>
+              <p v-else class="text-body text-muted-foreground">
                 Isso pode levar alguns segundos. Estamos verificando categorias e limites.
               </p>
             </div>
@@ -311,7 +309,7 @@ watch(isOpen, (val) => {
             <!-- Alerts -->
             <div v-if="quickInsights.insights.alertas?.length" class="space-y-2">
               <div v-for="(alerta, idx) in quickInsights.insights.alertas" :key="idx" class="flex items-center gap-2 text-destructive bg-destructive/5 p-2 rounded-lg border border-destructive/10 text-micro">
-                <div class="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse"></div>
+                <div class="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse"/>
                 {{ alerta }}
               </div>
             </div>
@@ -340,17 +338,17 @@ watch(isOpen, (val) => {
           <div v-if="!hasAnalyzedDeep" class="flex flex-col items-center justify-center py-8 text-center space-y-4">
             <div class="p-4 rounded-full bg-primary/5 border border-primary/10 relative">
               <Zap class="w-8 h-8 text-primary" :class="isLoadingDeep ? 'animate-pulse' : ''" />
-              <div v-if="isLoadingDeep" class="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+              <div v-if="isLoadingDeep" class="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin"/>
             </div>
 
             <div class="space-y-2 max-w-sm mx-auto">
-              <h4 class="text-h4 font-bold" v-if="!isLoadingDeep">Análise Profunda</h4>
-              <h4 class="text-h4 font-bold" v-else>Processando 6 meses de dados...</h4>
+              <h4 v-if="!isLoadingDeep" class="text-h4 font-bold">Análise Profunda</h4>
+              <h4 v-else class="text-h4 font-bold">Processando 6 meses de dados...</h4>
 
-              <p class="text-body text-muted-foreground" v-if="!isLoadingDeep">
+              <p v-if="!isLoadingDeep" class="text-body text-muted-foreground">
                 Análise de tendências com 6 meses de histórico, previsões e oportunidades de economia.
               </p>
-              <p class="text-body text-muted-foreground" v-else>
+              <p v-else class="text-body text-muted-foreground">
                 Nossa IA está analisando padrões, tendências e gerando previsões personalizadas.
               </p>
             </div>
@@ -386,7 +384,7 @@ watch(isOpen, (val) => {
                 <div
                   :class="['h-full rounded-full bg-gradient-to-r transition-all duration-1000', getHealthScoreGradient(deepInsights.insights.health_score.score)]"
                   :style="{ width: `${deepInsights.insights.health_score.score}%` }"
-                ></div>
+                />
               </div>
 
               <!-- Factors -->
@@ -454,7 +452,7 @@ watch(isOpen, (val) => {
                     <div
                       class="h-full bg-primary rounded-full"
                       :style="{ width: `${deepInsights.insights.forecast.confidence}%` }"
-                    ></div>
+                    />
                   </div>
                   <span class="text-micro text-muted-foreground">{{ deepInsights.insights.forecast.confidence }}% confiança</span>
                 </div>

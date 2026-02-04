@@ -74,12 +74,12 @@ function closeMobileMenu() {
 
 <template>
   <!-- Mobile Header -->
-  <header class="lg:hidden h-14 border-b border-white/10 backdrop-blur-xl bg-background/70 shadow-glass sticky top-0 z-40 px-4 flex items-center justify-between">
+  <header class="lg:hidden h-14 border-b border-border bg-card sticky top-0 z-40 px-4 flex items-center justify-between">
     <NuxtLink to="/" class="font-bold text-lg flex items-center gap-2">
-      <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-elevation-2">
-        D
+      <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-elevation-2 text-sm">
+        Du
       </div>
-      <span>Due</span>
+      <span>Du</span>
     </NuxtLink>
 
     <Button variant="ghost" size="icon" @click="isMobileMenuOpen = true">
@@ -89,17 +89,17 @@ function closeMobileMenu() {
 
   <!-- Sidebar Container -->
   <aside
-    class="fixed inset-y-0 left-0 z-50 w-64 bg-white/10 dark:bg-black/20 backdrop-blur-2xl border-r border-white/10 shadow-glass transition-transform duration-300 transform lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:inset-0 lg:bg-transparent lg:backdrop-blur-none lg:shadow-none lg:border-border"
-    :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
+    class="fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transition-transform duration-300"
+    :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
   >
     <div class="flex flex-col h-full">
       <!-- Sidebar Header (Desktop) -->
       <div class="h-16 flex items-center px-6 border-b border-border/50 shrink-0">
         <NuxtLink to="/" class="font-bold text-xl flex items-center gap-2">
-          <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-elevation-2">
-            D
+          <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-elevation-2 text-sm">
+            Du
           </div>
-          <span>Due</span>
+          <span>Du</span>
         </NuxtLink>
         <Button variant="ghost" size="icon" class="lg:hidden ml-auto" @click="closeMobileMenu">
           <X class="w-5 h-5" />
@@ -136,7 +136,7 @@ function closeMobileMenu() {
           <div class="flex items-center justify-between px-2 group/profile">
             <div class="flex items-center gap-3">
               <div class="h-9 w-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden shrink-0">
-                <img v-if="user?.imageUrl" :src="user.imageUrl" class="h-full w-full object-cover" alt="Avatar" />
+                <img v-if="user?.imageUrl" :src="user.imageUrl" class="h-full w-full object-cover" alt="Avatar" >
                 <User v-else class="w-5 h-5 text-primary opacity-70" />
               </div>
               <div class="flex flex-col min-w-0">
@@ -149,9 +149,9 @@ function closeMobileMenu() {
           <!-- Actions Row -->
           <div class="flex items-center justify-between px-2 gap-2">
             <button 
-              @click="toggleTheme" 
-              class="flex-1 flex items-center justify-center gap-2 h-9 px-3 rounded-md bg-background border border-border hover:bg-accent transition-all text-xs font-medium text-muted-foreground hover:text-foreground"
+              class="flex-1 flex items-center justify-center gap-2 h-9 px-3 rounded-md bg-background border border-border hover:bg-accent transition-all text-xs font-medium text-muted-foreground hover:text-foreground" 
               aria-label="Alternar Tema"
+              @click="toggleTheme"
             >
               <Moon v-if="colorMode.value === 'light'" class="w-3.5 h-3.5" />
               <Sun v-else class="w-3.5 h-3.5" />
@@ -159,9 +159,9 @@ function closeMobileMenu() {
             </button>
 
             <button
-              @click="handleSignOut"
               class="flex items-center justify-center h-9 w-9 rounded-md bg-background border border-border hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-500 transition-all text-muted-foreground"
               title="Sair"
+              @click="handleSignOut"
             >
               <LogOut class="w-4 h-4" />
             </button>
@@ -170,11 +170,11 @@ function closeMobileMenu() {
           <!-- Demo Mode Button (Dev Only) -->
           <div v-if="isDev" class="px-2">
             <button 
-              @click="toggleDemoMode" 
-              class="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-md transition-all text-xs font-bold border"
+              class="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-md transition-all text-xs font-bold border" 
               :class="isDemoMode 
                 ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20' 
                 : 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/20'"
+              @click="toggleDemoMode"
             >
               <ShieldCheck class="w-3.5 h-3.5" />
               <span>{{ isDemoMode ? 'Sair do Modo Demo' : 'Ativar Modo Demo' }}</span>
@@ -188,7 +188,7 @@ function closeMobileMenu() {
   <!-- Mobile Overlay -->
   <div
     v-if="isMobileMenuOpen"
-    class="fixed inset-0 bg-background/80 backdrop-blur-xl z-40 lg:hidden"
+    class="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
     @click="closeMobileMenu"
-  ></div>
+  />
 </template>

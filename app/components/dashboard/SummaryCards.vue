@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Component } from 'vue'
 import { computed } from 'vue'
 import { CreditCard, TrendingUp, Calendar, ShoppingBag, Utensils, Car, Home } from 'lucide-vue-next'
 
@@ -26,40 +27,40 @@ const colorState = computed(() => {
   return 'safe'
 })
 
-// Gradient classes for each state (Light and Dark friendly)
+// Gradient classes for each state (Light and Dark friendly) - solid backgrounds
 const invoiceGradient = computed(() => {
   switch (colorState.value) {
     case 'danger':
-      return 'bg-rose-500/10 backdrop-blur-2xl border-rose-500/20'
+      return 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/50'
     case 'warning':
-      return 'bg-amber-500/10 backdrop-blur-2xl border-amber-500/20'
+      return 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50'
     default:
-      return 'bg-emerald-500/10 backdrop-blur-2xl border-emerald-500/20'
+      return 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
   }
 })
 
 const limitGradient = computed(() => {
   switch (colorState.value) {
     case 'danger':
-      return 'bg-rose-500/10 backdrop-blur-2xl border-rose-500/20'
+      return 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/50'
     case 'warning':
-      return 'bg-orange-500/10 backdrop-blur-2xl border-orange-500/20'
+      return 'bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800/50'
     default:
-      return 'bg-teal-500/10 backdrop-blur-2xl border-teal-500/20'
+      return 'bg-teal-50 dark:bg-teal-950/30 border-teal-200 dark:border-teal-800/50'
   }
 })
 
 const dueGradient = computed(() => {
   if (props.status === 'PAID') {
-    return 'bg-emerald-500/10 backdrop-blur-2xl border-emerald-500/20'
+    return 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
   }
   switch (dueColorState.value) {
     case 'danger':
-      return 'bg-rose-500/10 backdrop-blur-2xl border-rose-500/20'
+      return 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/50'
     case 'warning':
-      return 'bg-amber-500/10 backdrop-blur-2xl border-amber-500/20'
+      return 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50'
     default:
-      return 'bg-blue-500/10 backdrop-blur-2xl border-blue-500/20'
+      return 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800/50'
   }
 })
 
@@ -80,7 +81,7 @@ const dueText = computed(() => {
 })
 
 // Category icon mapping
-const categoryIcons: Record<string, any> = {
+const categoryIcons: Record<string, Component> = {
   'Alimentação': Utensils,
   'Transporte': Car,
   'Casa': Home,
@@ -98,7 +99,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
     <!-- Card 1: Invoice Total -->
     <div
-      class="relative overflow-hidden rounded-2xl p-5 md:p-6 border shadow-elevation-4 transition-all hover:scale-[1.02] group backdrop-blur-xl"
+      class="relative overflow-hidden rounded-xl p-5 md:p-6 border shadow-elevation-2 transition-all hover:scale-[1.02] group"
       :class="[invoiceGradient, { 'motion-safe:animate-pulse ring-1 ring-rose-500/50': shouldPulse && colorState === 'danger' }]"
     >
       <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
@@ -124,7 +125,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 
     <!-- Card 2: Limit Usage -->
     <div
-      class="relative overflow-hidden rounded-2xl p-5 md:p-6 border shadow-elevation-4 transition-all hover:scale-[1.02] group backdrop-blur-xl"
+      class="relative overflow-hidden rounded-xl p-5 md:p-6 border shadow-elevation-2 transition-all hover:scale-[1.02] group"
       :class="limitGradient"
     >
       <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
@@ -157,7 +158,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 
     <!-- Card 3: Days to Due -->
     <div
-      class="relative overflow-hidden rounded-2xl p-5 md:p-6 border shadow-elevation-4 transition-all hover:scale-[1.02] group backdrop-blur-xl"
+      class="relative overflow-hidden rounded-xl p-5 md:p-6 border shadow-elevation-2 transition-all hover:scale-[1.02] group"
       :class="[dueGradient, { 'motion-safe:animate-pulse ring-1 ring-rose-500/50': shouldPulse && dueColorState === 'danger' }]"
     >
       <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
@@ -184,8 +185,8 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
           </div>
           <button
             v-if="status && status !== 'PAID'"
-            @click="emit('pay')"
             class="mb-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-elevation-3 shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
+            @click="emit('pay')"
           >
             PAGAR
           </button>
@@ -195,20 +196,20 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 
     <!-- Card 4: Top Category -->
     <div
-      class="relative overflow-hidden rounded-2xl p-5 md:p-6 border border-purple-500/20 shadow-glass transition-all hover:scale-[1.02] group bg-purple-500/10 backdrop-blur-2xl"
+      class="relative overflow-hidden rounded-xl p-5 md:p-6 border border-violet-200 dark:border-violet-800/50 shadow-elevation-2 transition-all hover:scale-[1.02] group bg-violet-50 dark:bg-violet-950/30"
     >
       <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
 
       <div class="relative z-10 space-y-4">
         <div class="flex items-center justify-between">
           <div class="p-2 rounded-xl bg-white/80 dark:bg-white/5 border border-white/20 dark:border-white/10 shadow-elevation-1">
-            <component :is="categoryIcon" class="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <component :is="categoryIcon" class="w-5 h-5 text-violet-600 dark:text-violet-400" />
           </div>
         </div>
         <div>
           <p class="text-micro text-muted-foreground dark:text-white/50">Maior Gasto</p>
           <p class="text-xl md:text-2xl lg:text-3xl font-black text-foreground dark:text-white mt-1.5 truncate">{{ topCategory?.name || '---' }}</p>
-          <p class="text-small font-black text-purple-600 dark:text-purple-400 mt-1.5 tabular-nums">
+          <p class="text-small font-black text-violet-600 dark:text-violet-400 mt-1.5 tabular-nums">
             {{ topCategory ? formatCurrency(topCategory.amount) : 'Sem gastos' }}
           </p>
         </div>

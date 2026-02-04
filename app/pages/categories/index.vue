@@ -26,7 +26,7 @@ async function onSubmit() {
 
   try {
     await $fetch('/api/categories', {
-      method: 'POST' as any,
+      method: 'POST',
       body: { name: form.name }
     })
     
@@ -54,7 +54,7 @@ async function saveEdit() {
 
   try {
     await $fetch(`/api/categories/${editingId.value}`, {
-      method: 'PUT' as any,
+      method: 'PUT',
       body: { name: editingName.value }
     })
     
@@ -81,12 +81,12 @@ async function handleDelete() {
   if (!categoryToDelete.value) return
   
   try {
-    await $fetch(`/api/categories/${categoryToDelete.value}`, { method: 'DELETE' as any })
+    await $fetch(`/api/categories/${categoryToDelete.value}`, { method: 'DELETE' })
     await refresh()
     toast.success('Categoria removida com sucesso')
-  } catch (e: any) {
-    console.error(e)
-    const errorMsg = e.data?.statusMessage || 'Erro ao remover categoria'
+  } catch (error) {
+    console.error(error)
+    const errorMsg = error instanceof Error ? error.message : 'Erro ao remover categoria'
     toast.error(errorMsg)
   } finally {
     showConfirm.value = false
@@ -107,7 +107,7 @@ async function handleDelete() {
 
     <template v-else>
       <!-- Add Category Form (Standardized) -->
-      <div class="rounded-2xl border border-white/20 dark:border-white/10 bg-white/50 dark:bg-black/20 backdrop-blur-xl text-card-foreground shadow-glass overflow-hidden">
+      <div class="rounded-xl border border-border bg-card text-card-foreground shadow-elevation-1 overflow-hidden">
           <div class="bg-muted/30 px-6 py-4 border-b flex items-center gap-2">
               <Plus class="w-4 h-4 text-primary" />
               <h3 class="text-micro text-muted-foreground">Nova Categoria</h3>
@@ -136,21 +136,21 @@ async function handleDelete() {
       </div>
   
       <!-- Categories List (Standardized Card) -->
-      <Card class="divide-y divide-white/10 overflow-hidden">
-        <div v-for="cat in categories" :key="cat.id" class="p-4 flex items-center justify-between group hover:bg-white/5 transition-colors">
+      <Card class="divide-y divide-border overflow-hidden">
+        <div v-for="cat in categories" :key="cat.id" class="p-4 flex items-center justify-between group hover:bg-muted/50 transition-colors">
           <div v-if="editingId === cat.id" class="flex-grow flex gap-2">
               <input
                 v-model="editingName"
-                class="flex h-9 w-full rounded-xl border border-white/20 dark:border-white/10 bg-white/10 dark:bg-black/20 px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-glass"
+                v-focus
+                class="flex h-9 w-full rounded-lg border border-border bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
+                aria-label="Editar nome da categoria"
                 @keyup.enter="saveEdit"
                 @keyup.esc="cancelEdit"
-                v-focus
-                aria-label="Editar nome da categoria"
               >
-              <button class="p-2 text-emerald-600 hover:bg-emerald-500/10 rounded-xl transition-all" @click="saveEdit" aria-label="Confirmar edição">
+              <button class="p-2 text-emerald-600 hover:bg-emerald-500/10 rounded-xl transition-all" aria-label="Confirmar edição" @click="saveEdit">
                   <Check class="h-4 w-4" />
               </button>
-              <button class="p-2 text-red-600 hover:bg-red-500/10 rounded-xl transition-all" @click="cancelEdit" aria-label="Cancelar edição">
+              <button class="p-2 text-red-600 hover:bg-red-500/10 rounded-xl transition-all" aria-label="Cancelar edição" @click="cancelEdit">
                   <X class="h-4 w-4" />
               </button>
           </div>
@@ -159,18 +159,18 @@ async function handleDelete() {
               <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     class="p-2 hover:bg-primary/10 rounded-xl transition-colors"
-                    @click="startEdit(cat)"
                     title="Editar"
                     aria-label="Editar categoria"
+                    @click="startEdit(cat)"
                   >
                       <Edit2 class="h-4 w-4 text-primary" />
                   </button>
                   <button
+                    v-if="cat.name.toLowerCase() !== 'outros'"
                     class="p-2 hover:bg-destructive/10 rounded-xl transition-colors text-muted-foreground hover:text-destructive shrink-0"
-                    @click="confirmDelete(cat.id)"
                     title="Remover"
                     aria-label="Remover categoria"
-                    v-if="cat.name.toLowerCase() !== 'outros'"
+                    @click="confirmDelete(cat.id)"
                   >
                       <Trash2 class="h-4 w-4" />
                   </button>

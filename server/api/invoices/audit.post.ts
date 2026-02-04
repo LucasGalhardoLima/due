@@ -1,6 +1,6 @@
 import { defineEventHandler, readBody } from 'h3'
 import prisma from '../../utils/prisma'
-import { startOfMonth, endOfMonth, parseISO, differenceInDays } from 'date-fns'
+import { endOfMonth, parseISO, differenceInDays } from 'date-fns'
 
 interface AuditItem {
   date: string
@@ -15,12 +15,22 @@ interface AuditRequest {
   year: number
 }
 
+interface AuditAlertItem {
+  date: string
+  merchant: string
+  amount: number
+  alert_level: 'info' | 'warning' | 'critical'
+  message: string
+  reason?: string
+  count?: number
+}
+
 interface FaturaAudit {
   status: 'divergent' | 'match'
-  missing_in_app: any[]
-  missing_in_bank: any[]
-  duplicates: any[]
-  suspicious: any[]
+  missing_in_app: AuditAlertItem[]
+  missing_in_bank: AuditAlertItem[]
+  duplicates: AuditAlertItem[]
+  suspicious: AuditAlertItem[]
   total_divergence: number
   action_needed: boolean
 }

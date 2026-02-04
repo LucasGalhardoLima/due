@@ -22,7 +22,7 @@ interface FaturaAudit {
   action_needed: boolean
 }
 
-const props = defineProps<{
+defineProps<{
   audit: FaturaAudit
 }>()
 
@@ -50,8 +50,8 @@ const formatDate = (dateStr: string) => {
         </div>
         <div>
           <h3 class="text-h4">{{ audit.status === 'match' ? 'Fatura Validada' : 'Divergências Encontradas' }}</h3>
-          <p class="text-small text-muted-foreground" v-if="audit.status === 'match'">Tudo certo! Seus lançamentos batem com o banco.</p>
-          <p class="text-small text-muted-foreground" v-else>
+          <p v-if="audit.status === 'match'" class="text-small text-muted-foreground">Tudo certo! Seus lançamentos batem com o banco.</p>
+          <p v-else class="text-small text-muted-foreground">
             Diferença total de <span class="font-bold text-destructive">{{ formatCurrency(audit.total_divergence) }}</span> precisa de atenção.
           </p>
         </div>

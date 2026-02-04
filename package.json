@@ -27,6 +27,7 @@
     "@types/papaparse": "^5.5.2",
     "@vee-validate/zod": "^4.15.1",
     "@vercel/analytics": "^1.6.1",
+    "@vite-pwa/nuxt": "^1.1.0",
     "@vueuse/core": "^14.1.0",
     "ai": "^4.0.0",
     "class-variance-authority": "^0.7.1",

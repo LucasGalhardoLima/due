@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import Papa from 'papaparse'
 import { toast } from 'vue-sonner'
-import { UploadCloud, FileText, Loader2, Search, Zap } from 'lucide-vue-next'
+import { UploadCloud, Loader2, Search, Zap } from 'lucide-vue-next'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import InvoiceAudit from '@/components/invoices/InvoiceAudit.vue'
@@ -16,9 +16,31 @@ const selectedMonth = ref<string>(String(new Date().getMonth() + 1))
 const selectedYear = ref<string>(String(new Date().getFullYear()))
 
 // Data
-const { data: cards } = useFetch<any[]>('/api/cards')
-const auditResult = ref<any>(null)
-const subscriptionAnalysis = ref<any>(null)
+interface CardOption {
+  id: string
+  name: string
+}
+
+interface AuditResult {
+  status: 'divergent' | 'match'
+  missing_in_app: unknown[]
+  missing_in_bank: unknown[]
+  duplicates: unknown[]
+  suspicious: unknown[]
+  total_divergence: number
+  action_needed: boolean
+}
+
+interface SubscriptionAnalysisData {
+  active_subscriptions: unknown[]
+  total_wasted: number
+  annual_waste: number
+  quick_wins: string[]
+}
+
+const { data: cards } = useFetch<CardOption[]>('/api/cards')
+const auditResult = ref<AuditResult | null>(null)
+const subscriptionAnalysis = ref<SubscriptionAnalysisData | null>(null)
 
 // Demo Mode State
 const demoCookie = useCookie('demo_mode')
@@ -72,14 +94,14 @@ function handleFile(file: File) {
     })
 }
 
-async function runAudit(rawRows: any[]) {
+async function runAudit(rawRows: unknown[]) {
     // Normalize logic (same as Import)
     const items = []
     
     for(const row of rawRows) {
         const dateVal = row['date'] || row['Date'] || row['Data'] || row['Data Lançamento']
         const descVal = row['title'] || row['description'] || row['Description'] || row['Histórico'] || row['Estabelecimento']
-        let amountVal = row['amount'] || row['Amount'] || row['Valor']
+        const amountVal = row['amount'] || row['Amount'] || row['Valor']
 
          if (dateVal && descVal && amountVal) {
              let numAmount = Number(amountVal)
@@ -199,7 +221,7 @@ onMounted(() => {
            @click="activeTab = 'subscriptions'"
         >
            Análise de Assinaturas
-           <span v-if="subscriptionAnalysis && subscriptionAnalysis.total_wasted > 0" class="w-2 h-2 rounded-full bg-destructive animate-pulse"></span>
+           <span v-if="subscriptionAnalysis && subscriptionAnalysis.total_wasted > 0" class="w-2 h-2 rounded-full bg-destructive animate-pulse"/>
         </button>
     </div>
 
@@ -262,12 +284,12 @@ onMounted(() => {
             @drop.prevent="onDrop"
             @click="() => selectedCardId && fileInput?.click()"
         >
-             <div class="bg-muted p-4 rounded-2xl" v-if="!isProcessing">
+             <div v-if="!isProcessing" class="bg-muted p-4 rounded-2xl">
                 <UploadCloud class="w-8 h-8 text-muted-foreground" />
             </div>
             <Loader2 v-else class="w-10 h-10 animate-spin text-primary" />
 
-            <div class="space-y-1" v-if="!isProcessing">
+            <div v-if="!isProcessing" class="space-y-1">
                 <p class="text-h3">Upload da Fatura (CSV)</p>
                 <p class="text-body text-muted-foreground">Compare o banco com seus registros</p>
             </div>
@@ -278,8 +300,8 @@ onMounted(() => {
             <!-- Try Demo Mode Button -->
             <button 
                 v-if="isDemoMode && selectedCardId"
-                @click.stop="runDemoAudit"
                 class="absolute -bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all font-bold shadow-lg"
+                @click.stop="runDemoAudit"
             >
                 <Zap class="w-4 h-4" />
                 Carregar Dados Demonstrativos
@@ -292,14 +314,14 @@ onMounted(() => {
                 class="hidden"
                 :disabled="!selectedCardId"
                 @change="onFileSelect"
-            />
+            >
         </div>
 
         <!-- Result -->
         <div v-else class="space-y-4">
             <div class="flex justify-between items-center bg-muted/30 p-4 rounded-xl">
                  <p class="text-small text-muted-foreground">Vendo auditoria para o mês {{ selectedMonth }}/{{ selectedYear }}</p>
-                 <button @click="auditResult = null" class="text-small font-medium text-primary hover:underline">Nova Auditoria</button>
+                 <button class="text-small font-medium text-primary hover:underline" @click="auditResult = null">Nova Auditoria</button>
             </div>
             <InvoiceAudit :audit="auditResult" />
         </div>

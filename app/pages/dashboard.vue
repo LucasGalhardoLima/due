@@ -6,20 +6,18 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
-import { Check, AlertCircle, Sparkles, Loader2, PlusCircle, TrendingDown, Calculator, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Clock } from 'lucide-vue-next'
+import { Sparkles, PlusCircle, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Calendar as CalendarIcon  } from 'lucide-vue-next'
 
 import TransactionList from '@/components/transaction/TransactionList.vue'
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton.vue'
 import AIInsights from '@/components/dashboard/AIInsights.vue'
 import AIMobileDrawer from '@/components/dashboard/AIMobileDrawer.vue'
 import SummaryCards from '@/components/dashboard/SummaryCards.vue'
-import CategoryBubbleChart from '@/components/dashboard/CategoryBubbleChart.vue'
 import PurchaseSimulator from '@/components/dashboard/PurchaseSimulator.vue'
 import ProactiveAdvisor from '@/components/dashboard/ProactiveAdvisor.vue'
 import CrisisAlertCard from '@/components/dashboard/CrisisAlertCard.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import { Card } from '@/components/ui/card'
-import { Calendar as CalendarIcon } from 'lucide-vue-next'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
 
 // Proactive Advisor
@@ -49,10 +47,49 @@ interface SummaryResponse {
     dueDate?: string
 }
 
+interface CardItem {
+  id: string
+  name: string
+  isDefault?: boolean
+}
+
+interface FutureProjectionResponse {
+  projections: { month: number; year: number; total: number; installmentsCount: number }[]
+}
+
+interface ParetoCategory {
+  name: string
+  total: number
+  percentage: number
+  color?: string
+}
+
+interface ParetoResponse {
+  categories: ParetoCategory[]
+  grandTotal: number
+  month: number
+  year: number
+}
+
+interface CrisisAlert {
+  type: 'future_shortage' | 'spending_trend_alert'
+  [key: string]: unknown
+}
+
+interface TransactionListItem {
+  transactionId: string
+}
+
 // Fetch Data
+const summaryKey = computed(() => {
+  const params = queryParams.value
+  return `dashboard-summary-${params.year}-${params.month}-${params.cardId ?? 'all'}`
+})
+
 const { data: summary, refresh: refreshSummary, status: summaryStatus } = useFetch<SummaryResponse>('/api/invoices/summary', {
-    key: 'dashboard-summary', // Enable global access for optimistic updates
-    query: queryParams
+    key: summaryKey, // Ensure cache key matches current month/card selection
+    query: queryParams,
+    watch: [queryParams]
 })
 
 const demoCookie = useCookie('demo_mode', { maxAge: 60 * 60 * 24 * 30, path: '/' })
@@ -75,14 +112,14 @@ const daysToDue = computed(() => {
 })
 
 // Fetch cards to check if user has any
-const { data: cards, status: cardsStatus } = useFetch<any[]>('/api/cards')
+const { data: cards, status: cardsStatus } = useFetch<CardItem[]>('/api/cards')
 
 // Keeping futureProjection and pareto for now
-const { data: futureProjection, refresh: refreshFuture, status: futureStatus } = useFetch<any>('/api/dashboard/future-projection')
-const { data: pareto, refresh: refreshPareto, status: paretoStatus } = useFetch<any>('/api/dashboard/pareto')
+const { data: futureProjection, refresh: refreshFuture } = useFetch<FutureProjectionResponse>('/api/dashboard/future-projection')
+const { data: pareto, refresh: refreshPareto } = useFetch<ParetoResponse>('/api/dashboard/pareto')
 
 // Fetch Crisis Alerts
-const { data: crisisAlerts, refresh: refreshAlerts } = useFetch<any[]>('/api/reports/crisis-alerts', {
+const { data: crisisAlerts } = useFetch<CrisisAlert[]>('/api/reports/crisis-alerts', {
   key: 'crisis-alerts',
   query: computed(() => ({ cardId: selectedCardId.value || undefined }))
 })
@@ -92,7 +129,7 @@ const isLoading = computed(() => summaryStatus.value === 'pending' || cardsStatu
 // Select Default Card on Load
 watch(cards, (newCards) => {
   if (newCards && newCards.length > 0 && !selectedCardId.value) {
-    const defaultCard = newCards.find(c => (c as any).isDefault) || newCards[0]
+    const defaultCard = newCards.find(c => c.isDefault) || newCards[0]
     if (defaultCard) selectedCardId.value = defaultCard.id
   }
 }, { immediate: true })
@@ -135,7 +172,7 @@ function prevMonth() {
 const isDrawerOpen = ref(false)
 const isAIDrawerOpen = ref(false)
 
-function handleEdit(tx: any) {
+function handleEdit(tx: TransactionListItem) {
   editingTransactionId.value = tx.transactionId
   isDrawerOpen.value = true
 }
@@ -168,25 +205,6 @@ const usagePercentage = computed(() => {
   return (s.total / base) * 100
 })
 
-const isOverBudget = computed(() => {
-    // True if usage > 100% (regardless if base is Budget or Limit)
-    return usagePercentage.value > 100
-})
-
-const progressColor = computed(() => {
-  const pct = usagePercentage.value
-  if (!summary.value) return 'bg-green-600'
-  // Game Logic:
-  // > 100% : Red (Over Budget/Limit)
-  // 90-100% : Red (Danger Zone)
-  // 70-90% : Yellow (Warning)
-  // 0-70% : Green (Safe)
-  if (pct >= 90) return 'bg-red-600'
-  if (pct >= 70) return 'bg-yellow-500'
-  return 'bg-green-600'
-})
-
-const showAlert = computed(() => usagePercentage.value >= 70)
 
 // Top spending category
 const topCategory = computed(() => {
@@ -196,7 +214,7 @@ const topCategory = computed(() => {
   return {
     name: top.name || 'Outros',
     amount: top.total || 0,
-    color: (top as any).color
+    color: top.color
   }
 })
 
@@ -214,7 +232,7 @@ const handlePayInvoice = async () => {
         })
         toast.success('Fatura paga com sucesso!')
         refreshSummary()
-    } catch (e) {
+    } catch {
         toast.error('Erro ao pagar fatura.')
     } finally {
         showPayConfirm.value = false
@@ -253,11 +271,11 @@ const showPayConfirm = ref(false)
 
             <!-- Month Navigation Buttons -->
             <div class="flex items-center bg-muted/30 rounded-xl p-1 border shadow-elevation-1">
-              <button @click="prevMonth" class="p-2 hover:bg-background rounded-lg transition-colors text-muted-foreground hover:text-foreground">
+              <button class="p-2 hover:bg-background rounded-lg transition-colors text-muted-foreground hover:text-foreground" @click="prevMonth">
                 <span class="sr-only">Anterior</span>
                 <ChevronLeft class="w-4 h-4" />
               </button>
-              <button @click="nextMonth" class="p-2 hover:bg-background rounded-lg transition-colors text-muted-foreground hover:text-foreground">
+              <button class="p-2 hover:bg-background rounded-lg transition-colors text-muted-foreground hover:text-foreground" @click="nextMonth">
                 <span class="sr-only">Proximo</span>
                 <ChevronRight class="w-4 h-4" />
               </button>
@@ -348,14 +366,14 @@ const showPayConfirm = ref(false)
                 <ProactiveAdvisor v-if="advisor.hasMessage.value || advisor.isLoading.value" class="hidden lg:block" />
 
                 <!-- Future Projection -->
-                <Card class="overflow-hidden p-0 hidden lg:block" v-if="futureProjection">
-                  <div class="p-4 border-b border-white/10 bg-white/10 dark:bg-black/10">
+                <Card v-if="futureProjection" class="overflow-hidden p-0 hidden lg:block">
+                  <div class="p-4 border-b border-border bg-muted/30">
                     <h3 class="text-micro text-muted-foreground">Projeção Futura</h3>
                   </div>
                   <div class="p-4 space-y-3">
                       <div
                           v-for="proj in futureProjection.projections" :key="`${proj.month}-${proj.year}`"
-                          class="flex justify-between items-center p-3 rounded-xl bg-white/5 dark:bg-black/20 border border-white/5 hover:border-primary/20 transition-colors group"
+                          class="flex justify-between items-center p-3 rounded-lg bg-muted/30 border border-border hover:border-primary/30 transition-colors group"
                       >
                           <div class="flex flex-col">
                               <span class="text-micro text-muted-foreground">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
@@ -375,8 +393,8 @@ const showPayConfirm = ref(false)
                   
                   <PurchaseSimulator 
                     v-if="selectedCardId && cards && cards.length > 0"
-                    :cardId="selectedCardId"
-                    :cardName="cards.find(c => c.id === selectedCardId)?.name || ''"
+                    :card-id="selectedCardId"
+                    :card-name="cards.find(c => c.id === selectedCardId)?.name || ''"
                   />
                 </div>
             </div>
@@ -386,11 +404,11 @@ const showPayConfirm = ref(false)
     </template>
 
     <div v-else-if="cardsStatus === 'success' && !cards?.length" class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-      <div class="p-6 rounded-3xl bg-card border border-primary/20 shadow-glass max-w-md">
+      <div class="p-6 rounded-xl bg-card border border-border shadow-elevation-2 max-w-md">
          <CreditCardIcon class="w-12 h-12 text-primary mx-auto mb-4" />
          <h2 class="text-h2 mb-2">Nenhum cartão encontrado</h2>
          <p class="text-muted-foreground mb-6">Você precisa cadastrar seu primeiro cartão para começar a gerenciar suas finanças.</p>
-         <Button @click="navigateTo('/cards')" class="w-full">Cadastrar Cartão</Button>
+         <Button class="w-full" @click="navigateTo('/cards')">Cadastrar Cartão</Button>
       </div>
     </div>
 
@@ -398,15 +416,15 @@ const showPayConfirm = ref(false)
     <div class="fixed bottom-8 right-8 z-50 flex flex-col items-center gap-4">
       <!-- AI FAB (Mobile Only) -->
       <button
-        class="lg:hidden flex h-12 w-12 items-center justify-center rounded-full bg-background/80 dark:bg-zinc-800/80 backdrop-blur-md text-primary border border-primary/20 shadow-glass hover:bg-primary/20 transition-all active:scale-95"
-        @click="isAIDrawerOpen = true"
+        class="lg:hidden flex h-12 w-12 items-center justify-center rounded-full bg-card border border-ai-accent/30 shadow-elevation-2 text-ai-accent hover:bg-ai-accent/10 transition-all active:scale-95"
         aria-label="Abrir assistente IA"
+        @click="isAIDrawerOpen = true"
       >
         <Sparkles class="h-6 w-6" aria-hidden="true" />
       </button>
 
       <!-- Main Add Button -->
-      <button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 hover:scale-110 transition-all duration-300" @click="isDrawerOpen = true" aria-label="Adicionar nova despesa">
+      <button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 hover:scale-110 transition-all duration-300" aria-label="Adicionar nova despesa" @click="isDrawerOpen = true">
         <PlusCircle class="h-8 w-8" aria-hidden="true" />
       </button>
     </div>

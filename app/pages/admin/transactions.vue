@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { AlertCircle, Edit2, ArrowLeft, Clock, Calendar, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { AlertCircle, Edit2, Clock, Calendar, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
 import { Button } from '@/components/ui/button'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -72,7 +72,7 @@ function prevPage() {
       title="Auditoria" 
       subtitle="Analise as transações por ordem de criação."
       :icon="AlertCircle"
-      backTo="/"
+      back-to="/"
     />
 
     <!-- Latest Transactions Table -->
@@ -117,9 +117,9 @@ function prevPage() {
                         </td>
                         <td class="px-4 py-4 text-center">
                             <button 
-                                @click="handleEdit(tx.id)"
                                 class="p-2 hover:bg-primary/10 rounded-full text-primary transition-colors"
                                 title="Editar Transação"
+                                @click="handleEdit(tx.id)"
                             >
                                 <Edit2 class="w-4 h-4" />
                             </button>
@@ -144,8 +144,8 @@ function prevPage() {
                     variant="outline" 
                     size="sm" 
                     :disabled="currentPage === 1"
-                    @click="prevPage"
                     class="gap-1 px-2"
+                    @click="prevPage"
                 >
                     <ChevronLeft class="w-4 h-4" />
                     Anterior
@@ -157,8 +157,8 @@ function prevPage() {
                     variant="outline" 
                     size="sm" 
                     :disabled="currentPage === totalPages"
-                    @click="nextPage"
                     class="gap-1 px-2"
+                    @click="nextPage"
                 >
                     Próximo
                     <ChevronRight class="w-4 h-4" />
@@ -170,7 +170,7 @@ function prevPage() {
     <!-- Reuse TransactionDrawer for editing -->
     <TransactionDrawer 
       v-model:open="isDrawerOpen" 
-      :transactionId="editingTransactionId"
+      :transaction-id="editingTransactionId"
       @saved="refresh"
     />
   </div>

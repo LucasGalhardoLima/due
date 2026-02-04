@@ -13,22 +13,25 @@ export const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: "backdrop-blur-2xl bg-white/5 dark:bg-black/10 border border-white/20 dark:border-white/10 rounded-2xl shadow-glass",
-        elevated: "backdrop-blur-2xl bg-white/10 dark:bg-black/20 border border-white/20 dark:border-white/10 rounded-2xl shadow-elevation-4 hover:shadow-elevation-5",
+        // Solid variants (default for most use cases)
+        default: "bg-card border border-border rounded-xl shadow-elevation-1",
+        elevated: "bg-card border border-border rounded-xl shadow-elevation-2",
+        // Glass variants (reserved for modals/overlays only)
         glass: "backdrop-blur-2xl bg-white/5 dark:bg-black/10 border border-white/20 dark:border-white/10 rounded-2xl shadow-glass",
         "glass-success": "backdrop-blur-2xl bg-success-muted/30 dark:bg-success-muted/10 border border-success/20 rounded-2xl shadow-glass",
         "glass-warning": "backdrop-blur-2xl bg-warning-muted/30 dark:bg-warning-muted/10 border border-warning/20 rounded-2xl shadow-glass",
         "glass-danger": "backdrop-blur-2xl bg-danger-muted/30 dark:bg-danger-muted/10 border border-danger/20 rounded-2xl shadow-glass",
         "glass-info": "backdrop-blur-2xl bg-info-muted/30 dark:bg-info-muted/10 border border-info/20 rounded-2xl shadow-glass",
-        success: "bg-success-muted/20 backdrop-blur-2xl border border-success/20 rounded-2xl shadow-elevation-2",
-        warning: "bg-warning-muted/20 backdrop-blur-2xl border border-warning/20 rounded-2xl shadow-elevation-2",
-        danger: "bg-danger-muted/20 backdrop-blur-2xl border border-danger/20 rounded-2xl shadow-elevation-2",
-        info: "bg-info-muted/20 backdrop-blur-2xl border border-info/20 rounded-2xl shadow-elevation-2",
+        // Status variants with solid tinted backgrounds
+        success: "bg-success-muted border border-success/20 rounded-xl shadow-elevation-1",
+        warning: "bg-warning-muted border border-warning/20 rounded-xl shadow-elevation-1",
+        danger: "bg-danger-muted border border-danger/20 rounded-xl shadow-elevation-1",
+        info: "bg-info-muted border border-info/20 rounded-xl shadow-elevation-1",
       },
       size: {
-        sm: "p-4 rounded-xl",
-        default: "p-6 rounded-2xl",
-        lg: "p-8 rounded-2xl",
+        sm: "p-4 rounded-lg",
+        default: "p-6 rounded-xl",
+        lg: "p-8 rounded-xl",
       },
       interactive: {
         true: "cursor-pointer hover:scale-[1.02] active:scale-[0.98]",

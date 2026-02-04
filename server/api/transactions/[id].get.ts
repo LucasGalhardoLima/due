@@ -1,4 +1,5 @@
 import prisma from '../../utils/prisma'
+import { serializeDecimals } from '../../utils/money'
 
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
@@ -20,5 +21,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Transaction not found' })
   }
 
-  return transaction
+  return serializeDecimals(transaction)
 })

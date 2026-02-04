@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import prisma from '../../utils/prisma'
+import { serializeDecimals } from '../../utils/money'
 
 const querySchema = z.object({
   page: z.string().optional().default('1'),
@@ -42,10 +43,10 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return {
+  return serializeDecimals({
     transactions,
     total,
     page: pageNumber,
     pageSize
-  }
+  })
 })

@@ -6,10 +6,8 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerDescription,
-  DrawerFooter,
   DrawerClose,
 } from '@/components/ui/drawer'
-import { Button } from '@/components/ui/button'
 import { Sparkles, X } from 'lucide-vue-next'
 import AIInsights from '@/components/dashboard/AIInsights.vue'
 import PurchaseSimulator from '@/components/dashboard/PurchaseSimulator.vue'
@@ -68,11 +66,11 @@ const isOpen = computed({
           </div>
 
           <!-- Purchase Simulator -->
-          <div class="space-y-2" v-if="selectedCardId">
+          <div v-if="selectedCardId" class="space-y-2">
             <h4 class="text-small font-black text-muted-foreground uppercase tracking-wider ml-1">Simular Compra</h4>
             <PurchaseSimulator 
-                :cardId="selectedCardId"
-                :cardName="cardName || ''"
+                :card-id="selectedCardId"
+                :card-name="cardName || ''"
             />
           </div>
           

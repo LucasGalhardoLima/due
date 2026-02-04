@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { FinanceUtils } from '../../utils/finance'
 import prisma from '../../utils/prisma'
+import { moneyFromCents, moneyToCents, moneyToNumber, serializeDecimals } from '../../utils/money'
 
 const updateSchema = z.object({
   description: z.string().min(1),
@@ -47,7 +48,7 @@ export default defineEventHandler(async (event) => {
   // 2. Determine if we need to regenerate installments
   // We regenerate if: Amount changed OR Date changed OR Card changed OR Installments Count changed
   // We do looser comparison for Date to avoid small time diffs (though frontend usually sends YYYY-MM-DDT12:00:00Z)
-  const isAmountChanged = Math.abs(existing.amount - amount) > 0.01
+  const isAmountChanged = Math.abs(moneyToNumber(existing.amount) - amount) > 0.01
   const isCountChanged = existing.installmentsCount !== installmentsCount
   const isCardChanged = existing.cardId !== cardId
   const isDateChanged = existing.purchaseDate.toISOString().split('T')[0] !== pDate.toISOString().split('T')[0]
@@ -59,11 +60,18 @@ export default defineEventHandler(async (event) => {
   if (!finalCategoryId) {
        // Keep existing or fetch 'Outros' (Logic same as create)
        finalCategoryId = existing.categoryId
+  } else {
+       const category = await prisma.category.findFirst({
+         where: { id: finalCategoryId, userId }
+       })
+       if (!category) {
+         throw createError({ statusCode: 400, statusMessage: 'Invalid Category' })
+       }
   }
 
   if (shouldRegenerate) {
      // Fetch card for closing day
-     const card = await prisma.creditCard.findUnique({ where: { id: cardId } })
+     const card = await prisma.creditCard.findFirst({ where: { id: cardId, userId } })
      if (!card) throw createError({ statusCode: 404, statusMessage: 'New Card not found' })
 
      const plan = FinanceUtils.generateInstallments(
@@ -86,7 +94,7 @@ export default defineEventHandler(async (event) => {
             where: { id },
             data: {
                 description,
-                amount,
+                amount: moneyFromCents(moneyToCents(amount)),
                 purchaseDate: pDate,
                 installmentsCount,
                 cardId,
@@ -95,14 +103,14 @@ export default defineEventHandler(async (event) => {
                 installments: {
                     create: plan.map(p => ({
                         number: p.number,
-                        amount: p.amount,
+                        amount: moneyFromCents(moneyToCents(p.amount)),
                         dueDate: p.dueDate
                     }))
                 }
             },
             include: { installments: true }
         })
-        return updated
+        return serializeDecimals(updated)
      })
 
   } else {
@@ -116,6 +124,6 @@ export default defineEventHandler(async (event) => {
               // We don't update amount/date/card if they didn't change enough to trigger regen
           }
       })
-      return updated
+      return serializeDecimals(updated)
   }
 })

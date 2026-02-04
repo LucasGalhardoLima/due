@@ -68,7 +68,7 @@ async function save() {
     <div class="space-y-4">
         <div>
             <Label for="legacy-description">Descrição</Label>
-            <Input id="legacy-description" name="legacy-description" autocomplete="off" v-model="description" placeholder="Ex: iPhone (Restante)…" />
+            <Input id="legacy-description" v-model="description" name="legacy-description" autocomplete="off" placeholder="Ex: iPhone (Restante)…" />
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -78,7 +78,7 @@ async function save() {
             </div>
             <div>
                 <Label for="legacy-installments">Parcelas Restantes</Label>
-                <Input id="legacy-installments" name="legacy-installments" inputmode="numeric" v-model="remainingInstallments" type="number" min="1" />
+                <Input id="legacy-installments" v-model="remainingInstallments" name="legacy-installments" inputmode="numeric" type="number" min="1" />
             </div>
         </div>
 

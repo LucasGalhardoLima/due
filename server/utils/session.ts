@@ -20,7 +20,7 @@ export const getUser = (event: H3Event) => {
   }
 
   // 3. Regular Clerk Authentication
-  const authFn = (event.context as any).auth
+  const authFn = (event.context as { auth?: () => { userId?: string } }).auth
   const auth = typeof authFn === 'function' ? authFn() : null
 
   if (!auth?.userId) {

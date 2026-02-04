@@ -14,11 +14,28 @@ async function main() {
     'Outros'
   ]
 
-  console.log('Seeding categories...')
-  for (const name of categories) {
-    const existing = await prisma.category.findFirst({ where: { name } })
-    if (!existing) {
-      await prisma.category.create({ data: { name } })
+  const defaultUserIds = ['user_demo_test_account', 'user_test']
+  const existingUserIds = new Set<string>()
+
+  const cards = await prisma.creditCard.findMany({
+    select: { userId: true }
+  })
+  cards.forEach(c => existingUserIds.add(c.userId))
+
+  const transactions = await prisma.transaction.findMany({
+    select: { userId: true }
+  })
+  transactions.forEach(t => existingUserIds.add(t.userId))
+
+  defaultUserIds.forEach(id => existingUserIds.add(id))
+
+  console.log('Seeding categories per user...')
+  for (const userId of existingUserIds) {
+    for (const name of categories) {
+      const existing = await prisma.category.findFirst({ where: { name, userId } })
+      if (!existing) {
+        await prisma.category.create({ data: { name, userId } })
+      }
     }
   }
 

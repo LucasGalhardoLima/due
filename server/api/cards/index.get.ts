@@ -2,10 +2,12 @@
 // But we used default export in utils/prisma.ts.
 // Let's rely on relative path for safety: '../../utils/prisma'
 import prisma from '../../utils/prisma'
+import { serializeDecimals } from '../../utils/money'
 
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
-  return await prisma.creditCard.findMany({
+  const cards = await prisma.creditCard.findMany({
     where: { userId }
   })
+  return serializeDecimals(cards)
 })

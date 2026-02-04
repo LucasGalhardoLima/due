@@ -4,11 +4,19 @@ import MonthBar from './MonthBar.vue'
 
 const { timeline, simulationState, timelineStatus } = useInstallments()
 
+interface TimelineMonth {
+  year: number
+  month: number
+  limitUsagePercent: number
+  totalCommitted: number
+}
+
 // Helper to calculate overlay data for simulation
-const getOverlay = (month: any) => {
-  if (!simulationState.value.result?.timeline?.after) return undefined
-  
-  const afterMonth = simulationState.value.result.timeline.after.find((m: any) => 
+const getOverlay = (month: TimelineMonth) => {
+  const result = simulationState.value.result as { timeline?: { after: TimelineMonth[] } } | null
+  if (!result?.timeline?.after) return undefined
+
+  const afterMonth = result.timeline.after.find((m) =>
     m.year === month.year && m.month === month.month
   )
   
@@ -54,7 +62,7 @@ const hasDanger = computed(() => {
 
     <!-- Loading State -->
     <div v-if="timelineStatus === 'pending'" class="space-y-3">
-      <div v-for="i in 6" :key="i" class="h-14 bg-muted/10 rounded-xl animate-pulse"></div>
+      <div v-for="i in 6" :key="i" class="h-14 bg-muted/10 rounded-xl animate-pulse"/>
     </div>
 
     <!-- Timeline List -->

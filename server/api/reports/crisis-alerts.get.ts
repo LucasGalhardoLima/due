@@ -1,15 +1,16 @@
 import { defineEventHandler, getQuery } from 'h3'
 import prisma from '../../utils/prisma'
-import { startOfMonth, endOfMonth, addMonths, subMonths, getYear, getMonth } from 'date-fns'
+import { startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns'
 import { ForecastUtils } from '../../utils/forecast'
 import { getUser } from '../../utils/session'
+import { moneyToNumber } from '../../utils/money'
 
 interface Alert {
   type: 'future_shortage' | 'spending_trend_alert'
   title?: string
   message?: string
   severity?: 'warning' | 'critical'
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export default defineEventHandler(async (event) => {
@@ -39,8 +40,6 @@ export default defineEventHandler(async (event) => {
   const timeline = []
   for (let i = 1; i <= 3; i++) {
       const targetDate = addMonths(today, i)
-      const month = getMonth(targetDate) + 1
-      const year = getYear(targetDate)
       
       // 1. Get Fixed Installments for this future month
       // We query installments that have a dueDate in this month/year
@@ -55,7 +54,7 @@ export default defineEventHandler(async (event) => {
           }
       })
       
-      const fixedCommitment = installments._sum.amount || 0
+      const fixedCommitment = installments._sum.amount ? moneyToNumber(installments._sum.amount) : 0
       
       // 2. Project Variable Spending
       // Get last 3 months of variable spending (non-installments, non-subscription) to project
@@ -73,10 +72,10 @@ export default defineEventHandler(async (event) => {
           }
       })
       
-      const avgVariable = (recentTransactions._sum.amount || 0) / 3
+      const avgVariable = ((recentTransactions._sum.amount ? moneyToNumber(recentTransactions._sum.amount) : 0) / 3)
       const projectedTotal = fixedCommitment + avgVariable
       
-      const usagePercent = (projectedTotal / card.limit) * 100
+      const usagePercent = (projectedTotal / moneyToNumber(card.limit)) * 100
       
       let status: 'ok' | 'warning' | 'critical' = 'ok'
       if (usagePercent > 70) status = 'warning'
@@ -139,7 +138,7 @@ export default defineEventHandler(async (event) => {
       
       monthlyTotals.push({
           month: d.toLocaleString('pt-BR', { month: 'short' }).toUpperCase(),
-          amount: sum._sum.amount || 0
+          amount: sum._sum.amount ? moneyToNumber(sum._sum.amount) : 0
       })
   }
   
@@ -150,7 +149,7 @@ export default defineEventHandler(async (event) => {
       
       // Project next 3 months
       const projection = []
-      let lastValue = trendAnalysis.nextValue // This is "Next Month" relative to input series
+      const lastValue = trendAnalysis.nextValue // This is "Next Month" relative to input series
       for(let k=0; k<3; k++) {
           const m = addMonths(today, k+1)
           projection.push({

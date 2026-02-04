@@ -20,6 +20,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { Sparkles, Loader2, PlusCircle } from 'lucide-vue-next'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
 
+interface TransactionResponse {
+  amount: number
+  description: string
+  cardId: string
+  categoryId: string
+  purchaseDate: string
+  installmentsCount: number
+  isSubscription: boolean
+}
+
 // Proactive Advisor for post_transaction trigger
 const advisor = useProactiveAdvisor()
 
@@ -119,7 +129,7 @@ watch(cards, (newCards) => {
 watch(() => props.open, async (isOpen) => {
     if (isOpen && props.transactionId) {
         try {
-            const tx = await $fetch<any>(`/api/transactions/${props.transactionId}`)
+            const tx = await $fetch<TransactionResponse>(`/api/transactions/${props.transactionId}`)
             amount.value = tx.amount
             description.value = tx.description
             selectedCardId.value = tx.cardId
@@ -127,7 +137,7 @@ watch(() => props.open, async (isOpen) => {
             purchaseDate.value = tx.purchaseDate.split('T')[0]
             installments.value = [tx.installmentsCount]
             paymentType.value = tx.isSubscription ? 'subscription' : (tx.installmentsCount > 1 ? 'installment' : 'cash')
-        } catch (e) {
+        } catch {
             toast.error('Erro ao carregar despesa')
             emit('update:open', false)
         }
@@ -317,7 +327,7 @@ async function handleDelete() {
         isOpen.value = false
         emit('saved')
         await refreshNuxtData('dashboard-summary')
-    } catch (e) {
+    } catch {
         toast.error('Erro ao excluir')
     }
 }
@@ -387,7 +397,7 @@ async function handleDelete() {
           <!-- Description -->
           <div>
             <Label for="drawer-description" class="sr-only">Descrição</Label>
-            <Input id="drawer-description" name="transaction-description" autocomplete="off" v-model="description" placeholder="Descrição (ex: Almoço)…" />
+            <Input id="drawer-description" v-model="description" name="transaction-description" autocomplete="off" placeholder="Descrição (ex: Almoço)…" />
           </div>
 
           <!-- Date -->
@@ -395,8 +405,8 @@ async function handleDelete() {
             <Label for="drawer-date" class="text-sm text-muted-foreground">Data da Compra</Label>
             <Input
               id="drawer-date"
-              name="transaction-date"
               v-model="purchaseDate"
+              name="transaction-date"
               type="date"
               :max="new Date().toISOString().split('T')[0]"
               class="mt-1"
@@ -467,11 +477,11 @@ async function handleDelete() {
                 :step="1"
             />
             <div class="flex justify-between text-xs text-muted-foreground">
-                <button type="button" @click="setInstallments(1)" aria-label="Definir 1 parcela">1x</button>
-                <button type="button" @click="setInstallments(3)" aria-label="Definir 3 parcelas">3x</button>
-                <button type="button" @click="setInstallments(6)" aria-label="Definir 6 parcelas">6x</button>
-                <button type="button" @click="setInstallments(10)" aria-label="Definir 10 parcelas">10x</button>
-                <button type="button" @click="setInstallments(12)" aria-label="Definir 12 parcelas">12x</button>
+                <button type="button" aria-label="Definir 1 parcela" @click="setInstallments(1)">1x</button>
+                <button type="button" aria-label="Definir 3 parcelas" @click="setInstallments(3)">3x</button>
+                <button type="button" aria-label="Definir 6 parcelas" @click="setInstallments(6)">6x</button>
+                <button type="button" aria-label="Definir 10 parcelas" @click="setInstallments(10)">10x</button>
+                <button type="button" aria-label="Definir 12 parcelas" @click="setInstallments(12)">12x</button>
             </div>
           </div>
           </div>
