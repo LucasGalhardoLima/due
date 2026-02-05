@@ -2,9 +2,11 @@ import { generateObject } from 'ai'
 import { z } from 'zod'
 import { gateway } from '../../utils/ai'
 import prisma from '../../utils/prisma'
+import { enforceRateLimit } from '../../utils/ai-rate-limit'
 
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
+  enforceRateLimit(`ai:parse-expense:${userId}`, 30, 10 * 60 * 1000)
   const body = await readBody(event)
   const { text, currentDate } = body
 

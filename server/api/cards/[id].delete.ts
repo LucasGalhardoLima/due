@@ -1,4 +1,5 @@
 import prisma from '../../utils/prisma'
+import { serializeDecimals } from '../../utils/money'
 
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
@@ -27,9 +28,9 @@ export default defineEventHandler(async (event) => {
     const deletedCard = await prisma.creditCard.delete({
       where: { id }
     })
-    return deletedCard
-  } catch (error: any) {
-    if (error.statusCode === 404) throw error
+    return serializeDecimals(deletedCard)
+  } catch (error) {
+    if ((error as { statusCode?: number }).statusCode === 404) throw error
     
     throw createError({
       statusCode: 500,

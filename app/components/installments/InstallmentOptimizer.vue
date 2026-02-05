@@ -46,7 +46,7 @@ const recommendationColor = computed(() => {
            Descubra quais parcelas antecipar para economizar e liberar crédito.
          </p>
        </div>
-       <Button @click="runAnalysis" class="bg-indigo-600 hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-500/20">
+       <Button class="bg-indigo-600 hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-500/20" @click="runAnalysis">
          Analisar Agora
        </Button>
     </div>

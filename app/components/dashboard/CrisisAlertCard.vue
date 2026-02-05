@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AlertTriangle, TrendingUp, ArrowRight, ShieldAlert, BarChart3, CalendarClock } from 'lucide-vue-next'
+import { TrendingUp, CalendarClock } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'vue-sonner'
 
@@ -29,9 +29,9 @@ interface Alert {
       risk_factors: string[]
   }
   prevention?: {
-      recommended: string,
-      option_1: any,
-      option_2: any
+      recommended: string
+      option_1: { action: string; impact: string; difficulty: string }
+      option_2: { action: string; impact: string; difficulty: string }
   }
   visualization?: {
       timeline?: TimelineItem[]
@@ -51,7 +51,7 @@ interface Alert {
   }
 }
 
-const props = defineProps<{
+defineProps<{
   alert: Alert
 }>()
 
@@ -76,7 +76,7 @@ const handleAction = (action: string) => {
       <div 
         class="absolute -right-12 -top-12 w-48 h-48 blur-[80px] rounded-full opacity-30 pointer-events-none"
         :class="alert.type === 'future_shortage' ? 'bg-destructive' : 'bg-warning'"
-      ></div>
+      />
 
       <!-- Header -->
       <div class="flex items-start justify-between relative z-10 mb-6">
@@ -91,12 +91,12 @@ const handleAction = (action: string) => {
               <div>
                   <h3 class="text-body font-bold flex items-center gap-2">
                        {{ alert.title || 'Alerta de Tendência' }}
-                       <Badge variant="outline" class="text-[10px] h-5" v-if="alert.probability">Probabilidade: {{ (alert.probability * 100).toFixed(0) }}%</Badge>
+                       <Badge v-if="alert.probability" variant="outline" class="text-[10px] h-5">Probabilidade: {{ (alert.probability * 100).toFixed(0) }}%</Badge>
                   </h3>
-                  <p class="text-small text-muted-foreground" v-if="alert.countdown_days">
+                  <p v-if="alert.countdown_days" class="text-small text-muted-foreground">
                       Previsto para daqui a <span class="font-bold text-foreground">{{ alert.countdown_days }} dias</span> ({{ new Date(alert.when!).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' }) }})
                   </p>
-                  <p class="text-small text-muted-foreground" v-else>
+                  <p v-else class="text-small text-muted-foreground">
                       {{ alert.detected_pattern?.percentage_growth }}
                   </p>
               </div>
@@ -126,7 +126,7 @@ const handleAction = (action: string) => {
                              </span>
                          </div>
                          <!-- Limit Line (approximate 100%) -->
-                         <div v-if="item.commitment >= 100" class="absolute top-0 w-full border-t border-destructive border-dashed z-10"></div>
+                         <div v-if="item.commitment >= 100" class="absolute top-0 w-full border-t border-destructive border-dashed z-10"/>
                      </div>
                       <span 
                          class="text-[10px] font-bold uppercase shrink-0"
@@ -146,7 +146,7 @@ const handleAction = (action: string) => {
               <h4 class="text-micro font-bold text-muted-foreground uppercase tracking-wider">Causas Principais</h4>
               <ul class="space-y-1">
                   <li v-for="cause in alert.analysis?.causes" :key="cause" class="text-small text-muted-foreground flex items-baseline gap-2">
-                      <span class="w-1.5 h-1.5 rounded-full bg-destructive shrink-0"></span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-destructive shrink-0"/>
                       {{ cause }}
                   </li>
               </ul>
@@ -155,9 +155,9 @@ const handleAction = (action: string) => {
           <!-- Actions -->
            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
               <div 
+                class="border rounded-xl p-3 hover:bg-muted/50 transition-colors cursor-pointer group/opt"
+                :class="alert.prevention?.recommended === 'option_1' ? 'border-primary ring-1 ring-primary/20 bg-primary/5' : ''" 
                 @click="handleAction('prevent')"
-                class="border rounded-xl p-3 hover:bg-muted/50 transition-colors cursor-pointer group/opt" 
-                :class="alert.prevention?.recommended === 'option_1' ? 'border-primary ring-1 ring-primary/20 bg-primary/5' : ''"
               >
                   <p class="text-small font-bold mb-1 flex items-center justify-between">
                     Opção 1: Prevenção
@@ -170,9 +170,9 @@ const handleAction = (action: string) => {
                   </div>
               </div>
               <div 
+                class="border rounded-xl p-3 hover:bg-muted/50 transition-colors cursor-pointer group/opt"
+                :class="alert.prevention?.recommended === 'option_2' ? 'border-primary ring-1 ring-primary/20 bg-primary/5' : ''" 
                 @click="handleAction('anticipate')"
-                class="border rounded-xl p-3 hover:bg-muted/50 transition-colors cursor-pointer group/opt" 
-                :class="alert.prevention?.recommended === 'option_2' ? 'border-primary ring-1 ring-primary/20 bg-primary/5' : ''"
               >
                   <p class="text-small font-bold mb-1 flex items-center justify-between">
                     Opção 2: Ação Imediata
@@ -201,7 +201,7 @@ const handleAction = (action: string) => {
                </div>
                <!-- Projection -->
                  <div v-for="(p, j) in alert.projection?.next_3_months" :key="'p'+j" class="flex-1 h-full flex flex-col justify-end gap-2 opacity-50 border-l border-dashed pl-1">
-                   <div class="w-full bg-red-500/10 rounded-t-sm relative border-t-2 border-red-500/20 border-dotted" :style="{ height: `${Math.max(5, (p.projected / 4000) * 100)}%` }"></div>
+                   <div class="w-full bg-red-500/10 rounded-t-sm relative border-t-2 border-red-500/20 border-dotted" :style="{ height: `${Math.max(5, (p.projected / 4000) * 100)}%` }"/>
                    <span class="text-[10px] text-center text-destructive shrink-0">{{ p.month }}?</span>
                </div>
            </div>
@@ -220,9 +220,9 @@ const handleAction = (action: string) => {
                <span class="text-[10px] font-bold text-muted-foreground uppercase px-2">Ação:</span>
                <div class="flex flex-wrap gap-2">
                    <Badge 
-                    variant="outline" 
                     v-for="act in alert.recommendation?.actions" 
                     :key="act" 
+                    variant="outline" 
                     class="bg-background text-[11px] font-normal cursor-pointer hover:bg-primary/5 hover:border-primary/30 transition-colors"
                     @click="toast.info('Dica anotada: ' + act)"
                    >

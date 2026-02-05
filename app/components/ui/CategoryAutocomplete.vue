@@ -96,8 +96,8 @@ onUnmounted(() => {
     <!-- Trigger -->
     <button
       type="button"
-      @click="toggleOpen"
       class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      @click="toggleOpen"
     >
       <span :class="!selectedCategory && 'text-muted-foreground'">
         {{ selectedCategory ? selectedCategory.name : "Selecionar categoria..." }}
@@ -117,9 +117,9 @@ onUnmounted(() => {
           v-model="searchQuery"
           class="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
           placeholder="Buscar ou criar..."
-          @keyup.enter="showCreateOption && createNewCategory()"
           autoFocus
-        />
+          @keyup.enter="showCreateOption && createNewCategory()"
+        >
       </div>
 
       <!-- List -->
@@ -131,8 +131,8 @@ onUnmounted(() => {
         <div v-for="cat in filteredCategories" :key="cat.id">
             <button
                 type="button"
-                @click="selectCategory(cat.id)"
                 class="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                @click="selectCategory(cat.id)"
             >
                 <Check
                     :class="cn(
@@ -148,9 +148,9 @@ onUnmounted(() => {
         <div v-if="showCreateOption" class="border-t mt-1 pt-1">
             <button
                 type="button"
-                @click="createNewCategory"
                 class="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm font-medium text-primary outline-none hover:bg-accent hover:text-accent-foreground"
                 :disabled="isCreating"
+                @click="createNewCategory"
             >
                 <Plus v-if="!isCreating" class="mr-2 h-4 w-4" />
                 <Loader2 v-else class="mr-2 h-4 w-4 animate-spin" />

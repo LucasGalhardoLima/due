@@ -1,6 +1,7 @@
 import { defineEventHandler } from 'h3'
 import prisma from '../../utils/prisma'
-import { differenceInDays, subMonths } from 'date-fns'
+import { differenceInDays } from 'date-fns'
+import { moneyToNumber } from '../../utils/money'
 
 interface SubscriptionItem {
   name: string
@@ -20,7 +21,7 @@ interface SubscriptionAnalysis {
   quick_wins: string[]
 }
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
   // Get all active subscriptions
   const subscriptions = await prisma.transaction.findMany({
     where: {
@@ -64,7 +65,7 @@ export default defineEventHandler(async (event) => {
     if (daysInactive > 45) {
         status = 'inactive'
         alert = `Você não usa há ${Math.floor(daysInactive / 30)} meses`
-        potentialSaving = sub.amount
+        potentialSaving = moneyToNumber(sub.amount)
         recommendation = 'Considere cancelar'
     }
 
@@ -87,7 +88,7 @@ export default defineEventHandler(async (event) => {
         if (status !== 'inactive') { // Don't double count
             status = 'redundant'
             alert = `Você tem multiplos serviços de ${myCat}`
-            potentialSaving = sub.amount
+            potentialSaving = moneyToNumber(sub.amount)
             recommendation = 'Avalie ficar com apenas um'
         }
     }
@@ -100,7 +101,7 @@ export default defineEventHandler(async (event) => {
 
     analysis.active_subscriptions.push({
         name: sub.description,
-        amount: sub.amount,
+        amount: moneyToNumber(sub.amount),
         last_usage: sub.lastProcessedDate ? sub.lastProcessedDate.toISOString() : null,
         days_inactive: daysInactive,
         alert,

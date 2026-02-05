@@ -1,6 +1,9 @@
 import { z } from 'zod'
-import { Prisma } from '@prisma/client'
+import type { CreditCard } from '@prisma/client'
 
+import { FinanceUtils } from '../../utils/finance'
+import prisma from '../../utils/prisma'
+import { moneyFromCents, moneyToCents } from '../../utils/money'
 const batchCreateSchema = z.array(z.object({
   description: z.string(),
   amount: z.number(),
@@ -8,9 +11,6 @@ const batchCreateSchema = z.array(z.object({
   categoryId: z.string().optional(),
   cardId: z.string(),
 }))
-
-import { FinanceUtils } from '../../utils/finance'
-import prisma from '../../utils/prisma'
 
 // ...
 
@@ -30,7 +30,16 @@ export default defineEventHandler(async (event) => {
   const transactions = result.data
   
   // Cache for cards
-  const cardCache = new Map<string, any>()
+  const cardCache = new Map<string, CreditCard>()
+
+  const categoryIds = Array.from(new Set(transactions.map(t => t.categoryId).filter(Boolean))) as string[]
+  const categories = categoryIds.length
+    ? await prisma.category.findMany({ where: { id: { in: categoryIds }, userId }, select: { id: true } })
+    : []
+  const allowedCategoryIds = new Set(categories.map(c => c.id))
+  if (categoryIds.some(id => !allowedCategoryIds.has(id))) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid Category' })
+  }
   
   // Fetch Default Category (Outros) for User
   let defaultCategoryId = ''
@@ -91,7 +100,7 @@ export default defineEventHandler(async (event) => {
       await prisma.transaction.create({
           data: {
               description: t.description,
-              amount: t.amount,
+              amount: moneyFromCents(moneyToCents(t.amount)),
               purchaseDate: purchaseDate,
               installmentsCount: 1,
               cardId: t.cardId,
@@ -101,7 +110,7 @@ export default defineEventHandler(async (event) => {
               installments: {
                   create: {
                       number: 1,
-                      amount: t.amount,
+                      amount: moneyFromCents(moneyToCents(t.amount)),
                       dueDate: dueDate
                   }
               }

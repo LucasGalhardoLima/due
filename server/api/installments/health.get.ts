@@ -3,6 +3,7 @@ import { startOfMonth, endOfMonth, addMonths, isBefore, getYear, getMonth, forma
 import { ptBR } from 'date-fns/locale'
 import prisma from '../../utils/prisma'
 import { getUser } from '../../utils/session'
+import { moneyToCents, moneyToNumber } from '../../utils/money'
 
 // Optional cardId to filter health by specific card
 const querySchema = z.object({
@@ -58,16 +59,16 @@ export default defineEventHandler(async (event) => {
   let totalLimit = 0
   if (cardId) {
     const card = await prisma.creditCard.findUnique({ where: { id: cardId } })
-    if (card) totalLimit = card.limit
+    if (card) totalLimit = moneyToNumber(card.limit)
   } else {
     const cards = await prisma.creditCard.findMany({ where: { userId } })
-    totalLimit = cards.reduce((sum: number, c) => sum + c.limit, 0)
+    totalLimit = cards.reduce((sum: number, c) => sum + moneyToNumber(c.limit), 0)
   }
 
   // 2. Metrics Calculation
   
   // Active Plans: distinct transactionIds in future installments
-  const activePlanIds = new Set(futureInstallments.map((i: any) => i.transactionId))
+  const activePlanIds = new Set(futureInstallments.map((i) => i.transactionId))
   const activeCount = activePlanIds.size
   
   // Calculate monthly commitment for current month, next month, etc.
@@ -84,7 +85,7 @@ export default defineEventHandler(async (event) => {
   for (const inst of futureInstallments) {
     const key = `${getYear(inst.dueDate)}-${getMonth(inst.dueDate)}`
     if (monthlyCommitments.has(key)) {
-      monthlyCommitments.set(key, monthlyCommitments.get(key)! + inst.amount)
+      monthlyCommitments.set(key, monthlyCommitments.get(key)! + (moneyToCents(inst.amount) / 100))
     }
   }
 
@@ -124,11 +125,10 @@ export default defineEventHandler(async (event) => {
   // Compare current month count vs next month count?
   // Or trend over multiple months? 
   // "decreasing month-over-month". Let's compare Month 0 vs Month 1.
-  const nextMonthKey = `${getYear(addMonths(startCurrentMonth, 1))}-${getMonth(addMonths(startCurrentMonth, 1))}`
-  const currentMonthCount = futureInstallments.filter((i: any) => {
+  const currentMonthCount = futureInstallments.filter((i) => {
     return getYear(i.dueDate) === getYear(startCurrentMonth) && getMonth(i.dueDate) === getMonth(startCurrentMonth)
   }).length
-  const nextMonthCount = futureInstallments.filter((i: any) => {
+  const nextMonthCount = futureInstallments.filter((i) => {
     return getYear(i.dueDate) === getYear(addMonths(startCurrentMonth, 1)) && getMonth(i.dueDate) === getMonth(addMonths(startCurrentMonth, 1))
   }).length
 
@@ -189,10 +189,6 @@ export default defineEventHandler(async (event) => {
     // Let's stick to that simple formula: baseCommitment - committed.
     
     const released = Math.max(0, baseCommitment - committed)
-    const cumulativeReleased = released // If it means cumulative over time? 
-    // Actually "cumulative" usually means Sum(released-prev). 
-    // But here "releasedAmount" = "Total Now - Total Then". That IS the cumulative amount freed relative to now.
-    
     const monthName = format(d, 'MMM', { locale: ptBR })
     const label = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)}`
 
@@ -202,7 +198,7 @@ export default defineEventHandler(async (event) => {
       label,
       committedAmount: committed,
       releasedAmount: released,
-      cumulativeReleased: released 
+      cumulativeReleased: released
     })
   }
 

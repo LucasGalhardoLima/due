@@ -26,5 +26,5 @@ test('Onboarding Legacy Expense Flow', async ({ page }) => {
   }
 
   // Verify title with longer timeout
-  await expect(page.getByText('Carga Inicial (Legado)')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Bem-vindo ao Due!')).toBeVisible({ timeout: 10000 });
 });

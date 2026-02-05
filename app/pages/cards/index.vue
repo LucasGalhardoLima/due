@@ -81,7 +81,7 @@ async function handleDelete() {
 
     <template v-else>
       <!-- Add Card Section (Standardized Form) -->
-      <div class="rounded-2xl border border-white/20 dark:border-white/10 bg-white/50 dark:bg-black/20 backdrop-blur-xl text-card-foreground shadow-glass overflow-hidden">
+      <div class="rounded-xl border border-border bg-card text-card-foreground shadow-elevation-1 overflow-hidden">
         <div class="bg-muted/30 px-6 py-4 border-b flex items-center gap-2">
           <Plus class="w-4 h-4 text-primary" />
           <h3 class="text-micro text-muted-foreground">Adicionar Novo Cartao</h3>
@@ -92,9 +92,9 @@ async function handleDelete() {
               <label class="text-micro text-muted-foreground ml-1" for="name">Nome do Cartao</label>
               <input
                 id="name"
+                v-model="form.name"
                 name="card-name"
                 autocomplete="cc-name"
-                v-model="form.name"
                 placeholder="Ex: Nubank Ultravioleta…"
                 class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
                 required
@@ -105,9 +105,9 @@ async function handleDelete() {
               <label class="text-micro text-muted-foreground ml-1" for="limit">Limite (R$)</label>
               <input
                 id="limit"
+                v-model.number="form.limit"
                 name="card-limit"
                 inputmode="numeric"
-                v-model.number="form.limit"
                 type="number"
                 placeholder="10000"
                 class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
@@ -119,9 +119,9 @@ async function handleDelete() {
               <label class="text-micro text-muted-foreground ml-1" for="budget">Meta (Opcional)</label>
               <input
                 id="budget"
+                v-model.number="form.budget"
                 name="card-budget"
                 inputmode="decimal"
-                v-model.number="form.budget"
                 type="number"
                 placeholder="500.00"
                 class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
@@ -132,9 +132,9 @@ async function handleDelete() {
               <label class="text-micro text-muted-foreground ml-1" for="closingDay">Fechamento</label>
               <input
                 id="closingDay"
+                v-model.number="form.closingDay"
                 name="closing-day"
                 inputmode="numeric"
-                v-model.number="form.closingDay"
                 type="number"
                 min="1"
                 max="31"
@@ -147,9 +147,9 @@ async function handleDelete() {
               <label class="text-micro text-muted-foreground ml-1" for="dueDay">Vencimento</label>
               <input
                 id="dueDay"
+                v-model.number="form.dueDay"
                 name="due-day"
                 inputmode="numeric"
-                v-model.number="form.dueDay"
                 type="number"
                 min="1"
                 max="31"
@@ -182,7 +182,7 @@ async function handleDelete() {
                 Padrao
               </span>
             </div>
-            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive/10 text-muted-foreground hover:text-destructive h-9 w-9 opacity-0 group-hover:opacity-100" @click.stop="confirmDelete(card.id)" aria-label="Remover cartão">
+            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive/10 text-muted-foreground hover:text-destructive h-9 w-9 opacity-0 group-hover:opacity-100" aria-label="Remover cartão" @click.stop="confirmDelete(card.id)">
               <Trash2 class="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
@@ -194,7 +194,7 @@ async function handleDelete() {
                 Meta: {{ card.budget.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
               </div>
             </div>
-            <div class="pt-4 border-t border-white/10 flex items-center justify-between text-micro text-muted-foreground">
+            <div class="pt-4 border-t border-border flex items-center justify-between text-micro text-muted-foreground">
               <span>Fecha dia {{ card.closingDay }}</span>
               <span class="w-1 h-1 rounded-full bg-muted-foreground opacity-30" />
               <span>Vence dia {{ card.dueDay }}</span>

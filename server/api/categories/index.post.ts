@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
       name,
       color: randomColor,
       userId
-    } as any
+    }
   })
 
   return category

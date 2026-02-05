@@ -102,7 +102,7 @@ async function main() {
 
   // 4. Future Crisis (High installment convergence)
   // Let's make June 2026 (or 3-4 months from today) critical
-  const targetMonth = thisMonth + 4
+  const _targetMonth = thisMonth + 4
   
   await prisma.transaction.create({
     data: {

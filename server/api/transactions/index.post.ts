@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { FinanceUtils } from '../../utils/finance'
 import prisma from '../../utils/prisma'
+import { moneyFromCents, moneyToCents, serializeDecimals } from '../../utils/money'
 
 const createTransactionSchema = z.object({
   description: z.string().min(1),
@@ -79,7 +80,7 @@ export default defineEventHandler(async (event) => {
   const transaction = await prisma.transaction.create({
     data: {
       description,
-      amount,
+      amount: moneyFromCents(moneyToCents(amount)),
       purchaseDate: pDate,
       installmentsCount,
       cardId,
@@ -88,9 +89,9 @@ export default defineEventHandler(async (event) => {
       userId, // Assign to user
       installments: {
         create: plan.map(p => ({
-            number: p.number,
-            amount: p.amount,
-            dueDate: p.dueDate
+          number: p.number,
+          amount: moneyFromCents(moneyToCents(p.amount)),
+          dueDate: p.dueDate
         }))
       }
     },
@@ -99,5 +100,5 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return transaction
+  return serializeDecimals(transaction)
 })

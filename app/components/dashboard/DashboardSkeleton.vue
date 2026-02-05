@@ -18,7 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
     <!-- Summary Cards Skeleton -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <Skeleton class="h-32 rounded-3xl" v-for="i in 4" :key="i" />
+      <Skeleton v-for="i in 4" :key="i" class="h-32 rounded-3xl" />
     </div>
 
     <!-- Main Content Area -->

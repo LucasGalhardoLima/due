@@ -15,37 +15,26 @@ const props = defineProps<{
 
 const { data } = toRefs(props)
 
-// Palette based on Pearl Aqua (Primary) and complementary accents
-const colorPalette = [
-  '#00F2DE', // Pearl Aqua (Primary)
-  '#10b981', // Emerald 500
-  '#06b6d4', // Cyan 500
-  '#0d9488', // Teal 600
-  '#0ea5e9', // Sky 500
-  '#6366f1', // Indigo 500
-  '#f59e0b', // Amber 500
-  '#f43f5e', // Rose 500
-]
-
 // Fixed virtual size for calculations - SVG scales automatically via viewBox
 const width = 600
 const height = 400
 
-const bubbles = computed(() => {
+const bubbles = computed<d3.HierarchyCircularNode<CategoryData>[]>(() => {
   if (!data.value || data.value.length === 0) return []
 
   // Create hierarchy
-  const root = d3.hierarchy({ children: data.value })
-    .sum(d => (d as any).amount)
+  const root = d3.hierarchy<{ children: CategoryData[] }>({ children: data.value })
+    .sum(d => ('amount' in d ? d.amount : 0))
     .sort((a, b) => (b.value || 0) - (a.value || 0))
 
   // Create pack layout
-  d3.pack()
+  const pack = d3.pack<{ children: CategoryData[] }>()
     .size([width, height])
-    .padding(12) 
-    (root as any)
+    .padding(12)
 
-  return root.descendants().slice(1) // Skip root node
+  pack(root)
+
+  return root.descendants().slice(1) as d3.HierarchyCircularNode<CategoryData>[] // Skip root node
 })
 
 function formatCurrency(val: number) {
@@ -66,7 +55,7 @@ function formatCurrency(val: number) {
     >
       <transition-group name="fade">
         <g 
-          v-for="(node, index) in (bubbles as any[])" 
+          v-for="node in bubbles" 
           :key="node.data.id"
           class="transition-all duration-700 ease-out hover:scale-[1.05]"
           :style="{ transformOrigin: `${node.x}px ${node.y}px` }"

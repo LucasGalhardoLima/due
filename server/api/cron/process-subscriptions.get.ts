@@ -1,11 +1,12 @@
 import prisma from '../../utils/prisma'
 import { startOfMonth } from 'date-fns'
+import { getRequestHeader } from 'h3'
 
-export default defineEventHandler(async (_event) => {
-  // Security Check (simulated)
-  // In Vercel Cron, you check 'Authorization' header matching CRON_SECRET
-  // const authHeader = getRequestHeader(event, 'authorization')
-  // if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) { ... }
+export default defineEventHandler(async (event) => {
+  const authHeader = getRequestHeader(event, 'authorization')
+  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  }
 
   const now = new Date()
   const currentMonthStart = startOfMonth(now)

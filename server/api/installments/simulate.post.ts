@@ -6,6 +6,9 @@ import prisma from '../../utils/prisma'
 import { getUser } from '../../utils/session'
 import { startOfMonth, endOfMonth, addMonths, getYear, getMonth, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { moneyToCents, moneyToNumber } from '../../utils/money'
+import { parseJsonWithSchema } from '../../utils/ai-guard'
+import { enforceRateLimit } from '../../utils/ai-rate-limit'
 
 const bodySchema = z.object({
   amount: z.number().positive(),
@@ -23,6 +26,8 @@ interface TimelineMonth {
 }
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
+  enforceRateLimit(`ai:installments-simulate:${userId}`, 20, 10 * 60 * 1000)
   const body = await readBody(event)
   const result = bodySchema.safeParse(body)
   if (!result.success) {
@@ -30,7 +35,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const { amount, installments, cardId } = result.data
-  const { userId } = getUser(event)
 
   // 1. Fetch Context
   // We need current installments for next 12 months to build "Before" timeline
@@ -56,21 +60,21 @@ export default defineEventHandler(async (event) => {
   if (cardId) {
     const card = await prisma.creditCard.findUnique({ where: { id: cardId } })
     if (card) {
-      cardLimit = card.limit
+      cardLimit = moneyToNumber(card.limit)
       closingDay = card.closingDay
       dueDay = card.dueDay
     }
   } else if (currentInstallments.length > 0) {
     // Fallback to first found card info
     const first = currentInstallments[0]!.transaction.card
-    cardLimit = first.limit
+    cardLimit = moneyToNumber(first.limit)
     closingDay = first.closingDay
     dueDay = first.dueDay
   } else {
     // Fallback if no data at all
     const card = await prisma.creditCard.findFirst({ where: { userId } })
     if (card) {
-      cardLimit = card.limit
+      cardLimit = moneyToNumber(card.limit)
       closingDay = card.closingDay
       dueDay = card.dueDay
     }
@@ -100,7 +104,7 @@ export default defineEventHandler(async (event) => {
     const key = `${getYear(inst.dueDate)}-${getMonth(inst.dueDate)}`
     if (monthsMap.has(key)) {
       const m = monthsMap.get(key)!
-      m.totalCommitted += inst.amount
+      m.totalCommitted += moneyToCents(inst.amount) / 100
     }
   }
 
@@ -205,8 +209,12 @@ export default defineEventHandler(async (event) => {
       temperature: 0.5,
       maxTokens: 500
     })
-    const cleaned = text.replace(/^```json/, '').replace(/```$/, '').trim()
-    evaluation = JSON.parse(cleaned)
+    evaluation = parseJsonWithSchema(text, z.object({
+      viable: z.boolean(),
+      impactScore: z.number(),
+      recommendation: z.string(),
+      bestTiming: z.string().optional()
+    }))
   } catch (e) {
     console.error('AI Eval Failed', e)
     // Fallback based on rules

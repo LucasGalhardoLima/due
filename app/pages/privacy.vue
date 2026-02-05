@@ -22,7 +22,7 @@ definePageMeta({
           Voltar
         </NuxtLink>
         <div class="flex items-center gap-4">
-          <button @click="toggleTheme" class="p-2 rounded-full hover:bg-muted transition-colors">
+          <button class="p-2 rounded-full hover:bg-muted transition-colors" @click="toggleTheme">
             <Moon v-if="colorMode.value === 'light'" class="w-5 h-5" />
             <Sun v-else class="w-5 h-5" />
           </button>

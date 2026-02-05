@@ -13,7 +13,7 @@ definePageMeta({
   layout: 'default'
 })
 
-const { filters, setCardFilter, timelineStatus, healthStatus } = useInstallments()
+const { timelineStatus, healthStatus } = useInstallments()
 
 const isLoading = computed(() => timelineStatus.value === 'pending' || healthStatus.value === 'pending')
 
@@ -58,12 +58,12 @@ const isLoading = computed(() => timelineStatus.value === 'pending' || healthSta
           
           <!-- Timeline (Left/Main Column) -->
           <div class="lg:col-span-2 space-y-8">
-            <div class="rounded-3xl border bg-card/50 backdrop-blur-sm p-6 shadow-sm">
+            <div class="rounded-3xl border bg-card p-6 shadow-sm">
               <TimelineMap />
             </div>
   
             <!-- Chart (Phase 4) -->
-            <div class="rounded-3xl border bg-card/50 backdrop-blur-sm p-6 shadow-sm min-h-[300px]">
+            <div class="rounded-3xl border bg-card p-6 shadow-sm min-h-[300px]">
                <LimitReleaseChart />
             </div>
           </div>
@@ -72,12 +72,12 @@ const isLoading = computed(() => timelineStatus.value === 'pending' || healthSta
           <div class="space-y-6">
             
             <!-- Simulator (Phase 3) -->
-            <div class="rounded-3xl border bg-card/50 backdrop-blur-sm p-6 shadow-sm min-h-[400px]">
+            <div class="rounded-3xl border bg-card p-6 shadow-sm min-h-[400px]">
                <UnifiedSimulator />
             </div>
   
             <!-- Optimizer (Phase 4) -->
-             <div class="rounded-3xl border bg-card/50 backdrop-blur-sm p-6 shadow-sm min-h-[200px]">
+             <div class="rounded-3xl border bg-card p-6 shadow-sm min-h-[200px]">
                 <InstallmentOptimizer />
             </div>
   

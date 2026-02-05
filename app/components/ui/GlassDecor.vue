@@ -10,6 +10,7 @@ const props = withDefaults(
     color?: "white" | "primary" | "success" | "warning" | "danger" | "info"
   }>(),
   {
+    class: undefined,
     size: "md",
     position: "bottom-right",
     color: "white",

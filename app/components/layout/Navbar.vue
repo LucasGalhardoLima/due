@@ -51,7 +51,7 @@ function closeMobileMenu() {
 
 <template>
   <div>
-    <nav class="sticky top-0 z-50 w-full border-b border-white/10 backdrop-blur-2xl bg-white/10 dark:bg-black/20 shadow-glass">
+    <nav class="sticky top-0 z-50 w-full border-b border-border bg-card">
       <div class="container mx-auto px-4 h-16 flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" class="font-bold text-xl flex items-center gap-2">
@@ -77,10 +77,10 @@ function closeMobileMenu() {
           <!-- Actions -->
           <div class="ml-4 flex items-center gap-4">
             <button
-              @click="toggleTheme"
               class="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
               title="Alternar Tema"
               aria-label="Alternar tema claro/escuro"
+              @click="toggleTheme"
             >
               <Sun v-if="colorMode.value === 'dark'" class="w-5 h-5" />
               <Moon v-else class="w-5 h-5" />
@@ -89,10 +89,10 @@ function closeMobileMenu() {
             <!-- Profile Section -->
             <div class="flex items-center gap-3 pl-2 border-l">
               <div class="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden shrink-0">
-                 <img v-if="user?.imageUrl" :src="user.imageUrl" width="32" height="32" class="h-full w-full object-cover" alt="Avatar do usuário" />
+                 <img v-if="user?.imageUrl" :src="user.imageUrl" width="32" height="32" class="h-full w-full object-cover" alt="Avatar do usuário" >
                  <User v-else class="w-4 h-4 text-primary opacity-70" aria-hidden="true" />
               </div>
-              <button @click="handleSignOut" class="text-muted-foreground hover:text-red-500 transition-colors" title="Sair" aria-label="Sair da conta">
+              <button class="text-muted-foreground hover:text-red-500 transition-colors" title="Sair" aria-label="Sair da conta" @click="handleSignOut">
                 <LogOut class="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
@@ -102,13 +102,13 @@ function closeMobileMenu() {
         <!-- Mobile Menu Button -->
         <div class="md:hidden flex items-center gap-2">
            <button 
-              @click="toggleTheme" 
-              class="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground"
+              class="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground" 
+              @click="toggleTheme"
             >
               <Sun v-if="colorMode.value === 'dark'" class="w-5 h-5" />
               <Moon v-else class="w-5 h-5" />
             </button>
-            <Button variant="ghost" size="icon" @click="isMobileMenuOpen = true" aria-label="Abrir menu">
+            <Button variant="ghost" size="icon" aria-label="Abrir menu" @click="isMobileMenuOpen = true">
               <Menu class="w-6 h-6" aria-hidden="true" />
             </Button>
         </div>
@@ -122,14 +122,14 @@ function closeMobileMenu() {
     >
       <!-- Overlay -->
       <div
-        class="absolute inset-0 bg-background/80 backdrop-blur-xl overscroll-contain"
-        @click="closeMobileMenu"
+        class="absolute inset-0 bg-background/80 backdrop-blur-sm overscroll-contain"
         aria-hidden="true"
+        @click="closeMobileMenu"
       />
 
       <!-- Drawer Panel -->
       <div
-        class="absolute inset-y-0 left-0 w-72 bg-card/95 backdrop-blur-xl border-r border-white/10 shadow-elevation-5 overflow-hidden"
+        class="absolute inset-y-0 left-0 w-72 bg-card border-r border-border shadow-elevation-4 overflow-hidden"
       >
         <div class="flex flex-col h-full">
           <!-- Header -->
@@ -138,7 +138,7 @@ function closeMobileMenu() {
               <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-elevation-2">D</div>
               <span>Due</span>
             </NuxtLink>
-            <Button variant="ghost" size="icon" @click="closeMobileMenu" aria-label="Fechar menu">
+            <Button variant="ghost" size="icon" aria-label="Fechar menu" @click="closeMobileMenu">
               <X class="w-5 h-5" aria-hidden="true" />
             </Button>
           </div>
@@ -162,7 +162,7 @@ function closeMobileMenu() {
           <div class="p-6 border-t bg-muted/20 shrink-0">
             <div class="flex items-center gap-3 mb-4">
               <div class="h-10 w-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden shrink-0">
-                <img v-if="user?.imageUrl" :src="user.imageUrl" width="40" height="40" class="h-full w-full object-cover" alt="Avatar do usuário" />
+                <img v-if="user?.imageUrl" :src="user.imageUrl" width="40" height="40" class="h-full w-full object-cover" alt="Avatar do usuário" >
                 <User v-else class="w-5 h-5 text-primary opacity-70" aria-hidden="true" />
               </div>
               <div class="flex flex-col min-w-0">

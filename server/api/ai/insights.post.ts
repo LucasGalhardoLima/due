@@ -2,20 +2,51 @@ import { z } from 'zod'
 import { generateText } from 'ai'
 import { gateway } from '../../utils/ai'
 import prisma from '../../utils/prisma'
+import { moneyToCents, moneyToNumber } from '../../utils/money'
+import { parseJsonWithSchema } from '../../utils/ai-guard'
+import { enforceRateLimit } from '../../utils/ai-rate-limit'
+import { getCache, setCache } from '../../utils/ai-cache'
 
 const querySchema = z.object({
   month: z.string().optional(),
   year: z.string().optional()
 })
 
+interface InsightsResponse {
+  success: true
+  insights: {
+    diagnostico: string
+    acoes_imediatas: string[]
+    alivio_futuro: string
+    alertas?: string[]
+  }
+  metadata: {
+    totalSpent: number
+    transactionCount: number
+    topCategories: { name: string; amount: number; percentage: string }[]
+  }
+}
+
+const aiResponseSchema = z.object({
+  diagnostico: z.string(),
+  acoes_imediatas: z.array(z.string()).min(1),
+  alivio_futuro: z.string(),
+  alertas: z.array(z.string()).optional().default([])
+})
+
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event) 
+  enforceRateLimit(`ai:insights:${userId}`, 10, 10 * 60 * 1000)
   const query = getQuery(event)
   const { month, year } = querySchema.parse(query)
   
   const now = new Date()
   const targetMonth = month ? parseInt(month) : now.getMonth() + 1
   const targetYear = year ? parseInt(year) : now.getFullYear()
+
+  const cacheKey = `ai:insights:${userId}:${targetYear}-${targetMonth}`
+  const cached = getCache<InsightsResponse>(cacheKey)
+  if (cached) return cached
 
   // Define Date Range for "Invoiced Installments" (Current Month)
   const startDate = new Date(targetYear, targetMonth - 1, 1)
@@ -44,12 +75,12 @@ export default defineEventHandler(async (event) => {
 
   // 2. Calculate category spending based on these installments
   const categorySpending: Record<string, number> = {}
-  let totalSpent = 0
+  let totalSpentCents = 0
   
   // Get user's global context (limit/budget)
   const userCards = await prisma.creditCard.findMany({ where: { userId } })
-  const totalBudget = userCards.reduce((acc, c) => acc + (c.budget || 0), 0)
-  const totalLimit = userCards.reduce((acc, c) => acc + c.limit, 0)
+  const totalBudget = userCards.reduce((acc, c) => acc + (c.budget ? moneyToNumber(c.budget) : 0), 0)
+  const totalLimit = userCards.reduce((acc, c) => acc + moneyToNumber(c.limit), 0)
 
   for (const inst of installments) {
     const categoryName = inst.transaction.category.name
@@ -57,8 +88,9 @@ export default defineEventHandler(async (event) => {
     if (!categorySpending[categoryName]) {
       categorySpending[categoryName] = 0
     }
-    categorySpending[categoryName] += inst.amount
-    totalSpent += inst.amount
+    const amountCents = moneyToCents(inst.amount)
+    categorySpending[categoryName] += amountCents / 100
+    totalSpentCents += amountCents
   }
 
   // 3. Get future commitments (next 3 months) for better advice
@@ -82,6 +114,7 @@ export default defineEventHandler(async (event) => {
   })
 
   // Prepare data for AI
+  const totalSpent = totalSpentCents / 100
   const categoryArray = Object.entries(categorySpending)
     .map(([name, amount]) => ({ name, amount, percentage: totalSpent > 0 ? (amount / totalSpent * 100).toFixed(1) : '0' }))
     .sort((a, b) => b.amount - a.amount)
@@ -135,11 +168,9 @@ Seja honesto, direto e use um tom profissional porém amigável (estilo Due/NuBa
       }
     })
 
-    // Clean markdown code blocks if present
-    const cleanedText = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
-    const insights = JSON.parse(cleanedText)
+    const insights = parseJsonWithSchema(text, aiResponseSchema)
 
-    return {
+    const response = {
       success: true,
       insights,
       metadata: {
@@ -148,7 +179,9 @@ Seja honesto, direto e use um tom profissional porém amigável (estilo Due/NuBa
         topCategories: categoryArray.slice(0, 3)
       }
     }
-  } catch (error: any) {
+    setCache(cacheKey, response, 5 * 60 * 1000)
+    return response
+  } catch (error) {
     console.error('AI Gateway Error:', error)
     throw createError({
       statusCode: 500,

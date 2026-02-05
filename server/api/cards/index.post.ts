@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import prisma from '../../utils/prisma'
+import { moneyFromCents, moneyToCents, serializeDecimals } from '../../utils/money'
 
 const createCardSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -33,8 +34,8 @@ export default defineEventHandler(async (event) => {
   const card = await prisma.creditCard.create({
     data: {
       name,
-      limit,
-      budget,
+      limit: moneyFromCents(moneyToCents(limit)),
+      budget: budget === undefined ? undefined : moneyFromCents(moneyToCents(budget)),
       closingDay,
       dueDay,
       isDefault,
@@ -42,5 +43,5 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return card
+  return serializeDecimals(card)
 })

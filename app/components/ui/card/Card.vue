@@ -12,6 +12,7 @@ const props = withDefaults(
     glow?: CardVariants["glow"]
   }>(),
   {
+    class: undefined,
     variant: "default",
     size: "default",
     interactive: false,

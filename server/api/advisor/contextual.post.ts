@@ -2,6 +2,8 @@ import { z } from 'zod'
 import { generateText } from 'ai'
 import { gateway } from '../../utils/ai'
 import { gatherAdvisorContext } from '../../utils/advisor-context'
+import { parseJsonWithSchema } from '../../utils/ai-guard'
+import { enforceRateLimit } from '../../utils/ai-rate-limit'
 
 const requestSchema = z.object({
   triggerType: z.enum(['morning_check', 'post_transaction', 'pre_fechamento']),
@@ -24,8 +26,20 @@ interface AdvisorResponse {
   priority: 'low' | 'medium' | 'high'
 }
 
+const advisorResponseSchema = z.object({
+  message: z.string(),
+  tone: z.enum(['curious', 'warning', 'congratulatory', 'neutral']),
+  action: z.object({
+    type: z.enum(['suggestion', 'alert']),
+    text: z.string()
+  }).nullable().optional(),
+  should_display: z.boolean(),
+  priority: z.enum(['low', 'medium', 'high'])
+})
+
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
+  enforceRateLimit(`ai:advisor:${userId}`, 30, 60 * 60 * 1000)
   const body = await readBody(event)
   const { triggerType, cardId, transactionData } = requestSchema.parse(body)
 
@@ -62,6 +76,7 @@ Regras de should_display:
 
   switch (triggerType) {
     case 'morning_check':
+    {
       systemPrompt = baseSystem
       prompt = `Analise o resumo dos últimos 7 dias do usuário e dê 1 insight + 1 recomendação em no máximo 2 frases.
 
@@ -85,8 +100,10 @@ SAÚDE FINANCEIRA: ${context.healthScore}/100
 
 Se não houver gastos nos últimos 7 dias ou nada relevante a destacar, retorne should_display: false.`
       break
+    }
 
     case 'post_transaction':
+    {
       if (!transactionData) {
         return {
           message: '',
@@ -134,8 +151,10 @@ ${catText}
 Se o gasto for normal/esperado sem nada especial a destacar, retorne should_display: false.
 Destaque apenas se: estourou orçamento, categoria com muitos gastos, valor alto, ou padrão preocupante.`
       break
+    }
 
     case 'pre_fechamento':
+    {
       if (context.invoiceTimeline.daysUntilClosing > 5) {
         return {
           message: '',
@@ -168,6 +187,7 @@ SAÚDE FINANCEIRA: ${context.healthScore}/100
 Se já estourou o orçamento, foque em contenção. Se está confortável, parabenize brevemente.
 Sempre inclua o valor diário seguro na mensagem.`
       break
+    }
 
     default:
       return {
@@ -195,13 +215,7 @@ Sempre inclua o valor diário seguro na mensagem.`
       }
     })
 
-    // Clean and parse response
-    const cleanedText = text
-      .replace(/^```(?:json)?\s*\n?/i, '')
-      .replace(/\n?```\s*$/i, '')
-      .trim()
-
-    const response: AdvisorResponse = JSON.parse(cleanedText)
+    const response: AdvisorResponse = parseJsonWithSchema(text, advisorResponseSchema)
 
     // Validate response structure
     return {
@@ -211,7 +225,7 @@ Sempre inclua o valor diário seguro na mensagem.`
       should_display: response.should_display ?? true,
       priority: response.priority || 'low'
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('Contextual Advisor Error:', error)
 
     // Silent fail - advisor is non-critical

@@ -25,7 +25,7 @@ useHead({
     <div class="flex items-center gap-3">
         <div class="relative">
           <ShieldCheck class="w-5 h-5" />
-          <span class="absolute -top-1 -right-1 w-2 h-2 bg-black rounded-full animate-ping"></span>
+          <span class="absolute -top-1 -right-1 w-2 h-2 bg-black rounded-full animate-ping"/>
         </div>
         <p class="text-sm font-bold">
             Modo Demo Ativo: <span class="font-normal opacity-90">Explore as funcionalidades com dados fictícios.</span>
@@ -33,8 +33,8 @@ useHead({
     </div>
     
     <button 
-        @click="exitDemoMode"
         class="flex items-center gap-2 bg-black/10 hover:bg-black/20 px-3 py-1 rounded-full text-xs font-bold transition-all border border-black/10"
+        @click="exitDemoMode"
     >
         Sair do Modo Demo
         <X class="w-3 h-3" />

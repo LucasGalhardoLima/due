@@ -38,6 +38,10 @@ module.exports = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        "ai-accent": {
+          DEFAULT: "hsl(var(--ai-accent))",
+          foreground: "hsl(var(--ai-accent-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -74,12 +78,12 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        // Elevation system
-        "elevation-1": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-        "elevation-2": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-        "elevation-3": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-        "elevation-4": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-        "elevation-5": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        // Elevation system - softened for subtle depth
+        "elevation-1": "0 1px 2px 0 rgb(0 0 0 / 0.04)",
+        "elevation-2": "0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06)",
+        "elevation-3": "0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05)",
+        "elevation-4": "0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.04)",
+        "elevation-5": "0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04)",
         // Glow shadows
         "success-glow": "0 0 20px -5px hsl(var(--success) / 0.4)",
         "warning-glow": "0 0 20px -5px hsl(var(--warning) / 0.4)",

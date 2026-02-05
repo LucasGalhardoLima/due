@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import prisma from '../../utils/prisma'
 import { endOfMonth } from 'date-fns'
+import { moneyToCents } from '../../utils/money'
 
 const querySchema = z.object({
   month: z.string(), // 1-12
@@ -39,13 +40,13 @@ export default defineEventHandler(async (event) => {
   })
 
   // Aggregate
-  const total = installments.reduce((acc, i) => acc + i.amount, 0)
+  const total = installments.reduce((acc, i) => acc + (moneyToCents(i.amount) / 100), 0)
   const map: Record<string, { amount: number, name: string }> = {}
 
   installments.forEach(i => {
     const catName = i.transaction.category.name
     if (!map[catName]) map[catName] = { amount: 0, name: catName }
-    map[catName].amount += i.amount
+    map[catName].amount += moneyToCents(i.amount) / 100
   })
 
   // Sort Descending

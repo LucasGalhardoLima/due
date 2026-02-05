@@ -1,5 +1,6 @@
 import prisma from '../../utils/prisma'
 import { startOfMonth, endOfMonth, getMonth, getYear } from 'date-fns'
+import { moneyToCents } from '../../utils/money'
 
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
@@ -28,35 +29,35 @@ export default defineEventHandler(async (event) => {
   })
   
   // Group by category
-  const categoryTotals = new Map<string, { name: string; total: number }>()
-  let grandTotal = 0
+  const categoryTotals = new Map<string, { name: string; totalCents: number; color: string }>()
+  let grandTotalCents = 0
   
   for (const inst of installments) {
     const catId = inst.transaction.categoryId
     const catName = inst.transaction.category.name
-    
-    const existing = categoryTotals.get(catId) || { name: catName, total: 0 }
-    existing.total += inst.amount
+    const catColor = inst.transaction.category.color || '#333'
+
+    const existing = categoryTotals.get(catId) || { name: catName, totalCents: 0, color: catColor }
+    existing.totalCents += moneyToCents(inst.amount)
     categoryTotals.set(catId, existing)
-    grandTotal += inst.amount
+    grandTotalCents += moneyToCents(inst.amount)
   }
   
   // Convert to array and sort descending
   const categories = Array.from(categoryTotals.values())
     .map(cat => {
-      const relatedInst = installments.find(i => i.transaction.category.name === cat.name)
       return {
         name: cat.name,
-        total: Math.round(cat.total * 100) / 100,
-        percentage: grandTotal > 0 ? Math.round((cat.total / grandTotal) * 10000) / 100 : 0,
-        color: (relatedInst?.transaction.category as any)?.color || '#333'
+        total: Math.round((cat.totalCents / 100) * 100) / 100,
+        percentage: grandTotalCents > 0 ? Math.round(((cat.totalCents / grandTotalCents) * 100) * 100) / 100 : 0,
+        color: cat.color
       }
     })
     .sort((a, b) => b.total - a.total)
   
   return {
     categories,
-    grandTotal: Math.round(grandTotal * 100) / 100,
+    grandTotal: Math.round((grandTotalCents / 100) * 100) / 100,
     month: getMonth(now) + 1,
     year: getYear(now),
   }

@@ -1,4 +1,5 @@
 import prisma from '../../utils/prisma'
+import { serializeDecimals } from '../../utils/money'
 
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
@@ -24,9 +25,9 @@ export default defineEventHandler(async (event) => {
      const transaction = await prisma.transaction.delete({
         where: { id }
      })
-     return transaction
-  } catch (error: any) {
-      if (error.statusCode === 404) throw error
+     return serializeDecimals(transaction)
+  } catch (error) {
+      if ((error as { statusCode?: number }).statusCode === 404) throw error
       throw createError({
           statusCode: 500,
           statusMessage: 'Transaction not found or could not be deleted'

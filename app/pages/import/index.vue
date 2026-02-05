@@ -2,7 +2,7 @@
 import Papa from 'papaparse'
 import { ref, computed } from 'vue'
 import { toast } from 'vue-sonner'
-import { UploadCloud, Check, AlertCircle, FileText, ArrowRight, Loader2, Smartphone, Share2, CreditCard, Sparkles } from 'lucide-vue-next'
+import { UploadCloud, FileText, ArrowRight, Loader2, Smartphone, Share2, CreditCard } from 'lucide-vue-next'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import ListSkeleton from '@/components/ui/ListSkeleton.vue'
@@ -17,9 +17,14 @@ interface ParsedRow {
   status: 'valid' | 'invalid'
 }
 
-interface MatchingRule {
-  keyword: string
-  categoryId: string
+interface CardOption {
+  id: string
+  name: string
+}
+
+interface CategoryOption {
+  id: string
+  name: string
 }
 
 // State
@@ -31,8 +36,8 @@ const selectedCardId = ref<string>('')
 const importStats = ref({ total: 0, matched: 0 })
 
 // Fetch Data
-const { data: cards, status: cardsStatus } = useFetch<any[]>('/api/cards')
-const { data: categories, status: catStatus } = useFetch<any[]>('/api/categories')
+const { data: cards, status: cardsStatus } = useFetch<CardOption[]>('/api/cards')
+const { data: categories, status: catStatus } = useFetch<CategoryOption[]>('/api/categories')
 
 const isLoading = computed(() => cardsStatus.value === 'pending' || catStatus.value === 'pending')
 
@@ -97,7 +102,9 @@ function handleFile(file: File) {
     })
 }
 
-function processResults(data: any[]) {
+type RawRow = Record<string, string | number | null | undefined>
+
+function processResults(data: RawRow[]) {
     // Nubank CSV Format: date, category, title, amount
     // Inter Format: Data Lançamento, Histórico, Valor
     // We need to normalize.
@@ -105,11 +112,11 @@ function processResults(data: any[]) {
     const rows: ParsedRow[] = []
     let matches = 0
     
-    data.forEach((row: any) => {
+    data.forEach((row) => {
         // Auto-detect columns
         const dateVal = row['date'] || row['Date'] || row['Data'] || row['Data Lançamento']
         const descVal = row['title'] || row['description'] || row['Description'] || row['Histórico'] || row['Estabelecimento']
-        let amountVal = row['amount'] || row['Amount'] || row['Valor']
+        const amountVal = row['amount'] || row['Amount'] || row['Valor']
 
         if (dateVal && descVal && amountVal) {
             
@@ -195,19 +202,17 @@ async function handleImport() {
             cardId: selectedCardId.value
         }))
 
-        // Explicit POST method casting workaround
-        const res = await $fetch('/api/transactions/batch', {
-            method: 'POST' as any,
+        const res = await $fetch<{ count: number }>('/api/transactions/batch', {
+            method: 'POST',
             body: payload
         })
         
-        toast.success(`${(res as any).count} transações importadas!`)
+        toast.success(`${res.count} transações importadas!`)
         step.value = 1
         parsedRows.value = []
         navigateTo('/')
-    } catch (e) {
-        console.error(e)
-        const err = e as { data?: any }
+    } catch (error) {
+        console.error(error)
         toast.error('Erro ao importar transações. Verifique o formato.')
     } finally {
         isProcessing.value = false
@@ -312,9 +317,9 @@ async function handleImport() {
                   accept=".csv"
                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                   :disabled="!selectedCardId"
-                  @change="onFileSelect"
                   aria-label="Selecionar arquivo CSV para importação"
-              />
+                  @change="onFileSelect"
+              >
   
               <p v-if="!selectedCardId" class="text-small text-red-500 font-medium absolute -bottom-6">
                   * Selecione um cartao primeiro
@@ -344,7 +349,7 @@ async function handleImport() {
               <h2 class="text-h2">Revisao de Lancamentos</h2>
               <div class="flex items-center gap-4 text-small">
                   <div class="flex items-center gap-2">
-                      <span class="w-2 h-2 rounded-full bg-success"></span>
+                      <span class="w-2 h-2 rounded-full bg-success"/>
                       <span>{{ importStats.matched }} Categorizados</span>
                   </div>
                   <div class="text-muted-foreground">Total: {{ parsedRows.length }}</div>
@@ -357,7 +362,7 @@ async function handleImport() {
                       <thead class="sticky top-0 bg-background border-b z-10">
                           <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                               <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground w-[50px]">
-                                  <input type="checkbox" checked @change="(e) => parsedRows.forEach(r => r.selected = (e.target as HTMLInputElement).checked)" aria-label="Selecionar todas as transações" />
+                                  <input type="checkbox" checked aria-label="Selecionar todas as transações" @change="(e) => parsedRows.forEach(r => r.selected = (e.target as HTMLInputElement).checked)" >
                               </th>
                               <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground">Data</th>
                               <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground">Descricao</th>
@@ -368,7 +373,7 @@ async function handleImport() {
                       <tbody>
                           <tr v-for="(row, idx) in parsedRows" :key="idx" class="border-b transition-colors hover:bg-muted/50">
                               <td class="p-4 align-middle">
-                                  <input type="checkbox" v-model="row.selected" :aria-label="`Selecionar transação: ${row.description}`" />
+                                  <input v-model="row.selected" type="checkbox" :aria-label="`Selecionar transação: ${row.description}`" >
                               </td>
                               <td class="p-4 align-middle text-body">{{ new Date(row.date).toLocaleDateString() }}</td>
                               <td class="p-4 align-middle text-body font-medium">{{ row.description }}</td>
@@ -402,7 +407,7 @@ async function handleImport() {
               >
                   <Loader2 v-if="isProcessing" class="w-4 h-4 animate-spin" />
                   <span v-else>Importar {{ parsedRows.filter(r => r.selected).length }} Itens</span>
-                  <ArrowRight class="w-4 h-4 ml-1" v-if="!isProcessing" />
+                  <ArrowRight v-if="!isProcessing" class="w-4 h-4 ml-1" />
               </button>
           </div>
       </div>

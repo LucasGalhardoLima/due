@@ -2,7 +2,7 @@
 import { toast } from 'vue-sonner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import PageHeader from '@/components/ui/PageHeader.vue'
-import { PlusCircle, Sparkles, Loader2, ArrowRight } from 'lucide-vue-next'
+import { PlusCircle, Sparkles, Loader2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button' 
 import { Textarea } from '@/components/ui/textarea'
 
@@ -128,7 +128,7 @@ async function onSubmit() {
       title="Adicionar Gasto" 
       subtitle="Registre uma nova despesa rapidamente."
       :icon="PlusCircle"
-      backTo="/"
+      back-to="/"
     />
 
     <div v-if="!cards?.length" class="p-6 rounded-2xl border bg-warning-muted text-warning border-warning/20 shadow-elevation-2">
@@ -139,18 +139,18 @@ async function onSubmit() {
     </div>
 
     <!-- Mode Toggle -->
-    <div v-else class="bg-muted/30 p-1 rounded-xl flex gap-1 mb-6">
-        <button 
-          class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all"
+    <div v-else class="bg-muted/30 p-1 rounded-lg flex gap-1 mb-6">
+        <button
+          class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-all"
           :class="!isAiMode ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:bg-background/50'"
           @click="isAiMode = false"
         >
           <PlusCircle class="w-4 h-4" />
           Manual
         </button>
-        <button 
-          class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all"
-          :class="isAiMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'"
+        <button
+          class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-all"
+          :class="isAiMode ? 'bg-ai-accent text-ai-accent-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'"
           @click="isAiMode = true"
         >
           <Sparkles class="w-4 h-4" />
@@ -188,9 +188,9 @@ async function onSubmit() {
         <label class="text-micro text-muted-foreground" for="description">O que voce comprou?</label>
         <input
           id="description"
+          v-model="form.description"
           name="expense-description"
           autocomplete="off"
-          v-model="form.description"
           placeholder="Ex: Almoco, Uber, Assinatura…"
           class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm shadow-elevation-1 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-colors transition-shadow"
           required
@@ -202,9 +202,9 @@ async function onSubmit() {
         <label class="text-micro text-muted-foreground" for="amount">Valor Total (R$)</label>
         <input
           id="amount"
+          v-model.number="form.amount"
           name="expense-amount"
           inputmode="decimal"
-          v-model.number="form.amount"
           type="number"
           step="0.01"
           placeholder="0,00"
@@ -219,8 +219,8 @@ async function onSubmit() {
           <label class="text-micro text-muted-foreground" for="date">Data da Compra</label>
           <input
             id="date"
-            name="expense-date"
             v-model="form.date"
+            name="expense-date"
             type="date"
             class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm shadow-elevation-1 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-colors transition-shadow"
             required
@@ -232,9 +232,9 @@ async function onSubmit() {
           <label class="text-micro text-muted-foreground" for="installments">Parcelas</label>
           <input
             id="installments"
+            v-model.number="form.installments"
             name="expense-installments"
             inputmode="numeric"
-            v-model.number="form.installments"
             type="number"
             min="1"
             max="24"

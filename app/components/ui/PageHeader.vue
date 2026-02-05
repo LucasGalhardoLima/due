@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import type { Component } from 'vue'
+
 interface Props {
   title: string
   subtitle?: string
-  icon?: any // Lucide component
+  icon?: Component // Lucide component
   backTo?: string
 }
 

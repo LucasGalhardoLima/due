@@ -13,8 +13,8 @@ datasource db {
 model CreditCard {
   id          String   @id @default(uuid())
   name        String   // Ex: "Nubank Ultravioleta"
-  limit       Float
-  budget      Float?   // Meta de gastos (opcional)
+  limit       Decimal  @db.Decimal(14, 2)
+  budget      Decimal? @db.Decimal(14, 2) // Meta de gastos (opcional)
   closingDay  Int      // Dia que fecha a fatura (ex: 25)
   dueDay      Int      // Dia que vence (ex: 01)
   isDefault   Boolean  @default(false) // Marca o cartão padrão
@@ -37,7 +37,7 @@ model Category {
 model Transaction {
   id            String   @id @default(uuid())
   description   String
-  amount        Float    // Valor TOTAL da compra
+  amount        Decimal  @db.Decimal(14, 2) // Valor TOTAL da compra
   purchaseDate  DateTime @default(now())
   
   // Controle de Parcelamento
@@ -64,7 +64,7 @@ model Transaction {
 model Installment {
   id            String      @id @default(uuid())
   number        Int         // Parcela 1, 2, 3...
-  amount        Float       // Valor desta parcela específica
+  amount        Decimal     @db.Decimal(14, 2) // Valor desta parcela específica
   dueDate       DateTime    // Data teórica que essa parcela cai na fatura
   
   transactionId String

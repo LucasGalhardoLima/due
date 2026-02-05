@@ -1,5 +1,6 @@
 import prisma from '../../utils/prisma'
 import { startOfMonth, endOfMonth, getMonth, getYear } from 'date-fns'
+import { sumMoneyToCents } from '../../utils/money'
 
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
@@ -23,10 +24,10 @@ export default defineEventHandler(async (event) => {
     }
   })
   
-  const total = installments.reduce((sum, inst) => sum + inst.amount, 0)
+  const totalCents = sumMoneyToCents(installments.map(inst => inst.amount))
   
   return {
-    total: Math.round(total * 100) / 100,
+    total: totalCents / 100,
     month: currentMonth + 1, // 1-indexed for display
     year: currentYear,
     installmentsCount: installments.length,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Sparkles, Loader2, CheckCircle2, XCircle, TrendingUp } from 'lucide-vue-next'
+import { Sparkles, Loader2, CheckCircle2, XCircle } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Label } from '@/components/ui/label'
@@ -76,11 +76,11 @@ const verdictBg = computed(() => {
            </div>
            <Slider v-model="installments" :min="1" :max="12" :step="1" />
            <div class="grid grid-cols-5 gap-1 text-[10px] text-muted-foreground text-center">
-             <button @click="installments = [1]" class="hover:text-foreground p-1 bg-muted/20 rounded">1x</button>
-             <button @click="installments = [3]" class="hover:text-foreground p-1 bg-muted/20 rounded">3x</button>
-             <button @click="installments = [6]" class="hover:text-foreground p-1 bg-muted/20 rounded">6x</button>
-             <button @click="installments = [10]" class="hover:text-foreground p-1 bg-muted/20 rounded">10x</button>
-             <button @click="installments = [12]" class="hover:text-foreground p-1 bg-muted/20 rounded">12x</button>
+             <button class="hover:text-foreground p-1 bg-muted/20 rounded" @click="installments = [1]">1x</button>
+             <button class="hover:text-foreground p-1 bg-muted/20 rounded" @click="installments = [3]">3x</button>
+             <button class="hover:text-foreground p-1 bg-muted/20 rounded" @click="installments = [6]">6x</button>
+             <button class="hover:text-foreground p-1 bg-muted/20 rounded" @click="installments = [10]">10x</button>
+             <button class="hover:text-foreground p-1 bg-muted/20 rounded" @click="installments = [12]">12x</button>
            </div>
         </div>
       </div>
@@ -95,8 +95,8 @@ const verdictBg = computed(() => {
 
         <Button 
           class="w-full h-11 font-bold shadow-lg shadow-primary/20" 
-          @click="runSimulation"
           :disabled="isLoading || amount <= 0"
+          @click="runSimulation"
         >
           <Loader2 v-if="isLoading" class="w-4 h-4 mr-2 animate-spin" />
           {{ isLoading ? 'Analisando...' : 'Simular Impacto' }}
@@ -145,7 +145,7 @@ const verdictBg = computed(() => {
                   class="h-full rounded-full" 
                   :class="result.timeline.peakMonth.usagePercentAfter > 80 ? 'bg-rose-500' : 'bg-primary'"
                   :style="{ width: `${Math.min(result.timeline.peakMonth.usagePercentAfter, 100)}%` }"
-               ></div>
+               />
              </div>
              <div class="text-xs font-bold w-12 text-right">
                {{ result.timeline.peakMonth.usagePercentAfter.toFixed(0) }}%
@@ -154,7 +154,7 @@ const verdictBg = computed(() => {
         </div>
       </div>
       
-      <div class="flex-1"></div>
+      <div class="flex-1"/>
 
       <Button variant="outline" class="w-full" @click="reset">
         Nova Simulação

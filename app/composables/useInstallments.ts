@@ -20,10 +20,14 @@ export const useInstallments = () => {
     })
 
   // Simulation State - shared across components
-  const simulationState = useState('installment-simulation', () => ({
-    result: null as any,
-    isLoading: false
-  }))
+  type SimulationResult = Record<string, unknown>
+  const simulationState = useState<{ result: SimulationResult | null; isLoading: boolean }>(
+    'installment-simulation',
+    () => ({
+      result: null,
+      isLoading: false
+    })
+  )
 
   const simulate = async (amount: number, installments: number, cardId?: string) => {
     simulationState.value.isLoading = true
@@ -45,10 +49,14 @@ export const useInstallments = () => {
   }
 
   // Optimizer State
-  const optimizerState = useState('installment-optimizer', () => ({
-    result: null as any,
-    isLoading: false
-  }))
+  type OptimizationResult = Record<string, unknown>
+  const optimizerState = useState<{ result: OptimizationResult | null; isLoading: boolean }>(
+    'installment-optimizer',
+    () => ({
+      result: null,
+      isLoading: false
+    })
+  )
 
   const optimize = async (cardId?: string) => {
     optimizerState.value.isLoading = true

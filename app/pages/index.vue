@@ -1,147 +1,16 @@
 <script setup lang="ts">
-import { Sparkles, Upload, CheckCircle, ArrowRight, Check, Clock, Shield, TrendingUp, PieChart, Users, Calendar, Bell, FileText, Smartphone, Building2, DollarSign, MessageSquare, Target, Globe, ChevronDown, Moon, Sun, ShieldCheck, Tags } from 'lucide-vue-next'
+import { Moon, Sun, X } from 'lucide-vue-next'
+import HeroSection from '@/components/landing/HeroSection.vue'
+import ProblemSection from '@/components/landing/ProblemSection.vue'
+import SolutionSection from '@/components/landing/SolutionSection.vue'
+import FeaturesGrid from '@/components/landing/FeaturesGrid.vue'
+import SocialProof from '@/components/landing/SocialProof.vue'
+import CTASection from '@/components/landing/CTASection.vue'
+import LandingFooter from '@/components/landing/LandingFooter.vue'
 
 const { userId } = useAuth()
 const colorMode = useColorMode()
-
-const features = [
-  {
-    icon: Sparkles,
-    title: 'Simulador IA',
-    description: 'Analise a viabilidade de novas compras com IA preditiva. Saiba quando gastar.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: Upload,
-    title: 'Importação Inteligente',
-    description: 'Arraste seu CSV do Nubank, Inter e outros. Nossa IA organiza tudo instantaneamente.',
-    colSpan: 'md:col-span-2'
-  },
-  {
-    icon: Bell,
-    title: 'Alertas de Crise',
-    description: 'O sistema que dorme com um olho aberto. Receba alertas antes de estourar seu limite.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: MessageSquare,
-    title: 'AI Advisor',
-    description: 'Seu copiloto financeiro. Receba diagnósticos profundos e sugestões de economia.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Auditoria de Gastos',
-    description: 'Conciliação perfeita. Histórico completo e auditoria avançada de transações.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: Globe,
-    title: 'Gestão Multi-Cartão',
-    description: 'Adicione quantos cartões quiser. Uma visão consolidada de todas as suas faturas.',
-    colSpan: 'md:col-span-2'
-  },
-  {
-    icon: Smartphone,
-    title: 'Mobile First',
-    description: 'O poder do dashboard na palma da sua mão. 100% responsivo para qualquer tela.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: Target,
-    title: 'Metas Inteligentes',
-    description: 'Defina limites por cartão ou categoria e acompanhe sua evolução mensal.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: Tags,
-    title: 'Organização por Tags',
-    description: 'Categorize gastos com tags para análises geográficas ou específicas por evento.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: PieChart,
-    title: 'Balanço Mensal',
-    description: 'Visualize sua saúde financeira com gráficos de fluxo de caixa e balanço simplificado.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: TrendingUp,
-    title: 'Projeção de Faturas',
-    description: 'Prepare-se para o futuro. Veja o impacto das suas parcelas nos próximos meses.',
-    colSpan: 'md:col-span-1'
-  },
-  {
-    icon: Shield,
-    title: 'Privacidade Total',
-    description: 'Seus dados financeiros são sagrados. Banco de dados isolado e segurança com Clerk.',
-    colSpan: 'md:col-span-2'
-  }
-]
-
-const roadmap = [
-  {
-    status: 'done',
-    icon: ShieldCheck,
-    title: 'Módulo de Auditoria',
-    description: 'Histórico completo e detalhado de todas as transações criadas, com filtros avançados.',
-    eta: 'Concluído'
-  },
-  {
-    status: 'done',
-    icon: Bell,
-    title: 'Alertas de Crise',
-    description: 'Sistema de notificações inteligentes para avisar sobre gastos anômalos ou proximidade do limite.',
-    eta: 'Concluído'
-  },
-  {
-    status: 'soon',
-    icon: Clock,
-    title: 'Detecção de Assinaturas',
-    description: 'Identificação inteligente de gastos recorrentes (Netflix, Spotify) para evitar cobranças indesejadas.',
-    eta: 'Q1 2026'
-  },
-  {
-    status: 'planned',
-    icon: FileText,
-    title: 'Relatórios & Exportação',
-    description: 'Gere PDFs profissionais e planilhas detalhadas dos seus gastos mensais com um clique.',
-    eta: 'Q2 2026'
-  },
-  {
-    status: 'planned',
-    icon: Users,
-    title: 'Compartilhamento Familiar',
-    description: 'Gerencie as finanças da casa com múltiplos usuários e orçamentos compartilhados.',
-    eta: 'Q3 2026'
-  },
-  {
-    status: 'planned',
-    icon: Building2,
-    title: 'Open Finance',
-    description: 'Conexão direta com bancos para importar transações automaticamente.',
-    eta: 'Q4 2026'
-  }
-]
-
-const faqs = [
-  {
-    question: 'O Due é gratuito?',
-    answer: 'Sim! A versão atual do Due é 100% gratuita. No futuro, podemos introduzir recursos premium opcionais.'
-  },
-  {
-    question: 'Meus dados estão seguros?',
-    answer: 'Absolutamente. Utilizamos Clerk para autenticação enterprise-grade e criptografia de ponta.'
-  },
-  {
-    question: 'Preciso conectar banco?',
-    answer: 'Não! Funciona com importação manual de CSV ou lançamentos manuais. Total privacidade.'
-  },
-  {
-    question: 'Como funciona a IA?',
-    answer: 'Utilizamos GPT-4o para analisar padrões, sem reter seus dados pessoais.'
-  }
-]
+const router = useRouter()
 
 const authMode = ref<'none' | 'sign-in' | 'sign-up'>('none')
 
@@ -161,288 +30,145 @@ function toggleTheme() {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
 }
 
+function handleDemo() {
+  const demoCookie = useCookie('demo_mode', { maxAge: 60 * 60 * 24 * 30, path: '/' })
+  demoCookie.value = 'true'
+  router.push('/dashboard')
+}
+
 definePageMeta({
   layout: false
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary overflow-x-hidden font-sans antialiased transition-colors duration-300">
-    
+  <div class="min-h-screen bg-background text-foreground font-sans antialiased">
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/10 backdrop-blur-xl bg-background/70 shadow-glass supports-[backdrop-filter]:bg-background/60">
-      <div class="container mx-auto px-8 h-20 flex items-center justify-between">
-        <NuxtLink to="/" class="font-black text-2xl flex items-center gap-3 tracking-tighter group">
-          <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-card text-xl font-black shadow-elevation-3 shadow-primary/25 transition-transform group-hover:scale-105">
-            D
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border bg-card/95 backdrop-blur-sm">
+      <div class="container mx-auto px-6 h-16 flex items-center justify-between">
+        <!-- Logo -->
+        <NuxtLink to="/" class="font-black text-xl flex items-center gap-2 tracking-tight">
+          <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-black shadow-elevation-2">
+            Du
           </div>
-          Due
         </NuxtLink>
-        <div class="flex items-center gap-6 md:gap-8">
-          <div class="hidden md:flex items-center gap-8">
-            <a href="#features" class="text-sm font-medium hover:text-primary transition-colors">Funcionalidades</a>
-            <a href="#roadmap" class="text-sm font-medium hover:text-primary transition-colors">Roadmap</a>
-          </div>
-          <div class="flex items-center gap-4">
-             <button 
-              @click="toggleTheme" 
-              class="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-              aria-label="Toggle Theme"
+
+        <!-- Right side -->
+        <div class="flex items-center gap-4">
+          <button
+            class="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            aria-label="Alternar tema"
+            @click="toggleTheme"
+          >
+            <Moon v-if="colorMode.value === 'light'" class="w-5 h-5" />
+            <Sun v-else class="w-5 h-5" />
+          </button>
+
+          <div class="hidden sm:flex items-center gap-4">
+            <button
+              class="text-sm font-semibold hover:text-primary transition-colors"
+              @click="openSignIn"
             >
-              <Moon v-if="colorMode.value === 'light'" class="w-5 h-5" />
-              <Sun v-else class="w-5 h-5" />
+              Entrar
             </button>
-            <div class="h-6 w-px bg-border/50 hidden md:block"></div>
-            <button @click="openSignIn" class="text-sm font-bold hover:text-primary transition-colors" aria-label="Entrar na conta">Entrar</button>
-            <button @click="openSignUp" class="hidden md:inline-flex h-9 px-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-elevation-3 shadow-primary/25 hover:scale-105 active:scale-[0.98] transition-all">
+            <button
+              class="h-9 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-bold shadow-elevation-2 hover:opacity-90 transition-all"
+              @click="openSignUp"
+            >
               Criar Conta
             </button>
           </div>
+
+          <!-- Mobile: Just Sign In -->
+          <button
+            class="sm:hidden text-sm font-semibold hover:text-primary transition-colors"
+            @click="openSignIn"
+          >
+            Entrar
+          </button>
         </div>
       </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <!-- Background Blobs -->
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] -z-10" aria-hidden="true">
-        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] motion-safe:animate-pulse" />
-        <div class="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-primary/10 rounded-full blur-[140px] motion-safe:animate-pulse duration-&lsqb;10s&lsqb;" />
-        <div class="absolute bottom-0 left-[20%] w-[30%] h-[30%] bg-cyan-500/10 rounded-full blur-[100px]" />
-      </div>
-      
-      <div class="container mx-auto px-8 text-center space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase backdrop-blur-md shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-primary motion-safe:animate-pulse" aria-hidden="true" />
-          Finanças Reimaginadas
-        </div>
-        
-        <h1 class="text-6xl md:text-8xl font-black tracking-tight max-w-5xl mx-auto leading-[0.9] text-foreground transition-all duration-700">
-          Domine sua <span class="text-transparent bg-clip-text bg-gradient-to-br from-primary via-cyan-400 to-emerald-500">fatura,</span> não sua planilha.
-        </h1>
-        
-        <p class="text-xl md:text-2xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-          Controle inteligente de cartão de crédito com projeção futura, Advisor IA e importação automática. <span class="text-foreground italic">Poderoso no desktop, perfeito no mobile.</span>
-        </p>
-
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-          <NuxtLink 
-            v-if="userId"
-            to="/dashboard" 
-            class="h-14 px-10 inline-flex items-center justify-center rounded-full bg-foreground text-background font-bold text-lg shadow-xl hover:scale-105 transition-all w-full sm:w-auto"
-          >
-            Acessar Dashboard
-          </NuxtLink>
-          <NuxtLink 
-            v-else
-            to="/sign-up" 
-            class="h-14 px-10 inline-flex items-center justify-center rounded-full bg-foreground text-background font-bold text-lg shadow-xl hover:scale-105 transition-all w-full sm:w-auto"
-          >
-            Começar Gratuitamente
-          </NuxtLink>
-          <a 
-            href="#features"
-            class="h-14 px-10 inline-flex items-center justify-center rounded-full border border-border/50 bg-background/50 backdrop-blur-md hover:bg-muted/50 transition-all w-full sm:w-auto font-semibold"
-          >
-            Explorar Features
-          </a>
-        </div>
-      </div>
-
-      <!-- Scroll Indicator -->
-      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce opacity-20 z-20">
-        <ChevronDown class="w-5 h-5" />
-      </div>
-    </section>
-
-    <!-- Bento Grid Features -->
-    <section id="features" class="py-16 relative overflow-hidden">
-      <!-- Glow -->
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10" />
-      
-      <div class="container mx-auto px-8">
-        <div class="mb-20">
-           <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-6">Poder sem <span class="text-primary/80">complexidade.</span></h2>
-           <p class="text-xl text-muted-foreground max-w-2xl font-medium">Ferramentas de elite, simplificadas para você.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div
-            v-for="feature in features"
-            :key="feature.title"
-            :class="[
-              feature.colSpan,
-              'group relative p-8 rounded-2xl bg-secondary/20 dark:bg-zinc-900/40 border border-border/50 backdrop-blur-xl shadow-elevation-2 hover:shadow-elevation-4 hover:border-primary/50 transition-all duration-500 overflow-hidden'
-            ]"
-          >
-            <!-- Hover Glow -->
-            <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-            <div class="relative z-10 h-full flex flex-col justify-between space-y-8">
-              <div class="w-14 h-14 rounded-2xl bg-background/80 flex items-center justify-center text-primary shadow-elevation-2 border border-border/50 group-hover:scale-110 transition-transform duration-500">
-                <component :is="feature.icon" class="w-7 h-7" />
-              </div>
-
-              <div>
-                <h3 class="text-h2 mb-3">{{ feature.title }}</h3>
-                <p class="text-body text-muted-foreground">
-                  {{ feature.description }}
-                </p>
-              </div>
-            </div>
+    <!-- Main Content -->
+    <main class="pt-16">
+      <!-- Redirect logged in users -->
+      <template v-if="userId">
+        <div class="min-h-[80vh] flex items-center justify-center">
+          <div class="text-center space-y-4">
+            <p class="text-muted-foreground">Voce ja esta logado.</p>
+            <NuxtLink
+              to="/dashboard"
+              class="inline-flex items-center justify-center h-12 px-8 rounded-lg bg-primary text-primary-foreground font-bold shadow-elevation-2"
+            >
+              Ir para o Dashboard
+            </NuxtLink>
           </div>
         </div>
-      </div>
-    </section>
+      </template>
 
-    <!-- Roadmap Section (Timeline) -->
-    <section id="roadmap" class="py-16 relative">
-       <!-- timeline bar -->
-       <div class="absolute left-1/2 -translate-x-1/2 top-48 bottom-32 w-px bg-gradient-to-b from-primary/40 via-border/40 to-transparent hidden md:block" />
-       
-       <div class="container mx-auto px-8">
-        <div class="mb-20 text-center">
-           <h2 class="text-4xl md:text-6xl font-black tracking-tight mb-6">O futuro é brilhante.</h2>
-           <p class="text-xl text-muted-foreground mx-auto max-w-2xl">Transparência radical sobre nossos próximos passos.</p>
-        </div>
+      <template v-else>
+        <HeroSection @start="openSignUp" @demo="handleDemo" />
+        <ProblemSection />
+        <SolutionSection />
+        <FeaturesGrid />
+        <SocialProof />
+        <CTASection @start="openSignUp" />
+      </template>
+    </main>
 
-        <div class="space-y-24 relative">
-          <div 
-            v-for="(item, index) in roadmap" 
-            :key="item.title"
-            class="flex flex-col md:flex-row items-center gap-8 md:gap-0"
-            :class="index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'"
-          >
-            <!-- Content -->
-            <div class="flex-1 w-full md:w-auto">
-               <div
-                class="p-8 rounded-2xl border border-border/40 bg-background/50 backdrop-blur-xl shadow-elevation-2 group hover:shadow-elevation-4 hover:border-primary/40 transition-all duration-500"
-                :class="index % 2 === 0 ? 'md:mr-16' : 'md:ml-16'"
-              >
-                  <div class="flex items-center justify-between mb-6">
-                    <div class="p-3 rounded-2xl bg-secondary/50 text-foreground/80 shadow-elevation-1 group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-500">
-                      <component :is="item.icon" class="w-6 h-6" />
-                    </div>
-                    <span
-                      class="px-3 py-1 rounded-full text-micro border"
-                      :class="[
-                        item.status === 'done' ? 'bg-success-muted text-success border-success/20' :
-                        item.status === 'soon' ? 'bg-warning-muted text-warning border-warning/20' :
-                        'bg-info-muted text-info border-info/20'
-                      ]"
-                    >
-                      {{ item.eta }}
-                    </span>
-                  </div>
-                  <h4 class="text-h2 mb-3">{{ item.title }}</h4>
-                  <p class="text-body text-muted-foreground">{{ item.description }}</p>
-               </div>
-            </div>
+    <LandingFooter />
 
-            <!-- Timeline Marker -->
-            <div class="relative z-10 flex items-center justify-center w-12">
-               <div :class="['w-4 h-4 rounded-full bg-background border-4 shadow-lg transition-colors duration-500', item.status === 'done' ? 'border-emerald-500 shadow-emerald-500/30' : 'border-primary shadow-primary/50']" />
-            </div>
-
-            <!-- Spacer -->
-            <div class="flex-1 hidden md:block" />
-          </div>
-        </div>
-       </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section id="faq" class="py-16 relative overflow-hidden bg-secondary/5 dark:bg-zinc-950/20">
-      <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] -z-10" />
-      
-      <div class="container mx-auto px-8 max-w-4xl">
-        <h2 class="text-3xl md:text-5xl font-black tracking-tight mb-16 text-center">Dúvidas Frequentes</h2>
-
-        <div class="space-y-4">
-          <details
-            v-for="faq in faqs"
-            :key="faq.question"
-            class="group p-6 rounded-2xl bg-card border border-border/50 backdrop-blur-xl shadow-elevation-1 open:shadow-elevation-3 open:bg-card/80 open:border-primary/30 transition-all duration-300"
-          >
-            <summary class="text-h3 cursor-pointer list-none flex items-center justify-between">
-              {{ faq.question }}
-              <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-300 group-open:rotate-180 group-open:text-primary" />
-            </summary>
-            <p class="mt-4 text-body text-muted-foreground animate-in slide-in-from-top-2 fade-in duration-300">
-              {{ faq.answer }}
-            </p>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-16 border-t border-border/40 relative overflow-hidden">
-      <div class="absolute bottom-[-100px] left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-primary/10 rounded-full blur-[80px] -z-10" />
-      
-      <div class="container mx-auto px-8">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-8 opacity-60 hover:opacity-100 transition-opacity">
-          <div class="flex items-center gap-2 font-black text-xl tracking-tighter group">
-            <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-card text-sm font-black shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
-              D
-            </div>
-            Due
-          </div>
-          <div class="flex items-center gap-6">
-            <NuxtLink to="/privacy" class="text-sm font-medium hover:text-primary transition-colors">Privacidade</NuxtLink>
-            <p class="text-sm text-muted-foreground font-medium">
-              &copy; {{ new Date().getFullYear() }} Due Finance.
-            </p>
-          </div>
-        </div>
-      </div>
-    </footer>
-
-    <!-- Auth Modals -->
-    <Transition 
-      enter-active-class="transition duration-300 ease-out" 
-      enter-from-class="opacity-0 scale-95" 
-      enter-to-class="opacity-100 scale-100" 
-      leave-active-class="transition duration-200 ease-in" 
-      leave-from-class="opacity-100 scale-100" 
-      leave-to-class="opacity-0 scale-95"
+    <!-- Auth Modal -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
     >
-      <div v-if="authMode !== 'none'" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-background/80 backdrop-blur-sm overscroll-contain" @click="closeAuth" />
-        
-        <div class="relative w-full max-w-md bg-card border border-border/50 rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+      <div v-if="authMode !== 'none'" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <!-- Overlay -->
+        <div
+          class="absolute inset-0 bg-background/80 backdrop-blur-sm"
+          @click="closeAuth"
+        />
+
+        <!-- Modal -->
+        <div class="relative w-full max-w-md bg-card border border-border rounded-2xl shadow-elevation-5 overflow-hidden animate-in zoom-in-95 duration-200">
           <button
+            class="absolute top-4 right-4 p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground z-10"
+            aria-label="Fechar"
             @click="closeAuth"
-            class="absolute top-6 right-6 p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground z-10"
-            aria-label="Fechar modal"
           >
-            <ChevronDown class="w-5 h-5 rotate-90 md:rotate-0" />
+            <X class="w-5 h-5" />
           </button>
 
-          <div class="flex items-center justify-center p-8 pt-16">
-            <SignIn 
-              v-if="authMode === 'sign-in'" 
-              after-sign-in-url="/dashboard" 
+          <div class="flex items-center justify-center p-8 pt-14">
+            <SignIn
+              v-if="authMode === 'sign-in'"
+              after-sign-in-url="/dashboard"
               sign-up-url="#"
               @click.capture="(e: MouseEvent) => {
-                const target = e.target as HTMLElement;
+                const target = e.target as HTMLElement
                 if (target.innerText?.includes('Sign up')) {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  openSignUp();
+                  e.stopPropagation()
+                  e.preventDefault()
+                  openSignUp()
                 }
               }"
             />
-            <SignUp 
-              v-if="authMode === 'sign-up'" 
-              after-sign-up-url="/dashboard" 
+            <SignUp
+              v-if="authMode === 'sign-up'"
+              after-sign-up-url="/dashboard"
               sign-in-url="#"
               @click.capture="(e: MouseEvent) => {
-                const target = e.target as HTMLElement;
+                const target = e.target as HTMLElement
                 if (target.innerText?.includes('Sign in')) {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  openSignIn();
+                  e.stopPropagation()
+                  e.preventDefault()
+                  openSignIn()
                 }
               }"
             />
@@ -455,14 +181,6 @@ definePageMeta({
 
 <style scoped>
 .container {
-  max-width: 1400px;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-details summary::-webkit-details-marker {
-  display: none;
+  max-width: 1200px;
 }
 </style>

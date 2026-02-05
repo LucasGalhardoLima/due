@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Component } from 'vue'
 import { ref, computed } from 'vue'
 import { 
   LucideShoppingBag, 
@@ -6,9 +7,7 @@ import {
   LucideCar, 
   LucideHome, 
   ArrowUpDown,
-  MoreHorizontal,
   Pencil,
-  Trash2
 } from 'lucide-vue-next'
 import {
   Table,
@@ -20,12 +19,24 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 
-const props = defineProps<{
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    transactions: Record<string, any[]>
+interface TransactionItem {
+  id: string
+  transactionId: string
+  description: string
+  amount: number
+  category: string
+  categoryIcon: string
+  installmentNumber: number
+  totalInstallments: number
+  cardName: string
+  purchaseDate: string
+}
+
+defineProps<{
+  transactions: Record<string, TransactionItem[]>
 }>()
 
-const emit = defineEmits(['edit', 'delete'])
+defineEmits(['edit', 'delete'])
 
 // Sorting state
 const sortKey = ref<'purchaseDate' | 'description' | 'amount' | 'cardName'>('purchaseDate')
@@ -41,8 +52,12 @@ function toggleSort(key: typeof sortKey.value) {
 }
 
 // Flattened transactions for desktop
-const allTransactions = computed(() => {
-  const flattened: any[] = []
+interface TransactionWithDate extends TransactionItem {
+  purchaseDate: string
+}
+
+const allTransactions = computed<TransactionWithDate[]>(() => {
+  const flattened: TransactionWithDate[] = []
   Object.entries(props.transactions).forEach(([date, items]) => {
     items.forEach(item => {
       flattened.push({ ...item, purchaseDate: date })
@@ -50,7 +65,7 @@ const allTransactions = computed(() => {
   })
 
   return flattened.sort((a, b) => {
-    let modifier = sortOrder.value === 'asc' ? 1 : -1
+    const modifier = sortOrder.value === 'asc' ? 1 : -1
     if (sortKey.value === 'amount') {
       return (a.amount - b.amount) * modifier
     }
@@ -76,7 +91,7 @@ function formatCurrency(val: number) {
 }
 
 // Icon Mapping
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, Component> = {
     'Alimentação': LucideUtensils,
     'Transporte': LucideCar,
     'Casa': LucideHome,
@@ -90,7 +105,7 @@ function getIcon(categoryName: string) {
 
 <template>
   <div class="transaction-list-container">
-    <div v-if="!transactions || Object.keys(transactions).length === 0" class="text-center py-10 text-muted-foreground border rounded-lg bg-card/50">
+    <div v-if="!transactions || Object.keys(transactions).length === 0" class="text-center py-10 text-muted-foreground border border-border rounded-lg bg-muted/30">
         Nenhum lançamento nesta fatura.
     </div>
 
@@ -98,11 +113,11 @@ function getIcon(categoryName: string) {
       <!-- Mobile View (Grouped List) -->
       <div class="lg:hidden space-y-6">
         <div v-for="(items, date) in transactions" :key="date" class="space-y-3">
-            <h4 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider sticky top-16 bg-background/95 backdrop-blur py-2 z-10 px-1">
+            <h4 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider sticky top-16 bg-background py-2 z-10 px-1">
                 {{ formatDate(String(date)) }}
             </h4>
             
-            <div class="rounded-2xl border border-white/20 dark:border-white/10 bg-white/50 dark:bg-black/20 backdrop-blur-xl text-card-foreground shadow-sm divide-y divide-white/10">
+            <div class="rounded-xl border border-border bg-card text-card-foreground shadow-elevation-1 divide-y divide-border">
                 <div 
                   v-for="tx in items" 
                   :key="tx.id" 
@@ -130,7 +145,7 @@ function getIcon(categoryName: string) {
       </div>
 
       <!-- Desktop View (Data Table) -->
-      <div class="hidden lg:block border border-white/20 dark:border-white/10 rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur-xl shadow-glass overflow-hidden">
+      <div class="hidden lg:block border border-border rounded-xl bg-card shadow-elevation-1 overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -164,7 +179,7 @@ function getIcon(categoryName: string) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="tx in allTransactions" :key="tx.id" class="group h-12 border-white/5 hover:bg-white/10 dark:hover:bg-black/20 transition-colors">
+            <TableRow v-for="tx in allTransactions" :key="tx.id" class="group h-12 border-border hover:bg-muted/50 transition-colors">
               <TableCell class="font-medium py-1">
                 {{ formatDate(tx.purchaseDate, 'short') }}
               </TableCell>

@@ -4,6 +4,9 @@ import { gateway } from '../../utils/ai'
 import prisma from '../../utils/prisma'
 import { getUser } from '../../utils/session'
 import { startOfMonth } from 'date-fns'
+import { moneyToCents } from '../../utils/money'
+import { parseJsonWithSchema } from '../../utils/ai-guard'
+import { enforceRateLimit } from '../../utils/ai-rate-limit'
 
 const bodySchema = z.object({
   cardId: z.string().optional()
@@ -20,12 +23,13 @@ interface PlanSummary {
 }
 
 export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
+  enforceRateLimit(`ai:installments-optimize:${userId}`, 10, 10 * 60 * 1000)
   const body = await readBody(event)
   const result = bodySchema.safeParse(body)
   if (!result.success) throw createError({ statusCode: 400 })
 
   const { cardId } = result.data
-  const { userId } = getUser(event)
 
   const now = new Date()
   const startCurrentMonth = startOfMonth(now)
@@ -53,18 +57,19 @@ export default defineEventHandler(async (event) => {
 
   for (const inst of futureInstallments) {
     if (!plansMap.has(inst.transactionId)) {
+      const instAmount = moneyToCents(inst.amount) / 100
       plansMap.set(inst.transactionId, {
         transactionId: inst.transactionId,
         description: inst.transaction.description,
         category: inst.transaction.category.name,
         remainingAmount: 0,
         remainingInstallments: 0,
-        monthlyAmount: inst.amount, // Approximate, taking first found
+        monthlyAmount: instAmount, // Approximate, taking first found
         lastDueDate: inst.dueDate
       })
     }
     const p = plansMap.get(inst.transactionId)!
-    p.remainingAmount += inst.amount
+    p.remainingAmount += moneyToCents(inst.amount) / 100
     p.remainingInstallments++
     if (inst.dueDate > p.lastDueDate) p.lastDueDate = inst.dueDate
   }
@@ -128,12 +133,33 @@ export default defineEventHandler(async (event) => {
       maxTokens: 800
     })
     
-    const cleaned = text.replace(/^```json/, '').replace(/```$/, '').trim()
-    const result = JSON.parse(cleaned)
+    const result = parseJsonWithSchema(text, z.object({
+      recommendation: z.object({
+        type: z.enum(['antecipate', 'pay_full', 'keep_current']),
+        title: z.string(),
+        description: z.string(),
+        impact: z.object({
+          monthlySavings: z.number(),
+          totalSavings: z.number(),
+          limitFreed: z.number(),
+          monthsReduced: z.number()
+        })
+      }),
+      alternative: z.object({
+        type: z.string(),
+        title: z.string(),
+        description: z.string()
+      }).nullable().optional(),
+      priorityList: z.array(z.object({
+        description: z.string(),
+        priority: z.enum(['high', 'medium', 'low']),
+        reason: z.string()
+      })).optional()
+    }))
     
     // Enrich priority list with local data if needed, or trust AI returns matching names
     // We append the original financial data to priority list items for frontend display
-    const enrichedList = result.priorityList?.map((item: any) => {
+    const enrichedList = result.priorityList?.map((item) => {
       const original = activePlans.find(p => p.description.includes(item.description) || item.description.includes(p.description))
       return {
         ...item,

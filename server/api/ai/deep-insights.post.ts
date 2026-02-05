@@ -2,6 +2,10 @@ import { z } from 'zod'
 import { generateText } from 'ai'
 import { gateway } from '../../utils/ai'
 import prisma from '../../utils/prisma'
+import { parseJsonWithSchema } from '../../utils/ai-guard'
+import { enforceRateLimit } from '../../utils/ai-rate-limit'
+import { getCache, setCache } from '../../utils/ai-cache'
+import { moneyToCents, moneyToNumber } from '../../utils/money'
 
 const querySchema = z.object({
   month: z.string().optional(),
@@ -32,14 +36,62 @@ export interface DeepInsights {
   }
 }
 
+interface DeepInsightsResponse {
+  success: true
+  insights: DeepInsights
+  metadata: {
+    periodStart: string
+    periodEnd: string
+    totalAnalyzed: number
+    monthlyAverage: number
+    monthlyData: { month: string; total: number; change_pct: number | null }[]
+    categoryTrends: { name: string; sixMonthAvg: number; lastMonth: number; change_pct: number }[]
+  }
+}
+
+const aiResponseSchema = z.object({
+  trend_analysis: z.object({
+    direction: z.enum(['crescente', 'estável', 'decrescente']),
+    monthly_change_pct: z.number(),
+    categories_driving_change: z.array(z.object({
+      name: z.string(),
+      change_pct: z.number()
+    }))
+  }),
+  forecast: z.object({
+    next_month_prediction: z.number(),
+    confidence: z.number(),
+    factors: z.array(z.string())
+  }),
+  optimization_opportunities: z.array(z.object({
+    category: z.string(),
+    current_spending: z.number(),
+    potential_saving: z.number(),
+    difficulty: z.enum(['fácil', 'médio', 'difícil']),
+    suggestion: z.string()
+  })),
+  health_score: z.object({
+    score: z.number(),
+    factors: z.array(z.object({
+      label: z.string(),
+      impact: z.enum(['positive', 'negative'])
+    }))
+  })
+})
+
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
+  enforceRateLimit(`ai:deep-insights:${userId}`, 5, 10 * 60 * 1000)
   const query = getQuery(event)
   const { month, year } = querySchema.parse(query)
 
   const now = new Date()
   const targetMonth = month ? parseInt(month) : now.getMonth() + 1
   const targetYear = year ? parseInt(year) : now.getFullYear()
+
+  const cacheKey = `ai:deep-insights:${userId}:${targetYear}-${targetMonth}`
+  const cached = getCache<DeepInsightsResponse>(cacheKey)
+  if (cached) return cached
 
   // Calculate 6-month date range (5 months back + current month)
   const endDate = new Date(targetYear, targetMonth, 0, 23, 59, 59)
@@ -85,14 +137,14 @@ export default defineEventHandler(async (event) => {
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 
     if (monthlyData[key]) {
-      monthlyData[key].total += inst.amount
+      monthlyData[key].total += moneyToCents(inst.amount) / 100
       monthlyData[key].count++
 
       const categoryName = inst.transaction.category.name
       if (!monthlyData[key].categories[categoryName]) {
         monthlyData[key].categories[categoryName] = 0
       }
-      monthlyData[key].categories[categoryName] += inst.amount
+      monthlyData[key].categories[categoryName] += moneyToCents(inst.amount) / 100
     }
   }
 
@@ -141,8 +193,8 @@ export default defineEventHandler(async (event) => {
 
   // Get user context
   const userCards = await prisma.creditCard.findMany({ where: { userId } })
-  const totalBudget = userCards.reduce((acc, c) => acc + (c.budget || 0), 0)
-  const totalLimit = userCards.reduce((acc, c) => acc + c.limit, 0)
+  const totalBudget = userCards.reduce((acc, c) => acc + (c.budget ? moneyToNumber(c.budget) : 0), 0)
+  const totalLimit = userCards.reduce((acc, c) => acc + moneyToNumber(c.limit), 0)
 
   // Future commitments (next 3 months)
   const futureStart = new Date(targetYear, targetMonth, 1)
@@ -171,7 +223,7 @@ export default defineEventHandler(async (event) => {
   for (const inst of futureInstallments) {
     const d = new Date(inst.dueDate)
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-    futureMonthly[key] = (futureMonthly[key] || 0) + inst.amount
+    futureMonthly[key] = (futureMonthly[key] || 0) + (moneyToCents(inst.amount) / 100)
   }
 
   // Build AI prompt with comprehensive data
@@ -254,11 +306,9 @@ Seja preciso, baseie-se nos números reais e dê conselhos acionáveis.`
       }
     })
 
-    // Clean markdown code blocks if present
-    const cleanedText = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
-    const insights: DeepInsights = JSON.parse(cleanedText)
+    const insights = parseJsonWithSchema(text, aiResponseSchema)
 
-    return {
+    const response = {
       success: true,
       insights,
       metadata: {
@@ -270,7 +320,9 @@ Seja preciso, baseie-se nos números reais e dê conselhos acionáveis.`
         categoryTrends: categoryTrends.slice(0, 5)
       }
     }
-  } catch (error: any) {
+    setCache(cacheKey, response, 10 * 60 * 1000)
+    return response
+  } catch (error) {
     console.error('Deep Insights AI Error:', error)
     throw createError({
       statusCode: 500,

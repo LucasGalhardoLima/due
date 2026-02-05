@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import prisma from '../../utils/prisma'
 import { endOfMonth } from 'date-fns'
+import { moneyToNumber, sumMoneyToCents } from '../../utils/money'
 
 const querySchema = z.object({
   month: z.string().optional(), // 1-12
@@ -54,30 +55,33 @@ export default defineEventHandler(async (event) => {
   })
 
   // Calculate Totals
-  const totalInvoice = installments.reduce((acc, curr) => acc + curr.amount, 0)
+  const totalInvoiceCents = sumMoneyToCents(installments.map(inst => inst.amount))
 
   // Calculate Limits (If filtering by card, or aggregate logic?)
   // If no cardId, we sum limits of ALL cards? Or just show "N/A"?
   // Let's sum all cards limits for "Global View" logic.
   let totalLimit = 0
   let totalBudget = 0
+  let card: { limit: unknown; budget: unknown | null; dueDay: number; closingDay: number } | null = null
 
   if (result.data.cardId) {
-    const card = await prisma.creditCard.findFirst({ 
+    const foundCard = await prisma.creditCard.findFirst({ 
       where: { 
         id: result.data.cardId,
         userId
-      } 
+      },
+      select: { limit: true, budget: true, dueDay: true, closingDay: true }
     })
-    totalLimit = card?.limit || 0
-    totalBudget = card?.budget || 0
+    card = foundCard
+    totalLimit = foundCard?.limit ? moneyToNumber(foundCard.limit) : 0
+    totalBudget = foundCard?.budget ? moneyToNumber(foundCard.budget) : 0
   } else {
     const cards = await prisma.creditCard.findMany({
       where: { userId }
     })
-    totalLimit = cards.reduce((acc, c) => acc + c.limit, 0)
+    totalLimit = cards.reduce((acc, c) => acc + moneyToNumber(c.limit), 0)
     // Sum budgets, treating null as 0
-    totalBudget = cards.reduce((acc, c) => acc + (c.budget || 0), 0)
+    totalBudget = cards.reduce((acc, c) => acc + (c.budget ? moneyToNumber(c.budget) : 0), 0)
   }
 
   // Group Transactions by Date
@@ -99,7 +103,7 @@ export default defineEventHandler(async (event) => {
         id: inst.id,
         transactionId: inst.transaction.id,
         description: inst.transaction.description,
-        amount: inst.amount,
+        amount: moneyToNumber(inst.amount),
         category: inst.transaction.category.name,
         categoryIcon: 'shopping-bag', // TODO: Map real icons
         installmentNumber: inst.number,
@@ -111,7 +115,7 @@ export default defineEventHandler(async (event) => {
   })
 
   // Determine Invoice Status
-  let status = 'OPEN'
+  let status: 'OPEN' | 'PAID' | 'CLOSED' | null = null
   if (result.data.cardId) {
     const invoiceRecord = await prisma.invoice.findUnique({
       where: {
@@ -124,27 +128,23 @@ export default defineEventHandler(async (event) => {
     })
     
     if (invoiceRecord) {
-        status = invoiceRecord.status
-    } else if (year < 2026) {
-        status = 'PAID'
-    } else {
-        // Optional: Check if it's past due to mark as CLOSED/OVERDUE?
-        // For MVP, if it doesn't exist, it's OPEN.
+        status = invoiceRecord.status as 'OPEN' | 'PAID' | 'CLOSED'
+    } else if (card) {
+        const dueDate = new Date(year, month - 1, card.dueDay)
+        status = new Date() > dueDate ? 'CLOSED' : 'OPEN'
     }
-  } else if (year < 2026) {
-    status = 'PAID'
   }
 
   return {
     month,
     year,
-    status, // New field
-    total: totalInvoice,
+    status, // Null when aggregating all cards
+    total: totalInvoiceCents / 100,
     limit: totalLimit,
     budget: totalBudget,
-    available: totalLimit - totalInvoice,
+    available: totalLimit - totalInvoiceCents / 100,
     transactions: groupedTransactions,
-    dueDate: result.data.cardId ? new Date(year, month - 1, (await prisma.creditCard.findFirst({where: {id: result.data.cardId}, select: {dueDay: true}}))?.dueDay || 10).toISOString() : null,
-    closingDate: result.data.cardId ? new Date(year, month - 1, (await prisma.creditCard.findFirst({where: {id: result.data.cardId}, select: {closingDay: true}}))?.closingDay || 3).toISOString() : null
+    dueDate: result.data.cardId && card ? new Date(year, month - 1, card.dueDay).toISOString() : null,
+    closingDate: result.data.cardId && card ? new Date(year, month - 1, card.closingDay).toISOString() : null
   }
 })

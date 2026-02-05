@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AlertCircle, CheckCircle2, DollarSign, XCircle, Activity, Sparkles } from 'lucide-vue-next'
+import { AlertCircle, CheckCircle2, XCircle, Activity, Sparkles } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 
 interface SubscriptionItem {
@@ -20,7 +20,7 @@ interface SubscriptionAnalysis {
   quick_wins: string[]
 }
 
-const props = defineProps<{
+defineProps<{
   analysis: SubscriptionAnalysis
 }>()
 
@@ -36,7 +36,7 @@ const formatCurrency = (val: number) => {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
        <!-- Wasted Money -->
        <div class="rounded-2xl bg-gradient-to-br from-destructive/20 to-destructive/5 border border-destructive/20 p-6 relative overflow-hidden">
-          <div class="absolute right-0 top-0 w-32 h-32 bg-destructive/10 blur-3xl rounded-full"></div>
+          <div class="absolute right-0 top-0 w-32 h-32 bg-destructive/10 blur-3xl rounded-full"/>
           <p class="text-small font-medium text-destructive mb-1 uppercase tracking-wider flex items-center gap-2">
             <XCircle class="w-4 h-4" /> Desperdício Mensal
           </p>
@@ -48,7 +48,7 @@ const formatCurrency = (val: number) => {
 
        <!-- Quick Wins -->
        <div class="rounded-2xl border bg-card p-6 relative overflow-hidden">
-          <div class="absolute right-0 top-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full"></div>
+          <div class="absolute right-0 top-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full"/>
              <p class="text-small font-medium text-primary mb-4 uppercase tracking-wider flex items-center gap-2">
                <Sparkles class="w-4 h-4 ml-1" /> Quick Wins
             </p>

@@ -68,7 +68,7 @@ const formatCurrency = (value: number) => {
           class="h-full rounded-full transition-all duration-700 ease-out"
           :class="statusColor"
           :style="{ width: `${Math.min(data.limitUsagePercent, 100)}%` }"
-        ></div>
+        />
         
         <!-- Simulation Overlay -->
         <div 
@@ -78,7 +78,7 @@ const formatCurrency = (value: number) => {
             left: `${Math.min(data.limitUsagePercent, 100)}%`,
             width: `${Math.min(overlay.addedPercent, 100 - data.limitUsagePercent)}%` 
           }"
-        ></div>
+        />
       </div>
       
       <!-- Right: Value & Indicator -->
@@ -118,7 +118,7 @@ const formatCurrency = (value: number) => {
              class="flex justify-between items-center text-xs group/item"
            >
              <div class="flex items-center gap-2 overflow-hidden">
-               <div class="w-1 h-1 rounded-full bg-muted-foreground/30"></div>
+               <div class="w-1 h-1 rounded-full bg-muted-foreground/30"/>
                <span class="font-medium truncate text-foreground/80 group-hover/item:text-foreground transition-colors">
                  {{ t.description }}
                </span>

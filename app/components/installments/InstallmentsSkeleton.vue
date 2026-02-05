@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
     
     <!-- Health Dashboard Skeleton -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Skeleton class="h-32 rounded-xl" v-for="i in 4" :key="i" />
+      <Skeleton v-for="i in 4" :key="i" class="h-32 rounded-xl" />
     </div>
 
     <!-- Main Layout -->
