@@ -31,36 +31,36 @@ const colorState = computed(() => {
 const invoiceGradient = computed(() => {
   switch (colorState.value) {
     case 'danger':
-      return 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/50'
+      return 'bg-danger-muted border-danger/20'
     case 'warning':
-      return 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50'
+      return 'bg-warning-muted border-warning/20'
     default:
-      return 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
+      return 'bg-[linear-gradient(145deg,hsl(var(--primary)/0.65),hsl(var(--mint-600)/0.24))] dark:bg-[linear-gradient(145deg,hsl(var(--primary)/0.42),hsl(var(--mint-700)/0.34))] border-primary/45'
   }
 })
 
 const limitGradient = computed(() => {
   switch (colorState.value) {
     case 'danger':
-      return 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/50'
+      return 'bg-danger-muted border-danger/20'
     case 'warning':
-      return 'bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800/50'
+      return 'bg-warning-muted border-warning/20'
     default:
-      return 'bg-teal-50 dark:bg-teal-950/30 border-teal-200 dark:border-teal-800/50'
+      return 'bg-card border-border'
   }
 })
 
 const dueGradient = computed(() => {
   if (props.status === 'PAID') {
-    return 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
+    return 'bg-success-muted border-success/20'
   }
   switch (dueColorState.value) {
     case 'danger':
-      return 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/50'
+      return 'bg-danger-muted border-danger/20'
     case 'warning':
-      return 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50'
+      return 'bg-warning-muted border-warning/20'
     default:
-      return 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800/50'
+      return 'bg-[linear-gradient(145deg,hsl(var(--card)),hsl(var(--violet-100)/0.32))] dark:bg-[linear-gradient(145deg,hsl(var(--card)),hsl(var(--violet-500)/0.16))] border-border'
   }
 })
 
@@ -96,28 +96,28 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 </script>
 
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
     <!-- Card 1: Invoice Total -->
     <div
-      class="relative overflow-hidden rounded-xl p-5 md:p-6 border shadow-elevation-2 transition-all hover:scale-[1.02] group"
-      :class="[invoiceGradient, { 'motion-safe:animate-pulse ring-1 ring-rose-500/50': shouldPulse && colorState === 'danger' }]"
+      class="relative overflow-hidden rounded-3xl p-6 border shadow-elevation-2 transition-all hover:scale-[1.01] group min-h-[176px]"
+      :class="[invoiceGradient, { 'motion-safe:animate-pulse ring-1 ring-danger/50': shouldPulse && colorState === 'danger' }]"
     >
-      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
+      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-background/50 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
 
       <div class="relative z-10 space-y-4">
         <div class="flex items-center justify-between">
-          <div class="p-2 rounded-xl bg-white/80 dark:bg-white/5 border border-white/20 dark:border-white/10 shadow-elevation-1">
-            <CreditCard class="w-5 h-5 text-emerald-600 dark:text-emerald-400" :class="{ 'text-rose-600 dark:text-rose-400': colorState === 'danger', 'text-amber-600 dark:text-amber-400': colorState === 'warning' }" />
+          <div class="p-2 rounded-2xl bg-card/80 border border-border/65 shadow-elevation-1">
+            <CreditCard class="w-5 h-5 text-primary-foreground dark:text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
           </div>
-          <div v-if="colorState === 'danger'" class="px-2 py-0.5 bg-rose-500/10 dark:bg-rose-500/20 border border-rose-500/20 dark:border-rose-500/30 rounded-full text-micro text-rose-600 dark:text-rose-400">
+          <div v-if="colorState === 'danger'" class="px-2 py-0.5 bg-danger/10 border border-danger/20 rounded-full text-micro text-danger">
             Alerta
           </div>
         </div>
         <div>
-          <p class="text-micro text-muted-foreground dark:text-white/50">Fatura Estimada</p>
-          <p class="text-stat text-foreground dark:text-white mt-1.5">{{ formatCurrency(total) }}</p>
+          <p class="text-micro text-muted-foreground">Fatura Estimada</p>
+          <p class="text-stat text-foreground mt-1.5">{{ formatCurrency(total) }}</p>
           <div class="flex items-center gap-2 mt-2">
-            <span class="text-small text-muted-foreground dark:text-white/40 tabular-nums">{{ usagePercentage.toFixed(0) }}% do limite</span>
+            <span class="text-small text-muted-foreground tabular-nums">{{ usagePercentage.toFixed(0) }}% do limite</span>
           </div>
         </div>
       </div>
@@ -125,29 +125,29 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 
     <!-- Card 2: Limit Usage -->
     <div
-      class="relative overflow-hidden rounded-xl p-5 md:p-6 border shadow-elevation-2 transition-all hover:scale-[1.02] group"
+      class="relative overflow-hidden rounded-3xl p-6 border shadow-elevation-2 transition-all hover:scale-[1.01] group min-h-[176px]"
       :class="limitGradient"
     >
-      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
+      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-background/50 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
 
       <div class="relative z-10 space-y-4">
         <div class="flex items-center justify-between">
-          <div class="p-2 rounded-xl bg-white/80 dark:bg-white/5 border border-white/20 dark:border-white/10 shadow-elevation-1">
-            <TrendingUp class="w-5 h-5 text-teal-600 dark:text-teal-400" :class="{ 'text-rose-600 dark:text-rose-400': colorState === 'danger', 'text-amber-600 dark:text-amber-400': colorState === 'warning' }" />
+          <div class="p-2 rounded-2xl bg-primary/25 dark:bg-primary/20 border border-primary/35 shadow-elevation-1">
+            <TrendingUp class="w-5 h-5 text-primary-foreground dark:text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
           </div>
         </div>
         <div>
-          <p class="text-micro text-muted-foreground dark:text-white/50">Limite Comprometido</p>
+          <p class="text-micro text-muted-foreground">Limite Comprometido</p>
           <div class="flex items-baseline gap-1 mt-1.5">
-            <p class="text-stat text-foreground dark:text-white tabular-nums">{{ usagePercentage.toFixed(1) }}</p>
-            <span class="text-lg font-bold text-muted-foreground dark:text-white/40">%</span>
+            <p class="text-stat text-foreground tabular-nums">{{ usagePercentage.toFixed(1) }}</p>
+            <span class="text-lg font-bold text-muted-foreground">%</span>
           </div>
 
           <!-- Progress bar -->
           <div class="mt-3">
-             <div class="h-1.5 w-full bg-black/5 dark:bg-white/5 rounded-full overflow-hidden border border-black/5 dark:border-white/5">
+             <div class="h-1.5 w-full bg-background/70 rounded-full overflow-hidden border border-border/60">
                 <div
-                  class="h-full bg-teal-600 dark:bg-emerald-400 rounded-full transition-all duration-1000 shadow-sm dark:shadow-[0_0_8px_rgba(52,211,153,0.3)]"
+                  class="h-full bg-primary dark:bg-primary rounded-full transition-all duration-1000 shadow-sm"
                   :style="{ width: `${Math.min(usagePercentage, 100)}%` }"
                 />
               </div>
@@ -158,34 +158,34 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 
     <!-- Card 3: Days to Due -->
     <div
-      class="relative overflow-hidden rounded-xl p-5 md:p-6 border shadow-elevation-2 transition-all hover:scale-[1.02] group"
-      :class="[dueGradient, { 'motion-safe:animate-pulse ring-1 ring-rose-500/50': shouldPulse && dueColorState === 'danger' }]"
+      class="relative overflow-hidden rounded-3xl p-6 border shadow-elevation-2 transition-all hover:scale-[1.01] group min-h-[176px]"
+      :class="[dueGradient, { 'motion-safe:animate-pulse ring-1 ring-danger/50': shouldPulse && dueColorState === 'danger' }]"
     >
-      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
+      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-background/50 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
 
       <div class="relative z-10 space-y-4">
         <div class="flex items-center justify-between">
-          <div class="p-2 rounded-xl bg-white/80 dark:bg-white/5 border border-white/20 dark:border-white/10 shadow-elevation-1">
-            <Calendar class="w-5 h-5" :class="[status === 'PAID' ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400', { 'text-rose-600 dark:text-rose-400': dueColorState === 'danger', 'text-amber-600 dark:text-amber-400': dueColorState === 'warning' }]" />
+          <div class="p-2 rounded-2xl bg-primary/20 border border-primary/35 shadow-elevation-1">
+            <Calendar class="w-5 h-5" :class="[status === 'PAID' ? 'text-success' : 'text-primary-foreground dark:text-primary', { 'text-danger': dueColorState === 'danger', 'text-warning': dueColorState === 'warning' }]" />
           </div>
-          <div v-if="dueColorState === 'danger' && status !== 'PAID'" class="px-2 py-0.5 bg-rose-500/10 dark:bg-rose-500/20 border border-rose-500/20 dark:border-rose-500/30 rounded-full text-micro text-rose-600 dark:text-rose-400">
+          <div v-if="dueColorState === 'danger' && status !== 'PAID'" class="px-2 py-0.5 bg-danger/10 border border-danger/20 rounded-full text-micro text-danger">
             Urgente
           </div>
-          <div v-else-if="status === 'PAID'" class="px-2 py-0.5 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 dark:border-emerald-500/30 rounded-full text-micro text-emerald-600 dark:text-emerald-400">
+          <div v-else-if="status === 'PAID'" class="px-2 py-0.5 bg-success/10 border border-success/20 rounded-full text-micro text-success">
             Concluido
           </div>
         </div>
         <div class="flex items-end justify-between gap-2">
           <div>
-            <p class="text-micro text-muted-foreground dark:text-white/50">Vencimento</p>
-            <p class="text-stat text-foreground dark:text-white mt-1.5">{{ dueText }}</p>
-            <p class="text-small text-muted-foreground dark:text-white/40 mt-1.5">
+            <p class="text-micro text-muted-foreground">Vencimento</p>
+            <p class="text-stat text-foreground mt-1.5">{{ dueText }}</p>
+            <p class="text-small text-muted-foreground mt-1.5">
               {{ status === 'PAID' ? 'Fatura Paga' : 'Acompanhe as datas' }}
             </p>
           </div>
           <button
             v-if="status && status !== 'PAID'"
-            class="mb-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-elevation-3 shadow-blue-500/20 active:scale-95 transition-all whitespace-nowrap"
+            class="mb-1 px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-2xl text-xs font-black shadow-elevation-3 active:scale-95 transition-all whitespace-nowrap"
             @click="emit('pay')"
           >
             PAGAR
@@ -196,20 +196,20 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 
     <!-- Card 4: Top Category -->
     <div
-      class="relative overflow-hidden rounded-xl p-5 md:p-6 border border-violet-200 dark:border-violet-800/50 shadow-elevation-2 transition-all hover:scale-[1.02] group bg-violet-50 dark:bg-violet-950/30"
+      class="relative overflow-hidden rounded-3xl p-6 border border-primary/35 shadow-elevation-2 transition-all hover:scale-[1.01] group bg-[linear-gradient(150deg,hsl(var(--primary)/0.46),hsl(var(--secondary)/0.08))] dark:bg-[linear-gradient(150deg,hsl(var(--primary)/0.24),hsl(var(--secondary)/0.22))] min-h-[176px]"
     >
-      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/40 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
+      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-background/50 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
 
       <div class="relative z-10 space-y-4">
         <div class="flex items-center justify-between">
-          <div class="p-2 rounded-xl bg-white/80 dark:bg-white/5 border border-white/20 dark:border-white/10 shadow-elevation-1">
-            <component :is="categoryIcon" class="w-5 h-5 text-violet-600 dark:text-violet-400" />
+          <div class="p-2 rounded-2xl bg-card/75 border border-primary/35 shadow-elevation-1">
+            <component :is="categoryIcon" class="w-5 h-5 text-primary-foreground dark:text-primary" />
           </div>
         </div>
         <div>
-          <p class="text-micro text-muted-foreground dark:text-white/50">Maior Gasto</p>
-          <p class="text-xl md:text-2xl lg:text-3xl font-black text-foreground dark:text-white mt-1.5 truncate">{{ topCategory?.name || '---' }}</p>
-          <p class="text-small font-black text-violet-600 dark:text-violet-400 mt-1.5 tabular-nums">
+          <p class="text-micro text-muted-foreground">Maior Gasto</p>
+          <p class="text-xl md:text-2xl lg:text-3xl font-black text-foreground mt-1.5 truncate">{{ topCategory?.name || '---' }}</p>
+          <p class="text-small font-black text-primary-foreground dark:text-primary mt-1.5 tabular-nums">
             {{ topCategory ? formatCurrency(topCategory.amount) : 'Sem gastos' }}
           </p>
         </div>

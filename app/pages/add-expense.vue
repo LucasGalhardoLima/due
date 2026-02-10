@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
+import { refDebounced } from '@vueuse/core'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import { PlusCircle, Sparkles, Loader2 } from 'lucide-vue-next'
@@ -21,7 +22,8 @@ interface Category {
 }
 
 const { data: cards } = await useFetch<Card[]>('/api/cards')
-const { data: categories } = await useFetch<Category[]>('/api/categories')
+const { data: categories, refresh: refreshCategories } = await useFetch<Category[]>('/api/categories')
+const { bumpDataVersion } = useDataVersion()
 
 const form = reactive({
   description: '',
@@ -32,10 +34,45 @@ const form = reactive({
   categoryId: ''
 })
 
+const AI_CATEGORY_VALUE = '__ai_suggest__'
+const MIN_DESCRIPTION_LENGTH = 4
+
 // AI Mode State
 const isAiMode = ref(false)
 const aiText = ref('')
 const isAnalyzing = ref(false)
+const isSuggestingCategory = ref(false)
+const isDescriptionFocused = ref(false)
+const lastCategorySuggestion = ref<{ name: string; created: boolean } | null>(null)
+
+const descriptionQuery = ref('')
+const debouncedDescription = refDebounced(descriptionQuery, 250)
+
+const { data: descriptionSuggestions, pending: suggestionsLoading } = useFetch<string[]>('/api/transactions/suggestions', {
+  query: computed(() => ({ q: debouncedDescription.value })),
+  watch: [debouncedDescription],
+  default: () => [],
+  server: false
+})
+
+watch(() => form.description, (value) => {
+  descriptionQuery.value = value
+  if (lastCategorySuggestion.value) lastCategorySuggestion.value = null
+})
+
+const shouldShowSuggestions = computed(() => {
+  return (
+    isDescriptionFocused.value &&
+    debouncedDescription.value.length >= 2 &&
+    (descriptionSuggestions.value?.length ?? 0) > 0
+  )
+})
+
+const applySuggestion = (value: string) => {
+  form.description = value
+  descriptionQuery.value = value
+  isDescriptionFocused.value = false
+}
 
 async function analyzeText() {
   if (!aiText.value.trim()) return
@@ -113,6 +150,7 @@ async function onSubmit() {
       }
     })
     
+    bumpDataVersion()
     toast.success('Despesa adicionada!', { position: 'top-center' })
     router.push('/')
   } catch (e) {
@@ -120,6 +158,47 @@ async function onSubmit() {
     toast.error('Erro ao adicionar despesa')
   }
 }
+
+watch(() => form.categoryId, async (value, oldValue) => {
+  if (value !== AI_CATEGORY_VALUE) return
+  if (!form.description.trim() || form.description.trim().length < MIN_DESCRIPTION_LENGTH) {
+    toast.error(`Informe ao menos ${MIN_DESCRIPTION_LENGTH} caracteres para sugerir a categoria.`, { position: 'top-center' })
+    form.categoryId = oldValue || ''
+    return
+  }
+
+  isSuggestingCategory.value = true
+  try {
+    const res = await $fetch<{ categoryId: string; categoryName: string; created: boolean }>('/api/categories/suggest', {
+      method: 'POST',
+      body: {
+        description: form.description,
+        amount: form.amount,
+        cardId: form.cardId || undefined
+      }
+    })
+
+    await refreshCategories()
+    form.categoryId = res.categoryId
+    lastCategorySuggestion.value = { name: res.categoryName, created: res.created }
+    toast.success(
+      res.created ? `Categoria "${res.categoryName}" criada e selecionada.` : `Categoria sugerida: ${res.categoryName}`,
+      { position: 'top-center' }
+    )
+  } catch (e) {
+    console.error(e)
+    toast.error('Não foi possível sugerir a categoria.', { position: 'top-center' })
+    form.categoryId = oldValue || ''
+  } finally {
+    isSuggestingCategory.value = false
+  }
+})
+
+watch(() => form.categoryId, (value) => {
+  if (value && value !== AI_CATEGORY_VALUE && lastCategorySuggestion.value) {
+    lastCategorySuggestion.value = null
+  }
+})
 </script>
 
 <template>
@@ -139,10 +218,10 @@ async function onSubmit() {
     </div>
 
     <!-- Mode Toggle -->
-    <div v-else class="bg-muted/30 p-1 rounded-lg flex gap-1 mb-6">
+    <div v-else class="bg-muted/40 p-1.5 rounded-2xl flex gap-1 mb-6 border border-border/70 shadow-elevation-1">
         <button
           class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-all"
-          :class="!isAiMode ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:bg-background/50'"
+          :class="!isAiMode ? 'bg-background shadow-sm text-foreground rounded-xl' : 'text-muted-foreground hover:bg-background/50 rounded-xl'"
           @click="isAiMode = false"
         >
           <PlusCircle class="w-4 h-4" />
@@ -150,7 +229,7 @@ async function onSubmit() {
         </button>
         <button
           class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-all"
-          :class="isAiMode ? 'bg-ai-accent text-ai-accent-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'"
+          :class="isAiMode ? 'bg-ai-accent text-ai-accent-foreground shadow-sm rounded-xl' : 'text-muted-foreground hover:bg-background/50 rounded-xl'"
           @click="isAiMode = true"
         >
           <Sparkles class="w-4 h-4" />
@@ -159,7 +238,7 @@ async function onSubmit() {
     </div>
 
     <!-- AI Input Mode -->
-    <div v-if="isAiMode && cards?.length" class="space-y-6 bg-card p-8 rounded-2xl border shadow-elevation-2 animate-in fade-in slide-in-from-left-4 duration-300">
+    <div v-if="isAiMode && cards?.length" class="space-y-6 bg-card p-8 rounded-[2rem] border border-border/70 shadow-elevation-3 animate-in fade-in slide-in-from-left-4 duration-300">
         <div class="space-y-2">
            <label class="text-sm font-medium">Descreva sua compra</label>
            <Textarea 
@@ -182,9 +261,9 @@ async function onSubmit() {
         </Button>
     </div>
 
-    <form v-else-if="cards?.length" class="space-y-6 bg-card p-8 rounded-2xl border shadow-elevation-2 animate-in fade-in slide-in-from-right-4 duration-300" @submit.prevent="onSubmit">
+    <form v-else-if="cards?.length" class="space-y-6 bg-card p-8 rounded-[2rem] border border-border/70 shadow-elevation-3 animate-in fade-in slide-in-from-right-4 duration-300" @submit.prevent="onSubmit">
       <!-- Descricao -->
-      <div class="space-y-2">
+      <div class="space-y-2 relative">
         <label class="text-micro text-muted-foreground" for="description">O que voce comprou?</label>
         <input
           id="description"
@@ -194,7 +273,32 @@ async function onSubmit() {
           placeholder="Ex: Almoco, Uber, Assinatura…"
           class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm shadow-elevation-1 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-colors transition-shadow"
           required
+          @focus="isDescriptionFocused = true"
+          @blur="isDescriptionFocused = false"
         >
+        <div
+          v-if="isDescriptionFocused && debouncedDescription.length >= 2"
+          class="absolute z-20 mt-2 w-full rounded-xl border bg-popover shadow-elevation-3 overflow-hidden"
+        >
+          <div v-if="suggestionsLoading" class="px-4 py-2 text-xs text-muted-foreground flex items-center gap-2">
+            <Loader2 class="w-3.5 h-3.5 animate-spin" />
+            Buscando sugestões...
+          </div>
+          <button
+            v-for="item in descriptionSuggestions"
+            :key="item"
+            class="w-full text-left px-4 py-2 text-sm hover:bg-muted/60 transition-colors"
+            @mousedown.prevent="applySuggestion(item)"
+          >
+            {{ item }}
+          </button>
+          <div
+            v-if="!suggestionsLoading && !shouldShowSuggestions"
+            class="px-4 py-2 text-xs text-muted-foreground"
+          >
+            Sem sugestões por enquanto — continue digitando.
+          </div>
+        </div>
       </div>
 
       <!-- Valor -->
@@ -267,11 +371,26 @@ async function onSubmit() {
               <SelectValue placeholder="Selecione" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem :value="AI_CATEGORY_VALUE">
+                <div class="flex items-center gap-2">
+                  <Sparkles class="w-3.5 h-3.5 text-ai-accent" />
+                  <span>Sugestão de IA</span>
+                  <span v-if="isSuggestingCategory" class="ml-auto text-[10px] text-muted-foreground flex items-center gap-1">
+                    <Loader2 class="w-3 h-3 animate-spin" />
+                    Analisando
+                  </span>
+                </div>
+              </SelectItem>
               <SelectItem v-for="cat in categories" :key="cat.id" :value="cat.id">
                 {{ cat.name }}
               </SelectItem>
             </SelectContent>
           </Select>
+          <p v-if="lastCategorySuggestion" class="text-xs text-muted-foreground">
+            Sugestão de IA:
+            <span class="font-medium text-foreground">{{ lastCategorySuggestion.name }}</span>
+            <span v-if="lastCategorySuggestion.created" class="ml-1 text-[10px] font-semibold text-ai-accent uppercase">criada</span>
+          </p>
         </div>
       </div>
 

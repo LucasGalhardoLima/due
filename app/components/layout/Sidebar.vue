@@ -76,10 +76,9 @@ function closeMobileMenu() {
   <!-- Mobile Header -->
   <header class="lg:hidden h-14 border-b border-border bg-card sticky top-0 z-40 px-4 flex items-center justify-between">
     <NuxtLink to="/" class="font-bold text-lg flex items-center gap-2">
-      <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-elevation-2 text-sm">
+      <div class="w-8 h-8 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground shadow-elevation-2 text-sm">
         Du
       </div>
-      <span>Du</span>
     </NuxtLink>
 
     <Button variant="ghost" size="icon" @click="isMobileMenuOpen = true">
@@ -89,17 +88,16 @@ function closeMobileMenu() {
 
   <!-- Sidebar Container -->
   <aside
-    class="fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transition-transform duration-300"
+    class="fixed inset-y-0 left-0 z-50 w-72 bg-card/95 backdrop-blur-sm border-r border-border/70 transition-transform duration-300"
     :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
   >
     <div class="flex flex-col h-full">
       <!-- Sidebar Header (Desktop) -->
       <div class="h-16 flex items-center px-6 border-b border-border/50 shrink-0">
         <NuxtLink to="/" class="font-bold text-xl flex items-center gap-2">
-          <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-elevation-2 text-sm">
+          <div class="w-9 h-9 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground shadow-elevation-2 text-sm">
             Du
           </div>
-          <span>Du</span>
         </NuxtLink>
         <Button variant="ghost" size="icon" class="lg:hidden ml-auto" @click="closeMobileMenu">
           <X class="w-5 h-5" />
@@ -107,37 +105,37 @@ function closeMobileMenu() {
       </div>
 
       <!-- Navigation Links -->
-      <nav class="flex-1 overflow-y-auto p-4 space-y-8">
+      <nav class="flex-1 overflow-y-auto p-4 space-y-5">
         <div v-for="group in groups" :key="group.label" class="space-y-2">
-          <h3 class="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <h3 class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             {{ group.label }}
           </h3>
-          <div class="space-y-1">
+          <div class="space-y-1 rounded-[2rem] border border-border/70 bg-background/70 p-2 shadow-elevation-1">
             <NuxtLink
               v-for="item in group.items"
               :key="item.path"
               :to="item.path"
-              class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:bg-accent group relative"
-              active-class="bg-primary/10 text-primary hover:bg-primary/15"
+              class="relative flex items-center gap-3 px-3.5 py-2.5 rounded-[1.5rem] text-sm font-semibold transition-[transform,background-color,color,box-shadow] duration-200 ease-out hover:bg-primary/16 dark:hover:bg-primary/14 hover:text-foreground hover:translate-x-0.5 group before:absolute before:left-1 before:top-1/2 before:h-5 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-primary before:opacity-0 before:scale-y-50 before:transition-all before:duration-200"
+              :active-class="item.ai ? 'bg-ai-accent/16 text-ai-accent hover:bg-ai-accent/22 before:opacity-100 before:scale-y-100 before:bg-ai-accent shadow-elevation-1' : 'bg-primary text-primary-foreground shadow-elevation-1 hover:bg-primary/88 hover:shadow-elevation-2 before:opacity-100 before:scale-y-100 before:bg-primary-foreground/80'"
               @click="closeMobileMenu"
             >
-              <component :is="item.icon" class="w-4 h-4 opacity-70 group-hover:opacity-100" />
+              <component :is="item.icon" class="w-4 h-4 opacity-80 transition-all duration-200 group-hover:opacity-100 group-hover:scale-105" />
               <span>{{ item.name }}</span>
-              <ChevronRight class="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ChevronRight class="w-4 h-4 ml-auto opacity-0 translate-x-0.5 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
             </NuxtLink>
           </div>
         </div>
       </nav>
 
       <!-- Sidebar Footer -->
-      <div class="p-4 border-t bg-muted/20">
+      <div class="p-4 border-t border-border/70 bg-secondary/5">
         <div class="flex flex-col gap-4">
           <!-- Profile Section -->
           <div class="flex items-center justify-between px-2 group/profile">
             <div class="flex items-center gap-3">
-              <div class="h-9 w-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden shrink-0">
+              <div class="h-9 w-9 rounded-xl bg-primary/35 border border-primary/50 flex items-center justify-center overflow-hidden shrink-0">
                 <img v-if="user?.imageUrl" :src="user.imageUrl" class="h-full w-full object-cover" alt="Avatar" >
-                <User v-else class="w-5 h-5 text-primary opacity-70" />
+                <User v-else class="w-5 h-5 text-primary-foreground opacity-80" />
               </div>
               <div class="flex flex-col min-w-0">
                 <span class="text-xs font-bold truncate">{{ isDemoMode ? 'Usuário' : (user?.firstName || 'Usuário') }}</span>
@@ -149,7 +147,7 @@ function closeMobileMenu() {
           <!-- Actions Row -->
           <div class="flex items-center justify-between px-2 gap-2">
             <button 
-              class="flex-1 flex items-center justify-center gap-2 h-9 px-3 rounded-md bg-background border border-border hover:bg-accent transition-all text-xs font-medium text-muted-foreground hover:text-foreground" 
+              class="flex-1 flex items-center justify-center gap-2 h-9 px-3 rounded-xl bg-background border border-border hover:bg-secondary/10 hover:border-primary/30 transition-all duration-200 ease-out hover:-translate-y-[1px] text-xs font-medium text-muted-foreground hover:text-foreground" 
               aria-label="Alternar Tema"
               @click="toggleTheme"
             >
@@ -159,7 +157,7 @@ function closeMobileMenu() {
             </button>
 
             <button
-              class="flex items-center justify-center h-9 w-9 rounded-md bg-background border border-border hover:bg-red-500/10 hover:border-red-500/20 hover:text-red-500 transition-all text-muted-foreground"
+              class="flex items-center justify-center h-9 w-9 rounded-xl bg-background border border-border hover:bg-danger/10 hover:border-danger/20 hover:text-danger transition-all duration-200 ease-out hover:-translate-y-[1px] text-muted-foreground"
               title="Sair"
               @click="handleSignOut"
             >
@@ -170,10 +168,10 @@ function closeMobileMenu() {
           <!-- Demo Mode Button (Dev Only) -->
           <div v-if="isDev" class="px-2">
             <button 
-              class="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-md transition-all text-xs font-bold border" 
+              class="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-xl transition-all duration-200 ease-out hover:-translate-y-[1px] text-xs font-bold border" 
               :class="isDemoMode 
-                ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20' 
-                : 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/20'"
+                ? 'bg-warning/10 border-warning/20 text-warning hover:bg-warning/20'
+                : 'bg-primary/40 border-primary/50 text-primary-foreground hover:bg-primary/50'"
               @click="toggleDemoMode"
             >
               <ShieldCheck class="w-3.5 h-3.5" />

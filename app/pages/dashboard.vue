@@ -22,6 +22,7 @@ import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
 
 // Proactive Advisor
 const advisor = useProactiveAdvisor()
+const { dataVersion } = useDataVersion()
 
 // Global State
 const currentDate = ref(new Date())
@@ -32,7 +33,8 @@ const editingTransactionId = ref<string | null>(null)
 const queryParams = computed(() => ({
     month: getMonth(currentDate.value) + 1,
     year: getYear(currentDate.value),
-    cardId: selectedCardId.value || undefined
+    cardId: selectedCardId.value || undefined,
+    v: dataVersion.value
 }))
 
 interface SummaryResponse {
@@ -83,7 +85,7 @@ interface TransactionListItem {
 // Fetch Data
 const summaryKey = computed(() => {
   const params = queryParams.value
-  return `dashboard-summary-${params.year}-${params.month}-${params.cardId ?? 'all'}`
+  return `dashboard-summary-${params.year}-${params.month}-${params.cardId ?? 'all'}-v${dataVersion.value}`
 })
 
 const { data: summary, refresh: refreshSummary, status: summaryStatus } = useFetch<SummaryResponse>('/api/invoices/summary', {
@@ -115,8 +117,12 @@ const daysToDue = computed(() => {
 const { data: cards, status: cardsStatus } = useFetch<CardItem[]>('/api/cards')
 
 // Keeping futureProjection and pareto for now
-const { data: futureProjection, refresh: refreshFuture } = useFetch<FutureProjectionResponse>('/api/dashboard/future-projection')
-const { data: pareto, refresh: refreshPareto } = useFetch<ParetoResponse>('/api/dashboard/pareto')
+const { data: futureProjection, refresh: refreshFuture } = useFetch<FutureProjectionResponse>('/api/dashboard/future-projection', {
+  key: computed(() => `dashboard-future-projection-v${dataVersion.value}`)
+})
+const { data: pareto, refresh: refreshPareto } = useFetch<ParetoResponse>('/api/dashboard/pareto', {
+  key: computed(() => `dashboard-pareto-v${dataVersion.value}`)
+})
 
 // Fetch Crisis Alerts
 const { data: crisisAlerts } = useFetch<CrisisAlert[]>('/api/reports/crisis-alerts', {
@@ -256,10 +262,10 @@ const showPayConfirm = ref(false)
         class="hidden lg:flex"
       >
         <template #actions>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-3">
             <!-- Card Selector -->
             <Select v-model="selectedCardId">
-              <SelectTrigger class="w-[180px] bg-card border-border/60">
+              <SelectTrigger class="w-[220px] bg-card border-border/70 rounded-2xl shadow-elevation-1">
                 <SelectValue placeholder="Todos os Cartões" />
               </SelectTrigger>
               <SelectContent>
@@ -270,12 +276,12 @@ const showPayConfirm = ref(false)
             </Select>
 
             <!-- Month Navigation Buttons -->
-            <div class="flex items-center bg-muted/30 rounded-xl p-1 border shadow-elevation-1">
-              <button class="p-2 hover:bg-background rounded-lg transition-colors text-muted-foreground hover:text-foreground" @click="prevMonth">
+            <div class="flex items-center bg-muted/40 rounded-2xl p-1 border border-border/70 shadow-elevation-1">
+              <button class="p-2.5 hover:bg-background rounded-xl transition-colors text-muted-foreground hover:text-foreground" @click="prevMonth">
                 <span class="sr-only">Anterior</span>
                 <ChevronLeft class="w-4 h-4" />
               </button>
-              <button class="p-2 hover:bg-background rounded-lg transition-colors text-muted-foreground hover:text-foreground" @click="nextMonth">
+              <button class="p-2.5 hover:bg-background rounded-xl transition-colors text-muted-foreground hover:text-foreground" @click="nextMonth">
                 <span class="sr-only">Proximo</span>
                 <ChevronRight class="w-4 h-4" />
               </button>
@@ -285,7 +291,7 @@ const showPayConfirm = ref(false)
       </PageHeader>
 
       <!-- Mobile Header & Navigation (New) -->
-      <div class="lg:hidden space-y-4 mb-6">
+      <div class="lg:hidden space-y-4 mb-7">
         <div>
           <h1 class="text-h1">Dashboard</h1>
           <p class="text-body text-muted-foreground">Visao geral.</p>
@@ -295,7 +301,7 @@ const showPayConfirm = ref(false)
         <div class="flex items-center gap-3">
            <!-- Card Selector (Mobile) -->
             <Select v-model="selectedCardId">
-              <SelectTrigger class="flex-1 bg-card border-border/60 shadow-elevation-1 rounded-xl">
+              <SelectTrigger class="flex-1 bg-card border-border/70 shadow-elevation-1 rounded-2xl">
                 <div class="flex items-center gap-2 truncate">
                   <span class="bg-primary/10 p-1 rounded-lg shrink-0">
                     <CreditCardIcon class="w-3.5 h-3.5 text-primary" />
@@ -315,96 +321,97 @@ const showPayConfirm = ref(false)
             </Select>
 
             <!-- Month Navigation (Pill) -->
-            <div class="flex items-center bg-zinc-900 border border-border/40 rounded-full h-10 shadow-elevation-2 shrink-0 px-1">
-               <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full hover:bg-white/10 text-white" @click="prevMonth">
+            <div class="flex items-center bg-card border border-border/70 rounded-full h-10 shadow-elevation-2 shrink-0 px-1">
+               <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground" @click="prevMonth">
                 <ChevronLeft class="w-4 h-4" />
               </Button>
-               <span class="text-small font-bold px-2 whitespace-nowrap text-white min-w-[70px] text-center">
+               <span class="text-small font-bold px-2 whitespace-nowrap text-foreground min-w-[70px] text-center">
                 {{ months[summary.month - 1] }}/{{ summary.year }}
                </span>
-              <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full hover:bg-white/10 text-white" @click="nextMonth">
+              <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground" @click="nextMonth">
                 <ChevronRight class="w-4 h-4" />
               </Button>
             </div>
         </div>
       </div>
 
-      <!-- Content Grid -->
-      <div class="grid grid-cols-1 gap-8">
-        <!-- Main Content Area (Full Width) -->
-        <div class="space-y-8">
-          <!-- Crisis Alerts (if any) -->
-          <div v-if="crisisAlerts && crisisAlerts.length > 0" class="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
-             <CrisisAlertCard v-for="(alert, idx) in crisisAlerts" :key="idx" :alert="alert" />
+      <!-- Section 1: Crisis Alerts + Summary -->
+      <div class="space-y-5">
+        <!-- Crisis Alerts -->
+        <div v-if="crisisAlerts && crisisAlerts.length > 0" class="space-y-4">
+          <div v-for="(alert, idx) in crisisAlerts" :key="idx" class="animate-in fade-in slide-in-from-top-4 duration-500">
+            <CrisisAlertCard :alert="alert" />
+          </div>
+        </div>
+
+        <!-- Summary Cards (own grid) -->
+        <SummaryCards
+          :total="summary.total"
+          :limit="summary.limit"
+          :budget="summary.budget"
+          :usage-percentage="usagePercentage"
+          :days-to-due="daysToDue"
+          :status="summary.status"
+          :top-category="topCategory || undefined"
+          @pay="showPayConfirm = true"
+        />
+      </div>
+
+      <!-- Section 2: Main + Sidebar -->
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+        <!-- Left: Transactions -->
+        <Card class="p-6 overflow-hidden">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-h2">Lançamentos</h2>
+          </div>
+          <TransactionList :transactions="summary.transactions || {}" @edit="handleEdit" />
+        </Card>
+
+        <!-- Right: Sidebar stack -->
+        <div class="space-y-5">
+          <!-- Proactive Advisor -->
+          <ProactiveAdvisor v-if="advisor.hasMessage.value || advisor.isLoading.value" class="hidden lg:block" />
+
+          <!-- AI Insights -->
+          <div class="hidden lg:block">
+            <AIInsights :month="summary.month" :year="summary.year" />
           </div>
 
-          <!-- Hero Summary Cards -->
-          <SummaryCards 
-            :total="summary.total"
-            :limit="summary.limit"
-            :budget="summary.budget"
-            :usage-percentage="usagePercentage"
-            :days-to-due="daysToDue"
-            :status="summary.status"
-            :top-category="topCategory || undefined"
-            @pay="showPayConfirm = true"
-          />
+          <!-- Purchase Simulator -->
+          <div v-if="selectedCardId && cards && cards.length > 0" class="hidden lg:block">
+            <PurchaseSimulator
+              :card-id="selectedCardId"
+              :card-name="cards.find(c => c.id === selectedCardId)?.name || ''"
+            />
+          </div>
 
-          <!-- Two Column Layout: Transactions + Sidebar -->
-          <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
-            <!-- Transaction List -->
-            <Card class="p-6 overflow-hidden">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-h2">Lançamentos</h2>
-                </div>
-                <TransactionList :transactions="summary.transactions || {}" @edit="handleEdit" />
-            </Card>
-
-            <!-- Right Sidebar -->
-            <div class="space-y-6">
-                <!-- Proactive Advisor (Desktop) -->
-                <ProactiveAdvisor v-if="advisor.hasMessage.value || advisor.isLoading.value" class="hidden lg:block" />
-
-                <!-- Future Projection -->
-                <Card v-if="futureProjection" class="overflow-hidden p-0 hidden lg:block">
-                  <div class="p-4 border-b border-border bg-muted/30">
-                    <h3 class="text-micro text-muted-foreground">Projeção Futura</h3>
-                  </div>
-                  <div class="p-4 space-y-3">
-                      <div
-                          v-for="proj in futureProjection.projections" :key="`${proj.month}-${proj.year}`"
-                          class="flex justify-between items-center p-3 rounded-lg bg-muted/30 border border-border hover:border-primary/30 transition-colors group"
-                      >
-                          <div class="flex flex-col">
-                              <span class="text-micro text-muted-foreground">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
-                              <span class="text-small text-muted-foreground">{{ proj.installmentsCount }} parcelas</span>
-                          </div>
-                          <span class="text-body font-black group-hover:text-primary transition-colors">{{ formatCurrency(proj.total || 0) }}</span>
-                      </div>
-                      <div v-if="!futureProjection.projections?.length" class="text-small text-muted-foreground text-center py-4">
-                          Nenhuma projeção futura.
-                      </div>
-                  </div>
-                </Card>
-
-                <!-- AI Tools Group (Hidden on Mobile) -->
-                <div class="hidden lg:flex flex-col gap-6">
-                  <AIInsights :month="summary.month" :year="summary.year" />
-                  
-                  <PurchaseSimulator 
-                    v-if="selectedCardId && cards && cards.length > 0"
-                    :card-id="selectedCardId"
-                    :card-name="cards.find(c => c.id === selectedCardId)?.name || ''"
-                  />
-                </div>
+          <!-- Future Projection -->
+          <Card v-if="futureProjection" class="overflow-hidden p-0 hidden lg:block">
+            <div class="p-4 border-b border-border bg-muted/30">
+              <h3 class="text-micro text-muted-foreground">Projeção Futura</h3>
             </div>
-          </div>
+            <div class="p-4 space-y-3">
+              <div
+                v-for="proj in futureProjection.projections" :key="`${proj.month}-${proj.year}`"
+                class="flex justify-between items-center p-3 rounded-2xl bg-muted/40 border border-border/70 hover:border-secondary/40 transition-colors group"
+              >
+                <div class="flex flex-col">
+                  <span class="text-micro text-muted-foreground">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
+                  <span class="text-small text-muted-foreground">{{ proj.installmentsCount }} parcelas</span>
+                </div>
+                <span class="text-body font-black group-hover:text-primary transition-colors">{{ formatCurrency(proj.total || 0) }}</span>
+              </div>
+              <div v-if="!futureProjection.projections?.length" class="text-small text-muted-foreground text-center py-4">
+                Nenhuma projeção futura.
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
     </template>
 
     <div v-else-if="cardsStatus === 'success' && !cards?.length" class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-      <div class="p-6 rounded-xl bg-card border border-border shadow-elevation-2 max-w-md">
+      <div class="p-6 rounded-[2rem] bg-card border border-border shadow-elevation-2 max-w-md">
          <CreditCardIcon class="w-12 h-12 text-primary mx-auto mb-4" />
          <h2 class="text-h2 mb-2">Nenhum cartão encontrado</h2>
          <p class="text-muted-foreground mb-6">Você precisa cadastrar seu primeiro cartão para começar a gerenciar suas finanças.</p>

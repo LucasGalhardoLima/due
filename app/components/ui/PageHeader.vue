@@ -14,7 +14,7 @@ defineProps<Props>()
 <template>
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 h-[72px]">
     <div class="flex items-center gap-4">
-      <div v-if="icon" class="hidden md:flex bg-primary/10 p-3 rounded-2xl border border-primary/20 text-primary shadow-elevation-1">
+      <div v-if="icon" class="hidden md:flex bg-primary/18 dark:bg-primary/20 p-3 rounded-2xl border border-primary/35 text-primary-foreground dark:text-primary shadow-elevation-1">
         <component :is="icon" class="w-6 h-6" />
       </div>
       <div>

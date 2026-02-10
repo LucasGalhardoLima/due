@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
   for (const inst of installments) {
     const catId = inst.transaction.categoryId
     const catName = inst.transaction.category.name
-    const catColor = inst.transaction.category.color || '#333'
+    const catColor = inst.transaction.category.color || '#231651'
 
     const existing = categoryTotals.get(catId) || { name: catName, totalCents: 0, color: catColor }
     existing.totalCents += moneyToCents(inst.amount)

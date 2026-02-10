@@ -4,44 +4,64 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    /* Slate 50 #F8FAFC */
-    --foreground: 222 47% 11%;
+    --background: 163 50% 97%;
+    --foreground: 253 57% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 253 57% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 253 57% 20%;
 
-    --primary: 174 84% 32%;
-    /* Teal 600 #0D9488 */
-    --primary-foreground: 0 0% 98%;
+    /* Brand ramps */
+    --mint-50: 163 100% 98%;
+    --mint-100: 163 100% 95%;
+    --mint-200: 163 100% 92%;
+    --mint-300: 163 80% 82%;
+    --mint-400: 163 65% 69%;
+    --mint-500: 163 55% 52%;
+    --mint-600: 163 50% 40%;
+    --mint-700: 163 48% 30%;
 
-    --secondary: 210 40% 96%;
-    /* Slate neutral */
-    --secondary-foreground: 215 28% 17%;
+    --violet-50: 253 50% 95%;
+    --violet-100: 253 48% 88%;
+    --violet-200: 253 46% 76%;
+    --violet-300: 253 44% 64%;
+    --violet-400: 253 48% 50%;
+    --violet-500: 253 54% 38%;
+    --violet-600: 253 56% 28%;
+    --violet-700: 253 57% 20%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --primary: 163 100% 92%;
+    --primary-foreground: 253 57% 20%;
 
-    --accent: 263 70% 58%;
-    /* Violet 500 #8B5CF6 for AI/premium */
-    --accent-foreground: 0 0% 98%;
+    --secondary: 253 57% 20%;
+    --secondary-foreground: 163 100% 92%;
+
+    --muted: 163 40% 93%;
+    --muted-foreground: 253 20% 38%;
+
+    --accent: 163 65% 91%;
+    --accent-foreground: 253 57% 20%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 174 84% 32%;
+    --border: 163 28% 86%;
+    --input: 163 30% 87%;
+    --ring: 163 55% 42%;
 
-    --radius: 0.75rem;
-    /* 12px */
+    --radius: 1.25rem;
 
-    /* AI Accent (Violet 500) */
-    --ai-accent: 263 70% 58%;
+    /* AI Accent aligned to violet family */
+    --ai-accent: 253 55% 44%;
     --ai-accent-foreground: 0 0% 98%;
+
+    /* Accent tokens (derived from blending primary & secondary) */
+    --accent-warm: 290 45% 65%;
+    --accent-warm-foreground: 0 0% 100%;
+    --accent-cool: 178 60% 42%;
+    --accent-cool-foreground: 0 0% 100%;
 
     /* Status Colors */
     --success: 160 84% 39%;
@@ -60,46 +80,50 @@
     --danger-foreground: 0 0% 98%;
     --danger-muted: 0 80% 95%;
 
-    /* Glassmorphism tokens - reduced opacity for modals/overlays only */
-    --glass-bg: 0 0% 100% / 0.85;
-    --glass-border: 0 0% 100% / 0.2;
+    --glass-bg: 163 55% 98% / 0.78;
+    --glass-border: 253 30% 72% / 0.18;
+
+    --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+    --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
   }
 
   .dark {
-    --background: 222 47% 5%;
-    /* Deep slate */
-    --foreground: 210 40% 98%;
+    --background: 253 40% 8%;
+    --foreground: 163 70% 90%;
 
-    --card: 222 47% 7%;
-    --card-foreground: 210 40% 98%;
+    --card: 253 35% 12%;
+    --card-foreground: 163 70% 90%;
 
-    --popover: 222 47% 5%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 253 33% 13%;
+    --popover-foreground: 163 70% 90%;
 
-    --primary: 174 72% 42%;
-    /* Teal 500 #14B8A6 */
-    --primary-foreground: 222 47% 5%;
+    --primary: 163 80% 70%;
+    --primary-foreground: 253 57% 12%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 174 72% 42%;
+    --secondary: 253 50% 36%;
+    --secondary-foreground: 163 94% 92%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 253 24% 16%;
+    --muted-foreground: 163 35% 72%;
 
-    --accent: 263 70% 58%;
-    /* Violet 500 */
-    --accent-foreground: 0 0% 98%;
+    --accent: 253 22% 20%;
+    --accent-foreground: 163 88% 90%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 174 72% 42%;
+    --border: 253 20% 24%;
+    --input: 253 20% 24%;
+    --ring: 163 72% 58%;
 
-    /* AI Accent (Violet 500) */
-    --ai-accent: 263 70% 58%;
+    --ai-accent: 253 68% 64%;
     --ai-accent-foreground: 0 0% 98%;
+
+    /* Accent tokens - slightly brighter for dark mode */
+    --accent-warm: 290 50% 70%;
+    --accent-warm-foreground: 0 0% 100%;
+    --accent-cool: 178 65% 48%;
+    --accent-cool-foreground: 0 0% 100%;
 
     /* Status Colors - Dark Mode */
     --success: 160 72% 45%;
@@ -114,9 +138,8 @@
     --danger: 0 72% 50%;
     --danger-muted: 0 50% 15%;
 
-    /* Glassmorphism tokens - Dark Mode - reduced opacity for modals/overlays only */
-    --glass-bg: 222 47% 7% / 0.9;
-    --glass-border: 0 0% 100% / 0.1;
+    --glass-bg: 253 35% 12% / 0.88;
+    --glass-border: 163 50% 88% / 0.12;
   }
 }
 
@@ -129,18 +152,19 @@
   html,
   body {
     @apply bg-background text-foreground h-full overscroll-y-none;
+    font-family: var(--font-body);
   }
 }
 
 @layer components {
   /* Typography utility classes */
-  .text-display { @apply text-4xl md:text-5xl font-black tracking-tight leading-none; }
-  .text-h1 { @apply text-3xl font-black tracking-tight leading-tight; }
-  .text-h2 { @apply text-xl md:text-2xl font-bold tracking-tight; }
-  .text-h3 { @apply text-lg font-bold; }
-  .text-h4 { @apply text-base font-semibold; }
+  .text-display { @apply text-4xl md:text-5xl font-extrabold tracking-tight leading-none; font-family: var(--font-display); }
+  .text-h1 { @apply text-3xl font-extrabold tracking-tight leading-tight; font-family: var(--font-display); }
+  .text-h2 { @apply text-xl md:text-2xl font-bold tracking-tight; font-family: var(--font-display); }
+  .text-h3 { @apply text-lg font-bold; font-family: var(--font-display); }
+  .text-h4 { @apply text-base font-semibold; font-family: var(--font-display); }
   .text-body { @apply text-sm font-normal leading-relaxed; }
   .text-small { @apply text-xs font-medium; }
   .text-micro { @apply text-[10px] font-bold uppercase tracking-widest; }
-  .text-stat { @apply text-2xl md:text-3xl lg:text-4xl font-black tabular-nums tracking-tighter; }
+  .text-stat { @apply text-2xl md:text-3xl lg:text-4xl font-extrabold tabular-nums tracking-tighter; font-family: var(--font-display); }
 }

@@ -44,11 +44,11 @@ definePageMeta({
 <template>
   <div class="min-h-screen bg-background text-foreground font-sans antialiased">
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border bg-card/95 backdrop-blur-sm">
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border/70 bg-card/90 backdrop-blur-md">
       <div class="container mx-auto px-6 h-16 flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" class="font-black text-xl flex items-center gap-2 tracking-tight">
-          <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-black shadow-elevation-2">
+          <div class="w-9 h-9 bg-secondary rounded-2xl flex items-center justify-center text-secondary-foreground font-black shadow-elevation-2">
             Du
           </div>
         </NuxtLink>
@@ -72,7 +72,7 @@ definePageMeta({
               Entrar
             </button>
             <button
-              class="h-9 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-bold shadow-elevation-2 hover:opacity-90 transition-all"
+              class="h-9 px-5 rounded-2xl bg-secondary text-secondary-foreground text-sm font-bold shadow-elevation-2 hover:opacity-90 transition-all"
               @click="openSignUp"
             >
               Criar Conta
@@ -97,10 +97,7 @@ definePageMeta({
         <div class="min-h-[80vh] flex items-center justify-center">
           <div class="text-center space-y-4">
             <p class="text-muted-foreground">Voce ja esta logado.</p>
-            <NuxtLink
-              to="/dashboard"
-              class="inline-flex items-center justify-center h-12 px-8 rounded-lg bg-primary text-primary-foreground font-bold shadow-elevation-2"
-            >
+            <NuxtLink to="/dashboard" class="inline-flex items-center justify-center h-12 px-8 rounded-2xl bg-secondary text-secondary-foreground font-bold shadow-elevation-2">
               Ir para o Dashboard
             </NuxtLink>
           </div>
@@ -136,7 +133,7 @@ definePageMeta({
         />
 
         <!-- Modal -->
-        <div class="relative w-full max-w-md bg-card border border-border rounded-2xl shadow-elevation-5 overflow-hidden animate-in zoom-in-95 duration-200">
+        <div class="relative w-full max-w-md bg-card border border-border/70 rounded-[2rem] shadow-elevation-5 overflow-hidden animate-in zoom-in-95 duration-200">
           <button
             class="absolute top-4 right-4 p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground z-10"
             aria-label="Fechar"

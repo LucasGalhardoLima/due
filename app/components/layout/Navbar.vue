@@ -55,7 +55,7 @@ function closeMobileMenu() {
       <div class="container mx-auto px-4 h-16 flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" class="font-bold text-xl flex items-center gap-2">
-          <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-elevation-2">
+          <div class="w-8 h-8 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground shadow-elevation-2">
             D
           </div>
           <span>Due</span>
@@ -92,7 +92,7 @@ function closeMobileMenu() {
                  <img v-if="user?.imageUrl" :src="user.imageUrl" width="32" height="32" class="h-full w-full object-cover" alt="Avatar do usuário" >
                  <User v-else class="w-4 h-4 text-primary opacity-70" aria-hidden="true" />
               </div>
-              <button class="text-muted-foreground hover:text-red-500 transition-colors" title="Sair" aria-label="Sair da conta" @click="handleSignOut">
+              <button class="text-muted-foreground hover:text-danger transition-colors" title="Sair" aria-label="Sair da conta" @click="handleSignOut">
                 <LogOut class="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
@@ -135,7 +135,7 @@ function closeMobileMenu() {
           <!-- Header -->
           <div class="h-16 flex items-center px-6 border-b border-border/50 shrink-0 justify-between">
             <NuxtLink to="/" class="font-bold text-xl flex items-center gap-2" @click="closeMobileMenu">
-              <div class="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-elevation-2">D</div>
+              <div class="w-8 h-8 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground shadow-elevation-2">D</div>
               <span>Due</span>
             </NuxtLink>
             <Button variant="ghost" size="icon" aria-label="Fechar menu" @click="closeMobileMenu">
@@ -170,7 +170,7 @@ function closeMobileMenu() {
                 <span class="text-xs text-muted-foreground truncate">{{ user?.primaryEmailAddress?.emailAddress }}</span>
               </div>
             </div>
-            <Button variant="outline" class="w-full text-red-500 hover:bg-red-500/10 hover:text-red-500" @click="handleSignOut">
+            <Button variant="outline" class="w-full text-danger hover:bg-danger/10 hover:text-danger" @click="handleSignOut">
               <LogOut class="w-4 h-4 mr-2" />
               Sair da Conta
             </Button>

@@ -58,12 +58,12 @@ const isLoading = computed(() => timelineStatus.value === 'pending' || healthSta
           
           <!-- Timeline (Left/Main Column) -->
           <div class="lg:col-span-2 space-y-8">
-            <div class="rounded-3xl border bg-card p-6 shadow-sm">
+            <div class="rounded-[2rem] border border-border/70 bg-card p-6 shadow-elevation-2">
               <TimelineMap />
             </div>
   
             <!-- Chart (Phase 4) -->
-            <div class="rounded-3xl border bg-card p-6 shadow-sm min-h-[300px]">
+            <div class="rounded-[2rem] border border-border/70 bg-card p-6 shadow-elevation-2 min-h-[300px]">
                <LimitReleaseChart />
             </div>
           </div>
@@ -72,13 +72,21 @@ const isLoading = computed(() => timelineStatus.value === 'pending' || healthSta
           <div class="space-y-6">
             
             <!-- Simulator (Phase 3) -->
-            <div class="rounded-3xl border bg-card p-6 shadow-sm min-h-[400px]">
-               <UnifiedSimulator />
+            <div class="rounded-[2rem] border border-ai-accent/30 bg-secondary/10 p-6 shadow-elevation-2 min-h-[400px] relative overflow-hidden">
+               <div class="absolute -right-16 -top-16 w-56 h-56 bg-ai-accent/10 rounded-full blur-[70px] pointer-events-none" />
+               <div class="absolute -left-16 -bottom-16 w-48 h-48 bg-secondary/10 rounded-full blur-[60px] pointer-events-none" />
+               <div class="relative z-10">
+                 <UnifiedSimulator />
+               </div>
             </div>
   
             <!-- Optimizer (Phase 4) -->
-             <div class="rounded-3xl border bg-card p-6 shadow-sm min-h-[200px]">
-                <InstallmentOptimizer />
+             <div class="rounded-[2rem] border border-ai-accent/30 bg-secondary/10 p-6 shadow-elevation-2 min-h-[200px] relative overflow-hidden">
+                <div class="absolute -right-16 -top-16 w-56 h-56 bg-ai-accent/10 rounded-full blur-[70px] pointer-events-none" />
+                <div class="absolute -left-16 -bottom-16 w-48 h-48 bg-secondary/10 rounded-full blur-[60px] pointer-events-none" />
+                <div class="relative z-10">
+                  <InstallmentOptimizer />
+                </div>
             </div>
   
           </div>

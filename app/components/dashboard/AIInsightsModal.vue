@@ -159,26 +159,26 @@ function getTrendIcon(direction: string) {
 
 function getTrendColor(direction: string) {
   if (direction === 'crescente') return 'text-destructive'
-  if (direction === 'decrescente') return 'text-emerald-500'
+  if (direction === 'decrescente') return 'text-success'
   return 'text-muted-foreground'
 }
 
 function getDifficultyBadgeClass(difficulty: string) {
-  if (difficulty === 'fácil') return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-  if (difficulty === 'médio') return 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+  if (difficulty === 'fácil') return 'bg-success/10 text-success border-success/20'
+  if (difficulty === 'médio') return 'bg-warning/10 text-warning border-warning/20'
   return 'bg-destructive/10 text-destructive border-destructive/20'
 }
 
 function getHealthScoreColor(score: number) {
-  if (score >= 70) return 'text-emerald-500'
-  if (score >= 40) return 'text-amber-500'
+  if (score >= 70) return 'text-success'
+  if (score >= 40) return 'text-warning'
   return 'text-destructive'
 }
 
 function getHealthScoreGradient(score: number) {
-  if (score >= 70) return 'from-emerald-500 to-emerald-400'
-  if (score >= 40) return 'from-amber-500 to-amber-400'
-  return 'from-destructive to-red-400'
+  if (score >= 70) return 'from-success to-success/70'
+  if (score >= 40) return 'from-warning to-warning/70'
+  return 'from-destructive to-destructive/70'
 }
 
 // Reset state when modal closes
@@ -269,8 +269,8 @@ watch(isOpen, (val) => {
           <!-- Quick Results -->
           <div v-else-if="quickInsights" class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <!-- Diagnosis Card -->
-            <Card variant="glass-warning" class="p-5 space-y-3 border-amber-500/20 bg-amber-500/5">
-              <div class="flex items-center gap-2 text-amber-500">
+            <Card variant="glass-warning" class="p-5 space-y-3 border-warning/20 bg-warning/5">
+              <div class="flex items-center gap-2 text-warning">
                 <AlertTriangle class="w-5 h-5" />
                 <h4 class="text-small font-black uppercase tracking-wide">Diagnóstico</h4>
               </div>
@@ -395,7 +395,7 @@ watch(isOpen, (val) => {
                   :class="[
                     'text-micro px-2 py-1 rounded-full border',
                     factor.impact === 'positive'
-                      ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                      ? 'bg-success/10 text-success border-success/20'
                       : 'bg-destructive/10 text-destructive border-destructive/20'
                   ]"
                 >
@@ -430,7 +430,7 @@ watch(isOpen, (val) => {
                     class="flex items-center justify-between text-small"
                   >
                     <span class="text-foreground/80">{{ cat.name }}</span>
-                    <span :class="cat.change_pct > 0 ? 'text-destructive' : 'text-emerald-500'">
+                    <span :class="cat.change_pct > 0 ? 'text-destructive' : 'text-success'">
                       {{ cat.change_pct > 0 ? '+' : '' }}{{ cat.change_pct.toFixed(0) }}%
                     </span>
                   </div>
@@ -472,7 +472,7 @@ watch(isOpen, (val) => {
             <!-- Optimization Opportunities -->
             <div class="space-y-3">
               <div class="flex items-center gap-2 ml-1">
-                <Lightbulb class="w-4 h-4 text-amber-500" />
+                <Lightbulb class="w-4 h-4 text-warning" />
                 <h4 class="text-small font-black text-muted-foreground uppercase tracking-wider">Oportunidades de Economia</h4>
               </div>
 
@@ -491,7 +491,7 @@ watch(isOpen, (val) => {
                   <p class="text-small text-muted-foreground">{{ opp.suggestion }}</p>
                   <div class="flex items-center justify-between pt-2 border-t border-border/50 text-small">
                     <span class="text-muted-foreground">Gasto atual: <span class="text-foreground">{{ formatCurrency(opp.current_spending) }}</span></span>
-                    <span class="text-emerald-500 font-semibold">Economia: {{ formatCurrency(opp.potential_saving) }}</span>
+                    <span class="text-success font-semibold">Economia: {{ formatCurrency(opp.potential_saving) }}</span>
                   </div>
                 </div>
               </div>

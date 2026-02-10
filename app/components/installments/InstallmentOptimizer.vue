@@ -18,9 +18,9 @@ const formatCurrency = (val: number) => {
 const recommendationColor = computed(() => {
   if (!result.value) return ''
   switch (result.value.recommendation.type) {
-    case 'antecipate': return 'text-purple-500 bg-purple-500/10 border-purple-500/20'
-    case 'pay_full': return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'
-    default: return 'text-blue-500 bg-blue-500/10 border-blue-500/20'
+    case 'antecipate': return 'text-ai-accent bg-ai-accent/10 border-ai-accent/20'
+    case 'pay_full': return 'text-success bg-success/10 border-success/20'
+    default: return 'text-ai-accent bg-ai-accent/10 border-ai-accent/20'
   }
 })
 </script>
@@ -28,8 +28,8 @@ const recommendationColor = computed(() => {
 <template>
   <div class="h-full flex flex-col">
     <div class="flex items-center gap-2 mb-6">
-      <div class="p-2 bg-indigo-500/10 rounded-lg">
-        <Sparkles class="w-5 h-5 text-indigo-500" />
+      <div class="p-2 bg-ai-accent/10 rounded-lg border border-ai-accent/20">
+        <Sparkles class="w-5 h-5 text-ai-accent" />
       </div>
       <div>
         <h3 class="font-bold text-lg">Otimizador</h3>
@@ -38,7 +38,7 @@ const recommendationColor = computed(() => {
     </div>
 
     <!-- Initial State -->
-    <div v-if="!result && !isLoading" class="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4 border-2 border-dashed rounded-xl border-muted">
+    <div v-if="!result && !isLoading" class="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4 border-2 border-dashed rounded-xl border-ai-accent/20 bg-ai-accent/5">
        <Sparkles class="w-10 h-10 text-muted-foreground/30" />
        <div>
          <p class="font-medium text-muted-foreground">IA pronta para analisar</p>
@@ -46,14 +46,14 @@ const recommendationColor = computed(() => {
            Descubra quais parcelas antecipar para economizar e liberar crédito.
          </p>
        </div>
-       <Button class="bg-indigo-600 hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-500/20" @click="runAnalysis">
+       <Button class="bg-ai-accent hover:bg-ai-accent/90 font-bold shadow-lg shadow-ai-accent/20 text-ai-accent-foreground" @click="runAnalysis">
          Analisar Agora
        </Button>
     </div>
 
     <!-- Loading -->
     <div v-else-if="isLoading" class="flex-1 flex flex-col items-center justify-center space-y-4">
-      <Loader2 class="w-8 h-8 animate-spin text-primary" />
+      <Loader2 class="w-8 h-8 animate-spin text-ai-accent" />
       <p class="text-xs text-muted-foreground animate-pulse">Consultando estratégias de otimização...</p>
     </div>
 
@@ -71,7 +71,7 @@ const recommendationColor = computed(() => {
            </div>
          </div>
          
-         <div class="grid grid-cols-2 gap-2 pt-2 border-t border-black/5 dark:border-white/5">
+         <div class="grid grid-cols-2 gap-2 pt-2 border-t border-border/40">
            <div v-if="result.recommendation.impact.monthlySavings > 0">
              <div class="text-[10px] opacity-70">Libera/mês</div>
              <div class="font-bold text-sm">{{ formatCurrency(result.recommendation.impact.monthlySavings) }}</div>
@@ -96,10 +96,10 @@ const recommendationColor = computed(() => {
            class="p-3 rounded-lg border bg-card/50 hover:bg-card transition-colors group"
          >
            <div class="flex justify-between items-start mb-1">
-             <span class="font-medium text-sm group-hover:text-primary transition-colors">{{ item.description }}</span>
+             <span class="font-medium text-sm group-hover:text-ai-accent transition-colors">{{ item.description }}</span>
              <span 
                class="text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase"
-               :class="item.priority === 'high' ? 'bg-rose-500/10 text-rose-500' : 'bg-muted text-muted-foreground'"
+               :class="item.priority === 'high' ? 'bg-danger/10 text-danger' : 'bg-muted text-muted-foreground'"
              >
                {{ item.priority === 'high' ? 'Alta' : item.priority === 'medium' ? 'Média' : 'Baixa' }}
              </span>

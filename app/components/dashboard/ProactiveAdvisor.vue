@@ -17,24 +17,24 @@ const toneConfig = computed(() => {
 
   const configs = {
     curious: {
-      bg: 'bg-blue-500/10',
-      border: 'border-blue-500/20',
-      iconBg: 'bg-blue-500/20',
-      iconColor: 'text-blue-500',
+      bg: 'bg-info-muted',
+      border: 'border-info/20',
+      iconBg: 'bg-info/20',
+      iconColor: 'text-info',
       icon: MessageCircle
     },
     warning: {
-      bg: 'bg-amber-500/10',
-      border: 'border-amber-500/20',
-      iconBg: 'bg-amber-500/20',
-      iconColor: 'text-amber-500',
+      bg: 'bg-warning-muted',
+      border: 'border-warning/20',
+      iconBg: 'bg-warning/20',
+      iconColor: 'text-warning',
       icon: AlertTriangle
     },
     congratulatory: {
-      bg: 'bg-emerald-500/10',
-      border: 'border-emerald-500/20',
-      iconBg: 'bg-emerald-500/20',
-      iconColor: 'text-emerald-500',
+      bg: 'bg-success-muted',
+      border: 'border-success/20',
+      iconBg: 'bg-success/20',
+      iconColor: 'text-success',
       icon: PartyPopper
     },
     neutral: {
@@ -69,7 +69,7 @@ function handleDismiss() {
     :class="{ 'p-3': compact, 'p-4': !compact }"
   >
     <div class="flex items-start gap-3">
-      <div class="h-8 w-8 rounded-lg bg-muted animate-pulse shrink-0" />
+      <div class="h-8 w-8 rounded-xl bg-muted animate-pulse shrink-0" />
       <div class="flex-1 space-y-2">
         <div class="h-4 w-3/4 bg-muted rounded animate-pulse" />
         <div class="h-3 w-1/2 bg-muted rounded animate-pulse" />
@@ -108,7 +108,7 @@ function handleDismiss() {
       <div class="flex items-start gap-3 pr-6">
         <!-- Icon -->
         <div
-          class="h-8 w-8 rounded-lg flex items-center justify-center shrink-0"
+          class="h-8 w-8 rounded-xl flex items-center justify-center shrink-0"
           :class="[toneConfig.iconBg]"
         >
           <component

@@ -54,7 +54,7 @@ const hasDanger = computed(() => {
       </div>
       
       <!-- Summaries / Legend could go here -->
-      <div v-if="hasDanger" class="bg-rose-500/10 text-rose-500 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2">
+      <div v-if="hasDanger" class="bg-danger/10 text-danger px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2">
         <AlertTriangle class="w-3 h-3" />
         Meses com alerta
       </div>

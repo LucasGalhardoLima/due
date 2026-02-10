@@ -17,13 +17,13 @@ const forwardedProps = useForwardProps(delegatedProps)
   <SelectTrigger
     v-bind="forwardedProps"
     :class="cn(
-      'flex h-11 w-full items-center justify-between whitespace-nowrap rounded-xl border border-white/20 dark:border-white/10 bg-white/50 dark:bg-black/20 backdrop-blur-md px-4 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start transition-colors hover:bg-white/60 dark:hover:bg-black/30',
+      'flex h-11 w-full items-center justify-between whitespace-nowrap rounded-2xl border border-border/70 bg-background/80 backdrop-blur-md px-4 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/55 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start transition-all duration-200 ease-out hover:bg-background hover:border-primary/35 hover:shadow-elevation-1 data-[state=open]:border-primary/55 data-[state=open]:shadow-elevation-2 data-[state=open]:[&_svg]:rotate-180',
       props.class,
     )"
   >
     <slot />
     <SelectIcon as-child>
-      <ChevronDown class="w-4 h-4 opacity-50 shrink-0" />
+      <ChevronDown class="w-4 h-4 opacity-50 shrink-0 transition-transform duration-200" />
     </SelectIcon>
   </SelectTrigger>
 </template>

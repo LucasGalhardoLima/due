@@ -15,19 +15,19 @@ defineProps<{
 
 const bgColors = {
   info: 'bg-primary/10 border-primary/20',
-  warning: 'bg-amber-500/10 border-amber-500/20',
+  warning: 'bg-warning-muted border-warning/20',
   critical: 'bg-destructive/10 border-destructive/20'
 }
 
 const textColors = {
   info: 'text-primary',
-  warning: 'text-amber-500 dark:text-amber-400',
-  critical: 'text-destructive dark:text-red-400'
+  warning: 'text-warning',
+  critical: 'text-destructive'
 }
 
 const iconColors = {
   info: 'text-primary',
-  warning: 'text-amber-500',
+  warning: 'text-warning',
   critical: 'text-destructive'
 }
 </script>
@@ -59,7 +59,7 @@ v-else-if="analysis"
             <h3 class="font-bold text-lg" :class="textColors[analysis.severity]">
             {{ analysis.title }}
             </h3>
-            <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-white/50 dark:bg-black/20" :class="textColors[analysis.severity]">
+            <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-background/60" :class="textColors[analysis.severity]">
                 Advisor
             </span>
         </div>

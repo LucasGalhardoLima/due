@@ -9,32 +9,32 @@ export { default as CardHeader } from "./CardHeader.vue"
 export { default as CardTitle } from "./CardTitle.vue"
 
 export const cardVariants = cva(
-  "text-card-foreground transition-all",
+  "text-card-foreground transform-gpu transition-[transform,box-shadow,border-color,background-color] duration-300 ease-out",
   {
     variants: {
       variant: {
         // Solid variants (default for most use cases)
-        default: "bg-card border border-border rounded-xl shadow-elevation-1",
-        elevated: "bg-card border border-border rounded-xl shadow-elevation-2",
+        default: "bg-card border border-border/80 rounded-[1.75rem] shadow-elevation-1",
+        elevated: "bg-card border border-border/80 rounded-[1.75rem] shadow-elevation-3",
         // Glass variants (reserved for modals/overlays only)
-        glass: "backdrop-blur-2xl bg-white/5 dark:bg-black/10 border border-white/20 dark:border-white/10 rounded-2xl shadow-glass",
-        "glass-success": "backdrop-blur-2xl bg-success-muted/30 dark:bg-success-muted/10 border border-success/20 rounded-2xl shadow-glass",
-        "glass-warning": "backdrop-blur-2xl bg-warning-muted/30 dark:bg-warning-muted/10 border border-warning/20 rounded-2xl shadow-glass",
-        "glass-danger": "backdrop-blur-2xl bg-danger-muted/30 dark:bg-danger-muted/10 border border-danger/20 rounded-2xl shadow-glass",
-        "glass-info": "backdrop-blur-2xl bg-info-muted/30 dark:bg-info-muted/10 border border-info/20 rounded-2xl shadow-glass",
+        glass: "backdrop-blur-2xl bg-background/35 border border-border/60 rounded-[2.25rem] shadow-glass",
+        "glass-success": "backdrop-blur-2xl bg-success-muted/30 dark:bg-success-muted/10 border border-success/20 rounded-[2.25rem] shadow-glass",
+        "glass-warning": "backdrop-blur-2xl bg-warning-muted/30 dark:bg-warning-muted/10 border border-warning/20 rounded-[2.25rem] shadow-glass",
+        "glass-danger": "backdrop-blur-2xl bg-danger-muted/30 dark:bg-danger-muted/10 border border-danger/20 rounded-[2.25rem] shadow-glass",
+        "glass-info": "backdrop-blur-2xl bg-info-muted/30 dark:bg-info-muted/10 border border-info/20 rounded-[2.25rem] shadow-glass",
         // Status variants with solid tinted backgrounds
-        success: "bg-success-muted border border-success/20 rounded-xl shadow-elevation-1",
-        warning: "bg-warning-muted border border-warning/20 rounded-xl shadow-elevation-1",
-        danger: "bg-danger-muted border border-danger/20 rounded-xl shadow-elevation-1",
-        info: "bg-info-muted border border-info/20 rounded-xl shadow-elevation-1",
+        success: "bg-success-muted border border-success/20 rounded-[1.75rem] shadow-elevation-1",
+        warning: "bg-warning-muted border border-warning/20 rounded-[1.75rem] shadow-elevation-1",
+        danger: "bg-danger-muted border border-danger/20 rounded-[1.75rem] shadow-elevation-1",
+        info: "bg-info-muted border border-info/20 rounded-[1.75rem] shadow-elevation-1",
       },
       size: {
-        sm: "p-4 rounded-lg",
-        default: "p-6 rounded-xl",
-        lg: "p-8 rounded-xl",
+        sm: "p-4 rounded-3xl",
+        default: "p-6 rounded-[1.75rem]",
+        lg: "p-8 rounded-[2.25rem]",
       },
       interactive: {
-        true: "cursor-pointer hover:scale-[1.02] active:scale-[0.98]",
+        true: "cursor-pointer hover:scale-[1.01] hover:shadow-elevation-4 hover:border-primary/35 active:scale-[0.99]",
         false: "",
       },
       glow: {

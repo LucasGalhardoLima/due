@@ -65,7 +65,7 @@ function formatCurrency(val: number) {
             :cx="node.x"
             :cy="node.y"
             :r="node.r"
-            :fill="node.data.color || '#333'"
+            :fill="node.data.color || 'hsl(var(--secondary))'"
             class="transition-all duration-300 hover:brightness-110"
             style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1))"
           />
@@ -94,7 +94,7 @@ function formatCurrency(val: number) {
               :x="node.x"
               :y="node.y + 14"
               text-anchor="middle"
-              class="text-[11px] font-bold fill-white/80 currency select-none drop-shadow-md"
+              class="text-[11px] font-bold fill-foreground/80 currency select-none drop-shadow-md"
               style="font-family: inherit;"
             >
               {{ formatCurrency(node.data.amount) }}

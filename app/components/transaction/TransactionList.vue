@@ -32,7 +32,7 @@ interface TransactionItem {
   purchaseDate: string
 }
 
-defineProps<{
+const props = defineProps<{
   transactions: Record<string, TransactionItem[]>
 }>()
 

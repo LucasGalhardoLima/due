@@ -35,7 +35,7 @@ const social = [
         <!-- Brand -->
         <div class="col-span-2">
           <NuxtLink to="/" class="font-black text-2xl flex items-center gap-2 mb-4">
-            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-black shadow-lg shadow-primary/20">
+            <div class="w-10 h-10 bg-secondary rounded-2xl flex items-center justify-center text-secondary-foreground font-black shadow-lg shadow-secondary/25">
               Du
             </div>
             Du
@@ -52,7 +52,7 @@ const social = [
               :href="item.href"
               target="_blank"
               rel="noopener noreferrer"
-              class="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200"
+              class="w-10 h-10 rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-secondary hover:bg-secondary/10 transition-all duration-200"
               :aria-label="item.name"
             >
               <component :is="item.icon" class="w-5 h-5" />

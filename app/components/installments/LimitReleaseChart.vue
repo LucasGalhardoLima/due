@@ -47,8 +47,8 @@ const formatCurrency = (val: number) => {
 <template>
   <div class="flex flex-col h-full">
     <div class="flex items-center gap-2 mb-6">
-      <div class="p-2 bg-emerald-500/10 rounded-lg">
-        <TrendingUp class="w-5 h-5 text-emerald-500" />
+      <div class="p-2 bg-success/10 rounded-lg">
+        <TrendingUp class="w-5 h-5 text-success" />
       </div>
       <div>
         <h3 class="font-bold text-lg">Liberação de Limite</h3>
@@ -65,7 +65,7 @@ const formatCurrency = (val: number) => {
             :y="yScale(d.releasedAmount)"
             :width="xScale.bandwidth()"
             :height="height - margin.bottom - yScale(d.releasedAmount)"
-            class="fill-emerald-500/80 hover:fill-emerald-500 transition-all duration-300 rounded"
+            class="fill-success/80 hover:fill-success transition-all duration-300 rounded"
             rx="4"
           />
           

@@ -24,12 +24,12 @@ export default defineEventHandler(async (event) => {
 
   // 1. Create categories
   const categories = [
-    { name: 'Alimentacao', color: '#ef4444' },
-    { name: 'Transporte', color: '#3b82f6' },
-    { name: 'Lazer', color: '#10b981' },
-    { name: 'Saude', color: '#f59e0b' },
-    { name: 'Assinaturas', color: '#8b5cf6' },
-    { name: 'Outros', color: '#6b7280' }
+    { name: 'Alimentacao', color: '#8FE6D2' },
+    { name: 'Transporte', color: '#64CCB8' },
+    { name: 'Lazer', color: '#BFF5E8' },
+    { name: 'Saude', color: '#9B8CEA' },
+    { name: 'Assinaturas', color: '#7561D8' },
+    { name: 'Outros', color: '#4E3EA8' }
   ]
 
   const categoryMap: Record<string, string> = {}

@@ -107,8 +107,8 @@ async function handleDelete() {
 
     <template v-else>
       <!-- Add Category Form (Standardized) -->
-      <div class="rounded-xl border border-border bg-card text-card-foreground shadow-elevation-1 overflow-hidden">
-          <div class="bg-muted/30 px-6 py-4 border-b flex items-center gap-2">
+      <div class="rounded-[2rem] border border-border/70 bg-card text-card-foreground shadow-elevation-2 overflow-hidden">
+          <div class="bg-secondary/5 px-6 py-4 border-b border-border/60 flex items-center gap-2">
               <Plus class="w-4 h-4 text-primary" />
               <h3 class="text-micro text-muted-foreground">Nova Categoria</h3>
           </div>
@@ -136,7 +136,7 @@ async function handleDelete() {
       </div>
   
       <!-- Categories List (Standardized Card) -->
-      <Card class="divide-y divide-border overflow-hidden">
+      <Card class="divide-y divide-border overflow-hidden rounded-[2rem]">
         <div v-for="cat in categories" :key="cat.id" class="p-4 flex items-center justify-between group hover:bg-muted/50 transition-colors">
           <div v-if="editingId === cat.id" class="flex-grow flex gap-2">
               <input
@@ -147,10 +147,10 @@ async function handleDelete() {
                 @keyup.enter="saveEdit"
                 @keyup.esc="cancelEdit"
               >
-              <button class="p-2 text-emerald-600 hover:bg-emerald-500/10 rounded-xl transition-all" aria-label="Confirmar edição" @click="saveEdit">
+              <button class="p-2 text-success hover:bg-success/10 rounded-xl transition-all" aria-label="Confirmar edição" @click="saveEdit">
                   <Check class="h-4 w-4" />
               </button>
-              <button class="p-2 text-red-600 hover:bg-red-500/10 rounded-xl transition-all" aria-label="Cancelar edição" @click="cancelEdit">
+              <button class="p-2 text-danger hover:bg-danger/10 rounded-xl transition-all" aria-label="Cancelar edição" @click="cancelEdit">
                   <X class="h-4 w-4" />
               </button>
           </div>

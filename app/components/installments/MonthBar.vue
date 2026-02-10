@@ -33,9 +33,9 @@ const expanded = ref(false)
 
 const statusColor = computed(() => {
   switch (props.data.status) {
-    case 'safe': return 'bg-emerald-500/60'
-    case 'warning': return 'bg-amber-500/60'
-    case 'danger': return 'bg-rose-500/60'
+    case 'safe': return 'bg-success/60'
+    case 'warning': return 'bg-warning/60'
+    case 'danger': return 'bg-danger/60'
     default: return 'bg-muted'
   }
 })
@@ -105,7 +105,7 @@ const formatCurrency = (value: number) => {
     <div v-if="expanded" class="pl-[4.5rem] pr-4 pb-4 animate-in slide-in-from-top-1 fade-in duration-200">
       <div class="space-y-3 pt-2 border-l-2 border-muted/50 pl-4">
          <!-- Alert Banner -->
-         <div v-if="data.alert" class="flex items-center gap-2 text-rose-500 bg-rose-500/10 p-2 rounded-md text-xs font-medium">
+         <div v-if="data.alert" class="flex items-center gap-2 text-danger bg-danger/10 p-2 rounded-md text-xs font-medium">
            <AlertTriangle class="w-3 h-3 shrink-0" />
            {{ data.alert }}
          </div>

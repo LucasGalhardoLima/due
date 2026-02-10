@@ -68,7 +68,7 @@ const features = [
     <!-- Background decoration -->
     <div class="absolute inset-0 -z-10" aria-hidden="true">
       <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px]" />
-      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-ai-accent/5 rounded-full blur-[120px]" />
+      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[120px]" />
     </div>
 
     <div class="container mx-auto px-6">
@@ -86,7 +86,7 @@ const features = [
       </div>
 
       <!-- Bento Grid -->
-      <div class="grid md:grid-cols-3 gap-4 max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-3 gap-5 max-w-6xl mx-auto">
         <div
           v-for="feature in features"
           :key="feature.title"
@@ -94,41 +94,47 @@ const features = [
             feature.colSpan,
             feature.rowSpan,
             'group relative p-8 rounded-3xl border transition-all duration-500',
+            feature.size === 'large' ? 'min-h-[200px]' : '',
+            feature.size === 'tall' ? 'min-h-[320px] flex flex-col' : '',
             'hover:scale-[1.02] hover:-translate-y-1',
             feature.isAi
-              ? 'bg-gradient-to-br from-violet-500/10 via-violet-500/5 to-transparent border-ai-accent/20 hover:border-ai-accent/40 hover:shadow-lg hover:shadow-ai-accent/10'
-              : 'bg-card border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5'
+              ? 'bg-gradient-to-br from-secondary/15 via-secondary/5 to-transparent border-secondary/20 hover:border-secondary/40 hover:shadow-lg hover:shadow-secondary/10'
+              : 'bg-card border-border hover:border-secondary/30 hover:shadow-lg hover:shadow-secondary/10'
           ]"
         >
           <!-- Glassmorphism overlay on hover -->
-          <div 
-            class="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" 
-          />
-          
-          <!-- Icon -->
           <div
-            class="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110"
-            :class="feature.isAi 
-              ? 'bg-gradient-to-br from-ai-accent/20 to-ai-accent/5' 
-              : 'bg-gradient-to-br from-primary/15 to-primary/5'"
-          >
-            <component
-              :is="feature.icon"
-              class="w-7 h-7 transition-colors duration-300"
-              :class="feature.isAi ? 'text-ai-accent' : 'text-primary'"
-            />
+            class="absolute inset-0 rounded-3xl bg-gradient-to-br from-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          />
+
+          <!-- Icon -->
+          <div>
+            <div
+              class="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110"
+              :class="feature.isAi
+                ? 'bg-gradient-to-br from-secondary/20 to-secondary/5'
+                : 'bg-gradient-to-br from-primary/15 to-primary/5'"
+            >
+              <component
+                :is="feature.icon"
+                class="w-7 h-7 transition-colors duration-300"
+                :class="feature.isAi ? 'text-secondary' : 'text-secondary'"
+              />
+            </div>
           </div>
 
           <!-- Content -->
-          <h3 class="relative text-xl font-bold mb-3 group-hover:text-primary transition-colors duration-300">
-            {{ feature.title }}
-            <span v-if="feature.isAi" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-ai-accent/10 text-ai-accent">
-              IA
-            </span>
-          </h3>
-          <p class="relative text-muted-foreground leading-relaxed">
-            {{ feature.description }}
-          </p>
+          <div :class="feature.size === 'tall' ? 'mt-auto' : ''">
+            <h3 class="relative text-xl font-bold mb-3 group-hover:text-secondary transition-colors duration-300">
+              {{ feature.title }}
+              <span v-if="feature.isAi" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-secondary/15 text-secondary">
+                IA
+              </span>
+            </h3>
+            <p class="relative text-muted-foreground leading-relaxed">
+              {{ feature.description }}
+            </p>
+          </div>
 
           <!-- Arrow indicator -->
           <div class="absolute bottom-6 right-6 w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">

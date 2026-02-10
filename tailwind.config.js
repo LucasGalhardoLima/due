@@ -38,6 +38,14 @@ module.exports = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        "accent-warm": {
+          DEFAULT: "hsl(var(--accent-warm))",
+          foreground: "hsl(var(--accent-warm-foreground))",
+        },
+        "accent-cool": {
+          DEFAULT: "hsl(var(--accent-cool))",
+          foreground: "hsl(var(--accent-cool-foreground))",
+        },
         "ai-accent": {
           DEFAULT: "hsl(var(--ai-accent))",
           foreground: "hsl(var(--ai-accent-foreground))",

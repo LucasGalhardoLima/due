@@ -82,7 +82,7 @@ onUnmounted(() => {
       v-if="showPrompt && !isInstalled" 
       class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-50"
     >
-      <div class="bg-card border border-border rounded-2xl p-4 shadow-lg shadow-black/10 backdrop-blur-xl">
+      <div class="bg-card border border-border rounded-2xl p-4 shadow-lg shadow-foreground/10 backdrop-blur-xl">
         <div class="flex items-start gap-4">
           <!-- App icon -->
           <div class="w-14 h-14 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-black text-xl shadow-lg shadow-primary/20 shrink-0">

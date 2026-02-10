@@ -31,7 +31,7 @@ const positionClasses = {
 }
 
 const colorClasses = {
-  white: "bg-white/40 dark:bg-white/5",
+  white: "bg-background/60 dark:bg-background/20",
   primary: "bg-primary/20 dark:bg-primary/10",
   success: "bg-success/20 dark:bg-success/10",
   warning: "bg-warning/20 dark:bg-warning/10",

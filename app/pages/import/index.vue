@@ -234,7 +234,7 @@ async function handleImport() {
       <!-- Step 1: Upload -->
       <div v-if="step === 1" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <!-- Visual Tutorial (Nubank Focus) -->
-          <div class="bg-card rounded-2xl p-8 border shadow-elevation-2">
+          <div class="bg-card rounded-[2rem] p-8 border border-border/70 shadow-elevation-3">
               <h3 class="text-micro text-muted-foreground mb-8 flex items-center gap-2">
                   <Smartphone class="w-3 h-3 text-primary" />
                   Como exportar do seu banco?
@@ -294,7 +294,7 @@ async function handleImport() {
   
           <!-- Dropzone -->
           <div
-              class="border-2 border-dashed rounded-2xl p-12 flex flex-col items-center justify-center text-center space-y-4 transition-colors relative"
+              class="border-2 border-dashed rounded-[2rem] p-12 flex flex-col items-center justify-center text-center space-y-4 transition-colors relative bg-card/60"
               :class="[
                   isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50',
                   !selectedCardId && 'opacity-50 cursor-not-allowed'
@@ -321,22 +321,22 @@ async function handleImport() {
                   @change="onFileSelect"
               >
   
-              <p v-if="!selectedCardId" class="text-small text-red-500 font-medium absolute -bottom-6">
+              <p v-if="!selectedCardId" class="text-small text-danger font-medium absolute -bottom-6">
                   * Selecione um cartao primeiro
               </p>
           </div>
   
           <!-- Instructions / Supported Banks -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
-               <div class="border rounded-2xl p-4 text-center space-y-2 shadow-elevation-1">
+               <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70">
                    <div class="text-h4">Nubank</div>
                    <div class="text-small text-muted-foreground">Suporte total ao CSV exportado pelo app.</div>
                </div>
-               <div class="border rounded-2xl p-4 text-center space-y-2 shadow-elevation-1">
+               <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70">
                    <div class="text-h4">Inter</div>
                    <div class="text-small text-muted-foreground">CSV de extrato suportado.</div>
                </div>
-                <div class="border rounded-2xl p-4 text-center space-y-2 shadow-elevation-1">
+                <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70">
                    <div class="text-h4">Outros</div>
                    <div class="text-small text-muted-foreground">CSV generico (Data, Descricao, Valor).</div>
                </div>
@@ -356,7 +356,7 @@ async function handleImport() {
               </div>
           </div>
   
-          <div class="rounded-2xl border bg-card shadow-elevation-2">
+          <div class="rounded-[2rem] border border-border/70 bg-card shadow-elevation-3">
               <div class="relative w-full overflow-auto max-h-[500px]">
                   <table class="w-full caption-bottom text-sm">
                       <thead class="sticky top-0 bg-background border-b z-10">

@@ -81,8 +81,8 @@ async function handleDelete() {
 
     <template v-else>
       <!-- Add Card Section (Standardized Form) -->
-      <div class="rounded-xl border border-border bg-card text-card-foreground shadow-elevation-1 overflow-hidden">
-        <div class="bg-muted/30 px-6 py-4 border-b flex items-center gap-2">
+      <div class="rounded-[2rem] border border-border/70 bg-card text-card-foreground shadow-elevation-2 overflow-hidden">
+        <div class="bg-secondary/5 px-6 py-4 border-b border-border/60 flex items-center gap-2">
           <Plus class="w-4 h-4 text-primary" />
           <h3 class="text-micro text-muted-foreground">Adicionar Novo Cartao</h3>
         </div>
@@ -216,4 +216,3 @@ async function handleDelete() {
     
   </div>
 </template>
-

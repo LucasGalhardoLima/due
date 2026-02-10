@@ -1,5 +1,6 @@
 import prisma from './prisma'
 import { subDays, startOfDay, endOfDay, addMonths, setDate, isAfter } from 'date-fns'
+import { moneyToCents, moneyToNumber } from './money'
 
 export interface AdvisorContext {
   recentTransactions: {
@@ -106,15 +107,15 @@ export async function gatherAdvisorContext(
   ])
 
   // Calculate last 7 days metrics
-  const last7DaysTotal = last7DaysInstallments.reduce((acc, inst) => acc + inst.amount, 0)
+  const last7DaysTotal = last7DaysInstallments.reduce((acc, inst) => acc + (moneyToCents(inst.amount) / 100), 0)
   const byCategory: Record<string, number> = {}
   for (const inst of last7DaysInstallments) {
     const catName = inst.transaction.category.name
-    byCategory[catName] = (byCategory[catName] || 0) + inst.amount
+    byCategory[catName] = (byCategory[catName] || 0) + (moneyToCents(inst.amount) / 100)
   }
 
   // Calculate same period last month
-  const samePeriodTotal = samePeriodInstallments.reduce((acc, inst) => acc + inst.amount, 0)
+  const samePeriodTotal = samePeriodInstallments.reduce((acc, inst) => acc + (moneyToCents(inst.amount) / 100), 0)
 
   // Calculate change percent
   const changePercent = samePeriodTotal > 0
@@ -122,9 +123,9 @@ export async function gatherAdvisorContext(
     : 0
 
   // Calculate budget utilization
-  const currentMonthTotal = currentMonthInstallments.reduce((acc, inst) => acc + inst.amount, 0)
-  const totalLimit = userCards.reduce((acc, c) => acc + c.limit, 0)
-  const totalBudget = userCards.reduce((acc, c) => acc + (c.budget || 0), 0)
+  const currentMonthTotal = currentMonthInstallments.reduce((acc, inst) => acc + (moneyToCents(inst.amount) / 100), 0)
+  const totalLimit = userCards.reduce((acc, c) => acc + moneyToNumber(c.limit), 0)
+  const totalBudget = userCards.reduce((acc, c) => acc + (c.budget ? moneyToNumber(c.budget) : 0), 0)
   const utilizationBase = totalBudget > 0 ? totalBudget : totalLimit
   const utilizationPercent = utilizationBase > 0
     ? (currentMonthTotal / utilizationBase) * 100

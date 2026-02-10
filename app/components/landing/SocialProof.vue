@@ -37,17 +37,17 @@ const colorClasses: Record<string, { bg: string; icon: string }> = {
 </script>
 
 <template>
-  <section class="py-20 bg-muted/30 border-y border-border">
+  <section class="py-20 bg-muted/30 border-y border-border/70">
     <div class="container mx-auto px-6">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto">
         <div
           v-for="stat in stats"
           :key="stat.label"
-          class="group text-center p-6 rounded-2xl bg-card/50 border border-transparent hover:border-border hover:bg-card transition-all duration-300"
+          class="group text-center p-6 rounded-[2rem] bg-card/60 border border-transparent hover:border-border/70 hover:bg-card transition-all duration-300"
         >
           <!-- Icon -->
           <div 
-            class="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4 transition-transform duration-300 group-hover:scale-110"
+            class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 transition-transform duration-300 group-hover:scale-110"
             :class="colorClasses[stat.color].bg"
           >
             <component 

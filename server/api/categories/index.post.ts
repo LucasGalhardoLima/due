@@ -36,14 +36,14 @@ export default defineEventHandler(async (event) => {
   }
 
   const colorPalette = [
-    '#00F2DE', // Pearl Aqua (Primary)
-    '#10b981', // Emerald 500
-    '#06b6d4', // Cyan 500
-    '#0d9488', // Teal 600
-    '#0ea5e9', // Sky 500
-    '#6366f1', // Indigo 500
-    '#f59e0b', // Amber 500
-    '#f43f5e', // Rose 500
+    '#D6FFF6', // Mint Green (Primary)
+    '#BFF5E8', // Mint Soft
+    '#8FE6D2', // Mint Mid
+    '#64CCB8', // Mint Deep
+    '#9B8CEA', // Violet Light
+    '#7561D8', // Violet Mid
+    '#4E3EA8', // Violet Deep
+    '#231651', // Russian Violet (Secondary)
   ]
   const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)]
 

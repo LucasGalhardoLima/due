@@ -293,7 +293,7 @@ onMounted(() => {
                 <p class="text-h3">Upload da Fatura (CSV)</p>
                 <p class="text-body text-muted-foreground">Compare o banco com seus registros</p>
             </div>
-             <p v-if="!selectedCardId" class="text-small text-red-500 font-medium absolute bottom-4">
+             <p v-if="!selectedCardId" class="text-small text-danger font-medium absolute bottom-4">
                 * Selecione o cartão acima primeiro
             </p>
 

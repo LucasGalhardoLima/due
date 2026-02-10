@@ -14,7 +14,7 @@ const steps = [
     icon: LineChart,
     title: 'Eu te mostro o futuro',
     description: 'Vou te mostrar suas faturas dos próximos 12 meses. Sem surpresa, sem aquele susto no fim do mês.',
-    color: 'info'
+    color: 'secondary'
   },
   {
     number: '03',
@@ -27,19 +27,19 @@ const steps = [
 
 const colorMap: Record<string, { bg: string; text: string; border: string }> = {
   primary: {
-    bg: 'bg-primary/10',
-    text: 'text-primary',
-    border: 'border-primary/30'
+    bg: 'bg-primary/35',
+    text: 'text-secondary',
+    border: 'border-primary/60'
   },
-  info: {
-    bg: 'bg-info-muted',
-    text: 'text-info',
-    border: 'border-info/30'
+  secondary: {
+    bg: 'bg-secondary/10',
+    text: 'text-secondary',
+    border: 'border-secondary/30'
   },
   'ai-accent': {
-    bg: 'bg-ai-accent/10',
-    text: 'text-ai-accent',
-    border: 'border-ai-accent/30'
+    bg: 'bg-secondary/10',
+    text: 'text-secondary',
+    border: 'border-secondary/30'
   }
 }
 </script>
@@ -69,7 +69,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
       <div class="max-w-3xl mx-auto">
         <div class="relative">
           <!-- Vertical line -->
-          <div class="absolute left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-primary via-info to-ai-accent opacity-20" />
+          <div class="absolute left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-primary via-secondary to-secondary/70 opacity-20" />
 
           <div class="space-y-6">
             <div
@@ -99,7 +99,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
                 <div class="flex-1 pt-2 pb-6">
                   <div class="flex items-center gap-3 mb-2">
                     <span 
-                      class="text-xs font-bold px-2 py-1 rounded-md"
+                      class="text-xs font-bold px-2 py-1 rounded-xl"
                       :class="[
                         colorMap[step.color]?.bg || 'bg-primary/10',
                         colorMap[step.color]?.text || 'text-primary'
@@ -107,7 +107,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
                     >
                       {{ step.number }}
                     </span>
-                    <h3 class="text-2xl font-bold group-hover:text-primary transition-colors">
+                    <h3 class="text-2xl font-bold group-hover:text-secondary transition-colors">
                       {{ step.title }}
                     </h3>
                   </div>

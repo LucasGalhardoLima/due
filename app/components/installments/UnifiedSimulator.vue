@@ -10,6 +10,7 @@ const { simulate, simulationState, clearSimulation } = useInstallments()
 
 const amount = ref(0)
 const installments = ref([1])
+const quickOptions = [1, 3, 6, 10, 12]
 
 const runSimulation = async () => {
   if (amount.value <= 0 || !installments.value[0]) return
@@ -32,12 +33,12 @@ const isLoading = computed(() => simulationState.value.isLoading)
 // Computed helpers for result display
 const verdictColor = computed(() => {
   if (!result.value) return ''
-  return result.value.evaluation.viable ? 'text-emerald-500' : 'text-rose-500'
+  return result.value.evaluation.viable ? 'text-success' : 'text-danger'
 })
 
 const verdictBg = computed(() => {
   if (!result.value) return ''
-  return result.value.evaluation.viable ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-rose-500/10 border-rose-500/20'
+  return result.value.evaluation.viable ? 'bg-success/10 border-success/20' : 'bg-danger/10 border-danger/20'
 })
 </script>
 
@@ -45,8 +46,8 @@ const verdictBg = computed(() => {
   <div class="h-full flex flex-col">
     <!-- Header -->
     <div class="mb-6 flex items-center gap-2">
-      <div class="p-2 bg-primary/10 rounded-lg">
-        <Sparkles class="w-5 h-5 text-primary" />
+      <div class="p-2 bg-ai-accent/10 rounded-lg border border-ai-accent/20">
+        <Sparkles class="w-5 h-5 text-ai-accent" />
       </div>
       <div>
         <h3 class="font-bold text-lg">Simulador</h3>
@@ -72,15 +73,21 @@ const verdictBg = computed(() => {
         <div class="space-y-4">
            <div class="flex justify-between items-center">
              <Label>Parcelas</Label>
-             <span class="font-bold text-base text-primary">{{ installments[0] }}x</span>
+             <span class="font-bold text-base text-ai-accent">{{ installments[0] }}x</span>
            </div>
-           <Slider v-model="installments" :min="1" :max="12" :step="1" />
-           <div class="grid grid-cols-5 gap-1 text-[10px] text-muted-foreground text-center">
-             <button class="hover:text-foreground p-1 bg-muted/20 rounded" @click="installments = [1]">1x</button>
-             <button class="hover:text-foreground p-1 bg-muted/20 rounded" @click="installments = [3]">3x</button>
-             <button class="hover:text-foreground p-1 bg-muted/20 rounded" @click="installments = [6]">6x</button>
-             <button class="hover:text-foreground p-1 bg-muted/20 rounded" @click="installments = [10]">10x</button>
-             <button class="hover:text-foreground p-1 bg-muted/20 rounded" @click="installments = [12]">12x</button>
+           <Slider v-model="installments" variant="ai" :min="1" :max="12" :step="1" />
+           <div class="grid grid-cols-5 gap-1 text-center">
+             <button
+               v-for="option in quickOptions"
+               :key="option"
+               class="rounded-md px-2 py-1 text-[11px] font-semibold transition-colors"
+               :class="installments[0] === option 
+                 ? 'bg-ai-accent/15 text-ai-accent' 
+                 : 'bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/50'"
+               @click="installments = [option]"
+             >
+               {{ option }}x
+             </button>
            </div>
         </div>
       </div>
@@ -94,7 +101,7 @@ const verdictBg = computed(() => {
         </div>
 
         <Button 
-          class="w-full h-11 font-bold shadow-lg shadow-primary/20" 
+          class="w-full h-11 font-bold shadow-lg shadow-ai-accent/20 bg-ai-accent text-ai-accent-foreground hover:bg-ai-accent/90" 
           :disabled="isLoading || amount <= 0"
           @click="runSimulation"
         >
@@ -141,9 +148,9 @@ const verdictBg = computed(() => {
           </div>
           <div class="flex items-center gap-2">
              <div class="flex-1 h-2 bg-muted/30 rounded-full overflow-hidden">
-               <div 
-                  class="h-full rounded-full" 
-                  :class="result.timeline.peakMonth.usagePercentAfter > 80 ? 'bg-rose-500' : 'bg-primary'"
+               <div
+                  class="h-full rounded-full"
+                  :class="result.timeline.peakMonth.usagePercentAfter > 80 ? 'bg-danger' : 'bg-ai-accent'"
                   :style="{ width: `${Math.min(result.timeline.peakMonth.usagePercentAfter, 100)}%` }"
                />
              </div>

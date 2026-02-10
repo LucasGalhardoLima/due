@@ -69,7 +69,7 @@ const colorClasses: Record<string, { bg: string; icon: string; border: string }>
         <div
           v-for="(point, index) in painPoints"
           :key="point.title"
-          class="group relative p-8 rounded-3xl bg-card border shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+          class="group relative p-8 rounded-[2rem] bg-card border shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
           :class="colorClasses[point.color].border"
         >
           <!-- Number indicator -->

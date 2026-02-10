@@ -17,8 +17,8 @@ export default defineNuxtConfig({
       name: 'Du - Seu Assistente Financeiro',
       short_name: 'Du',
       description: 'Oi, eu sou o Du! Vou te ajudar a sair do buraco da fatura e conquistar sua liberdade financeira.',
-      theme_color: '#0D9488',
-      background_color: '#0a0f14',
+      theme_color: '#D6FFF6',
+      background_color: '#D6FFF6',
       display: 'standalone',
       start_url: '/',
       icons: [
@@ -81,13 +81,16 @@ export default defineNuxtConfig({
       title: 'Due - Financas Reimaginadas',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' },
-        { name: 'theme-color', content: '#0D9488' },
+        { name: 'theme-color', content: '#D6FFF6' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { name: 'apple-mobile-web-app-title', content: 'Due' },
         { name: 'description', content: 'Controle inteligente de cartao de credito com projecao futura, Advisor IA e importacao automatica.' }
       ],
       link: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap' },
         { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.svg' }
       ]
     }
