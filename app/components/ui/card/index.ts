@@ -9,7 +9,7 @@ export { default as CardHeader } from "./CardHeader.vue"
 export { default as CardTitle } from "./CardTitle.vue"
 
 export const cardVariants = cva(
-  "text-card-foreground transform-gpu transition-[transform,box-shadow,border-color,background-color] duration-300 ease-out",
+  "text-card-foreground transform-gpu transition-[transform,box-shadow,border-color,background-color,opacity] duration-300 ease-out",
   {
     variants: {
       variant: {
@@ -34,7 +34,7 @@ export const cardVariants = cva(
         lg: "p-8 rounded-[2.25rem]",
       },
       interactive: {
-        true: "cursor-pointer hover:scale-[1.01] hover:shadow-elevation-4 hover:border-primary/35 active:scale-[0.99]",
+        true: "cursor-pointer motion-safe:hover:-translate-y-0.5 hover:scale-[1.01] hover:shadow-elevation-4 hover:border-primary/35 active:scale-[0.99]",
         false: "",
       },
       glow: {

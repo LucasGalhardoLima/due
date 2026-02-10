@@ -67,7 +67,7 @@ function prevPage() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl py-10 px-4 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <div class="app-page animate-in fade-in slide-in-from-bottom-4 duration-500">
     <PageHeader 
       title="Auditoria" 
       subtitle="Analise as transações por ordem de criação."
@@ -76,11 +76,11 @@ function prevPage() {
     />
 
     <!-- Latest Transactions Table -->
-    <div class="rounded-xl border bg-card shadow-sm overflow-hidden">
+    <div class="rounded-[2rem] border border-border/70 bg-card shadow-elevation-2 overflow-hidden transition-all duration-300 hover:shadow-elevation-3">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="bg-muted/50 border-b text-muted-foreground font-medium">
+                    <tr class="bg-muted/40 border-b border-border/60 text-muted-foreground font-medium">
                         <th class="px-4 py-3 text-left">Criada em</th>
                         <th class="px-4 py-3 text-left">Data Compra</th>
                         <th class="px-4 py-3 text-left">Descrição</th>
@@ -89,8 +89,8 @@ function prevPage() {
                         <th class="px-4 py-3 text-center">Ações</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y">
-                    <tr v-for="tx in transactions" :key="tx.id" class="hover:bg-muted/30 transition-colors">
+                <tbody class="divide-y divide-border/60">
+                    <tr v-for="tx in transactions" :key="tx.id" class="hover:bg-muted/40 transition-all duration-200 hover:translate-x-[2px]">
                         <td class="px-4 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-2 text-xs text-muted-foreground">
                                 <Clock class="w-3 h-3" />
@@ -116,8 +116,8 @@ function prevPage() {
                             {{ formatCurrency(tx.amount) }}
                         </td>
                         <td class="px-4 py-4 text-center">
-                            <button 
-                                class="p-2 hover:bg-primary/10 rounded-full text-primary transition-colors"
+                            <button
+                                class="p-2 hover:bg-primary/10 rounded-xl text-primary transition-all duration-200 hover:scale-105 active:scale-[0.97]"
                                 title="Editar Transação"
                                 @click="handleEdit(tx.id)"
                             >
@@ -135,7 +135,7 @@ function prevPage() {
         </div>
         
         <!-- Pagination Controls -->
-        <div class="flex items-center justify-between px-4 py-4 border-t bg-muted/20">
+        <div class="flex items-center justify-between px-4 py-4 border-t border-border/60 bg-muted/30 transition-all duration-200 hover:bg-muted/40">
             <div class="text-sm text-muted-foreground">
                 Mostrando <span class="font-medium">{{ transactions.length }}</span> de <span class="font-medium">{{ response?.total || 0 }}</span> transações
             </div>
@@ -144,7 +144,7 @@ function prevPage() {
                     variant="outline" 
                     size="sm" 
                     :disabled="currentPage === 1"
-                    class="gap-1 px-2"
+                    class="gap-1 px-2 transition-all duration-200 hover:-translate-y-[1px]"
                     @click="prevPage"
                 >
                     <ChevronLeft class="w-4 h-4" />
@@ -157,7 +157,7 @@ function prevPage() {
                     variant="outline" 
                     size="sm" 
                     :disabled="currentPage === totalPages"
-                    class="gap-1 px-2"
+                    class="gap-1 px-2 transition-all duration-200 hover:-translate-y-[1px]"
                     @click="nextPage"
                 >
                     Próximo

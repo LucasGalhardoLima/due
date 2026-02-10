@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton'
       <!-- Left Column (Timeline & Chart) -->
       <div class="lg:col-span-2 space-y-8">
         <!-- Timeline Map Skeleton -->
-        <div class="rounded-3xl border p-6 space-y-4">
+        <div class="rounded-[2rem] border border-border/70 p-6 space-y-4 bg-card/70 shadow-elevation-1">
           <div class="flex justify-between items-center mb-6">
              <Skeleton class="h-8 w-48 rounded-lg" />
              <div class="flex gap-2">
@@ -35,7 +35,7 @@ import { Skeleton } from '@/components/ui/skeleton'
         </div>
 
         <!-- Limit Chart Skeleton -->
-        <div class="rounded-3xl border p-6 min-h-[300px] flex items-end justify-between gap-2">
+        <div class="rounded-[2rem] border border-border/70 p-6 min-h-[300px] flex items-end justify-between gap-2 bg-card/70 shadow-elevation-1">
            <Skeleton v-for="k in 12" :key="k" class="w-full rounded-t-lg" :style="{ height: `${Math.random() * 60 + 20}%` }" />
         </div>
       </div>
@@ -43,7 +43,7 @@ import { Skeleton } from '@/components/ui/skeleton'
       <!-- Right Column (Tools) -->
       <div class="space-y-6">
         <!-- Simulator Skeleton -->
-        <div class="rounded-3xl border p-6 h-[400px] space-y-4">
+        <div class="rounded-[2rem] border border-border/70 p-6 h-[400px] space-y-4 bg-card/70 shadow-elevation-1">
            <Skeleton class="h-8 w-3/4 rounded-lg" />
            <Skeleton class="h-4 w-full rounded" />
            <Skeleton class="h-12 w-full rounded-xl mt-8" />
@@ -51,7 +51,7 @@ import { Skeleton } from '@/components/ui/skeleton'
         </div>
 
         <!-- Optimizer Skeleton -->
-        <div class="rounded-3xl border p-6 h-[200px] space-y-4">
+        <div class="rounded-[2rem] border border-border/70 p-6 h-[200px] space-y-4 bg-card/70 shadow-elevation-1">
            <Skeleton class="h-6 w-1/2 rounded-lg" />
            <Skeleton class="h-24 w-full rounded-xl" />
         </div>

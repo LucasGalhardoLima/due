@@ -26,6 +26,14 @@ interface Card {
 
 const { data: cards, refresh, status } = useFetch<Card[]>('/api/cards')
 
+const cardsCount = computed(() => cards.value?.length ?? 0)
+const totalLimit = computed(() => (cards.value ?? []).reduce((sum, card) => sum + (card.limit || 0), 0))
+const totalBudget = computed(() => (cards.value ?? []).reduce((sum, card) => sum + (card.budget || 0), 0))
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+}
+
 async function onSubmit() {
   await $fetch('/api/cards', {
     method: 'POST',
@@ -70,7 +78,7 @@ async function handleDelete() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <div class="app-page animate-in fade-in slide-in-from-bottom-4 duration-500">
     <PageHeader 
       title="Cartões" 
       subtitle="Gerencie seus cartões de crédito e limites."
@@ -81,8 +89,8 @@ async function handleDelete() {
 
     <template v-else>
       <!-- Add Card Section (Standardized Form) -->
-      <div class="rounded-[2rem] border border-border/70 bg-card text-card-foreground shadow-elevation-2 overflow-hidden">
-        <div class="bg-secondary/5 px-6 py-4 border-b border-border/60 flex items-center gap-2">
+      <div class="rounded-[2rem] border border-border/70 bg-card text-card-foreground shadow-elevation-2 overflow-hidden transition-all duration-300 hover:shadow-elevation-3 hover:border-primary/25">
+        <div class="bg-secondary/5 px-6 py-4 border-b border-border/60 flex items-center gap-2 transition-colors duration-200">
           <Plus class="w-4 h-4 text-primary" />
           <h3 class="text-micro text-muted-foreground">Adicionar Novo Cartao</h3>
         </div>
@@ -96,7 +104,7 @@ async function handleDelete() {
                 name="card-name"
                 autocomplete="cc-name"
                 placeholder="Ex: Nubank Ultravioleta…"
-                class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
+                class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all duration-200 shadow-elevation-1 hover:border-primary/30"
                 required
               >
             </div>
@@ -110,7 +118,7 @@ async function handleDelete() {
                 inputmode="numeric"
                 type="number"
                 placeholder="10000"
-                class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
+                class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all duration-200 shadow-elevation-1 hover:border-primary/30"
                 required
               >
             </div>
@@ -124,7 +132,7 @@ async function handleDelete() {
                 inputmode="decimal"
                 type="number"
                 placeholder="500.00"
-                class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
+                class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all duration-200 shadow-elevation-1 hover:border-primary/30"
               >
             </div>
   
@@ -138,7 +146,7 @@ async function handleDelete() {
                 type="number"
                 min="1"
                 max="31"
-                class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
+                class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all duration-200 shadow-elevation-1 hover:border-primary/30"
                 required
               >
             </div>
@@ -153,7 +161,7 @@ async function handleDelete() {
                 type="number"
                 min="1"
                 max="31"
-                class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
+                class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all duration-200 shadow-elevation-1 hover:border-primary/30"
                 required
               >
             </div>
@@ -161,7 +169,7 @@ async function handleDelete() {
             <div class="col-span-1 md:col-start-6">
               <button
                 type="submit"
-                class="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-bold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-4 py-2 w-full active:scale-[0.98] shadow-elevation-2"
+                class="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-bold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-4 py-2 w-full active:scale-[0.98] hover:-translate-y-[1px] shadow-elevation-2 hover:shadow-elevation-3"
               >
                 Salvar
               </button>
@@ -169,12 +177,30 @@ async function handleDelete() {
           </form>
         </div>
       </div>
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <Card class="p-5 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-3">
+          <p class="text-micro text-muted-foreground">Cartões cadastrados</p>
+          <p class="text-h2 mt-1">{{ cardsCount }}</p>
+        </Card>
+        <Card class="p-5 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-3">
+          <p class="text-micro text-muted-foreground">Limite total</p>
+          <p class="text-h2 mt-1">{{ formatCurrency(totalLimit) }}</p>
+        </Card>
+        <Card class="p-5 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-3">
+          <p class="text-micro text-muted-foreground">Meta total (opcional)</p>
+          <p class="text-h2 mt-1">{{ formatCurrency(totalBudget) }}</p>
+        </Card>
+      </div>
   
       <!-- Cards List (Standardized) -->
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 font-sans">
-        <Card v-for="card in cards" :key="card.id" interactive class="overflow-hidden group cursor-pointer">
-          <div class="flex flex-row items-center justify-between space-y-0 p-6 pb-2">
-            <div class="flex items-center gap-2">
+        <Card v-for="card in cards" :key="card.id" interactive class="overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-elevation-3 hover:-translate-y-[2px]">
+          <div class="flex flex-row items-center justify-between space-y-0 p-6 pb-4 border-b border-border/60 bg-secondary/5 transition-colors duration-200 group-hover:bg-secondary/8">
+            <div class="flex items-center gap-3">
+              <div class="h-9 w-9 rounded-xl bg-primary/20 border border-primary/35 flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:bg-primary/25">
+                <CardIcon class="h-4 w-4 text-primary transition-transform duration-200 group-hover:scale-105" />
+              </div>
               <h3 class="text-micro text-muted-foreground">
                 {{ card.name }}
               </h3>
@@ -182,22 +208,25 @@ async function handleDelete() {
                 Padrao
               </span>
             </div>
-            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive/10 text-muted-foreground hover:text-destructive h-9 w-9 opacity-0 group-hover:opacity-100" aria-label="Remover cartão" @click.stop="confirmDelete(card.id)">
+            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive/10 text-muted-foreground hover:text-destructive h-9 w-9 opacity-0 group-hover:opacity-100 hover:scale-105 active:scale-[0.97]" aria-label="Remover cartão" @click.stop="confirmDelete(card.id)">
               <Trash2 class="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
-          <div class="p-6 pt-0">
+          <div class="p-6">
             <div class="flex flex-col mb-4">
-              <div class="text-h2">{{ card.limit.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</div>
+              <div class="text-h2">{{ formatCurrency(card.limit) }}</div>
               <div v-if="card.budget" class="text-small font-bold text-primary mt-1 flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-primary" />
-                Meta: {{ card.budget.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                Meta: {{ formatCurrency(card.budget) }}
               </div>
             </div>
-            <div class="pt-4 border-t border-border flex items-center justify-between text-micro text-muted-foreground">
-              <span>Fecha dia {{ card.closingDay }}</span>
-              <span class="w-1 h-1 rounded-full bg-muted-foreground opacity-30" />
-              <span>Vence dia {{ card.dueDay }}</span>
+            <div class="pt-4 border-t border-border flex items-center justify-between gap-2">
+              <span class="inline-flex items-center rounded-xl border border-border/70 bg-muted/35 px-3 py-1.5 text-micro text-muted-foreground">
+                Fecha dia {{ card.closingDay }}
+              </span>
+              <span class="inline-flex items-center rounded-xl border border-border/70 bg-muted/35 px-3 py-1.5 text-micro text-muted-foreground">
+                Vence dia {{ card.dueDay }}
+              </span>
             </div>
           </div>
         </Card>

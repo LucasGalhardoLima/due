@@ -52,7 +52,7 @@ const formatCurrency = (value: number) => {
   <div class="group relative">
     <!-- Main Bar Row -->
     <div 
-      class="flex items-center gap-3 py-3 px-3 hover:bg-muted/40 rounded-xl transition-all cursor-pointer select-none"
+      class="flex items-center gap-3 py-3 px-3 hover:bg-muted/40 rounded-xl transition-all duration-200 cursor-pointer select-none hover:translate-x-[2px]"
       @click="expanded = !expanded"
     >
       <!-- Left: Date -->
@@ -95,7 +95,7 @@ const formatCurrency = (value: number) => {
       <!-- Icon -->
       <div class="w-6 flex justify-center shrink-0">
         <ChevronDown 
-          class="w-4 h-4 text-muted-foreground transition-transform duration-300"
+          class="w-4 h-4 text-muted-foreground transition-transform duration-300 group-hover:scale-110"
           :class="{ 'rotate-180': expanded }"
         />
       </div>
@@ -105,7 +105,7 @@ const formatCurrency = (value: number) => {
     <div v-if="expanded" class="pl-[4.5rem] pr-4 pb-4 animate-in slide-in-from-top-1 fade-in duration-200">
       <div class="space-y-3 pt-2 border-l-2 border-muted/50 pl-4">
          <!-- Alert Banner -->
-         <div v-if="data.alert" class="flex items-center gap-2 text-danger bg-danger/10 p-2 rounded-md text-xs font-medium">
+         <div v-if="data.alert" class="flex items-center gap-2 text-danger bg-danger/10 p-2 rounded-md text-xs font-medium border border-danger/20">
            <AlertTriangle class="w-3 h-3 shrink-0" />
            {{ data.alert }}
          </div>
@@ -115,7 +115,7 @@ const formatCurrency = (value: number) => {
            <div 
              v-for="(t, i) in data.transactions" 
              :key="i"
-             class="flex justify-between items-center text-xs group/item"
+             class="flex justify-between items-center text-xs group/item transition-all duration-150 hover:translate-x-[1px]"
            >
              <div class="flex items-center gap-2 overflow-hidden">
                <div class="w-1 h-1 rounded-full bg-muted-foreground/30"/>

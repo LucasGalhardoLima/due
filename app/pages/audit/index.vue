@@ -199,7 +199,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+  <div class="app-page animate-in fade-in slide-in-from-bottom-4 duration-500">
     <PageHeader 
       title="Auditoria & Balanço" 
       subtitle="Detecte erros na fatura e economize em assinaturas esquecidas."
@@ -207,17 +207,17 @@ onMounted(() => {
     />
 
     <!-- Tabs -->
-    <div class="flex p-1 bg-muted/50 rounded-xl w-fit">
+    <div class="flex p-1.5 bg-muted/40 rounded-[1.25rem] w-fit border border-border/70 shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2">
         <button 
-           class="px-6 py-2 rounded-lg text-small font-medium transition-all"
-           :class="activeTab === 'audit' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'"
+           class="px-6 py-2 rounded-xl text-small font-medium transition-all duration-200 active:scale-[0.98]"
+           :class="activeTab === 'audit' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-background/60'"
            @click="activeTab = 'audit'"
         >
            Auditoria de Fatura
         </button>
         <button 
-           class="px-6 py-2 rounded-lg text-small font-medium transition-all flex items-center gap-2"
-           :class="activeTab === 'subscriptions' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'"
+           class="px-6 py-2 rounded-xl text-small font-medium transition-all duration-200 flex items-center gap-2 active:scale-[0.98]"
+           :class="activeTab === 'subscriptions' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-background/60'"
            @click="activeTab = 'subscriptions'"
         >
            Análise de Assinaturas
@@ -229,20 +229,25 @@ onMounted(() => {
     <div v-show="activeTab === 'audit'" class="space-y-6">
         
         <!-- Controls -->
-        <div v-if="!auditResult" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="space-y-2">
+        <div v-if="!auditResult" class="rounded-[2rem] border border-border/70 bg-card text-card-foreground shadow-elevation-2 overflow-hidden transition-all duration-300 hover:shadow-elevation-3 hover:border-primary/25">
+            <div class="bg-secondary/5 px-6 py-4 border-b border-border/60 flex items-center gap-2">
+                <Search class="w-4 h-4 text-primary" />
+                <h3 class="text-micro text-muted-foreground">Configuração da Auditoria</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+              <div class="space-y-2">
                 <label class="text-micro text-muted-foreground">Cartão</label>
                 <Select v-model="selectedCardId">
-                    <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                    <SelectTrigger class="h-11 rounded-xl border border-input bg-background shadow-elevation-1 transition-all duration-200 hover:border-primary/30 data-[state=open]:border-primary/40 data-[state=open]:shadow-elevation-2"><SelectValue placeholder="Selecione..." /></SelectTrigger>
                     <SelectContent>
                         <SelectItem v-for="c in cards" :key="c.id" :value="c.id">{{ c.name }}</SelectItem>
                     </SelectContent>
                 </Select>
-            </div>
-             <div class="space-y-2">
+              </div>
+              <div class="space-y-2">
                 <label class="text-micro text-muted-foreground">Mês Referência</label>
                 <Select v-model="selectedMonth">
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger class="h-11 rounded-xl border border-input bg-background shadow-elevation-1 transition-all duration-200 hover:border-primary/30 data-[state=open]:border-primary/40 data-[state=open]:shadow-elevation-2"><SelectValue /></SelectTrigger>
                     <SelectContent>
                         <SelectItem value="1">Janeiro</SelectItem>
                         <SelectItem value="2">Fevereiro</SelectItem>
@@ -258,25 +263,26 @@ onMounted(() => {
                         <SelectItem value="12">Dezembro</SelectItem>
                     </SelectContent>
                 </Select>
-            </div>
-             <div class="space-y-2">
+              </div>
+              <div class="space-y-2">
                 <label class="text-micro text-muted-foreground">Ano</label>
                 <Select v-model="selectedYear">
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger class="h-11 rounded-xl border border-input bg-background shadow-elevation-1 transition-all duration-200 hover:border-primary/30 data-[state=open]:border-primary/40 data-[state=open]:shadow-elevation-2"><SelectValue /></SelectTrigger>
                     <SelectContent>
                         <SelectItem value="2025">2025</SelectItem>
                         <SelectItem value="2026">2026</SelectItem>
                     </SelectContent>
                 </Select>
+              </div>
             </div>
         </div>
 
         <!-- Dropzone -->
         <div
             v-if="!auditResult"
-            class="border-2 border-dashed rounded-2xl p-12 flex flex-col items-center justify-center text-center space-y-4 transition-colors relative cursor-pointer"
+            class="border-2 border-dashed border-border/70 rounded-[2rem] bg-card p-12 flex flex-col items-center justify-center text-center space-y-4 transition-all duration-300 relative cursor-pointer shadow-elevation-2"
             :class="[
-                isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50',
+                isDragging ? 'border-primary bg-primary/5 scale-[1.005]' : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50 hover:-translate-y-[2px] hover:shadow-elevation-3',
                 !selectedCardId && 'opacity-50 cursor-not-allowed'
             ]"
             @dragover.prevent="isDragging = true"
@@ -300,7 +306,7 @@ onMounted(() => {
             <!-- Try Demo Mode Button -->
             <button 
                 v-if="isDemoMode && selectedCardId"
-                class="absolute -bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all font-bold shadow-lg"
+                class="absolute -bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 hover:-translate-y-[1px] transition-all duration-200 font-bold shadow-lg hover:shadow-elevation-3"
                 @click.stop="runDemoAudit"
             >
                 <Zap class="w-4 h-4" />
@@ -319,9 +325,9 @@ onMounted(() => {
 
         <!-- Result -->
         <div v-else class="space-y-4">
-            <div class="flex justify-between items-center bg-muted/30 p-4 rounded-xl">
+            <div class="flex justify-between items-center bg-muted/30 border border-border/70 p-4 rounded-[1.25rem] shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2">
                  <p class="text-small text-muted-foreground">Vendo auditoria para o mês {{ selectedMonth }}/{{ selectedYear }}</p>
-                 <button class="text-small font-medium text-primary hover:underline" @click="auditResult = null">Nova Auditoria</button>
+                 <button class="text-small font-medium text-primary hover:underline transition-all duration-200 hover:-translate-y-[1px]" @click="auditResult = null">Nova Auditoria</button>
             </div>
             <InvoiceAudit :audit="auditResult" />
         </div>

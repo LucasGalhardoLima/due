@@ -85,6 +85,13 @@
 
     --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
     --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+    /* Motion tokens */
+    --motion-fast: 140ms;
+    --motion-base: 220ms;
+    --motion-slow: 320ms;
+    --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --motion-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   .dark {
@@ -155,6 +162,17 @@
     @apply bg-background text-foreground h-full overscroll-y-none;
     font-family: var(--font-body);
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @layer components {
@@ -168,4 +186,28 @@
   .text-small { @apply text-xs font-medium; }
   .text-micro { @apply text-[10px] font-bold uppercase tracking-widest; }
   .text-stat { @apply text-2xl md:text-3xl lg:text-4xl font-extrabold tabular-nums tracking-tighter; font-family: var(--font-display); }
+
+  /* Shared micro-interaction helpers */
+  .micro-lift { @apply motion-safe:transition-[transform,box-shadow,background-color,border-color,color] motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-elevation-2; }
+  .micro-press { @apply active:scale-[0.98] active:translate-y-0; }
+  .micro-focus { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2; }
+
+  /* Authenticated app shell contracts */
+  .app-page { @apply w-full space-y-8 pb-24; }
+  .app-panel { @apply rounded-[2rem] border border-border/70 bg-card shadow-elevation-2 transition-all duration-300 hover:shadow-elevation-3; }
+  .app-strip { @apply bg-secondary/5 px-6 py-4 border-b border-border/60; }
+  .app-table-row { @apply transition-all duration-200 hover:bg-muted/40; }
+
+  .app-shell button,
+  .app-shell [role="button"] {
+    @apply transition-all duration-200;
+  }
+
+  .app-shell a {
+    @apply transition-colors duration-200;
+  }
+
+  .app-shell :is(input, textarea, [data-slot="select-trigger"], [role="combobox"]) {
+    @apply transition-all duration-200;
+  }
 }

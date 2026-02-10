@@ -221,7 +221,7 @@ async function handleImport() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <div class="app-page animate-in fade-in slide-in-from-bottom-4 duration-500">
     <PageHeader 
       title="Importação Inteligente" 
       subtitle="Arraste sua fatura (CSV) e nossa IA organiza tudo para você."
@@ -234,7 +234,7 @@ async function handleImport() {
       <!-- Step 1: Upload -->
       <div v-if="step === 1" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <!-- Visual Tutorial (Nubank Focus) -->
-          <div class="bg-card rounded-[2rem] p-8 border border-border/70 shadow-elevation-3">
+          <div class="bg-card rounded-[2rem] p-8 border border-border/70 shadow-elevation-3 transition-all duration-300 hover:shadow-elevation-4 hover:border-primary/25">
               <h3 class="text-micro text-muted-foreground mb-8 flex items-center gap-2">
                   <Smartphone class="w-3 h-3 text-primary" />
                   Como exportar do seu banco?
@@ -248,7 +248,7 @@ async function handleImport() {
                               Abra a Fatura
                               <CreditCard class="w-3 h-3 text-muted-foreground" />
                           </p>
-                          <p class="text-small text-muted-foreground leading-relaxed">No app do Nubank, toque no cartao de credito na tela inicial.</p>
+                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">No app do Nubank, toque no cartao de credito na tela inicial.</p>
                       </div>
                   </div>
   
@@ -260,7 +260,7 @@ async function handleImport() {
                               Enviar por E-mail
                               <Share2 class="w-3 h-3 text-muted-foreground" />
                           </p>
-                          <p class="text-small text-muted-foreground leading-relaxed">Toque em "Mais" ou no icone de compartilhar no topo da fatura.</p>
+                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">Toque em "Mais" ou no icone de compartilhar no topo da fatura.</p>
                       </div>
                   </div>
   
@@ -272,7 +272,7 @@ async function handleImport() {
                               Formato CSV
                               <FileText class="w-3 h-3 text-muted-foreground" />
                           </p>
-                          <p class="text-small text-muted-foreground leading-relaxed">Selecione CSV, envie para seu computador e arraste o arquivo abaixo.</p>
+                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">Selecione CSV, envie para seu computador e arraste o arquivo abaixo.</p>
                       </div>
                   </div>
               </div>
@@ -281,7 +281,7 @@ async function handleImport() {
            <div class="max-w-md space-y-2">
               <label class="text-micro text-muted-foreground">Cartao de Destino</label>
               <Select v-model="selectedCardId">
-                <SelectTrigger>
+              <SelectTrigger class="h-11 rounded-xl border border-input bg-background shadow-elevation-1 transition-all duration-200 hover:border-primary/30 data-[state=open]:border-primary/40 data-[state=open]:shadow-elevation-2">
                   <SelectValue placeholder="Selecione o cartao" />
                 </SelectTrigger>
                 <SelectContent>
@@ -294,9 +294,9 @@ async function handleImport() {
   
           <!-- Dropzone -->
           <div
-              class="border-2 border-dashed rounded-[2rem] p-12 flex flex-col items-center justify-center text-center space-y-4 transition-colors relative bg-card/60"
+              class="border-2 border-dashed rounded-[2rem] p-12 flex flex-col items-center justify-center text-center space-y-4 transition-all duration-300 relative bg-card/60"
               :class="[
-                  isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50',
+                  isDragging ? 'border-primary bg-primary/5 scale-[1.005]' : 'border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50 hover:-translate-y-[2px] hover:shadow-elevation-3',
                   !selectedCardId && 'opacity-50 cursor-not-allowed'
               ]"
               @dragover.prevent="isDragging = true"
@@ -328,15 +328,15 @@ async function handleImport() {
   
           <!-- Instructions / Supported Banks -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
-               <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70">
+               <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-2 hover:border-primary/25">
                    <div class="text-h4">Nubank</div>
                    <div class="text-small text-muted-foreground">Suporte total ao CSV exportado pelo app.</div>
                </div>
-               <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70">
+               <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-2 hover:border-primary/25">
                    <div class="text-h4">Inter</div>
                    <div class="text-small text-muted-foreground">CSV de extrato suportado.</div>
                </div>
-                <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70">
+                <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-2 hover:border-primary/25">
                    <div class="text-h4">Outros</div>
                    <div class="text-small text-muted-foreground">CSV generico (Data, Descricao, Valor).</div>
                </div>
@@ -356,11 +356,11 @@ async function handleImport() {
               </div>
           </div>
   
-          <div class="rounded-[2rem] border border-border/70 bg-card shadow-elevation-3">
+          <div class="rounded-[2rem] border border-border/70 bg-card shadow-elevation-3 transition-all duration-300 hover:shadow-elevation-4">
               <div class="relative w-full overflow-auto max-h-[500px]">
                   <table class="w-full caption-bottom text-sm">
                       <thead class="sticky top-0 bg-background border-b z-10">
-                          <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                          <tr class="border-b border-border/60 transition-colors hover:bg-muted/40 data-[state=selected]:bg-muted">
                               <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground w-[50px]">
                                   <input type="checkbox" checked aria-label="Selecionar todas as transações" @change="(e) => parsedRows.forEach(r => r.selected = (e.target as HTMLInputElement).checked)" >
                               </th>
@@ -371,7 +371,7 @@ async function handleImport() {
                           </tr>
                       </thead>
                       <tbody>
-                          <tr v-for="(row, idx) in parsedRows" :key="idx" class="border-b transition-colors hover:bg-muted/50">
+                          <tr v-for="(row, idx) in parsedRows" :key="idx" class="border-b border-border/60 transition-all duration-200 hover:bg-muted/40 hover:translate-x-[2px]">
                               <td class="p-4 align-middle">
                                   <input v-model="row.selected" type="checkbox" :aria-label="`Selecionar transação: ${row.description}`" >
                               </td>
@@ -380,7 +380,7 @@ async function handleImport() {
                               <td class="p-4 align-middle text-body">R$ {{ row.amount.toFixed(2) }}</td>
                               <td class="p-4 align-middle w-[250px]">
                                   <Select v-model="row.categoryId">
-                                    <SelectTrigger :class="!row.categoryId && 'text-muted-foreground border-warning bg-warning-muted'">
+                                    <SelectTrigger class="h-11 rounded-xl border border-input bg-background shadow-elevation-1 transition-all duration-200 hover:border-primary/30 data-[state=open]:border-primary/40 data-[state=open]:shadow-elevation-2" :class="!row.categoryId && 'text-muted-foreground border-warning bg-warning-muted'">
                                       <SelectValue placeholder="Sem Categoria" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -397,11 +397,11 @@ async function handleImport() {
           </div>
   
           <div class="flex justify-end gap-3 pt-4">
-              <button class="px-4 py-2 text-body font-medium text-muted-foreground hover:text-foreground transition-colors" @click="step = 1">
+              <button class="px-4 py-2 text-body font-medium text-muted-foreground hover:text-foreground transition-all duration-200 hover:-translate-y-[1px]" @click="step = 1">
                   Cancelar
               </button>
               <button
-                  class="inline-flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-xl text-body font-bold shadow-elevation-2 hover:bg-primary/90 disabled:opacity-50 active:scale-[0.98] transition-all"
+                  class="inline-flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-xl text-body font-bold shadow-elevation-2 hover:bg-primary/90 hover:-translate-y-[1px] hover:shadow-elevation-3 disabled:opacity-50 active:scale-[0.98] transition-all duration-200"
                   :disabled="isProcessing || parsedRows.filter(r => r.selected).length === 0"
                   @click="handleImport"
               >

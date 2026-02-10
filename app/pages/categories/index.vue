@@ -13,6 +13,7 @@ interface Category {
 }
 
 const { data: categories, refresh, status } = useFetch<Category[]>('/api/categories')
+const categoriesCount = computed(() => categories.value?.length ?? 0)
 
 const form = reactive({
   name: '',
@@ -96,7 +97,7 @@ async function handleDelete() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <div class="app-page animate-in fade-in slide-in-from-bottom-4 duration-500">
     <PageHeader 
       title="Categorias" 
       subtitle="Organize seus gastos por tipo para uma melhor análise."
@@ -107,7 +108,7 @@ async function handleDelete() {
 
     <template v-else>
       <!-- Add Category Form (Standardized) -->
-      <div class="rounded-[2rem] border border-border/70 bg-card text-card-foreground shadow-elevation-2 overflow-hidden">
+      <div class="rounded-[2rem] border border-border/70 bg-card text-card-foreground shadow-elevation-2 overflow-hidden transition-all duration-300 hover:shadow-elevation-3 hover:border-primary/25">
           <div class="bg-secondary/5 px-6 py-4 border-b border-border/60 flex items-center gap-2">
               <Plus class="w-4 h-4 text-primary" />
               <h3 class="text-micro text-muted-foreground">Nova Categoria</h3>
@@ -120,14 +121,14 @@ async function handleDelete() {
                     id="name"
                     v-model="form.name"
                     placeholder="Ex: Educacao, Lazer, Saude..."
-                    class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
+                    class="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all duration-200 shadow-elevation-1 hover:border-primary/30"
                     required
                   >
                 </div>
   
                 <button
                   type="submit"
-                  class="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-bold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-6 active:scale-[0.98] shadow-elevation-2"
+                  class="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-bold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-6 active:scale-[0.98] hover:-translate-y-[1px] shadow-elevation-2 hover:shadow-elevation-3"
                 >
                   Adicionar
                 </button>
@@ -135,30 +136,50 @@ async function handleDelete() {
           </div>
       </div>
   
+      <div class="grid gap-4 md:grid-cols-2">
+        <Card class="p-5 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-3">
+          <p class="text-micro text-muted-foreground">Categorias ativas</p>
+          <p class="text-h2 mt-1">{{ categoriesCount }}</p>
+        </Card>
+        <Card class="p-5 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-3">
+          <p class="text-micro text-muted-foreground">Sugestão</p>
+          <p class="text-small mt-1 text-muted-foreground">Mantenha categorias objetivas para melhorar os insights e relatórios.</p>
+        </Card>
+      </div>
+  
       <!-- Categories List (Standardized Card) -->
-      <Card class="divide-y divide-border overflow-hidden rounded-[2rem]">
-        <div v-for="cat in categories" :key="cat.id" class="p-4 flex items-center justify-between group hover:bg-muted/50 transition-colors">
+      <Card class="overflow-hidden rounded-[2rem] border border-border/70 shadow-elevation-2 transition-all duration-300 hover:shadow-elevation-3">
+        <div class="bg-secondary/5 px-6 py-4 border-b border-border/60">
+          <h3 class="text-micro text-muted-foreground">Categorias Cadastradas</h3>
+        </div>
+        <div class="divide-y divide-border/70">
+        <div v-for="cat in categories" :key="cat.id" class="p-4 md:p-5 flex items-center justify-between gap-3 group hover:bg-muted/40 transition-all duration-200">
           <div v-if="editingId === cat.id" class="flex-grow flex gap-2">
               <input
                 v-model="editingName"
                 v-focus
-                class="flex h-9 w-full rounded-lg border border-border bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all shadow-elevation-1"
+                class="flex h-9 w-full rounded-lg border border-border bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 transition-all duration-200 shadow-elevation-1 hover:border-primary/30"
                 aria-label="Editar nome da categoria"
                 @keyup.enter="saveEdit"
                 @keyup.esc="cancelEdit"
               >
-              <button class="p-2 text-success hover:bg-success/10 rounded-xl transition-all" aria-label="Confirmar edição" @click="saveEdit">
+              <button class="p-2 text-success hover:bg-success/10 rounded-xl transition-all duration-200 hover:scale-105 active:scale-[0.97]" aria-label="Confirmar edição" @click="saveEdit">
                   <Check class="h-4 w-4" />
               </button>
-              <button class="p-2 text-danger hover:bg-danger/10 rounded-xl transition-all" aria-label="Cancelar edição" @click="cancelEdit">
+              <button class="p-2 text-danger hover:bg-danger/10 rounded-xl transition-all duration-200 hover:scale-105 active:scale-[0.97]" aria-label="Cancelar edição" @click="cancelEdit">
                   <X class="h-4 w-4" />
               </button>
           </div>
           <template v-else>
-              <span class="text-body font-semibold text-foreground/80">{{ cat.name }}</span>
-              <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rounded-xl bg-primary/15 border border-primary/25 flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:bg-primary/20">
+                  <TagsIcon class="h-3.5 w-3.5 text-primary transition-transform duration-200 group-hover:scale-105" />
+                </div>
+                <span class="text-body font-semibold text-foreground/80">{{ cat.name }}</span>
+              </div>
+              <div class="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                   <button
-                    class="p-2 hover:bg-primary/10 rounded-xl transition-colors"
+                    class="p-2 hover:bg-primary/10 rounded-xl transition-all duration-200 hover:scale-105 active:scale-[0.97]"
                     title="Editar"
                     aria-label="Editar categoria"
                     @click="startEdit(cat)"
@@ -167,7 +188,7 @@ async function handleDelete() {
                   </button>
                   <button
                     v-if="cat.name.toLowerCase() !== 'outros'"
-                    class="p-2 hover:bg-destructive/10 rounded-xl transition-colors text-muted-foreground hover:text-destructive shrink-0"
+                    class="p-2 hover:bg-destructive/10 rounded-xl transition-all duration-200 text-muted-foreground hover:text-destructive shrink-0 hover:scale-105 active:scale-[0.97]"
                     title="Remover"
                     aria-label="Remover categoria"
                     @click="confirmDelete(cat.id)"
@@ -176,6 +197,7 @@ async function handleDelete() {
                   </button>
               </div>
           </template>
+        </div>
         </div>
   
         <div v-if="!categories?.length" class="p-12 text-center text-body text-muted-foreground">

@@ -7,7 +7,6 @@ import {
   Tags, 
   UploadCloud, 
   ShieldCheck, 
-  PlusCircle,
   Menu,
   Moon,
   Sun,
@@ -47,7 +46,6 @@ const groups = [
     items: [
       { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
       { name: 'Parcelamentos', path: '/parcelamentos', icon: CalendarRange },
-      { name: 'Adicionar Gasto', path: '/add-expense', icon: PlusCircle },
     ]
   },
   {
@@ -110,13 +108,13 @@ function closeMobileMenu() {
           <h3 class="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             {{ group.label }}
           </h3>
-          <div class="space-y-1 rounded-[2rem] border border-border/70 bg-background/70 p-2 shadow-elevation-1">
+          <div class="space-y-1 rounded-[2rem] border border-border/70 bg-background/70 p-2 shadow-elevation-1 transition-[box-shadow,border-color] duration-200 hover:shadow-elevation-2 hover:border-primary/20">
             <NuxtLink
               v-for="item in group.items"
               :key="item.path"
               :to="item.path"
-              class="relative flex items-center gap-3 px-3.5 py-2.5 rounded-[1.5rem] text-sm font-semibold transition-[transform,background-color,color,box-shadow] duration-200 ease-out hover:bg-primary/16 dark:hover:bg-primary/14 hover:text-foreground hover:translate-x-0.5 group before:absolute before:left-1 before:top-1/2 before:h-5 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-primary before:opacity-0 before:scale-y-50 before:transition-all before:duration-200"
-              :active-class="item.ai ? 'bg-ai-accent/16 text-ai-accent hover:bg-ai-accent/22 before:opacity-100 before:scale-y-100 before:bg-ai-accent shadow-elevation-1' : 'bg-primary text-primary-foreground shadow-elevation-1 hover:bg-primary/88 hover:shadow-elevation-2 before:opacity-100 before:scale-y-100 before:bg-primary-foreground/80'"
+              class="relative flex items-center gap-3 px-3.5 py-2.5 rounded-[1.5rem] text-sm font-semibold transition-[transform,background-color,color,box-shadow] duration-200 ease-out hover:bg-primary/16 dark:hover:bg-primary/14 hover:text-foreground hover:translate-x-0.5 group before:absolute before:left-1 before:top-1/2 before:h-5 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-primary before:opacity-0 before:scale-y-50 before:transition-all before:duration-200 active:scale-[0.99]"
+              :active-class="item.ai ? 'bg-ai-accent/16 text-ai-accent hover:bg-ai-accent/22 before:opacity-100 before:scale-y-100 before:bg-ai-accent shadow-elevation-1 hover:shadow-elevation-2' : 'bg-primary text-primary-foreground shadow-elevation-1 hover:bg-primary/92 hover:shadow-elevation-2 before:opacity-100 before:scale-y-100 before:bg-primary-foreground/80'"
               @click="closeMobileMenu"
             >
               <component :is="item.icon" class="w-4 h-4 opacity-80 transition-all duration-200 group-hover:opacity-100 group-hover:scale-105" />
@@ -147,7 +145,7 @@ function closeMobileMenu() {
           <!-- Actions Row -->
           <div class="flex items-center justify-between px-2 gap-2">
             <button 
-              class="flex-1 flex items-center justify-center gap-2 h-9 px-3 rounded-xl bg-background border border-border hover:bg-secondary/10 hover:border-primary/30 transition-all duration-200 ease-out hover:-translate-y-[1px] text-xs font-medium text-muted-foreground hover:text-foreground" 
+              class="flex-1 flex items-center justify-center gap-2 h-9 px-3 rounded-xl bg-background border border-border hover:bg-secondary/10 hover:border-primary/30 transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-xs font-medium text-muted-foreground hover:text-foreground" 
               aria-label="Alternar Tema"
               @click="toggleTheme"
             >
@@ -157,7 +155,7 @@ function closeMobileMenu() {
             </button>
 
             <button
-              class="flex items-center justify-center h-9 w-9 rounded-xl bg-background border border-border hover:bg-danger/10 hover:border-danger/20 hover:text-danger transition-all duration-200 ease-out hover:-translate-y-[1px] text-muted-foreground"
+              class="flex items-center justify-center h-9 w-9 rounded-xl bg-background border border-border hover:bg-danger/10 hover:border-danger/20 hover:text-danger transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-muted-foreground"
               title="Sair"
               @click="handleSignOut"
             >

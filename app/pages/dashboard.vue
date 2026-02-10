@@ -6,7 +6,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
-import { Sparkles, PlusCircle, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Calendar as CalendarIcon  } from 'lucide-vue-next'
+import { Sparkles, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Calendar as CalendarIcon  } from 'lucide-vue-next'
 
 import TransactionList from '@/components/transaction/TransactionList.vue'
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton.vue'
@@ -249,7 +249,7 @@ const showPayConfirm = ref(false)
 </script>
 
 <template>
-  <div class="space-y-8 relative min-h-screen">
+  <div class="app-page relative min-h-screen">
 
     <DashboardSkeleton v-if="isLoading" />
 
@@ -419,22 +419,14 @@ const showPayConfirm = ref(false)
       </div>
     </div>
 
-    <!-- Quick Add Button (Floating - Desktop & Mobile) -->
-    <div class="fixed bottom-8 right-8 z-50 flex flex-col items-center gap-4">
-      <!-- AI FAB (Mobile Only) -->
-      <button
-        class="lg:hidden flex h-12 w-12 items-center justify-center rounded-full bg-card border border-ai-accent/30 shadow-elevation-2 text-ai-accent hover:bg-ai-accent/10 transition-all active:scale-95"
-        aria-label="Abrir assistente IA"
-        @click="isAIDrawerOpen = true"
-      >
-        <Sparkles class="h-6 w-6" aria-hidden="true" />
-      </button>
-
-      <!-- Main Add Button -->
-      <button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 hover:scale-110 transition-all duration-300" aria-label="Adicionar nova despesa" @click="isDrawerOpen = true">
-        <PlusCircle class="h-8 w-8" aria-hidden="true" />
-      </button>
-    </div>
+    <!-- AI FAB (Mobile Only) -->
+    <button
+      class="lg:hidden fixed bottom-24 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-card border border-ai-accent/30 shadow-elevation-2 text-ai-accent hover:bg-ai-accent/10 transition-all active:scale-95"
+      aria-label="Abrir assistente IA"
+      @click="isAIDrawerOpen = true"
+    >
+      <Sparkles class="h-6 w-6" aria-hidden="true" />
+    </button>
 
     <!-- Drawer Component -->
     <TransactionDrawer v-model:open="isDrawerOpen" :transaction-id="editingTransactionId" @saved="onSaved" />

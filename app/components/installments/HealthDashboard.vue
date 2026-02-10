@@ -12,9 +12,9 @@ const scoreColor = computed(() => {
 
 const scoreGradient = computed(() => {
   const score = health.value?.score || 0
-  if (score >= 80) return 'bg-success-muted border-success/20'
-  if (score >= 50) return 'bg-warning-muted border-warning/20'
-  return 'bg-danger-muted border-danger/20'
+  if (score >= 80) return 'bg-card border-border/70'
+  if (score >= 50) return 'bg-card border-border/70'
+  return 'bg-card border-border/70'
 })
 
 const trend = computed(() => {
@@ -35,14 +35,11 @@ const formatCurrency = (val: number) => {
 <template>
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
     <!-- Card 1: Health Score -->
-    <div
-      class="relative overflow-hidden rounded-xl p-4 md:p-5 border shadow-elevation-1 transition-all hover:scale-[1.02]"
-      :class="scoreGradient"
-    >
+    <div class="group relative overflow-hidden rounded-[1.5rem] p-4 md:p-5 border shadow-elevation-1 transition-all duration-300 hover:shadow-elevation-3 hover:-translate-y-[2px]" :class="scoreGradient">
       <div class="flex flex-col h-full justify-between">
          <div class="flex items-start justify-between">
-           <div class="p-2 rounded-xl bg-background/80 border border-border">
-             <Activity class="w-5 h-5" :class="scoreColor" />
+           <div class="p-2 rounded-xl bg-primary/12 border border-primary/30 transition-all duration-200 group-hover:scale-105">
+             <Activity class="w-5 h-5 transition-transform duration-200 group-hover:scale-105" :class="scoreColor" />
            </div>
          </div>
          <div class="mt-4">
@@ -56,11 +53,11 @@ const formatCurrency = (val: number) => {
     </div>
 
     <!-- Card 2: Active Plans -->
-    <div class="relative overflow-hidden rounded-xl p-4 md:p-5 border border-info/20 bg-info-muted shadow-elevation-1 transition-all hover:scale-[1.02]">
+    <div class="group relative overflow-hidden rounded-[1.5rem] p-4 md:p-5 border border-border/70 bg-card shadow-elevation-1 transition-all duration-300 hover:shadow-elevation-3 hover:-translate-y-[2px]">
       <div class="flex flex-col h-full justify-between">
          <div class="flex items-start justify-between">
-           <div class="p-2 rounded-xl bg-background/80 border border-border">
-             <Layers class="w-5 h-5 text-info" />
+           <div class="p-2 rounded-xl bg-primary/12 border border-primary/30 transition-all duration-200 group-hover:scale-105">
+             <Layers class="w-5 h-5 text-primary transition-transform duration-200 group-hover:scale-105" />
            </div>
          </div>
          <div class="mt-4">
@@ -74,11 +71,11 @@ const formatCurrency = (val: number) => {
     </div>
 
     <!-- Card 3: Monthly Commitment -->
-    <div class="relative overflow-hidden rounded-xl p-4 md:p-5 border border-secondary/25 bg-secondary/10 shadow-elevation-1 transition-all hover:scale-[1.02]">
+    <div class="group relative overflow-hidden rounded-[1.5rem] p-4 md:p-5 border border-border/70 bg-card shadow-elevation-1 transition-all duration-300 hover:shadow-elevation-3 hover:-translate-y-[2px]">
       <div class="flex flex-col h-full justify-between">
          <div class="flex items-start justify-between">
-           <div class="p-2 rounded-lg bg-background/80 border border-secondary/20">
-             <Wallet class="w-5 h-5 text-secondary" />
+           <div class="p-2 rounded-lg bg-secondary/12 border border-secondary/30 transition-all duration-200 group-hover:scale-105">
+             <Wallet class="w-5 h-5 text-secondary transition-transform duration-200 group-hover:scale-105" />
            </div>
          </div>
          <div class="mt-4">
@@ -92,12 +89,12 @@ const formatCurrency = (val: number) => {
     </div>
 
     <!-- Card 4: Trend -->
-    <div class="relative overflow-hidden rounded-xl p-4 md:p-5 border border-warning/20 bg-warning-muted shadow-elevation-1 transition-all hover:scale-[1.02]">
+    <div class="group relative overflow-hidden rounded-[1.5rem] p-4 md:p-5 border border-border/70 bg-card shadow-elevation-1 transition-all duration-300 hover:shadow-elevation-3 hover:-translate-y-[2px]">
       <div class="flex flex-col h-full justify-between">
          <div class="flex items-start justify-between">
-           <div class="p-2 rounded-xl bg-background/80 border border-border">
-             <TrendingUp v-if="trend === 'worse'" class="w-5 h-5 text-danger" />
-             <TrendingDown v-else class="w-5 h-5 text-success" />
+           <div class="p-2 rounded-xl bg-primary/12 border border-primary/30 transition-all duration-200 group-hover:scale-105">
+             <TrendingUp v-if="trend === 'worse'" class="w-5 h-5 text-danger transition-transform duration-200 group-hover:scale-105" />
+             <TrendingDown v-else class="w-5 h-5 text-success transition-transform duration-200 group-hover:scale-105" />
            </div>
          </div>
          <div class="mt-4">

@@ -202,7 +202,7 @@ watch(() => form.categoryId, (value) => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <div class="app-page animate-in fade-in slide-in-from-bottom-4 duration-500">
     <PageHeader 
       title="Adicionar Gasto" 
       subtitle="Registre uma nova despesa rapidamente."
@@ -218,7 +218,7 @@ watch(() => form.categoryId, (value) => {
     </div>
 
     <!-- Mode Toggle -->
-    <div v-else class="bg-muted/40 p-1.5 rounded-2xl flex gap-1 mb-6 border border-border/70 shadow-elevation-1">
+    <div v-else class="bg-muted/40 p-1.5 rounded-[1.25rem] flex gap-1 mb-6 border border-border/70 shadow-elevation-1">
         <button
           class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-all"
           :class="!isAiMode ? 'bg-background shadow-sm text-foreground rounded-xl' : 'text-muted-foreground hover:bg-background/50 rounded-xl'"
@@ -352,7 +352,7 @@ watch(() => form.categoryId, (value) => {
         <div class="space-y-2">
           <label class="text-micro text-muted-foreground">Cartao</label>
           <Select v-model="form.cardId">
-            <SelectTrigger>
+            <SelectTrigger class="h-11 rounded-xl border border-input bg-background shadow-elevation-1">
               <SelectValue placeholder="Selecione" />
             </SelectTrigger>
             <SelectContent>
@@ -367,7 +367,7 @@ watch(() => form.categoryId, (value) => {
         <div class="space-y-2">
           <label class="text-micro text-muted-foreground">Categoria</label>
           <Select v-model="form.categoryId">
-            <SelectTrigger>
+            <SelectTrigger class="h-11 rounded-xl border border-input bg-background shadow-elevation-1">
               <SelectValue placeholder="Selecione" />
             </SelectTrigger>
             <SelectContent>

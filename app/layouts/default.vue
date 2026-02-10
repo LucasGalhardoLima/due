@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import Sidebar from '@/components/layout/Sidebar.vue'
 import InstallPrompt from '@/components/pwa/InstallPrompt.vue'
+import GlobalQuickAddFab from '@/components/layout/GlobalQuickAddFab.vue'
 </script>
 
 <template>
-  <div class="min-h-screen bg-background font-sans antialiased relative overflow-hidden">
+  <div class="app-shell min-h-screen bg-background font-sans antialiased relative overflow-hidden">
     <!-- Branded ambient background -->
     <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_10%_12%,hsl(var(--primary)/0.42),transparent_42%),radial-gradient(circle_at_86%_18%,hsl(var(--secondary)/0.14),transparent_36%),radial-gradient(circle_at_58%_88%,hsl(var(--primary)/0.22),transparent_44%)] dark:bg-[radial-gradient(circle_at_10%_12%,hsl(var(--primary)/0.28),transparent_42%),radial-gradient(circle_at_86%_18%,hsl(var(--secondary)/0.20),transparent_36%),radial-gradient(circle_at_58%_88%,hsl(var(--primary)/0.16),transparent_44%)]" />
@@ -19,6 +20,8 @@ import InstallPrompt from '@/components/pwa/InstallPrompt.vue'
         <slot />
       </main>
     </div>
+
+    <GlobalQuickAddFab />
 
     <!-- PWA Install Prompt -->
     <InstallPrompt />

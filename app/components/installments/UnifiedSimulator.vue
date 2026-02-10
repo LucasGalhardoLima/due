@@ -38,7 +38,7 @@ const verdictColor = computed(() => {
 
 const verdictBg = computed(() => {
   if (!result.value) return ''
-  return result.value.evaluation.viable ? 'bg-success/10 border-success/20' : 'bg-danger/10 border-danger/20'
+  return result.value.evaluation.viable ? 'bg-ai-accent/10 border-ai-accent/25' : 'bg-secondary/10 border-secondary/25'
 })
 </script>
 
@@ -46,7 +46,7 @@ const verdictBg = computed(() => {
   <div class="h-full flex flex-col">
     <!-- Header -->
     <div class="mb-6 flex items-center gap-2">
-      <div class="p-2 bg-ai-accent/10 rounded-lg border border-ai-accent/20">
+      <div class="h-9 w-9 rounded-xl bg-ai-accent/20 flex items-center justify-center text-ai-accent shadow-elevation-1 ring-1 ring-ai-accent/30">
         <Sparkles class="w-5 h-5 text-ai-accent" />
       </div>
       <div>
@@ -80,7 +80,7 @@ const verdictBg = computed(() => {
              <button
                v-for="option in quickOptions"
                :key="option"
-               class="rounded-md px-2 py-1 text-[11px] font-semibold transition-colors"
+               class="rounded-md px-2 py-1 text-[11px] font-semibold transition-all duration-200 hover:-translate-y-[1px] active:scale-[0.98]"
                :class="installments[0] === option 
                  ? 'bg-ai-accent/15 text-ai-accent' 
                  : 'bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/50'"
@@ -101,7 +101,7 @@ const verdictBg = computed(() => {
         </div>
 
         <Button 
-          class="w-full h-11 font-bold shadow-lg shadow-ai-accent/20 bg-ai-accent text-ai-accent-foreground hover:bg-ai-accent/90" 
+          class="w-full h-11 font-bold shadow-elevation-3 bg-ai-accent text-ai-accent-foreground hover:bg-ai-accent/90 transition-all" 
           :disabled="isLoading || amount <= 0"
           @click="runSimulation"
         >
@@ -115,7 +115,7 @@ const verdictBg = computed(() => {
     <div v-else class="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300 flex-1 flex flex-col">
       <!-- AI Verdict Banner -->
       <div 
-        class="p-4 rounded-xl border flex flex-col gap-3 text-center"
+        class="p-4 rounded-xl border flex flex-col gap-3 text-center transition-all duration-200 hover:shadow-elevation-1"
         :class="verdictBg"
       >
         <div class="mx-auto p-2 bg-background/50 rounded-full w-fit backdrop-blur-sm shadow-sm" :class="verdictColor">
@@ -134,14 +134,14 @@ const verdictBg = computed(() => {
 
       <!-- Stats -->
       <div class="space-y-3">
-        <div class="p-3 rounded-lg bg-muted/10 border flex items-center justify-between">
+        <div class="p-3 rounded-lg bg-muted/10 border flex items-center justify-between transition-all duration-200 hover:bg-muted/20">
           <div class="text-xs text-muted-foreground">Impacto Mensal</div>
           <div class="font-mono text-sm font-bold">
             {{ formatCurrency(result.timeline.monthlyImpact) }}
           </div>
         </div>
 
-        <div class="p-3 rounded-lg bg-muted/10 border flex flex-col gap-1">
+        <div class="p-3 rounded-lg bg-muted/10 border flex flex-col gap-1 transition-all duration-200 hover:bg-muted/20">
           <div class="flex items-center justify-between text-xs text-muted-foreground">
             <span>Pico de Uso</span>
             <span>Mês {{ result.timeline.peakMonth.label }}</span>
@@ -150,7 +150,7 @@ const verdictBg = computed(() => {
              <div class="flex-1 h-2 bg-muted/30 rounded-full overflow-hidden">
                <div
                   class="h-full rounded-full"
-                  :class="result.timeline.peakMonth.usagePercentAfter > 80 ? 'bg-danger' : 'bg-ai-accent'"
+                  :class="result.timeline.peakMonth.usagePercentAfter > 80 ? 'bg-secondary' : 'bg-ai-accent'"
                   :style="{ width: `${Math.min(result.timeline.peakMonth.usagePercentAfter, 100)}%` }"
                />
              </div>
@@ -163,7 +163,7 @@ const verdictBg = computed(() => {
       
       <div class="flex-1"/>
 
-      <Button variant="outline" class="w-full" @click="reset">
+      <Button variant="outline" class="w-full border-ai-accent/30 text-foreground hover:bg-ai-accent/10" @click="reset">
         Nova Simulação
       </Button>
     </div>

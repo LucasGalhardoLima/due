@@ -14,11 +14,11 @@ defineProps<Props>()
 <template>
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 h-[72px]">
     <div class="flex items-center gap-4">
-      <div v-if="icon" class="hidden md:flex bg-primary/18 dark:bg-primary/20 p-3 rounded-2xl border border-primary/35 text-primary-foreground dark:text-primary shadow-elevation-1">
+      <div v-if="icon" class="hidden md:flex bg-primary/18 dark:bg-primary/20 p-3 rounded-2xl border border-primary/35 text-primary-foreground dark:text-primary shadow-elevation-1 transition-[transform,box-shadow,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-elevation-2">
         <component :is="icon" class="w-6 h-6" />
       </div>
       <div>
-        <h1 class="text-h1">
+        <h1 class="text-h1 transition-colors duration-200">
           {{ title }}
         </h1>
         <p v-if="subtitle" class="text-body text-muted-foreground mt-1.5">
@@ -30,9 +30,9 @@ defineProps<Props>()
     <NuxtLink
       v-if="backTo"
       :to="backTo"
-      class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
+      class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-[color,transform] duration-200 ease-out hover:-translate-x-0.5 group"
     >
-      <div class="w-8 h-8 rounded-xl bg-muted/50 flex items-center justify-center group-hover:bg-muted transition-colors">
+      <div class="w-8 h-8 rounded-xl bg-muted/50 flex items-center justify-center group-hover:bg-muted transition-[background-color,transform] duration-200 group-hover:scale-105">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="m15 18-6-6 6-6"/></svg>
       </div>
       Voltar

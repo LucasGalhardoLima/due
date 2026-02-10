@@ -19,7 +19,7 @@ const recommendationColor = computed(() => {
   if (!result.value) return ''
   switch (result.value.recommendation.type) {
     case 'antecipate': return 'text-ai-accent bg-ai-accent/10 border-ai-accent/20'
-    case 'pay_full': return 'text-success bg-success/10 border-success/20'
+    case 'pay_full': return 'text-secondary bg-secondary/10 border-secondary/20'
     default: return 'text-ai-accent bg-ai-accent/10 border-ai-accent/20'
   }
 })
@@ -28,7 +28,7 @@ const recommendationColor = computed(() => {
 <template>
   <div class="h-full flex flex-col">
     <div class="flex items-center gap-2 mb-6">
-      <div class="p-2 bg-ai-accent/10 rounded-lg border border-ai-accent/20">
+      <div class="h-9 w-9 rounded-xl bg-ai-accent/20 flex items-center justify-center text-ai-accent shadow-elevation-1 ring-1 ring-ai-accent/30">
         <Sparkles class="w-5 h-5 text-ai-accent" />
       </div>
       <div>
@@ -38,7 +38,7 @@ const recommendationColor = computed(() => {
     </div>
 
     <!-- Initial State -->
-    <div v-if="!result && !isLoading" class="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4 border-2 border-dashed rounded-xl border-ai-accent/20 bg-ai-accent/5">
+    <div v-if="!result && !isLoading" class="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4 border-2 border-dashed rounded-xl border-ai-accent/20 bg-ai-accent/5 transition-all duration-300 hover:border-ai-accent/35 hover:bg-ai-accent/8">
        <Sparkles class="w-10 h-10 text-muted-foreground/30" />
        <div>
          <p class="font-medium text-muted-foreground">IA pronta para analisar</p>
@@ -46,7 +46,7 @@ const recommendationColor = computed(() => {
            Descubra quais parcelas antecipar para economizar e liberar crédito.
          </p>
        </div>
-       <Button class="bg-ai-accent hover:bg-ai-accent/90 font-bold shadow-lg shadow-ai-accent/20 text-ai-accent-foreground" @click="runAnalysis">
+       <Button class="bg-ai-accent hover:bg-ai-accent/90 font-bold shadow-elevation-3 text-ai-accent-foreground transition-all" @click="runAnalysis">
          Analisar Agora
        </Button>
     </div>
@@ -60,7 +60,7 @@ const recommendationColor = computed(() => {
     <!-- Result -->
     <div v-else-if="result" class="flex-1 flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4">
       <!-- Main Recommendation -->
-      <div class="p-4 rounded-xl border space-y-3" :class="recommendationColor">
+      <div class="p-4 rounded-xl border space-y-3 transition-all duration-200 hover:shadow-elevation-1" :class="recommendationColor">
          <div class="flex items-start gap-3">
            <div class="p-2 bg-background/50 backdrop-blur-sm rounded-full shadow-sm">
              <Zap class="w-4 h-4" />
@@ -93,13 +93,13 @@ const recommendationColor = computed(() => {
          <div 
            v-for="(item, i) in result.priorityList" 
            :key="i"
-           class="p-3 rounded-lg border bg-card/50 hover:bg-card transition-colors group"
+           class="p-3 rounded-lg border bg-card/50 hover:bg-card transition-all duration-200 group hover:translate-x-[2px]"
          >
            <div class="flex justify-between items-start mb-1">
              <span class="font-medium text-sm group-hover:text-ai-accent transition-colors">{{ item.description }}</span>
              <span 
                class="text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase"
-               :class="item.priority === 'high' ? 'bg-danger/10 text-danger' : 'bg-muted text-muted-foreground'"
+               :class="item.priority === 'high' ? 'bg-secondary/12 text-secondary' : 'bg-muted text-muted-foreground'"
              >
                {{ item.priority === 'high' ? 'Alta' : item.priority === 'medium' ? 'Média' : 'Baixa' }}
              </span>

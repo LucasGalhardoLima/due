@@ -35,8 +35,8 @@ const formatCurrency = (val: number) => {
     <!-- Hero / Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
        <!-- Wasted Money -->
-       <div class="rounded-2xl bg-gradient-to-br from-destructive/20 to-destructive/5 border border-destructive/20 p-6 relative overflow-hidden">
-          <div class="absolute right-0 top-0 w-32 h-32 bg-destructive/10 blur-3xl rounded-full"/>
+       <div class="rounded-[2rem] border border-ai-accent/25 bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.12),hsl(var(--secondary)/0.08))] p-6 relative overflow-hidden shadow-elevation-2 transition-all duration-300 hover:shadow-elevation-3 hover:border-ai-accent/40 hover:-translate-y-[2px]">
+          <div class="absolute right-0 top-0 w-32 h-32 bg-ai-accent/12 blur-3xl rounded-full"/>
           <p class="text-small font-medium text-destructive mb-1 uppercase tracking-wider flex items-center gap-2">
             <XCircle class="w-4 h-4" /> Desperdício Mensal
           </p>
@@ -47,13 +47,13 @@ const formatCurrency = (val: number) => {
        </div>
 
        <!-- Quick Wins -->
-       <div class="rounded-2xl border bg-card p-6 relative overflow-hidden">
+       <div class="app-panel p-6 relative overflow-hidden hover:-translate-y-[2px]">
           <div class="absolute right-0 top-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full"/>
              <p class="text-small font-medium text-primary mb-4 uppercase tracking-wider flex items-center gap-2">
                <Sparkles class="w-4 h-4 ml-1" /> Quick Wins
             </p>
           <ul class="space-y-3">
-             <li v-for="(win, idx) in analysis.quick_wins" :key="idx" class="flex items-center gap-3 text-body font-medium">
+             <li v-for="(win, idx) in analysis.quick_wins" :key="idx" class="flex items-center gap-3 text-body font-medium transition-all duration-200 hover:translate-x-0.5">
                 <div class="w-6 h-6 rounded-full bg-success/10 flex items-center justify-center text-success shrink-0">
                     <CheckCircle2 class="w-4 h-4" />
                 </div>
@@ -77,7 +77,7 @@ const formatCurrency = (val: number) => {
             <div 
               v-for="(sub, idx) in analysis.active_subscriptions" 
               :key="idx"
-              class="rounded-xl border p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-elevation-1 bg-card"
+              class="rounded-2xl border p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300 hover:shadow-elevation-2 hover:-translate-y-[2px] bg-card"
               :class="{
                   'border-destructive/50 bg-destructive/5': sub.status === 'inactive',
                   'border-warning/50 bg-warning/5': sub.status === 'redundant'
@@ -85,7 +85,7 @@ const formatCurrency = (val: number) => {
             >
                 <div class="flex items-start gap-4">
                      <!-- Icon placeholder -->
-                    <div class="w-12 h-12 rounded-xl bg-background border flex items-center justify-center text-xl font-bold uppercase shadow-sm shrink-0">
+                    <div class="w-12 h-12 rounded-xl bg-background border flex items-center justify-center text-xl font-bold uppercase shadow-sm shrink-0 transition-all duration-200 group-hover:scale-105 group-hover:border-primary/35">
                         {{ sub.name.substring(0, 2) }}
                     </div>
                     
@@ -113,14 +113,14 @@ const formatCurrency = (val: number) => {
                     
                     <button 
                         v-if="sub.recommendation"
-                        class="px-4 py-2 rounded-lg bg-background border shadow-sm hover:bg-muted transition-colors text-small font-medium whitespace-nowrap"
+                        class="px-4 py-2 rounded-lg bg-background border shadow-sm hover:bg-muted transition-all duration-200 text-small font-medium whitespace-nowrap hover:-translate-y-[1px] hover:shadow-elevation-1 active:scale-[0.98]"
                         :class="sub.status === 'inactive' ? 'text-destructive border-destructive/20 hover:border-destructive/50' : ''"
                     >
                         {{ sub.recommendation }}
                     </button>
                      <button 
                         v-else
-                        class="px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground text-small font-medium"
+                        class="px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground text-small font-medium transition-all duration-200 hover:-translate-y-[1px] active:scale-[0.98]"
                     >
                         Detalhes
                     </button>
