@@ -194,7 +194,7 @@ watch(isOpen, (val) => {
     <DialogContent class="sm:max-w-xl bg-background border-border max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <div class="flex items-center gap-3 mb-2">
-          <div class="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary shadow-glass ring-1 ring-primary/30">
+          <div class="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center text-secondary-accent shadow-glass ring-1 ring-primary/30">
             <Sparkles class="w-5 h-5" />
           </div>
           <div>
@@ -239,7 +239,7 @@ watch(isOpen, (val) => {
           <!-- Initial State / Loading -->
           <div v-if="!hasAnalyzedQuick" class="flex flex-col items-center justify-center py-8 text-center space-y-4">
             <div class="p-4 rounded-full bg-primary/5 border border-primary/10 relative">
-              <Sparkles class="w-8 h-8 text-primary" :class="isLoadingQuick ? 'animate-pulse' : ''" />
+              <Sparkles class="w-8 h-8 text-secondary-accent" :class="isLoadingQuick ? 'animate-pulse' : ''" />
               <div v-if="isLoadingQuick" class="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin"/>
             </div>
 
@@ -287,7 +287,7 @@ watch(isOpen, (val) => {
                   v-for="(action, idx) in quickInsights.insights.acoes_imediatas" :key="idx"
                   class="p-4 rounded-xl bg-secondary/30 border border-border flex gap-3 items-start group hover:bg-secondary/50 transition-colors"
                 >
-                  <div class="h-6 w-6 rounded-full bg-background flex items-center justify-center shrink-0 border border-border text-[10px] font-bold text-muted-foreground group-hover:border-primary/50 group-hover:text-primary transition-colors">
+                  <div class="h-6 w-6 rounded-full bg-background flex items-center justify-center shrink-0 border border-border text-[10px] font-bold text-muted-foreground group-hover:border-secondary-accent/50 group-hover:text-secondary-accent transition-colors">
                     {{ idx + 1 }}
                   </div>
                   <p class="text-small text-foreground/90 pt-0.5">{{ action }}</p>
@@ -297,7 +297,7 @@ watch(isOpen, (val) => {
 
             <!-- Future Outlook -->
             <div class="p-4 rounded-xl border border-dashed border-primary/20 bg-primary/5 space-y-2">
-              <div class="flex items-center gap-2 text-primary">
+              <div class="flex items-center gap-2 text-secondary-accent">
                 <TrendingDown class="w-4 h-4" />
                 <h4 class="text-micro font-bold uppercase">Previsão e Próximos Passos</h4>
               </div>
@@ -337,7 +337,7 @@ watch(isOpen, (val) => {
           <!-- Initial State / Loading -->
           <div v-if="!hasAnalyzedDeep" class="flex flex-col items-center justify-center py-8 text-center space-y-4">
             <div class="p-4 rounded-full bg-primary/5 border border-primary/10 relative">
-              <Zap class="w-8 h-8 text-primary" :class="isLoadingDeep ? 'animate-pulse' : ''" />
+              <Zap class="w-8 h-8 text-secondary-accent" :class="isLoadingDeep ? 'animate-pulse' : ''" />
               <div v-if="isLoadingDeep" class="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin"/>
             </div>
 
@@ -371,7 +371,7 @@ watch(isOpen, (val) => {
             <Card class="p-5 border-border bg-secondary/20">
               <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2">
-                  <Heart class="w-5 h-5 text-primary" />
+                  <Heart class="w-5 h-5 text-secondary-accent" />
                   <h4 class="text-small font-black uppercase tracking-wide">Saúde Financeira</h4>
                 </div>
                 <span :class="['text-h2 font-black', getHealthScoreColor(deepInsights.insights.health_score.score)]">
@@ -441,8 +441,8 @@ watch(isOpen, (val) => {
             <!-- Forecast -->
             <Card class="p-5 border-primary/20 bg-primary/5">
               <div class="flex items-center gap-2 mb-3">
-                <Target class="w-5 h-5 text-primary" />
-                <h4 class="text-small font-black uppercase tracking-wide text-primary">Previsão Próximo Mês</h4>
+                <Target class="w-5 h-5 text-secondary-accent" />
+                <h4 class="text-small font-black uppercase tracking-wide text-secondary-accent">Previsão Próximo Mês</h4>
               </div>
 
               <div class="flex items-baseline gap-3 mb-3">
@@ -462,7 +462,7 @@ watch(isOpen, (val) => {
                 <span
                   v-for="(factor, idx) in deepInsights.insights.forecast.factors"
                   :key="idx"
-                  class="text-micro px-2 py-0.5 rounded-full bg-primary/10 text-primary/80"
+                  class="text-micro px-2 py-0.5 rounded-full bg-primary/10 text-secondary-accent/80"
                 >
                   {{ factor }}
                 </span>

@@ -75,7 +75,7 @@ const formatCurrency = (val: number) => {
       <div class="flex flex-col h-full justify-between">
          <div class="flex items-start justify-between">
            <div class="p-2 rounded-lg bg-secondary/12 border border-secondary/30 transition-all duration-200 group-hover:scale-105">
-             <Wallet class="w-5 h-5 text-secondary transition-transform duration-200 group-hover:scale-105" />
+             <Wallet class="w-5 h-5 text-secondary-accent transition-transform duration-200 group-hover:scale-105" />
            </div>
          </div>
          <div class="mt-4">

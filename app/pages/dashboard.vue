@@ -16,9 +16,16 @@ import SummaryCards from '@/components/dashboard/SummaryCards.vue'
 import PurchaseSimulator from '@/components/dashboard/PurchaseSimulator.vue'
 import ProactiveAdvisor from '@/components/dashboard/ProactiveAdvisor.vue'
 import CrisisAlertCard from '@/components/dashboard/CrisisAlertCard.vue'
+import FreeToSpendCard from '@/components/dashboard/FreeToSpendCard.vue'
+import NetThisMonthCard from '@/components/dashboard/NetThisMonthCard.vue'
+import TrendingBudgetsCard from '@/components/dashboard/TrendingBudgetsCard.vue'
+import UpcomingBillsCard from '@/components/dashboard/UpcomingBillsCard.vue'
+import SpendingPaceChart from '@/components/dashboard/SpendingPaceChart.vue'
+import SavingsGoalsWidget from '@/components/dashboard/SavingsGoalsWidget.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import { Card } from '@/components/ui/card'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
+import type { BudgetSummary } from '@/composables/useBudget'
 
 // Proactive Advisor
 const advisor = useProactiveAdvisor()
@@ -128,6 +135,47 @@ const { data: pareto, refresh: refreshPareto } = useFetch<ParetoResponse>('/api/
 const { data: crisisAlerts } = useFetch<CrisisAlert[]>('/api/reports/crisis-alerts', {
   key: 'crisis-alerts',
   query: computed(() => ({ cardId: selectedCardId.value || undefined }))
+})
+
+// Fetch Budget Summary (current month)
+const budgetQueryParams = computed(() => ({
+  month: getMonth(currentDate.value) + 1,
+  year: getYear(currentDate.value),
+}))
+
+const { data: budgetSummary } = useFetch<BudgetSummary>('/api/budget/summary', {
+  key: computed(() => `dashboard-budget-${budgetQueryParams.value.year}-${budgetQueryParams.value.month}-v${dataVersion.value}`),
+  query: budgetQueryParams,
+  watch: [budgetQueryParams, dataVersion],
+})
+
+// Fetch previous month budget for delta comparison
+const prevMonthParams = computed(() => {
+  const m = getMonth(currentDate.value) + 1
+  const y = getYear(currentDate.value)
+  return m === 1 ? { month: 12, year: y - 1 } : { month: m - 1, year: y }
+})
+
+const { data: prevBudgetSummary } = useFetch<BudgetSummary>('/api/budget/summary', {
+  key: computed(() => `dashboard-budget-prev-${prevMonthParams.value.year}-${prevMonthParams.value.month}-v${dataVersion.value}`),
+  query: prevMonthParams,
+  watch: [prevMonthParams, dataVersion],
+})
+
+// Fetch Upcoming Bills
+interface UpcomingBill {
+  id: string
+  description: string
+  amount: number
+  dueDate: string
+  isSubscription: boolean
+  installmentLabel: string | null
+  categoryName: string
+  categoryColor: string | null
+}
+
+const { data: upcomingBills } = useFetch<{ bills: UpcomingBill[] }>('/api/dashboard/upcoming-bills', {
+  key: computed(() => `dashboard-upcoming-bills-v${dataVersion.value}`),
 })
 
 const isLoading = computed(() => summaryStatus.value === 'pending' || cardsStatus.value === 'pending')
@@ -304,7 +352,7 @@ const showPayConfirm = ref(false)
               <SelectTrigger class="flex-1 bg-card border-border/70 shadow-elevation-1 rounded-2xl">
                 <div class="flex items-center gap-2 truncate">
                   <span class="bg-primary/10 p-1 rounded-lg shrink-0">
-                    <CreditCardIcon class="w-3.5 h-3.5 text-primary" />
+                    <CreditCardIcon class="w-3.5 h-3.5 text-primary-accent" />
                   </span>
                   <span class="truncate text-small font-semibold">{{
                     selectedCardId === ''
@@ -335,6 +383,16 @@ const showPayConfirm = ref(false)
         </div>
       </div>
 
+      <!-- Section 0: Free to Spend Hero -->
+      <FreeToSpendCard
+        v-if="budgetSummary && budgetSummary.totalIncome > 0"
+        :total-income="budgetSummary.totalIncome"
+        :total-spending="budgetSummary.totalSpending"
+        :remaining="budgetSummary.remaining"
+        :savings-rate="budgetSummary.savingsRate"
+        class="mb-5"
+      />
+
       <!-- Section 1: Crisis Alerts + Summary -->
       <div class="space-y-5">
         <!-- Crisis Alerts -->
@@ -357,6 +415,28 @@ const showPayConfirm = ref(false)
         />
       </div>
 
+      <!-- Section 2: Budget Widgets Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-6">
+        <SpendingPaceChart v-if="budgetSummary" :month="budgetQueryParams.month" :year="budgetQueryParams.year" />
+
+        <NetThisMonthCard
+          v-if="budgetSummary"
+          :total-income="budgetSummary.totalIncome"
+          :total-spending="budgetSummary.totalSpending"
+          :remaining="budgetSummary.remaining"
+          :previous-remaining="prevBudgetSummary?.remaining ?? null"
+        />
+
+        <TrendingBudgetsCard
+          v-if="budgetSummary"
+          :categories="budgetSummary.categories"
+        />
+
+        <UpcomingBillsCard
+          :bills="upcomingBills?.bills ?? []"
+        />
+      </div>
+
       <!-- Section 2: Main + Sidebar -->
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
         <!-- Left: Transactions -->
@@ -369,9 +449,6 @@ const showPayConfirm = ref(false)
 
         <!-- Right: Sidebar stack -->
         <div class="space-y-5">
-          <!-- Proactive Advisor -->
-          <ProactiveAdvisor v-if="advisor.hasMessage.value || advisor.isLoading.value" class="hidden lg:block" />
-
           <!-- AI Insights -->
           <div class="hidden lg:block">
             <AIInsights :month="summary.month" :year="summary.year" />
@@ -383,6 +460,11 @@ const showPayConfirm = ref(false)
               :card-id="selectedCardId"
               :card-name="cards.find(c => c.id === selectedCardId)?.name || ''"
             />
+          </div>
+
+          <!-- Savings Goals Widget -->
+          <div class="hidden lg:block">
+            <SavingsGoalsWidget />
           </div>
 
           <!-- Future Projection -->
@@ -399,7 +481,7 @@ const showPayConfirm = ref(false)
                   <span class="text-micro text-muted-foreground">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
                   <span class="text-small text-muted-foreground">{{ proj.installmentsCount }} parcelas</span>
                 </div>
-                <span class="text-body font-black group-hover:text-primary transition-colors">{{ formatCurrency(proj.total || 0) }}</span>
+                <span class="text-body font-black group-hover:text-primary-accent transition-colors">{{ formatCurrency(proj.total || 0) }}</span>
               </div>
               <div v-if="!futureProjection.projections?.length" class="text-small text-muted-foreground text-center py-4">
                 Nenhuma projeção futura.
@@ -439,12 +521,15 @@ const showPayConfirm = ref(false)
     />
 
     <!-- Confirm Dialog -->
-    <ConfirmDialog 
+    <ConfirmDialog
       v-model:open="showPayConfirm"
       title="Pagar Fatura?"
       description="Isso marcará a fatura deste mês como paga. O limite será liberado no próximo ciclo (simulação)."
       confirm-text="Confirmar Pagamento"
       @confirm="handlePayInvoice"
     />
+
+    <!-- Proactive Advisor Toast (teleports to body) -->
+    <ProactiveAdvisor />
   </div>
 </template>
