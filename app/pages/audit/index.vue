@@ -245,7 +245,7 @@ onMounted(() => {
                 </Select>
               </div>
               <div class="space-y-2">
-                <label class="text-micro text-muted-foreground">Mês Referência</label>
+                <label class="text-micro text-muted-foreground">Mês de Referência</label>
                 <Select v-model="selectedMonth">
                     <SelectTrigger class="h-11 rounded-xl border border-input bg-background shadow-elevation-1 transition-all duration-200 hover:border-primary/30 data-[state=open]:border-primary/40 data-[state=open]:shadow-elevation-2"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -306,7 +306,7 @@ onMounted(() => {
             <!-- Try Demo Mode Button -->
             <button 
                 v-if="isDemoMode && selectedCardId"
-                class="absolute -bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 hover:-translate-y-[1px] transition-all duration-200 font-bold shadow-lg hover:shadow-elevation-3"
+                class="absolute -bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary/10 text-primary-accent border border-primary/20 hover:bg-primary/20 hover:-translate-y-[1px] transition-all duration-200 font-bold shadow-lg hover:shadow-elevation-3"
                 @click.stop="runDemoAudit"
             >
                 <Zap class="w-4 h-4" />

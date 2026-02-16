@@ -330,7 +330,7 @@ const showPayConfirm = ref(false)
                 <ChevronLeft class="w-4 h-4" />
               </button>
               <button class="p-2.5 hover:bg-background rounded-xl transition-colors text-muted-foreground hover:text-foreground" @click="nextMonth">
-                <span class="sr-only">Proximo</span>
+                <span class="sr-only">Próximo</span>
                 <ChevronRight class="w-4 h-4" />
               </button>
             </div>
@@ -342,7 +342,7 @@ const showPayConfirm = ref(false)
       <div class="lg:hidden space-y-4 mb-7">
         <div>
           <h1 class="text-h1">Dashboard</h1>
-          <p class="text-body text-muted-foreground">Visao geral.</p>
+          <p class="text-body text-muted-foreground">Visão geral.</p>
         </div>
 
         <!-- Mobile Controls Row -->
@@ -356,8 +356,8 @@ const showPayConfirm = ref(false)
                   </span>
                   <span class="truncate text-small font-semibold">{{
                     selectedCardId === ''
-                      ? 'Selecione um Cartao'
-                      : cards?.find(c => c.id === selectedCardId)?.name || 'Selecione um Cartao'
+                      ? 'Selecione um Cartão'
+                      : cards?.find(c => c.id === selectedCardId)?.name || 'Selecione um Cartão'
                   }}</span>
                 </div>
               </SelectTrigger>

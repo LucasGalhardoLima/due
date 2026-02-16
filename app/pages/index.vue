@@ -100,7 +100,7 @@ definePageMeta({
       <template v-if="userId">
         <div class="min-h-[80vh] flex items-center justify-center">
           <div class="text-center space-y-4">
-            <p class="text-muted-foreground">Voce ja esta logado.</p>
+            <p class="text-muted-foreground">Você já está logado.</p>
             <NuxtLink to="/dashboard" class="inline-flex items-center justify-center h-12 px-8 rounded-2xl bg-secondary text-secondary-foreground font-bold shadow-elevation-2">
               Ir para o Dashboard
             </NuxtLink>

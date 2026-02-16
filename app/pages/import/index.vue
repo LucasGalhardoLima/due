@@ -242,31 +242,31 @@ async function handleImport() {
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <!-- Step 1 -->
                   <div class="flex items-start gap-3 group">
-                      <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 group-hover:scale-110 transition-transform">1</div>
+                      <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary-accent font-bold text-xs shrink-0 group-hover:scale-110 transition-transform">1</div>
                       <div class="space-y-1">
                           <p class="text-h4 flex items-center gap-2">
                               Abra a Fatura
                               <CreditCard class="w-3 h-3 text-muted-foreground" />
                           </p>
-                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">No app do Nubank, toque no cartao de credito na tela inicial.</p>
+                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">No app do Nubank, toque no cartão de crédito na tela inicial.</p>
                       </div>
                   </div>
   
                   <!-- Step 2 -->
                   <div class="flex items-start gap-3 group">
-                      <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 group-hover:scale-110 transition-transform">2</div>
+                      <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary-accent font-bold text-xs shrink-0 group-hover:scale-110 transition-transform">2</div>
                       <div class="space-y-1">
                           <p class="text-h4 flex items-center gap-2">
                               Enviar por E-mail
                               <Share2 class="w-3 h-3 text-muted-foreground" />
                           </p>
-                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">Toque em "Mais" ou no icone de compartilhar no topo da fatura.</p>
+                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">Toque em "Mais" ou no ícone de compartilhar no topo da fatura.</p>
                       </div>
                   </div>
   
                   <!-- Step 3 -->
                   <div class="flex items-start gap-3 group">
-                      <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 group-hover:scale-110 transition-transform">3</div>
+                      <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary-accent font-bold text-xs shrink-0 group-hover:scale-110 transition-transform">3</div>
                       <div class="space-y-1">
                           <p class="text-h4 flex items-center gap-2">
                               Formato CSV
@@ -279,10 +279,10 @@ async function handleImport() {
           </div>
           <!-- Card Selector -->
            <div class="max-w-md space-y-2">
-              <label class="text-micro text-muted-foreground">Cartao de Destino</label>
+              <label class="text-micro text-muted-foreground">Cartão de Destino</label>
               <Select v-model="selectedCardId">
               <SelectTrigger class="h-11 rounded-xl border border-input bg-background shadow-elevation-1 transition-all duration-200 hover:border-primary/30 data-[state=open]:border-primary/40 data-[state=open]:shadow-elevation-2">
-                  <SelectValue placeholder="Selecione o cartao" />
+                  <SelectValue placeholder="Selecione o cartão" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem v-for="card in cards" :key="card.id" :value="card.id">
@@ -322,7 +322,7 @@ async function handleImport() {
               >
   
               <p v-if="!selectedCardId" class="text-small text-danger font-medium absolute -bottom-6">
-                  * Selecione um cartao primeiro
+                  * Selecione um cartão primeiro
               </p>
           </div>
   
@@ -338,7 +338,7 @@ async function handleImport() {
                </div>
                 <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-2 hover:border-primary/25">
                    <div class="text-h4">Outros</div>
-                   <div class="text-small text-muted-foreground">CSV generico (Data, Descricao, Valor).</div>
+                   <div class="text-small text-muted-foreground">CSV genérico (Data, Descrição, Valor).</div>
                </div>
           </div>
       </div>
@@ -346,7 +346,7 @@ async function handleImport() {
       <!-- Step 2: Review -->
       <div v-else class="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
           <div class="flex items-center justify-between">
-              <h2 class="text-h2">Revisao de Lancamentos</h2>
+              <h2 class="text-h2">Revisão de Lançamentos</h2>
               <div class="flex items-center gap-4 text-small">
                   <div class="flex items-center gap-2">
                       <span class="w-2 h-2 rounded-full bg-success"/>
@@ -365,7 +365,7 @@ async function handleImport() {
                                   <input type="checkbox" checked aria-label="Selecionar todas as transações" @change="(e) => parsedRows.forEach(r => r.selected = (e.target as HTMLInputElement).checked)" >
                               </th>
                               <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground">Data</th>
-                              <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground">Descricao</th>
+                              <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground">Descrição</th>
                               <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground">Valor</th>
                               <th class="h-12 px-4 text-left align-middle text-micro text-muted-foreground">Categoria</th>
                           </tr>
