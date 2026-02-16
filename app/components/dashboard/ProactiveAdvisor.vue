@@ -1,15 +1,40 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Card } from '@/components/ui/card'
+import { computed, ref, watch, onUnmounted } from 'vue'
 import { Button } from '@/components/ui/button'
 import { X, MessageCircle, AlertTriangle, PartyPopper, Bot } from 'lucide-vue-next'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
 
-defineProps<{
-  compact?: boolean
-}>()
-
 const advisor = useProactiveAdvisor()
+
+// Controls the Transition visibility (separate from advisor.hasMessage so animation completes)
+const showToast = ref(false)
+
+// Auto-dismiss timer
+let autoDismissTimer: ReturnType<typeof setTimeout> | undefined
+
+const AUTO_DISMISS_MS: Record<string, number | null> = {
+  low: 8000,
+  medium: 12000,
+  high: null, // manual only
+}
+
+function startAutoDismiss() {
+  clearAutoDismiss()
+  const priority = advisor.currentMessage.value?.priority || 'low'
+  const delay = AUTO_DISMISS_MS[priority]
+  if (delay) {
+    autoDismissTimer = setTimeout(() => {
+      showToast.value = false
+    }, delay)
+  }
+}
+
+function clearAutoDismiss() {
+  if (autoDismissTimer !== undefined) {
+    clearTimeout(autoDismissTimer)
+    autoDismissTimer = undefined
+  }
+}
 
 // Tone-based styling
 const toneConfig = computed(() => {
@@ -17,31 +42,35 @@ const toneConfig = computed(() => {
 
   const configs = {
     curious: {
-      bg: 'bg-info-muted',
+      bg: 'bg-info-muted/95',
       border: 'border-info/20',
       iconBg: 'bg-info/20',
       iconColor: 'text-info',
+      shadow: 'shadow-info-glow',
       icon: MessageCircle
     },
     warning: {
-      bg: 'bg-warning-muted',
+      bg: 'bg-warning-muted/95',
       border: 'border-warning/20',
       iconBg: 'bg-warning/20',
       iconColor: 'text-warning',
+      shadow: 'shadow-warning-glow',
       icon: AlertTriangle
     },
     congratulatory: {
-      bg: 'bg-success-muted',
+      bg: 'bg-success-muted/95',
       border: 'border-success/20',
       iconBg: 'bg-success/20',
       iconColor: 'text-success',
+      shadow: 'shadow-success-glow',
       icon: PartyPopper
     },
     neutral: {
-      bg: 'bg-muted/50',
+      bg: 'bg-background/95',
       border: 'border-border',
       iconBg: 'bg-muted',
       iconColor: 'text-muted-foreground',
+      shadow: 'shadow-elevation-2',
       icon: Bot
     }
   }
@@ -49,111 +78,127 @@ const toneConfig = computed(() => {
   return configs[tone]
 })
 
-// Priority-based animation
-const priorityClass = computed(() => {
-  const priority = advisor.currentMessage.value?.priority
-  if (priority === 'high') return 'animate-pulse'
-  return ''
-})
+// Show toast when message arrives
+watch(() => advisor.hasMessage.value, (has) => {
+  if (has) {
+    showToast.value = true
+    startAutoDismiss()
+  }
+}, { immediate: true })
 
 function handleDismiss() {
+  clearAutoDismiss()
+  showToast.value = false
+}
+
+function handleAction() {
+  handleDismiss()
+}
+
+function onAfterLeave() {
   advisor.dismiss()
 }
+
+onUnmounted(() => {
+  clearAutoDismiss()
+})
 </script>
 
 <template>
-  <!-- Loading State -->
-  <Card
-    v-if="advisor.isLoading.value"
-    class="overflow-hidden border-border/50 bg-muted/30"
-    :class="{ 'p-3': compact, 'p-4': !compact }"
-  >
-    <div class="flex items-start gap-3">
-      <div class="h-8 w-8 rounded-xl bg-muted animate-pulse shrink-0" />
-      <div class="flex-1 space-y-2">
-        <div class="h-4 w-3/4 bg-muted rounded animate-pulse" />
-        <div class="h-3 w-1/2 bg-muted rounded animate-pulse" />
-      </div>
-    </div>
-  </Card>
-
-  <!-- Message State -->
-  <Transition
-    enter-active-class="transition-all duration-300 ease-out"
-    enter-from-class="opacity-0 translate-y-2 scale-95"
-    enter-to-class="opacity-100 translate-y-0 scale-100"
-    leave-active-class="transition-all duration-200 ease-in"
-    leave-from-class="opacity-100 translate-y-0 scale-100"
-    leave-to-class="opacity-0 translate-y-2 scale-95"
-  >
-    <Card
-      v-if="advisor.hasMessage.value && !advisor.isLoading.value"
-      class="overflow-hidden relative"
-      :class="[
-        toneConfig.bg,
-        toneConfig.border,
-        priorityClass,
-        compact ? 'p-3' : 'p-4'
-      ]"
-    >
-      <!-- Dismiss Button -->
-      <button
-        class="absolute top-2 right-2 p-1.5 rounded-full bg-background/50 hover:bg-background/80 text-muted-foreground hover:text-foreground transition-colors z-10"
-        aria-label="Fechar"
-        @click="handleDismiss"
+  <ClientOnly>
+    <Teleport to="body">
+      <Transition
+        name="advisor-slide"
+        @after-leave="onAfterLeave"
       >
-        <X class="w-3.5 h-3.5" />
-      </button>
-
-      <div class="flex items-start gap-3 pr-6">
-        <!-- Icon -->
         <div
-          class="h-8 w-8 rounded-xl flex items-center justify-center shrink-0"
-          :class="[toneConfig.iconBg]"
+          v-if="showToast && advisor.hasMessage.value"
+          role="status"
+          aria-live="polite"
+          class="fixed top-4 inset-x-4 sm:inset-x-auto sm:right-4 sm:max-w-sm sm:w-full z-50"
         >
-          <component
-            :is="toneConfig.icon"
-            class="w-4 h-4"
-            :class="[toneConfig.iconColor]"
-          />
-        </div>
-
-        <!-- Content -->
-        <div class="flex-1 min-w-0 space-y-2">
-          <!-- Message -->
-          <p
-            class="text-sm leading-relaxed"
-            :class="{ 'text-small': compact }"
+          <div
+            class="rounded-lg border backdrop-blur-md p-4 transition-colors"
+            :class="[
+              toneConfig.bg,
+              toneConfig.border,
+              toneConfig.shadow,
+            ]"
           >
-            {{ advisor.currentMessage.value?.message }}
-          </p>
+            <!-- Row: icon + message + close -->
+            <div class="flex items-start gap-3">
+              <!-- Icon -->
+              <div
+                class="h-8 w-8 rounded-xl flex items-center justify-center shrink-0"
+                :class="[toneConfig.iconBg]"
+              >
+                <component
+                  :is="toneConfig.icon"
+                  class="w-4 h-4"
+                  :class="[toneConfig.iconColor]"
+                />
+              </div>
 
-          <!-- Action Button (if provided) -->
-          <Button
-            v-if="advisor.currentMessage.value?.action"
-            variant="secondary"
-            size="sm"
-            class="h-auto min-h-7 py-1 px-3 text-xs whitespace-normal text-left justify-start"
-          >
-            {{ advisor.currentMessage.value.action.text }}
-          </Button>
+              <!-- Message -->
+              <p class="flex-1 min-w-0 text-sm leading-relaxed">
+                {{ advisor.currentMessage.value?.message }}
+              </p>
+
+              <!-- Close button — 44px touch target -->
+              <button
+                class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-background/50 hover:bg-background/80 text-muted-foreground hover:text-foreground transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                aria-label="Fechar"
+                @click="handleDismiss"
+              >
+                <X class="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <!-- Action button (if provided) -->
+            <div v-if="advisor.currentMessage.value?.action" class="mt-3 pl-11">
+              <Button
+                variant="secondary"
+                size="sm"
+                class="h-auto min-h-7 py-1 px-3 text-xs whitespace-normal text-left justify-start"
+                @click="handleAction"
+              >
+                {{ advisor.currentMessage.value.action.text }}
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <!-- Trigger Type Badge (for debugging/context) -->
-      <div
-        v-if="!compact"
-        class="mt-3 pt-2 border-t border-current/10"
-      >
-        <span class="text-[10px] uppercase tracking-wider text-muted-foreground">
-          {{
-            advisor.currentMessage.value?.triggerType === 'morning_check' ? 'Resumo do dia' :
-            advisor.currentMessage.value?.triggerType === 'post_transaction' ? 'Sobre seu gasto' :
-            advisor.currentMessage.value?.triggerType === 'pre_fechamento' ? 'Fechamento próximo' :
-            'Dica'
-          }}
-        </span>
-      </div>
-    </Card>
-  </Transition>
+      </Transition>
+    </Teleport>
+  </ClientOnly>
 </template>
+
+<style scoped>
+.advisor-slide-enter-active,
+.advisor-slide-leave-active {
+  transition: transform 300ms ease-out, opacity 300ms ease-out;
+}
+
+.advisor-slide-enter-from,
+.advisor-slide-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .advisor-slide-enter-active,
+  .advisor-slide-leave-active {
+    transition: none;
+  }
+}
+
+/* Tone-specific glow shadows */
+.shadow-warning-glow {
+  box-shadow: 0 4px 14px -3px hsl(var(--warning) / 0.2), 0 2px 6px -2px hsl(var(--warning) / 0.1);
+}
+.shadow-success-glow {
+  box-shadow: 0 4px 14px -3px hsl(var(--success) / 0.2), 0 2px 6px -2px hsl(var(--success) / 0.1);
+}
+.shadow-info-glow {
+  box-shadow: 0 4px 14px -3px hsl(var(--info) / 0.2), 0 2px 6px -2px hsl(var(--info) / 0.1);
+}
+</style>

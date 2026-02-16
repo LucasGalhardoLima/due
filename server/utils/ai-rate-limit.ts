@@ -11,7 +11,7 @@ declare global {
 }
 
 const limits = globalThis.aiRateLimitGlobal ?? new Map<string, RateLimitEntry>()
-if (process.env.NODE_ENV !== 'production') globalThis.aiRateLimitGlobal = limits
+globalThis.aiRateLimitGlobal = limits
 
 export function enforceRateLimit(key: string, limit: number, windowMs: number): void {
   const now = Date.now()

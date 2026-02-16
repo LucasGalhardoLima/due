@@ -1,13 +1,7 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import prisma from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
-  const { userId } = event.context.auth || {}
-
-  if (!userId) {
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
+  const { userId } = getUser(event)
 
   // Check if user already has cards (prevent re-seeding)
   const existingCards = await prisma.creditCard.findFirst({
@@ -24,18 +18,18 @@ export default defineEventHandler(async (event) => {
 
   // 1. Create categories
   const categories = [
-    { name: 'Alimentacao', color: '#8FE6D2' },
-    { name: 'Transporte', color: '#64CCB8' },
-    { name: 'Lazer', color: '#BFF5E8' },
-    { name: 'Saude', color: '#9B8CEA' },
-    { name: 'Assinaturas', color: '#7561D8' },
-    { name: 'Outros', color: '#4E3EA8' }
+    { name: 'Alimentação', color: '#8FE6D2', emoji: '🍔' },
+    { name: 'Transporte', color: '#64CCB8', emoji: '🚗' },
+    { name: 'Lazer', color: '#BFF5E8', emoji: '🎮' },
+    { name: 'Saúde', color: '#9B8CEA', emoji: '💊' },
+    { name: 'Assinaturas', color: '#7561D8', emoji: '📱' },
+    { name: 'Outros', color: '#4E3EA8', emoji: '📦' }
   ]
 
   const categoryMap: Record<string, string> = {}
   for (const cat of categories) {
     const newCat = await prisma.category.create({
-      data: { name: cat.name, color: cat.color, userId }
+      data: { name: cat.name, color: cat.color, emoji: cat.emoji, userId }
     })
     categoryMap[cat.name] = newCat.id
   }
@@ -43,7 +37,7 @@ export default defineEventHandler(async (event) => {
   // 2. Create a sample card
   const sampleCard = await prisma.creditCard.create({
     data: {
-      name: 'Cartao Principal',
+      name: 'Cartão Principal',
       limit: 5000,
       budget: 3000,
       closingDay: 25,
@@ -73,7 +67,7 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  // One-time expense - Alimentacao
+  // One-time expense - Alimentação
   await prisma.transaction.create({
     data: {
       description: 'Supermercado',
@@ -81,7 +75,7 @@ export default defineEventHandler(async (event) => {
       purchaseDate: new Date(thisYear, thisMonth, 10),
       installmentsCount: 1,
       cardId: sampleCard.id,
-      categoryId: categoryMap['Alimentacao'],
+      categoryId: categoryMap['Alimentação'],
       userId,
       installments: {
         create: [{ number: 1, amount: 450, dueDate: new Date(thisYear, thisMonth, 25) }]
@@ -112,7 +106,7 @@ export default defineEventHandler(async (event) => {
   // Gas/Transport
   await prisma.transaction.create({
     data: {
-      description: 'Combustivel',
+      description: 'Combustível',
       amount: 280,
       purchaseDate: new Date(thisYear, thisMonth, 8),
       installmentsCount: 1,
@@ -133,7 +127,7 @@ export default defineEventHandler(async (event) => {
       purchaseDate: new Date(thisYear, thisMonth, 12),
       installmentsCount: 1,
       cardId: sampleCard.id,
-      categoryId: categoryMap['Alimentacao'],
+      categoryId: categoryMap['Alimentação'],
       userId,
       installments: {
         create: [{ number: 1, amount: 180, dueDate: new Date(thisYear, thisMonth, 25) }]

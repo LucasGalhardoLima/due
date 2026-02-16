@@ -5,49 +5,14 @@ import prisma from '../../utils/prisma'
 import { parseJsonWithSchema } from '../../utils/ai-guard'
 import { enforceRateLimit } from '../../utils/ai-rate-limit'
 import { getCache, setCache } from '../../utils/ai-cache'
-import { moneyToCents, moneyToNumber } from '../../utils/money'
+import { moneyToCents } from '../../utils/money'
+import { totalCardLimit, totalCardBudget } from '../../utils/analytics/card-aggregates'
+import type { DeepInsightsResponse } from '#shared/types/api-responses'
 
 const querySchema = z.object({
   month: z.string().optional(),
   year: z.string().optional()
 })
-
-export interface DeepInsights {
-  trend_analysis: {
-    direction: 'crescente' | 'estável' | 'decrescente'
-    monthly_change_pct: number
-    categories_driving_change: { name: string; change_pct: number }[]
-  }
-  forecast: {
-    next_month_prediction: number
-    confidence: number
-    factors: string[]
-  }
-  optimization_opportunities: {
-    category: string
-    current_spending: number
-    potential_saving: number
-    difficulty: 'fácil' | 'médio' | 'difícil'
-    suggestion: string
-  }[]
-  health_score: {
-    score: number
-    factors: { label: string; impact: 'positive' | 'negative' }[]
-  }
-}
-
-interface DeepInsightsResponse {
-  success: true
-  insights: DeepInsights
-  metadata: {
-    periodStart: string
-    periodEnd: string
-    totalAnalyzed: number
-    monthlyAverage: number
-    monthlyData: { month: string; total: number; change_pct: number | null }[]
-    categoryTrends: { name: string; sixMonthAvg: number; lastMonth: number; change_pct: number }[]
-  }
-}
 
 const aiResponseSchema = z.object({
   trend_analysis: z.object({
@@ -80,7 +45,9 @@ const aiResponseSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const { userId } = getUser(event)
+  const appUser = await getOrCreateUser(event)
+  const userId = appUser.userId
+  enforceTierAccess(await checkAndIncrementUsage(appUser.dbUserId, appUser.tier, 'ai_insights'))
   enforceRateLimit(`ai:deep-insights:${userId}`, 5, 10 * 60 * 1000)
   const query = getQuery(event)
   const { month, year } = querySchema.parse(query)
@@ -193,8 +160,8 @@ export default defineEventHandler(async (event) => {
 
   // Get user context
   const userCards = await prisma.creditCard.findMany({ where: { userId } })
-  const totalBudget = userCards.reduce((acc, c) => acc + (c.budget ? moneyToNumber(c.budget) : 0), 0)
-  const totalLimit = userCards.reduce((acc, c) => acc + moneyToNumber(c.limit), 0)
+  const totalBudget = totalCardBudget(userCards)
+  const totalLimit = totalCardLimit(userCards)
 
   // Future commitments (next 3 months)
   const futureStart = new Date(targetYear, targetMonth, 1)

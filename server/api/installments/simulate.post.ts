@@ -3,7 +3,6 @@ import { generateText } from 'ai'
 import { gateway } from '../../utils/ai'
 import { FinanceUtils } from '../../utils/finance'
 import prisma from '../../utils/prisma'
-import { getUser } from '../../utils/session'
 import { startOfMonth, endOfMonth, addMonths, getYear, getMonth, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { moneyToCents, moneyToNumber } from '../../utils/money'
@@ -26,7 +25,9 @@ interface TimelineMonth {
 }
 
 export default defineEventHandler(async (event) => {
-  const { userId } = getUser(event)
+  const appUser = await getOrCreateUser(event)
+  const userId = appUser.userId
+  enforceTierAccess(await checkAndIncrementUsage(appUser.dbUserId, appUser.tier, 'simulations'))
   enforceRateLimit(`ai:installments-simulate:${userId}`, 20, 10 * 60 * 1000)
   const body = await readBody(event)
   const result = bodySchema.safeParse(body)

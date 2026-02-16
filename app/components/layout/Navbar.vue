@@ -67,8 +67,8 @@ function closeMobileMenu() {
             v-for="item in navItems" 
             :key="item.path" 
             :to="item.path"
-            class="text-sm font-medium transition-colors hover:text-primary relative"
-            active-class="text-primary font-semibold"
+            class="text-sm font-medium transition-colors hover:text-primary-accent relative"
+            active-class="text-primary-accent font-semibold"
           >
             {{ item.name }}
             <div v-if="$route.path === item.path" class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary rounded-full transition-all" />
@@ -150,7 +150,7 @@ function closeMobileMenu() {
               :key="item.path" 
               :to="item.path"
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all hover:bg-accent"
-              active-class="bg-primary/10 text-primary"
+              active-class="bg-primary/10 text-primary-accent"
               @click="closeMobileMenu"
             >
               <component :is="item.icon" class="w-5 h-5 opacity-70" />

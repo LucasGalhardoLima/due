@@ -1,6 +1,23 @@
 import prisma from './prisma'
 import { subDays, startOfDay, endOfDay, addMonths, setDate, isAfter } from 'date-fns'
 import { moneyToCents, moneyToNumber } from './money'
+import { totalCardLimit, totalCardBudget } from './analytics/card-aggregates'
+import { sumInstallmentAmounts } from './analytics/category-analytics'
+
+/** Strip control chars and truncate user-supplied text before embedding in AI prompts */
+function sanitizeForPrompt(text: string, maxLength = 50): string {
+  return text.replace(/[^\p{L}\p{N}\s\-_.,&()]/gu, '').trim().slice(0, maxLength)
+}
+
+export interface BudgetMetrics {
+  totalMonthlyIncome: number
+  savingsRate: number
+  budgetUtilizationOverall: number
+  overBudgetCategories: Array<{
+    name: string
+    overagePercent: number
+  }>
+}
 
 export interface AdvisorContext {
   recentTransactions: {
@@ -26,6 +43,7 @@ export interface AdvisorContext {
     closingDate: Date
   }
   healthScore: number // 0-100 simplified calculation
+  budgetMetrics: BudgetMetrics | null
 }
 
 export async function gatherAdvisorContext(
@@ -107,15 +125,15 @@ export async function gatherAdvisorContext(
   ])
 
   // Calculate last 7 days metrics
-  const last7DaysTotal = last7DaysInstallments.reduce((acc, inst) => acc + (moneyToCents(inst.amount) / 100), 0)
+  const last7DaysTotal = sumInstallmentAmounts(last7DaysInstallments)
   const byCategory: Record<string, number> = {}
   for (const inst of last7DaysInstallments) {
-    const catName = inst.transaction.category.name
+    const catName = sanitizeForPrompt(inst.transaction.category.name)
     byCategory[catName] = (byCategory[catName] || 0) + (moneyToCents(inst.amount) / 100)
   }
 
   // Calculate same period last month
-  const samePeriodTotal = samePeriodInstallments.reduce((acc, inst) => acc + (moneyToCents(inst.amount) / 100), 0)
+  const samePeriodTotal = sumInstallmentAmounts(samePeriodInstallments)
 
   // Calculate change percent
   const changePercent = samePeriodTotal > 0
@@ -123,9 +141,9 @@ export async function gatherAdvisorContext(
     : 0
 
   // Calculate budget utilization
-  const currentMonthTotal = currentMonthInstallments.reduce((acc, inst) => acc + (moneyToCents(inst.amount) / 100), 0)
-  const totalLimit = userCards.reduce((acc, c) => acc + moneyToNumber(c.limit), 0)
-  const totalBudget = userCards.reduce((acc, c) => acc + (c.budget ? moneyToNumber(c.budget) : 0), 0)
+  const currentMonthTotal = sumInstallmentAmounts(currentMonthInstallments)
+  const totalLimit = totalCardLimit(userCards)
+  const totalBudget = totalCardBudget(userCards)
   const utilizationBase = totalBudget > 0 ? totalBudget : totalLimit
   const utilizationPercent = utilizationBase > 0
     ? (currentMonthTotal / utilizationBase) * 100
@@ -175,6 +193,83 @@ export async function gatherAdvisorContext(
 
   healthScore = Math.max(0, Math.min(100, healthScore))
 
+  // Gather budget metrics (income + category budgets)
+  let budgetMetrics: BudgetMetrics | null = null
+  try {
+    const currentMonth = now.getMonth() + 1
+    const currentYear = now.getFullYear()
+
+    const [incomes, categoryBudgets, catSpendingInstallments] = await Promise.all([
+      prisma.income.findMany({
+        where: {
+          userId,
+          OR: [
+            { month: currentMonth, year: currentYear },
+            {
+              isRecurring: true,
+              OR: [
+                { year: { lt: currentYear } },
+                { year: currentYear, month: { lte: currentMonth } },
+              ],
+            },
+          ],
+        },
+      }),
+      prisma.categoryBudget.findMany({
+        where: { userId },
+        include: { category: { select: { name: true } } },
+      }),
+      prisma.installment.findMany({
+        where: {
+          dueDate: { gte: currentMonthStart, lte: currentMonthEnd },
+          transaction: { userId },
+        },
+        include: { transaction: { include: { category: true } } },
+      }),
+    ])
+
+    const totalMonthlyIncome = incomes.reduce((sum, inc) => sum + moneyToNumber(inc.amount), 0)
+
+    if (totalMonthlyIncome > 0 || categoryBudgets.length > 0) {
+
+      const catSpending: Record<string, number> = {}
+      for (const inst of catSpendingInstallments) {
+        const catId = inst.transaction.category.id
+        catSpending[catId] = (catSpending[catId] || 0) + moneyToNumber(inst.amount)
+      }
+
+      const totalSpending = Object.values(catSpending).reduce((s, v) => s + v, 0)
+      const remaining = totalMonthlyIncome - totalSpending
+      const savingsRate = totalMonthlyIncome > 0 ? (remaining / totalMonthlyIncome) * 100 : 0
+      const budgetUtilizationOverall = totalMonthlyIncome > 0 ? (totalSpending / totalMonthlyIncome) * 100 : 0
+
+      // Find top 3 over-budget categories
+      const overBudgetCategories = categoryBudgets
+        .filter(cb => {
+          const spent = catSpending[cb.categoryId] || 0
+          const limit = moneyToNumber(cb.amount)
+          return limit > 0 && spent > limit
+        })
+        .map(cb => ({
+          name: cb.category.name,
+          overagePercent: Math.round(
+            (((catSpending[cb.categoryId] || 0) - moneyToNumber(cb.amount)) / moneyToNumber(cb.amount)) * 100
+          ),
+        }))
+        .sort((a, b) => b.overagePercent - a.overagePercent)
+        .slice(0, 3)
+
+      budgetMetrics = {
+        totalMonthlyIncome: Math.round(totalMonthlyIncome * 100) / 100,
+        savingsRate: Math.round(savingsRate),
+        budgetUtilizationOverall: Math.round(budgetUtilizationOverall),
+        overBudgetCategories,
+      }
+    }
+  } catch {
+    // Budget metrics are optional — don't fail the whole context
+  }
+
   return {
     recentTransactions: {
       last7Days: {
@@ -198,6 +293,7 @@ export async function gatherAdvisorContext(
       daysUntilClosing,
       closingDate
     },
-    healthScore
+    healthScore,
+    budgetMetrics
   }
 }

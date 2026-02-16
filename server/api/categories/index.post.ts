@@ -3,10 +3,13 @@ import prisma from '../../utils/prisma'
 
 const createCategorySchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
+  color: z.string().optional(),
+  emoji: z.string().optional(),
 })
 
 export default defineEventHandler(async (event) => {
-  const { userId } = getUser(event)
+  const appUser = await getOrCreateUser(event)
+  const userId = appUser.userId
   const body = await readBody(event)
   const result = createCategorySchema.safeParse(body)
 
@@ -18,7 +21,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { name } = result.data
+  const { name, color: bodyColor, emoji } = result.data
+
+  // Tier: count limit check
+  const categoryCount = await prisma.category.count({ where: { userId } })
+  enforceTierAccess(checkCountLimit(appUser.tier, 'maxCategories', categoryCount))
 
   // Check if category already exists for this user (case-insensitive)
   const existing = await prisma.category.findFirst({
@@ -48,9 +55,10 @@ export default defineEventHandler(async (event) => {
   const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)]
 
   const category = await prisma.category.create({
-    data: { 
+    data: {
       name,
-      color: randomColor,
+      color: bodyColor || randomColor,
+      emoji: emoji || null,
       userId
     }
   })

@@ -17,7 +17,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div class="space-y-8 animate-pulse">
+  <div class="space-y-8">
     <!-- Header Skeleton -->
     <div class="space-y-2">
       <Skeleton :class="[headerHeight, 'w-1/4 rounded-lg']" />

@@ -29,9 +29,9 @@ const emit = defineEmits<{
         </h2>
         
         <p class="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-          Eu tô aqui pra te ajudar, de verdade. Sem truque, sem pegadinha. 
-          <span class="text-foreground font-medium">É de graça e sempre vai ser.</span>
-          Vem comigo! 🚀
+          Eu tô aqui pra te ajudar, de verdade. Sem truque, sem pegadinha.
+          <span class="text-foreground font-medium">Comece de graça, sem compromisso.</span>
+          Quando precisar de mais, eu tô aqui. 🚀
         </p>
 
         <!-- CTA Buttons -->
@@ -42,9 +42,15 @@ const emit = defineEmits<{
             @click="emit('start')"
           >
             <Heart class="w-5 h-5" />
-            Quero conhecer o Du!
+            Começar de graça
             <ArrowRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </NuxtLink>
+          <a
+            href="#precos"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-16 px-10 rounded-[2rem] border-2 border-border bg-card/70 backdrop-blur-sm font-semibold hover:bg-card hover:border-secondary/40 transition-all duration-300"
+          >
+            Ver planos
+          </a>
         </div>
 
         <!-- Guarantee -->

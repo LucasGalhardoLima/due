@@ -1,3 +1,5 @@
+import { ptBR } from '@clerk/localizations'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
@@ -60,6 +62,40 @@ export default defineNuxtConfig({
   // supabase: {
   //   redirect: false, // We'll handle auth redirect manually if needed
   // },
+  clerk: {
+    localization: ptBR,
+    appearance: {
+      variables: {
+        colorPrimary: '#231651',
+        colorBackground: 'transparent',
+        colorNeutral: '#231651',
+        colorForeground: 'hsl(252, 57%, 20%)',
+        colorMutedForeground: 'hsl(252, 26%, 38%)',
+        colorInput: 'hsl(168, 22%, 86%)',
+        colorInputForeground: 'hsl(252, 57%, 20%)',
+        colorBorder: 'hsl(168, 22%, 84%)',
+        colorDanger: 'hsl(0, 84%, 60%)',
+        colorSuccess: 'hsl(160, 84%, 39%)',
+        fontFamily: '"Manrope", ui-sans-serif, system-ui, sans-serif',
+        fontFamilyButtons: '"Sora", ui-sans-serif, system-ui, sans-serif',
+        borderRadius: '0.75rem',
+        fontSize: '0.875rem',
+      },
+      elements: {
+        rootBox: 'w-full',
+        cardBox: 'shadow-none bg-transparent',
+        card: 'shadow-none bg-transparent',
+      },
+    },
+  },
+  runtimeConfig: {
+    stripeSecretKey: '',
+    stripeWebhookSecret: '',
+    stripePlusMonthlyPriceId: '',
+    stripePlusAnnualPriceId: '',
+    stripeProMonthlyPriceId: '',
+    stripeProAnnualPriceId: '',
+  },
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   // Build Configuration

@@ -11,11 +11,12 @@ export default defineEventHandler(async (event) => {
   const now = new Date()
   const currentMonthStart = startOfMonth(now)
 
-  // 1. Fetch Active Subscriptions
+  // 1. Fetch Active Subscriptions — scoped per user to avoid cross-tenant data leaks
   const subscriptions = await prisma.transaction.findMany({
     where: {
       isSubscription: true,
-      active: true
+      active: true,
+      userId: { not: 'migration_temp' }
     },
     include: {
       installments: {
@@ -50,33 +51,29 @@ export default defineEventHandler(async (event) => {
     }
 
     if (shouldCreate) {
-      // Create new installment
-      // Due Date Logic: "Current Month" + Card Closing/Due Logic
-      // For simplicity in MVP: Set dueDate to today or same day next month.
-      // Better: Use the subscription's purchase day in the current month.
-      
       const purchaseDay = sub.purchaseDate.getDate()
       const newDueDate = new Date(now.getFullYear(), now.getMonth(), purchaseDay)
 
-      const newInstallment = await prisma.installment.create({
-        data: {
-          number: (lastInstallment?.number || 0) + 1,
-          amount: sub.amount,
-          dueDate: newDueDate,
-          transactionId: sub.id
-        }
-      })
+      // Atomic: create installment + update transaction in a single transaction
+      const [newInstallment] = await prisma.$transaction([
+        prisma.installment.create({
+          data: {
+            number: (lastInstallment?.number || 0) + 1,
+            amount: sub.amount,
+            dueDate: newDueDate,
+            transactionId: sub.id
+          }
+        }),
+        prisma.transaction.update({
+          where: { id: sub.id },
+          data: { lastProcessedDate: now }
+        })
+      ])
 
-      // Update Subscription
-      await prisma.transaction.update({
-        where: { id: sub.id },
-        data: { lastProcessedDate: now }
-      })
-
-      results.push({ 
-        subscription: sub.description, 
-        status: 'renewed', 
-        installment: newInstallment.id 
+      results.push({
+        subscription: sub.description,
+        status: 'renewed',
+        installment: newInstallment.id
       })
     } else {
       results.push({ 

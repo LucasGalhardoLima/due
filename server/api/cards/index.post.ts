@@ -11,7 +11,8 @@ const createCardSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const { userId } = getUser(event)
+  const appUser = await getOrCreateUser(event)
+  const userId = appUser.userId
   const body = await readBody(event)
   const result = createCardSchema.safeParse(body)
 
@@ -29,6 +30,7 @@ export default defineEventHandler(async (event) => {
   const existingCardsCount = await prisma.creditCard.count({
     where: { userId }
   })
+  enforceTierAccess(checkCountLimit(appUser.tier, 'maxCards', existingCardsCount))
   const isDefault = existingCardsCount === 0
 
   const card = await prisma.creditCard.create({

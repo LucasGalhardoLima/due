@@ -43,16 +43,16 @@ const emit = defineEmits<{
 
         <!-- Personal greeting -->
         <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/30 to-secondary/10 border border-border backdrop-blur-sm">
-          <Sparkles class="w-4 h-4 text-secondary animate-pulse" />
-          <span class="text-sm font-bold bg-gradient-to-r from-secondary to-secondary/70 bg-clip-text text-transparent">Seu assistente financeiro pessoal</span>
+          <Sparkles class="w-4 h-4 text-secondary-accent animate-pulse" />
+          <span class="text-sm font-bold bg-gradient-to-r from-secondary-accent to-secondary-accent/70 bg-clip-text text-transparent">Seu assistente financeiro pessoal</span>
         </div>
 
         <!-- Personal Headline -->
         <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1]">
           <span class="block text-2xl sm:text-3xl text-muted-foreground font-medium mb-4">Oi, eu sou o Du! 👋</span>
-          <span class="block mb-2">Vou te ajudar a sair</span>
+          <span class="block mb-2">Vou te ajudar a dominar</span>
           <span class="relative inline-block">
-            <span class="bg-gradient-to-r from-secondary via-secondary to-secondary/70 bg-clip-text text-transparent">do buraco da fatura.</span>
+            <span class="bg-gradient-to-r from-secondary via-secondary to-secondary/70 bg-clip-text text-transparent">sua vida financeira.</span>
             <!-- Underline decoration -->
             <svg class="absolute -bottom-2 left-0 w-full h-3 text-primary/30" viewBox="0 0 200 8" preserveAspectRatio="none">
               <path d="M0,5 Q50,0 100,5 T200,5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
@@ -62,8 +62,8 @@ const emit = defineEmits<{
 
         <!-- Personal Subheadline -->
         <p class="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Eu entendo suas parcelas, projeto suas faturas futuras e te mostro 
-          <span class="text-foreground font-semibold">exatamente o que fazer</span> pra 
+          Eu organizo seus gastos, controlo suas parcelas, projeto seu orçamento e te mostro
+          <span class="text-foreground font-semibold">exatamente o que fazer</span> pra
           você respirar financeiramente. Sem julgamento, só solução. 💪
         </p>
 
@@ -82,7 +82,7 @@ const emit = defineEmits<{
             @click="emit('demo')"
           >
             <div class="w-10 h-10 rounded-xl bg-muted flex items-center justify-center group-hover:bg-secondary/10 transition-colors">
-              <Play class="w-4 h-4 text-muted-foreground group-hover:text-secondary transition-colors" />
+              <Play class="w-4 h-4 text-muted-foreground group-hover:text-secondary-accent transition-colors" />
             </div>
             Ver como funciona
           </button>
@@ -94,7 +94,7 @@ const emit = defineEmits<{
             <svg class="w-5 h-5 text-success" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
-            <span>100% gratuito</span>
+            <span>Comece de graça</span>
           </div>
           <div class="flex items-center gap-2">
             <svg class="w-5 h-5 text-success" fill="currentColor" viewBox="0 0 20 20">

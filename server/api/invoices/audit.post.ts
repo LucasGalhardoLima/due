@@ -36,6 +36,9 @@ interface FaturaAudit {
 }
 
 export default defineEventHandler(async (event) => {
+  const appUser = await getOrCreateUser(event)
+  enforceTierAccess(await checkAndIncrementUsage(appUser.dbUserId, appUser.tier, 'audits'))
+
   const body = await readBody<AuditRequest>(event)
   const { items: bankItems, cardId, month, year } = body
 

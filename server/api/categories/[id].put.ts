@@ -2,11 +2,15 @@ import { z } from 'zod'
 import prisma from '../../utils/prisma'
 
 const updateCategorySchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
+  name: z.string().min(1, 'Nome é obrigatório').optional(),
+  color: z.string().optional(),
+  emoji: z.string().nullable().optional(),
+  parentId: z.string().nullable().optional(),
 })
 
 export default defineEventHandler(async (event) => {
-  const { userId } = getUser(event)
+  const appUser = await getOrCreateUser(event)
+  const userId = appUser.userId
   const id = getRouterParam(event, 'id')
   const body = await readBody(event)
   const result = updateCategorySchema.safeParse(body)
@@ -38,12 +42,28 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { name } = result.data
+  const { name, color, emoji, parentId } = result.data
 
-  const category = await prisma.category.update({
-    where: { id },
-    data: { name }
+  // Tier: category hierarchy gate
+  if (parentId !== undefined) {
+    enforceTierAccess(checkFeatureAccess(appUser.tier, 'categoryHierarchy'))
+  }
+
+  // Atomic ownership-scoped update to prevent TOCTOU race
+  const updateResult = await prisma.category.updateMany({
+    where: { id, userId },
+    data: {
+      ...(name !== undefined && { name }),
+      ...(color !== undefined && { color }),
+      ...(emoji !== undefined && { emoji }),
+      ...(parentId !== undefined && { parentId }),
+    }
   })
 
-  return category
+  if (updateResult.count === 0) {
+    throw createError({ statusCode: 404, statusMessage: 'Category not found' })
+  }
+
+  // Return the updated category
+  return prisma.category.findUnique({ where: { id } })
 })

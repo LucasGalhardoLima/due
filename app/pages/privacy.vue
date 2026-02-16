@@ -34,7 +34,7 @@ definePageMeta({
       <div class="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
         <!-- Header Section -->
         <div class="space-y-4 text-center">
-          <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-primary">
+          <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-primary-accent">
             <Shield class="w-8 h-8" />
           </div>
           <h1 class="text-4xl md:text-6xl font-black tracking-tight">Política de Privacidade</h1>

@@ -2,30 +2,17 @@ import { z } from 'zod'
 import { generateText } from 'ai'
 import { gateway } from '../../utils/ai'
 import prisma from '../../utils/prisma'
-import { moneyToCents, moneyToNumber } from '../../utils/money'
+import { moneyToCents } from '../../utils/money'
+import { totalCardLimit, totalCardBudget } from '../../utils/analytics/card-aggregates'
 import { parseJsonWithSchema } from '../../utils/ai-guard'
 import { enforceRateLimit } from '../../utils/ai-rate-limit'
 import { getCache, setCache } from '../../utils/ai-cache'
+import type { InsightsResponse } from '#shared/types/api-responses'
 
 const querySchema = z.object({
   month: z.string().optional(),
   year: z.string().optional()
 })
-
-interface InsightsResponse {
-  success: true
-  insights: {
-    diagnostico: string
-    acoes_imediatas: string[]
-    alivio_futuro: string
-    alertas?: string[]
-  }
-  metadata: {
-    totalSpent: number
-    transactionCount: number
-    topCategories: { name: string; amount: number; percentage: string }[]
-  }
-}
 
 const aiResponseSchema = z.object({
   diagnostico: z.string(),
@@ -35,7 +22,9 @@ const aiResponseSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const { userId } = getUser(event) 
+  const appUser = await getOrCreateUser(event)
+  const userId = appUser.userId
+  enforceTierAccess(await checkAndIncrementUsage(appUser.dbUserId, appUser.tier, 'ai_insights'))
   enforceRateLimit(`ai:insights:${userId}`, 10, 10 * 60 * 1000)
   const query = getQuery(event)
   const { month, year } = querySchema.parse(query)
@@ -79,8 +68,8 @@ export default defineEventHandler(async (event) => {
   
   // Get user's global context (limit/budget)
   const userCards = await prisma.creditCard.findMany({ where: { userId } })
-  const totalBudget = userCards.reduce((acc, c) => acc + (c.budget ? moneyToNumber(c.budget) : 0), 0)
-  const totalLimit = userCards.reduce((acc, c) => acc + moneyToNumber(c.limit), 0)
+  const totalBudget = totalCardBudget(userCards)
+  const totalLimit = totalCardLimit(userCards)
 
   for (const inst of installments) {
     const categoryName = inst.transaction.category.name

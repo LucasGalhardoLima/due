@@ -1,22 +1,26 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: N/A → 1.0.0 (Initial ratification)
+Version change: 1.0.0 → 1.1.0 (MINOR - material expansion of
+Development Standards)
 
-Modified principles: N/A (new constitution)
+Modified principles: None (principles unchanged)
 
-Added sections:
-- Core Principles (3 principles)
-  - I. Privacy-First Architecture
-  - II. Intelligent AI Boundaries
-  - III. Performance & Mobile Excellence
-- Development Standards
-- Quality Assurance
+Modified sections:
+- Development Standards > Technology Stack Alignment
+  - AI: "OpenAI GPT-4o (via API, stateless)" →
+    "Vercel AI SDK (ai) with OpenAI provider"
+  - Added: State Management (Pinia, TanStack Vue Query)
+  - Added: UI Components (shadcn-vue/reka-ui, CVA, Lucide)
+  - Added: PWA (@vite-pwa/nuxt with offline caching)
+  - Added: Utilities (VueUse, date-fns, PapaParse)
+  - Added: Data Visualization (D3 hierarchy, scale)
 
-Removed sections: N/A
+Added sections: None
+Removed sections: None
 
 Templates requiring updates:
-- .specify/templates/plan-template.md ✅ (Constitution Check section compatible)
+- .specify/templates/plan-template.md ✅ (No changes needed)
 - .specify/templates/spec-template.md ✅ (No changes needed)
 - .specify/templates/tasks-template.md ✅ (No changes needed)
 
@@ -73,10 +77,15 @@ Due MUST deliver a fast, fluid experience optimized for mobile-first usage.
 
 **Technology Stack Alignment**:
 - Frontend: Nuxt 4, Vue 3, TypeScript, Tailwind CSS
+- UI Components: shadcn-vue (reka-ui), CVA, Lucide icons
+- State Management: Pinia (global), TanStack Vue Query (server state)
 - Backend: Nuxt server routes, Prisma ORM, PostgreSQL
 - Authentication: Clerk
-- AI: OpenAI GPT-4o (via API, stateless)
-- Validation: Zod schemas
+- AI: Vercel AI SDK (`ai`) with OpenAI provider
+- Validation: Zod schemas, VeeValidate (forms)
+- PWA: @vite-pwa/nuxt with offline caching (Workbox)
+- Utilities: VueUse, date-fns, PapaParse (CSV)
+- Data Visualization: D3 (hierarchy, scale)
 - Testing: Vitest (unit/integration), Playwright (E2E)
 
 **Code Quality Gates**:
@@ -117,4 +126,4 @@ This constitution supersedes all other development practices for the Due Finance
 - Complexity additions MUST be justified against Principle III (Performance)
 - New features MUST be evaluated against all three principles before design begins
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-23 | **Last Amended**: 2026-01-23
+**Version**: 1.1.0 | **Ratified**: 2026-01-23 | **Last Amended**: 2026-02-11

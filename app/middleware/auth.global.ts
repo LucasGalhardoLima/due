@@ -12,7 +12,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const { userId } = useAuth()
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/', '/sign-in', '/sign-up', '/terms', '/privacy', '/offline']
+  const publicRoutes = ['/', '/sign-in', '/sign-up', '/sso-callback', '/terms', '/privacy', '/offline']
   if (!userId.value && !publicRoutes.includes(to.path)) {
     return navigateTo('/sign-in')
   }
