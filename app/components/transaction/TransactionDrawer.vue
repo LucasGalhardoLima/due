@@ -112,8 +112,8 @@ async function analyzeText() {
     description.value = res.description
     purchaseDate.value = res.date
     installments.value = [res.installments]
-    if (res.cardId) selectedCardId.value = res.cardId
-    if (res.categoryId) selectedCategoryId.value = res.categoryId
+    if (res.cardId && res.cardId !== 'null') selectedCardId.value = res.cardId
+    if (res.categoryId && res.categoryId !== 'null') selectedCategoryId.value = res.categoryId
     paymentType.value = res.installments > 1 ? 'installment' : 'cash'
   } catch (e) {
     console.error(e)
