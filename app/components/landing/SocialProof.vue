@@ -11,7 +11,7 @@ const stats = [
   {
     icon: TrendingUp,
     value: 'R$ 50M+',
-    label: 'Em faturas gerenciadas',
+    label: 'Em finanças gerenciadas',
     color: 'info'
   },
   {
@@ -29,7 +29,7 @@ const stats = [
 ]
 
 const colorClasses: Record<string, { bg: string; icon: string }> = {
-  primary: { bg: 'bg-primary/10', icon: 'text-primary' },
+  primary: { bg: 'bg-primary/10', icon: 'text-primary-accent' },
   info: { bg: 'bg-info-muted', icon: 'text-info' },
   warning: { bg: 'bg-warning-muted', icon: 'text-warning' },
   success: { bg: 'bg-success-muted', icon: 'text-success' }

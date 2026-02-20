@@ -17,7 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import CurrencyInput from '@/components/ui/CurrencyInput.vue'
 import CategoryAutocomplete from '@/components/ui/CategoryAutocomplete.vue'
 import { Textarea } from '@/components/ui/textarea'
-import { Sparkles, Loader2, PlusCircle } from 'lucide-vue-next'
+import { Badge } from '@/components/ui/badge'
+import { Sparkles, Loader2, PlusCircle, X, Tag } from 'lucide-vue-next'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
 
 interface TransactionResponse {
@@ -28,6 +29,14 @@ interface TransactionResponse {
   purchaseDate: string
   installmentsCount: number
   isSubscription: boolean
+  tags?: Array<{ tag: TagItem }>
+}
+
+interface TagItem {
+  id: string
+  name: string
+  color: string | null
+  emoji: string | null
 }
 
 // Proactive Advisor for post_transaction trigger
@@ -48,20 +57,38 @@ const selectedCategoryId = ref<string>('')
 const selectedCardId = ref<string>('')
 const paymentType = ref<'cash' | 'installment' | 'subscription'>('cash')
 const purchaseDate = ref(new Date().toISOString().split('T')[0]) // YYYY-MM-DD format
-
-
+const selectedTagIds = ref<string[]>([])
+const newTagName = ref('')
+const isCreatingTag = ref(false)
+const showTagPicker = ref(false)
 
 // AI Mode State
 const isAiMode = ref(false)
 const aiText = ref('')
 const isAnalyzing = ref(false)
+const aiParseError = ref('')
+
+interface AiParsedResult {
+  amount: number
+  description: string
+  date: string
+  installments: number
+  cardId?: string
+  categoryId?: string
+  cardName?: string
+  categoryName?: string
+}
+
+const aiParsedResult = ref<AiParsedResult | null>(null)
 
 async function analyzeText() {
   if (!aiText.value.trim()) return
 
   isAnalyzing.value = true
+  aiParseError.value = ''
+  aiParsedResult.value = null
   try {
-    const res = await $fetch('/api/ai/parse-expense', {
+    const res = await $fetch<AiParsedResult>('/api/ai/parse-expense', {
       method: 'POST',
       body: {
         text: aiText.value,
@@ -69,31 +96,44 @@ async function analyzeText() {
       }
     })
 
-    // Populate form
+    // Find display names for card and category
+    const cardName = cards.value?.find(c => c.id === res.cardId)?.name
+    const categoryName = categories.value?.find(c => c.id === res.categoryId)?.name
+
+    // Store parsed result for inline display
+    aiParsedResult.value = {
+      ...res,
+      cardName: cardName || undefined,
+      categoryName: categoryName || undefined,
+    }
+
+    // Also populate form fields for potential manual editing
     amount.value = res.amount
     description.value = res.description
     purchaseDate.value = res.date
     installments.value = [res.installments]
-    
-    if (res.cardId) selectedCardId.value = res.cardId
-    if (res.categoryId) selectedCategoryId.value = res.categoryId
-
-    // Logic for payment type based on installments
-    if (res.installments > 1) {
-        paymentType.value = 'installment'
-    } else {
-        paymentType.value = 'cash'
-    }
-    
-    // Switch back to manual for verification
-    isAiMode.value = false
-    toast.success('Dados preenchidos! Verifique e salve.')
+    if (res.cardId && res.cardId !== 'null') selectedCardId.value = res.cardId
+    if (res.categoryId && res.categoryId !== 'null') selectedCategoryId.value = res.categoryId
+    paymentType.value = res.installments > 1 ? 'installment' : 'cash'
   } catch (e) {
     console.error(e)
-    toast.error('Não entendi. Tente ser mais específico.')
+    aiParseError.value = 'Não entendi. Tente ser mais específico.'
   } finally {
     isAnalyzing.value = false
   }
+}
+
+function switchToManualFromAi() {
+  // Form fields are already populated from the AI parse
+  isAiMode.value = false
+  aiParsedResult.value = null
+}
+
+async function submitAiParsed() {
+  if (!aiParsedResult.value) return
+  // Fields are already populated, just call save
+  await save()
+  aiParsedResult.value = null
 }
 
 // Data Fetching
@@ -109,7 +149,8 @@ interface Category {
 }
 
 const { data: cards } = await useFetch<Card[]>('/api/cards')
-const { data: categories, refresh: refreshCategories } = await useFetch<Category[]>('/api/categories') 
+const { data: categories, refresh: refreshCategories } = await useFetch<Category[]>('/api/categories')
+const { data: tags, refresh: refreshTags } = await useFetch<TagItem[]>('/api/tags')
 
 // Auto-select default card when cards load (only if NEW)
 watch(cards, (newCards) => {
@@ -137,6 +178,7 @@ watch(() => props.open, async (isOpen) => {
             purchaseDate.value = tx.purchaseDate.split('T')[0]
             installments.value = [tx.installmentsCount]
             paymentType.value = tx.isSubscription ? 'subscription' : (tx.installmentsCount > 1 ? 'installment' : 'cash')
+            selectedTagIds.value = tx.tags?.map(t => t.tag.id) || []
         } catch {
             toast.error('Erro ao carregar despesa')
             emit('update:open', false)
@@ -148,16 +190,21 @@ watch(() => props.open, async (isOpen) => {
         installments.value = [1]
         paymentType.value = 'cash'
         purchaseDate.value = new Date().toISOString().split('T')[0]
+        selectedTagIds.value = []
         if (cards.value && cards.value.length) {
              const defaultCard = cards.value.find(c => c.isDefault) || cards.value[0]
              if (defaultCard) selectedCardId.value = defaultCard.id
         }
     }
     
-    // Reset AI Mode when opening
+    // Reset AI Mode and tag picker when opening
     if (isOpen) {
         isAiMode.value = false
         aiText.value = ''
+        aiParsedResult.value = null
+        aiParseError.value = ''
+        newTagName.value = ''
+        showTagPicker.value = false
     }
 })
 
@@ -246,15 +293,18 @@ async function save() {
   // Close UI immediately for "Native Feel"
   
   // Reset Form
+  const savedTagIds = [...selectedTagIds.value]
   amount.value = 0
   description.value = ''
   installments.value = [1]
   paymentType.value = 'cash'
   purchaseDate.value = new Date().toISOString().split('T')[0]
+  selectedTagIds.value = []
   isOpen.value = false
 
   try {
     // 4. API Call
+    let savedTransactionId = props.transactionId
     if (props.transactionId) {
         await $fetch(`/api/transactions/${props.transactionId}`, {
             method: 'PUT',
@@ -262,10 +312,11 @@ async function save() {
         })
         toast.success('Despesa atualizada!')
     } else {
-        await $fetch('/api/transactions', {
+        const created = await $fetch<{ id: string }>('/api/transactions', {
             method: 'POST',
             body: payload
         })
+        savedTransactionId = created.id
         toast.success('Despesa salva com sucesso!')
 
         // Trigger proactive advisor for significant transactions (>=R$100)
@@ -280,6 +331,26 @@ async function save() {
             }
           })
         }
+    }
+
+    // 4b. Save tags if any were selected
+    if (savedTransactionId && savedTagIds.length > 0) {
+        await $fetch('/api/tags/transaction', {
+            method: 'POST',
+            body: {
+              transactionId: savedTransactionId,
+              tagIds: savedTagIds,
+            }
+        })
+    } else if (savedTransactionId && savedTagIds.length === 0 && props.transactionId) {
+        // Clear tags if editing and all tags were removed
+        await $fetch('/api/tags/transaction', {
+            method: 'POST',
+            body: {
+              transactionId: savedTransactionId,
+              tagIds: [],
+            }
+        })
     }
 
     emit('saved')
@@ -315,6 +386,39 @@ function togglePaymentType(type: 'cash' | 'installment' | 'subscription') {
   }
 }
 
+// Tag helpers
+function toggleTag(tagId: string) {
+  const idx = selectedTagIds.value.indexOf(tagId)
+  if (idx === -1) {
+    selectedTagIds.value.push(tagId)
+  } else {
+    selectedTagIds.value.splice(idx, 1)
+  }
+}
+
+function isTagSelected(tagId: string) {
+  return selectedTagIds.value.includes(tagId)
+}
+
+async function createTag() {
+  const name = newTagName.value.trim()
+  if (!name) return
+  isCreatingTag.value = true
+  try {
+    const tag = await $fetch<TagItem>('/api/tags', {
+      method: 'POST',
+      body: { name },
+    })
+    await refreshTags()
+    selectedTagIds.value.push(tag.id)
+    newTagName.value = ''
+  } catch {
+    toast.error('Erro ao criar tag')
+  } finally {
+    isCreatingTag.value = false
+  }
+}
+
 async function handleDelete() {
     if (!props.transactionId) return
     if (!confirm('Tem certeza que deseja excluir esta despesa?')) return
@@ -343,17 +447,33 @@ async function handleDelete() {
         </DrawerHeader>
 
         <div class="p-4 space-y-6">
+          <!-- Card Selector (always visible) -->
+          <div v-if="cards && cards.length > 1" class="space-y-1">
+            <Label class="text-xs text-muted-foreground">Cartão</Label>
+            <Select v-model="selectedCardId">
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o cartão" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="card in cards" :key="card.id" :value="card.id">
+                  {{ card.name }}
+                  <span v-if="card.isDefault" class="text-muted-foreground text-[10px] ml-1">(padrão)</span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <!-- Toggle Mode -->
           <div v-if="!transactionId" class="bg-muted/30 p-1 rounded-xl flex gap-1">
-             <button 
+             <button
                class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-medium transition-all"
                :class="!isAiMode ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:bg-background/50'"
-               @click="isAiMode = false"
+               @click="isAiMode = false; aiParsedResult = null"
              >
                <PlusCircle class="w-3 h-3" />
                Manual
              </button>
-             <button 
+             <button
                class="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-medium transition-all"
                :class="isAiMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/50'"
                @click="isAiMode = true"
@@ -366,7 +486,7 @@ async function handleDelete() {
           <!-- AI Input -->
           <div v-if="isAiMode" class="space-y-4 animate-in fade-in zoom-in-95 duration-200">
              <div class="space-y-2">
-                <Textarea 
+                <Textarea
                   v-model="aiText"
                   placeholder="Ex: Uber de 25 reais ontem..."
                   class="min-h-[100px] text-base resize-none"
@@ -375,8 +495,51 @@ async function handleDelete() {
                 <p class="text-[10px] text-muted-foreground text-center">Pressione Enter para processar</p>
              </div>
 
-             <Button 
-               class="w-full" 
+             <!-- AI Parse Error -->
+             <p v-if="aiParseError" class="text-xs text-destructive text-center">
+               {{ aiParseError }}
+             </p>
+
+             <!-- AI Parsed Results (inline summary) -->
+             <div v-if="aiParsedResult" class="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
+               <div class="rounded-2xl border border-border/70 bg-muted/30 p-4 space-y-2">
+                 <div class="flex items-center justify-between">
+                   <span class="text-xs text-muted-foreground">Descrição</span>
+                   <span class="text-sm font-medium">{{ aiParsedResult.description }}</span>
+                 </div>
+                 <div class="flex items-center justify-between">
+                   <span class="text-xs text-muted-foreground">Valor</span>
+                   <span class="text-sm font-bold text-primary">R$ {{ aiParsedResult.amount.toFixed(2) }}</span>
+                 </div>
+                 <div v-if="aiParsedResult.cardName" class="flex items-center justify-between">
+                   <span class="text-xs text-muted-foreground">Cartão</span>
+                   <span class="text-sm">{{ aiParsedResult.cardName }}</span>
+                 </div>
+                 <div v-if="aiParsedResult.categoryName" class="flex items-center justify-between">
+                   <span class="text-xs text-muted-foreground">Categoria</span>
+                   <span class="text-sm">{{ aiParsedResult.categoryName }}</span>
+                 </div>
+                 <div v-if="aiParsedResult.installments > 1" class="flex items-center justify-between">
+                   <span class="text-xs text-muted-foreground">Parcelas</span>
+                   <span class="text-sm">{{ aiParsedResult.installments }}x</span>
+                 </div>
+               </div>
+
+               <Button class="w-full" @click="submitAiParsed">
+                 Adicionar
+               </Button>
+               <button
+                 class="w-full text-center text-xs text-primary hover:underline"
+                 @click="switchToManualFromAi"
+               >
+                 Editar manualmente
+               </button>
+             </div>
+
+             <!-- Process Button (only when no results yet) -->
+             <Button
+               v-if="!aiParsedResult"
+               class="w-full"
                :disabled="!aiText || isAnalyzing"
                @click="analyzeText"
              >
@@ -385,7 +548,7 @@ async function handleDelete() {
                {{ isAnalyzing ? 'Processando...' : 'Processar' }}
              </Button>
           </div>
-          
+
           <!-- Manual Form (Shown if NOT AI Mode OR if Editing) -->
           <div v-else class="space-y-6 animate-in fade-in zoom-in-95 duration-200">
             <!-- Amount -->
@@ -413,31 +576,94 @@ async function handleDelete() {
             />
           </div>
 
-          <!-- Card & Category -->
-          <div class="grid grid-cols-2 gap-2">
-            <Select v-model="selectedCardId">
-                <SelectTrigger>
-                    <SelectValue placeholder="Cartão" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem v-for="card in cards" :key="card.id" :value="card.id">
-                        {{ card.name }}
-                    </SelectItem>
-                </SelectContent>
-            </Select>
-
-            <CategoryAutocomplete 
-                v-model="selectedCategoryId" 
-                :categories="categories || []" 
+          <!-- Category -->
+          <div>
+            <CategoryAutocomplete
+                v-model="selectedCategoryId"
+                :categories="categories || []"
                 @refresh="refreshCategories"
             />
+          </div>
+
+          <!-- Tags -->
+          <div class="space-y-2">
+            <button
+              type="button"
+              class="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              @click="showTagPicker = !showTagPicker"
+            >
+              <Tag class="w-3 h-3" />
+              Tags
+              <span v-if="selectedTagIds.length" class="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-[10px] leading-none">
+                {{ selectedTagIds.length }}
+              </span>
+            </button>
+
+            <!-- Selected Tags Display -->
+            <div v-if="selectedTagIds.length && !showTagPicker" class="flex flex-wrap gap-1.5">
+              <Badge
+                v-for="tagId in selectedTagIds"
+                :key="tagId"
+                variant="secondary"
+                class="gap-1 pr-1 cursor-pointer"
+                @click="toggleTag(tagId)"
+              >
+                <template v-if="tags?.find(t => t.id === tagId)">
+                  <span v-if="tags.find(t => t.id === tagId)?.emoji" class="text-xs">{{ tags.find(t => t.id === tagId)?.emoji }}</span>
+                  {{ tags.find(t => t.id === tagId)?.name }}
+                </template>
+                <X class="w-3 h-3 opacity-60" />
+              </Badge>
+            </div>
+
+            <!-- Tag Picker -->
+            <div v-if="showTagPicker" class="space-y-2 rounded-xl border border-border/70 bg-muted/20 p-3 animate-in fade-in slide-in-from-top-1 duration-150">
+              <!-- Existing Tags -->
+              <div v-if="tags && tags.length" class="flex flex-wrap gap-1.5">
+                <button
+                  v-for="tag in tags"
+                  :key="tag.id"
+                  type="button"
+                  class="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors"
+                  :class="isTagSelected(tag.id)
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-background border-border hover:bg-muted text-foreground'"
+                  @click="toggleTag(tag.id)"
+                >
+                  <span v-if="tag.emoji" class="text-xs">{{ tag.emoji }}</span>
+                  {{ tag.name }}
+                </button>
+              </div>
+              <p v-else class="text-xs text-muted-foreground">Nenhuma tag criada ainda.</p>
+
+              <!-- Create New Tag -->
+              <div class="flex items-center gap-2 pt-1">
+                <Input
+                  v-model="newTagName"
+                  placeholder="Nova tag..."
+                  class="h-7 text-xs flex-1"
+                  @keydown.enter.prevent="createTag"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  class="h-7 text-xs px-2"
+                  :disabled="!newTagName.trim() || isCreatingTag"
+                  @click="createTag"
+                >
+                  <Loader2 v-if="isCreatingTag" class="w-3 h-3 animate-spin" />
+                  <PlusCircle v-else class="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
           </div>
 
           <!-- Payment Type Toggle -->
           <div class="space-y-3">
             <Label>Tipo de Pagamento</Label>
             <div class="grid grid-cols-3 gap-2">
-              <Button 
+              <Button
                 type="button"
                 :variant="paymentType === 'cash' ? 'default' : 'outline'"
                 class="w-full text-xs px-1"
@@ -445,7 +671,7 @@ async function handleDelete() {
               >
                 À Vista
               </Button>
-              <Button 
+              <Button
                 type="button"
                 :variant="paymentType === 'installment' ? 'default' : 'outline'"
                 class="w-full text-xs px-1"
@@ -453,7 +679,7 @@ async function handleDelete() {
               >
                 Parcelado
               </Button>
-              <Button 
+              <Button
                 type="button"
                 :variant="paymentType === 'subscription' ? 'default' : 'outline'"
                 class="w-full text-xs px-1"
@@ -485,7 +711,7 @@ async function handleDelete() {
             </div>
           </div>
           </div>
-          
+
         </div>
 
         <DrawerFooter>

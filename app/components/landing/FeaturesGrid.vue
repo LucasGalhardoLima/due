@@ -6,7 +6,11 @@ import {
   Upload,
   CreditCard,
   Bell,
-  Zap
+  Zap,
+  Wallet,
+  Target,
+  RotateCw,
+  TrendingUp
 } from 'lucide-vue-next'
 
 const features = [
@@ -25,6 +29,7 @@ const features = [
     colSpan: 'md:col-span-1',
     rowSpan: 'md:row-span-2',
     isAi: true,
+    tier: 'pro',
     size: 'tall'
   },
   {
@@ -34,6 +39,41 @@ const features = [
     colSpan: 'md:col-span-1',
     rowSpan: 'md:row-span-1',
     isAi: true,
+    tier: 'pro',
+    size: 'normal'
+  },
+  {
+    icon: Wallet,
+    title: 'Orçamento Mensal',
+    description: 'Defina limites por categoria e acompanhe sua renda. Saiba exatamente quanto pode gastar.',
+    colSpan: 'md:col-span-1',
+    rowSpan: 'md:row-span-1',
+    size: 'normal'
+  },
+  {
+    icon: Target,
+    title: 'Metas de Economia',
+    description: 'Crie metas de poupança e acompanhe o progresso até conquistar.',
+    colSpan: 'md:col-span-1',
+    rowSpan: 'md:row-span-1',
+    tier: 'plus',
+    size: 'normal'
+  },
+  {
+    icon: RotateCw,
+    title: 'Recorrentes',
+    description: 'Detecção automática de assinaturas e controle de gastos recorrentes.',
+    colSpan: 'md:col-span-1',
+    rowSpan: 'md:row-span-1',
+    tier: 'plus',
+    size: 'normal'
+  },
+  {
+    icon: TrendingUp,
+    title: 'Fluxo de Caixa',
+    description: 'Visualize receitas vs despesas mês a mês com gráficos interativos.',
+    colSpan: 'md:col-span-1',
+    rowSpan: 'md:row-span-1',
     size: 'normal'
   },
   {
@@ -56,9 +96,9 @@ const features = [
     icon: Bell,
     title: 'Alertas de Crise',
     description: 'Receba avisos antes de estourar o limite ou quando algo parecer errado.',
-    colSpan: 'md:col-span-2',
+    colSpan: 'md:col-span-1',
     rowSpan: 'md:row-span-1',
-    size: 'large'
+    size: 'normal'
   }
 ]
 </script>
@@ -74,7 +114,7 @@ const features = [
     <div class="container mx-auto px-6">
       <div class="max-w-4xl mx-auto text-center mb-20">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border text-sm font-medium mb-6">
-          <Zap class="w-4 h-4 text-primary" />
+          <Zap class="w-4 h-4 text-primary-accent" />
           Ferramentas poderosas
         </div>
         <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6">
@@ -118,17 +158,20 @@ const features = [
               <component
                 :is="feature.icon"
                 class="w-7 h-7 transition-colors duration-300"
-                :class="feature.isAi ? 'text-secondary' : 'text-secondary'"
+                :class="feature.isAi ? 'text-secondary-accent' : 'text-secondary-accent'"
               />
             </div>
           </div>
 
           <!-- Content -->
           <div :class="feature.size === 'tall' ? 'mt-auto' : ''">
-            <h3 class="relative text-xl font-bold mb-3 group-hover:text-secondary transition-colors duration-300">
+            <h3 class="relative text-xl font-bold mb-3 group-hover:text-secondary-accent transition-colors duration-300">
               {{ feature.title }}
-              <span v-if="feature.isAi" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-secondary/15 text-secondary">
+              <span v-if="feature.isAi" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-secondary/15 text-secondary-accent">
                 IA
+              </span>
+              <span v-if="feature.tier" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary-accent">
+                {{ feature.tier }}
               </span>
             </h3>
             <p class="relative text-muted-foreground leading-relaxed">

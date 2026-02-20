@@ -5,7 +5,9 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-background">
-    <SignUp redirect-url="/" sign-in-url="/sign-in" />
+  <div class="flex items-center justify-center min-h-screen bg-background px-4">
+    <div class="w-full max-w-sm">
+      <AuthForm initial-intent="sign-up" />
+    </div>
   </div>
 </template>

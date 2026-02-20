@@ -1,10 +1,15 @@
 import prisma from '../../utils/prisma'
+import { SYSADMIN_CLERK_ID } from '#shared/tier-config'
 
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
-  
+
   if (!userId) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  }
+
+  if (!SYSADMIN_CLERK_ID || userId !== SYSADMIN_CLERK_ID) {
+    throw createError({ statusCode: 403, statusMessage: 'Forbidden — sysadmin only' })
   }
 
   // Count records to migrate

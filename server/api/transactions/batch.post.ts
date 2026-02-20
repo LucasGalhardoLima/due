@@ -15,7 +15,10 @@ const batchCreateSchema = z.array(z.object({
 // ...
 
 export default defineEventHandler(async (event) => {
-  const { userId } = getUser(event)
+  const appUser = await getOrCreateUser(event)
+  const userId = appUser.userId
+  enforceTierAccess(await checkAndIncrementUsage(appUser.dbUserId, appUser.tier, 'csv_imports'))
+
   const body = await readBody(event)
   const result = batchCreateSchema.safeParse(body)
 

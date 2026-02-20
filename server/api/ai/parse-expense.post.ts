@@ -71,6 +71,10 @@ export default defineEventHandler(async (event) => {
       prompt: prompt
     })
 
+    // Sanitize: AI sometimes returns "null" string instead of actual null
+    if (object.cardId === 'null') object.cardId = null
+    if (object.categoryId === 'null') object.categoryId = null
+
     return object
   } catch (error) {
     console.error('AI Parse Error:', error)

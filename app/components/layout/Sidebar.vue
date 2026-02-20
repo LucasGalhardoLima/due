@@ -1,26 +1,34 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { 
-  LayoutDashboard, 
+import {
+  LayoutDashboard,
   CalendarRange,
-  CreditCard, 
-  Tags, 
-  UploadCloud, 
-  ShieldCheck, 
+  Wallet,
+  CreditCard,
+  Tags,
+  UploadCloud,
+  ShieldCheck,
+  RotateCw,
+  TrendingUp,
+  Target,
   Menu,
   Moon,
   Sun,
   X,
   ChevronRight,
   LogOut,
-  User
+  User,
+  Sparkles,
+  Settings,
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import TierBadge from '@/components/tier/TierBadge.vue'
 
 const { user } = useUser()
 const clerk = useClerk()
 const colorMode = useColorMode()
 const isMobileMenuOpen = ref(false)
+const { tier, isFree, hasStripe } = useTier()
 
 function handleSignOut() {
   clerk.value?.signOut()
@@ -34,6 +42,15 @@ const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV
 const demoCookie = useCookie('demo_mode', { maxAge: 60 * 60 * 24 * 30, path: '/' })
 const isDemoMode = computed(() => demoCookie.value === 'true')
 
+async function manageSubscription() {
+  try {
+    const { url } = await $fetch<{ url: string }>('/api/stripe/portal', { method: 'POST' })
+    if (url) window.location.href = url
+  } catch {
+    // Silently fail
+  }
+}
+
 function toggleDemoMode() {
   demoCookie.value = isDemoMode.value ? 'false' : 'true'
   // Force reload to apply session changes
@@ -42,27 +59,35 @@ function toggleDemoMode() {
 
 const groups = [
   {
-    label: 'Principal',
+    label: 'Visão Geral',
     items: [
       { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-      { name: 'Parcelamentos', path: '/parcelamentos', icon: CalendarRange },
+      { name: 'Fluxo de Caixa', path: '/fluxo-de-caixa', icon: TrendingUp },
     ]
   },
   {
-    label: 'Gestão',
+    label: 'Gastos',
+    items: [
+      { name: 'Parcelamentos', path: '/parcelamentos', icon: CalendarRange },
+      { name: 'Recorrentes', path: '/recorrentes', icon: RotateCw },
+      { name: 'Orçamento', path: '/orcamento', icon: Wallet },
+    ]
+  },
+  {
+    label: 'Planejamento',
+    items: [
+      { name: 'Metas', path: '/metas', icon: Target },
+      { name: 'Categorias', path: '/categories', icon: Tags },
+    ]
+  },
+  {
+    label: 'Ferramentas',
     items: [
       { name: 'Cartões', path: '/cards', icon: CreditCard },
-      { name: 'Categorias', path: '/categories', icon: Tags },
       { name: 'Importar CSV', path: '/import', icon: UploadCloud },
-      { name: 'Auditoria & Balanço', path: '/audit', icon: ShieldCheck },
+      { name: 'Auditoria', path: '/audit', icon: ShieldCheck },
     ]
   },
-  {
-    label: 'Administração',
-    items: [
-      { name: 'Auditoria', path: '/admin/transactions', icon: ShieldCheck },
-    ]
-  }
 ]
 
 function closeMobileMenu() {
@@ -136,10 +161,33 @@ function closeMobileMenu() {
                 <User v-else class="w-5 h-5 text-primary-foreground opacity-80" />
               </div>
               <div class="flex flex-col min-w-0">
-                <span class="text-xs font-bold truncate">{{ isDemoMode ? 'Usuário' : (user?.firstName || 'Usuário') }}</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-bold truncate">{{ isDemoMode ? 'Usuário' : (user?.firstName || 'Usuário') }}</span>
+                  <TierBadge :tier="tier" />
+                </div>
                 <span class="text-[10px] text-muted-foreground truncate">{{ user?.primaryEmailAddress?.emailAddress || 'Conta Pessoal' }}</span>
               </div>
             </div>
+          </div>
+
+          <!-- Upgrade / Manage Subscription -->
+          <div v-if="isFree" class="px-2">
+            <button
+              class="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-xl bg-primary/40 border border-primary/50 text-primary-foreground text-xs font-bold transition-all duration-200 ease-out hover:-translate-y-[1px] hover:bg-primary/50 hover:shadow-elevation-1"
+              @click="useUpgradeModal().show()"
+            >
+              <Sparkles class="w-3.5 h-3.5" />
+              <span>Fazer Upgrade</span>
+            </button>
+          </div>
+          <div v-else-if="hasStripe" class="px-2">
+            <button
+              class="w-full flex items-center justify-center gap-2 h-9 px-3 rounded-xl bg-background border border-border hover:bg-secondary/10 hover:border-primary/30 transition-all duration-200 ease-out hover:-translate-y-[1px] text-xs font-medium text-muted-foreground hover:text-foreground"
+              @click="manageSubscription"
+            >
+              <Settings class="w-3.5 h-3.5" />
+              <span>Gerenciar assinatura</span>
+            </button>
           </div>
 
           <!-- Actions Row -->

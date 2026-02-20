@@ -2,7 +2,6 @@ import { z } from 'zod'
 import { generateText } from 'ai'
 import { gateway } from '../../utils/ai'
 import prisma from '../../utils/prisma'
-import { getUser } from '../../utils/session'
 import { startOfMonth } from 'date-fns'
 import { moneyToCents } from '../../utils/money'
 import { parseJsonWithSchema } from '../../utils/ai-guard'
@@ -23,7 +22,9 @@ interface PlanSummary {
 }
 
 export default defineEventHandler(async (event) => {
-  const { userId } = getUser(event)
+  const appUser = await getOrCreateUser(event)
+  const userId = appUser.userId
+  enforceTierAccess(checkFeatureAccess(appUser.tier, 'aiInstallmentOptimizer'))
   enforceRateLimit(`ai:installments-optimize:${userId}`, 10, 10 * 60 * 1000)
   const body = await readBody(event)
   const result = bodySchema.safeParse(body)

@@ -13,6 +13,28 @@ const shouldShowFab = computed(() => {
 function openDrawer() {
   isDrawerOpen.value = true
 }
+
+function handleKeydown(event: KeyboardEvent) {
+  const target = event.target as HTMLElement
+  const tag = target.tagName.toLowerCase()
+  if (tag === 'input' || tag === 'textarea' || tag === 'select' || target.isContentEditable) return
+  if (event.ctrlKey || event.metaKey || event.altKey) return
+
+  if (event.key === 'a' || event.key === 'A') {
+    if (shouldShowFab.value && !isDrawerOpen.value) {
+      event.preventDefault()
+      openDrawer()
+    }
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <template>

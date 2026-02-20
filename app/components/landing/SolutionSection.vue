@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import { Upload, LineChart, Sparkles, Wand2 } from 'lucide-vue-next'
+import { Upload, LayoutDashboard, Sparkles, Wand2 } from 'lucide-vue-next'
 
 const steps = [
   {
     number: '01',
     icon: Upload,
     title: 'Me conta tudo',
-    description: 'Manda seu CSV do Nubank, Inter ou qualquer banco. Eu organizo tudo em segundos, sem você mexer em nada.',
+    description: 'Importa seu CSV ou adiciona na mão. Eu organizo gastos, cartões, parcelas e assinaturas em segundos.',
     color: 'primary'
   },
   {
     number: '02',
-    icon: LineChart,
-    title: 'Eu te mostro o futuro',
-    description: 'Vou te mostrar suas faturas dos próximos 12 meses. Sem surpresa, sem aquele susto no fim do mês.',
+    icon: LayoutDashboard,
+    title: 'Eu organizo tudo pra você',
+    description: 'Orçamento por categoria, metas de economia, projeção de faturas, fluxo de caixa. Tudo num lugar só.',
     color: 'secondary'
   },
   {
     number: '03',
     icon: Sparkles,
     title: 'E te digo o que fazer',
-    description: 'Te dou dicas personalizadas: quando gastar, quando segurar, e como liberar limite mais rápido.',
+    description: 'Minha IA analisa seus padrões, simula decisões e te dá dicas sob medida. Você decide, eu calculo.',
     color: 'ai-accent'
   }
 ]
@@ -28,17 +28,17 @@ const steps = [
 const colorMap: Record<string, { bg: string; text: string; border: string }> = {
   primary: {
     bg: 'bg-primary/35',
-    text: 'text-secondary',
+    text: 'text-secondary-accent',
     border: 'border-primary/60'
   },
   secondary: {
     bg: 'bg-secondary/10',
-    text: 'text-secondary',
+    text: 'text-secondary-accent',
     border: 'border-secondary/30'
   },
   'ai-accent': {
     bg: 'bg-secondary/10',
-    text: 'text-secondary',
+    text: 'text-secondary-accent',
     border: 'border-secondary/30'
   }
 }
@@ -107,7 +107,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
                     >
                       {{ step.number }}
                     </span>
-                    <h3 class="text-2xl font-bold group-hover:text-secondary transition-colors">
+                    <h3 class="text-2xl font-bold group-hover:text-secondary-accent transition-colors">
                       {{ step.title }}
                     </h3>
                   </div>

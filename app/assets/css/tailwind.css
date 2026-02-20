@@ -63,6 +63,10 @@
     --accent-cool: 168 46% 42%;
     --accent-cool-foreground: 0 0% 100%;
 
+    /* Readable accent tokens (text on light backgrounds) */
+    --primary-accent: 168 48% 40%;
+    --secondary-accent: 252 48% 54%;
+
     /* Status Colors */
     --success: 160 84% 39%;
     --success-foreground: 0 0% 98%;
@@ -131,6 +135,10 @@
     --accent-warm-foreground: 0 0% 100%;
     --accent-cool: 168 56% 60%;
     --accent-cool-foreground: 0 0% 100%;
+
+    /* Readable accent tokens (text on dark backgrounds) */
+    --primary-accent: 168 56% 60%;
+    --secondary-accent: 252 58% 68%;
 
     /* Status Colors - Dark Mode */
     --success: 160 72% 45%;

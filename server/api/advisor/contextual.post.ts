@@ -4,9 +4,10 @@ import { gateway } from '../../utils/ai'
 import { gatherAdvisorContext } from '../../utils/advisor-context'
 import { parseJsonWithSchema } from '../../utils/ai-guard'
 import { enforceRateLimit } from '../../utils/ai-rate-limit'
+import type { AdvisorResponse } from '#shared/types/api-responses'
 
 const requestSchema = z.object({
-  triggerType: z.enum(['morning_check', 'post_transaction', 'pre_fechamento']),
+  triggerType: z.enum(['morning_check', 'post_transaction', 'pre_fechamento', 'budget_review']),
   cardId: z.string().optional(),
   transactionData: z.object({
     amount: z.number(),
@@ -14,17 +15,6 @@ const requestSchema = z.object({
     categoryName: z.string()
   }).optional()
 })
-
-interface AdvisorResponse {
-  message: string
-  tone: 'curious' | 'warning' | 'congratulatory' | 'neutral'
-  action?: {
-    type: 'suggestion' | 'alert'
-    text: string
-  }
-  should_display: boolean
-  priority: 'low' | 'medium' | 'high'
-}
 
 const advisorResponseSchema = z.object({
   message: z.string(),
@@ -38,7 +28,9 @@ const advisorResponseSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const { userId } = getUser(event)
+  const appUser = await getOrCreateUser(event)
+  const userId = appUser.userId
+  enforceTierAccess(await checkAndIncrementUsage(appUser.dbUserId, appUser.tier, 'ai_insights'))
   enforceRateLimit(`ai:advisor:${userId}`, 30, 60 * 60 * 1000)
   const body = await readBody(event)
   const { triggerType, cardId, transactionData } = requestSchema.parse(body)
@@ -189,6 +181,52 @@ Sempre inclua o valor diário seguro na mensagem.`
       break
     }
 
+    case 'budget_review':
+    {
+      systemPrompt = baseSystem
+      const bm = context.budgetMetrics
+
+      if (!bm || (bm.totalMonthlyIncome === 0 && bm.overBudgetCategories.length === 0)) {
+        return {
+          message: 'Configure suas receitas e metas de categoria para receber recomendações personalizadas.',
+          tone: 'neutral',
+          should_display: true,
+          priority: 'low'
+        } as AdvisorResponse
+      }
+
+      const overBudgetText = bm.overBudgetCategories.length > 0
+        ? bm.overBudgetCategories.map(c => `${c.name}: ${c.overagePercent}% acima`).join(', ')
+        : 'Nenhuma categoria acima do limite'
+
+      prompt = `Analise o orçamento mensal do usuário e sugira ajustes realistas nas metas de categoria.
+Baseie-se nos padrões de gasto reais, não em valores arbitrários.
+Explique o raciocínio por trás de cada sugestão.
+
+ORÇAMENTO MENSAL:
+- Receita total: R$ ${bm.totalMonthlyIncome.toFixed(2)}
+- Taxa de poupança: ${bm.savingsRate}%
+- Utilização geral: ${bm.budgetUtilizationOverall}%
+
+CATEGORIAS ACIMA DO LIMITE:
+${overBudgetText}
+
+GASTOS RECENTES (últimos 7 dias):
+- Total: R$ ${context.recentTransactions.last7Days.total.toFixed(2)}
+- Por categoria: ${Object.entries(context.recentTransactions.last7Days.byCategory)
+  .map(([cat, val]) => `${cat}: R$ ${val.toFixed(2)}`)
+  .join(', ') || 'Nenhum gasto'}
+
+SAÚDE FINANCEIRA: ${context.healthScore}/100
+
+Dê 1-2 sugestões concretas de ajuste com valores específicos.
+Se a taxa de poupança for baixa, sugira estratégias de alocação (reserva de emergência, quitação de dívidas).
+Se tudo estiver bem, parabenize e sugira metas de economia.
+
+IMPORTANTE: Esta é uma análise gerada por inteligência artificial.`
+      break
+    }
+
     default:
       return {
         message: '',
@@ -215,18 +253,30 @@ Sempre inclua o valor diário seguro na mensagem.`
       }
     })
 
-    const response: AdvisorResponse = parseJsonWithSchema(text, advisorResponseSchema)
+    const parsed = parseJsonWithSchema(text, advisorResponseSchema)
+    const response = { ...parsed, action: parsed.action ?? undefined } satisfies AdvisorResponse
 
     // Validate response structure
     return {
       message: response.message || '',
       tone: response.tone || 'neutral',
-      action: response.action || undefined,
+      action: response.action ?? undefined,
       should_display: response.should_display ?? true,
       priority: response.priority || 'low'
     }
   } catch (error) {
     console.error('Contextual Advisor Error:', error)
+
+    // Budget review gets a helpful fallback instead of empty response
+    if (triggerType === 'budget_review') {
+      return {
+        message: 'Tente manter gastos abaixo de 80% do limite por categoria. Revise suas metas mensalmente para ajustes realistas.',
+        tone: 'neutral',
+        action: { type: 'suggestion', text: 'Revise suas categorias com maior gasto' },
+        should_display: true,
+        priority: 'low'
+      } as AdvisorResponse
+    }
 
     // Silent fail - advisor is non-critical
     return {

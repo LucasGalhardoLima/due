@@ -13,7 +13,10 @@ export default defineEventHandler(async (event) => {
     },
     include: {
       card: true,
-      category: true
+      category: true,
+      tags: {
+        include: { tag: true }
+      }
     }
   })
 

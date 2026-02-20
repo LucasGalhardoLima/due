@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { TrendingUp, Calendar, AlertTriangle, Frown } from 'lucide-vue-next'
+import { CircleDollarSign, Repeat, Telescope, Frown } from 'lucide-vue-next'
 
 const painPoints = [
   {
-    icon: TrendingUp,
-    title: 'Parcelas esquecidas',
-    description: 'Aquela compra de 10x que você nem lembra mais, mas ainda está pagando toda santa fatura.',
+    icon: CircleDollarSign,
+    title: 'Dinheiro que some',
+    description: 'Você ganha, mas não sabe pra onde vai. Fim do mês chega e a conta não fecha.',
     color: 'warning'
   },
   {
-    icon: Calendar,
-    title: 'Faturas surpresa',
-    description: '"Nossa, de onde veio isso tudo?" — você, todo mês, quando abre a fatura.',
+    icon: Repeat,
+    title: 'Parcelas e assinaturas infinitas',
+    description: 'Comprou de 12x e esqueceu. Assinou e não cancelou. A fatura só sobe.',
     color: 'info'
   },
   {
-    icon: AlertTriangle,
-    title: 'Limite no vermelho',
-    description: 'Quer comprar algo mas já sabe que vai apertar. E aí, vale a pena ou não?',
+    icon: Telescope,
+    title: 'Zero visão do futuro',
+    description: 'Quer comprar algo, mas não sabe se vai caber. Planeja uma viagem, mas não faz ideia se vai dar.',
     color: 'danger'
   }
 ]
@@ -57,11 +57,11 @@ const colorClasses: Record<string, { bg: string; icon: string; border: string }>
         
         <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
           Deixa eu adivinhar...<br class="hidden sm:block" >
-          <span class="text-warning">você tá perdido, né?</span>
+          <span class="text-warning">tá difícil, né?</span>
         </h2>
         <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Calma, eu entendo. Eu já vi de tudo: parcelas infinitas, faturas que só crescem, 
-          aquela sensação de que o dinheiro some sem explicação. Eu tô aqui pra mudar isso.
+          Calma, eu entendo. Orçamento que nunca fecha, parcelas que não acabam, metas que
+          parecem impossíveis. A vida financeira é caótica, mas não precisa ser. Eu tô aqui pra mudar isso.
         </p>
       </div>
 

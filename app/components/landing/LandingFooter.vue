@@ -6,8 +6,9 @@ const currentYear = new Date().getFullYear()
 const links = {
   product: [
     { name: 'Como funciona', href: '#how-it-works' },
-    { name: 'Features', href: '#features' },
-    { name: 'Segurança', href: '#security' }
+    { name: 'Recursos', href: '#features' },
+    { name: 'Segurança', href: '#security' },
+    { name: 'Preços', href: '#precos' }
   ],
   company: [
     { name: 'Sobre o Du', href: '/about' },
@@ -41,8 +42,8 @@ const social = [
             Du
           </NuxtLink>
           <p class="text-muted-foreground text-sm max-w-xs leading-relaxed mb-6">
-            Oi! Eu sou o Du, seu assistente financeiro pessoal. Tô aqui pra te ajudar a entender 
-            suas parcelas, projetar seu futuro e conquistar sua liberdade financeira. 💚
+            Oi! Eu sou o Du, seu assistente financeiro pessoal. Tô aqui pra te ajudar a organizar
+            seus gastos, controlar parcelas, planejar metas e conquistar sua liberdade financeira. 💚
           </p>
           <!-- Social links -->
           <div class="flex items-center gap-3">
@@ -52,7 +53,7 @@ const social = [
               :href="item.href"
               target="_blank"
               rel="noopener noreferrer"
-              class="w-10 h-10 rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-secondary hover:bg-secondary/10 transition-all duration-200"
+              class="w-10 h-10 rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-secondary-accent hover:bg-secondary/10 transition-all duration-200"
               :aria-label="item.name"
             >
               <component :is="item.icon" class="w-5 h-5" />

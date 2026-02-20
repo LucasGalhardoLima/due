@@ -74,8 +74,8 @@ export const FinanceUtils = {
     const plans: InstallmentPlan[] = []
 
     for (let i = 0; i < installmentsCount; i++) {
-        // First installment gets the remainder pennies? Or last? Usually first is safer.
-        const thisAmountCents = i === 0 ? installmentCents + remainderCents : installmentCents
+        // Last installment absorbs remainder pennies so the total is exact
+        const thisAmountCents = i === installmentsCount - 1 ? installmentCents + remainderCents : installmentCents
         
         const dueDate = addMonths(firstDueDate, i)
         

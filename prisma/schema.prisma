@@ -27,11 +27,18 @@ model CreditCard {
 }
 
 model Category {
-  id           String        @id @default(uuid())
-  name         String        // Ex: Alimentação, Tech, Assinaturas
-  color        String?       // Hex color para visualização
-  userId       String        @default("migration_temp") // Multi-tenancy
+  id           String          @id @default(uuid())
+  name         String          // Ex: Alimentação, Tech, Assinaturas
+  color        String?         // Hex color para visualização
+  emoji        String?         // Emoji icon for visual identification
+  parentId     String?         // Self-reference for category grouping
+  parent       Category?       @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children     Category[]      @relation("CategoryHierarchy")
+  userId       String          @default("migration_temp") // Multi-tenancy
   transactions Transaction[]
+  budget       CategoryBudget?
+
+  @@index([parentId])
 }
 
 model Transaction {
@@ -58,7 +65,12 @@ model Transaction {
   createdAt         DateTime  @default(now())
   // Aqui está o segredo para performance e análise rápida
   // Ao invés de calcular na leitura, criamos os registros das parcelas
-  installments  Installment[] 
+  installments  Installment[]
+  tags          TransactionTag[]
+
+  @@index([cardId])
+  @@index([categoryId])
+  @@index([userId, purchaseDate])
 }
 
 model Installment {
@@ -71,6 +83,111 @@ model Installment {
   transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
 
   @@index([dueDate]) // Índice para buscar rápido "fatura de agosto"
+  @@index([transactionId])
+}
+
+model Income {
+  id          String   @id @default(uuid())
+  description String   // Ex: "Salario", "Freelance", "Bonus"
+  amount      Decimal  @db.Decimal(14, 2)
+  isRecurring Boolean  @default(true)
+  month       Int      // 1-12
+  year        Int      // 2026, etc.
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, month, year])
+}
+
+model CategoryBudget {
+  id              String   @id @default(uuid())
+  amount          Decimal  @db.Decimal(14, 2)
+  rolloverEnabled Boolean  @default(false)
+  categoryId      String   @unique
+  category        Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  userId          String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model CategorizationRule {
+  id         String   @id @default(uuid())
+  pattern    String   // Text pattern to match against transaction descriptions
+  isRegex    Boolean  @default(false)
+  categoryId String
+  userId     String
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Tag {
+  id     String @id @default(uuid())
+  name   String
+  color  String?
+  emoji  String?
+  userId String
+
+  transactions TransactionTag[]
+
+  @@unique([name, userId])
+  @@index([userId])
+}
+
+model TransactionTag {
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  tagId         String
+  tag           Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([transactionId, tagId])
+}
+
+model SavingsGoal {
+  id            String   @id @default(uuid())
+  name          String
+  targetAmount  Decimal  @db.Decimal(14, 2)
+  currentAmount Decimal  @db.Decimal(14, 2) @default(0)
+  deadline      DateTime?
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model User {
+  id                     String         @id @default(uuid())
+  clerkId                String         @unique
+  tier                   String         @default("free") // "free" | "plus" | "pro"
+  stripeCustomerId       String?        @unique
+  stripeSubscriptionId   String?
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  usageCounters          UsageCounter[]
+
+  @@index([clerkId])
+}
+
+model UsageCounter {
+  id        String @id @default(uuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feature   String // "ai_insights" | "csv_imports" | "simulations" | "audits"
+  count     Int    @default(0)
+  periodKey String // "2026-02" (YYYY-MM)
+
+  @@unique([userId, feature, periodKey])
+  @@index([userId, periodKey])
+}
+
+// Stripe webhook idempotency — prevents duplicate processing on retries
+model ProcessedStripeEvent {
+  id          String   @id // Stripe event ID (evt_xxx)
+  processedAt DateTime @default(now())
 }
 
 // Invoice model for caching/tracking invoice status

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Moon, Sun, X } from 'lucide-vue-next'
+import { Moon, Sun } from 'lucide-vue-next'
 import HeroSection from '@/components/landing/HeroSection.vue'
 import ProblemSection from '@/components/landing/ProblemSection.vue'
 import SolutionSection from '@/components/landing/SolutionSection.vue'
 import FeaturesGrid from '@/components/landing/FeaturesGrid.vue'
+import PricingSection from '@/components/landing/PricingSection.vue'
 import SocialProof from '@/components/landing/SocialProof.vue'
 import CTASection from '@/components/landing/CTASection.vue'
 import LandingFooter from '@/components/landing/LandingFooter.vue'
@@ -13,6 +14,13 @@ const colorMode = useColorMode()
 const router = useRouter()
 
 const authMode = ref<'none' | 'sign-in' | 'sign-up'>('none')
+const authOpen = computed({
+  get: () => authMode.value !== 'none',
+  set: (val) => { if (!val) authMode.value = 'none' },
+})
+const authIntent = computed(() =>
+  authMode.value === 'sign-up' ? 'sign-up' : 'sign-in',
+)
 
 function openSignIn() {
   authMode.value = 'sign-in'
@@ -20,10 +28,6 @@ function openSignIn() {
 
 function openSignUp() {
   authMode.value = 'sign-up'
-}
-
-function closeAuth() {
-  authMode.value = 'none'
 }
 
 function toggleTheme() {
@@ -66,7 +70,7 @@ definePageMeta({
 
           <div class="hidden sm:flex items-center gap-4">
             <button
-              class="text-sm font-semibold hover:text-primary transition-colors"
+              class="text-sm font-semibold hover:text-primary-accent transition-colors"
               @click="openSignIn"
             >
               Entrar
@@ -81,7 +85,7 @@ definePageMeta({
 
           <!-- Mobile: Just Sign In -->
           <button
-            class="sm:hidden text-sm font-semibold hover:text-primary transition-colors"
+            class="sm:hidden text-sm font-semibold hover:text-primary-accent transition-colors"
             @click="openSignIn"
           >
             Entrar
@@ -96,7 +100,7 @@ definePageMeta({
       <template v-if="userId">
         <div class="min-h-[80vh] flex items-center justify-center">
           <div class="text-center space-y-4">
-            <p class="text-muted-foreground">Voce ja esta logado.</p>
+            <p class="text-muted-foreground">Você já está logado.</p>
             <NuxtLink to="/dashboard" class="inline-flex items-center justify-center h-12 px-8 rounded-2xl bg-secondary text-secondary-foreground font-bold shadow-elevation-2">
               Ir para o Dashboard
             </NuxtLink>
@@ -109,6 +113,7 @@ definePageMeta({
         <ProblemSection />
         <SolutionSection />
         <FeaturesGrid />
+        <PricingSection @start="openSignUp" />
         <SocialProof />
         <CTASection @start="openSignUp" />
       </template>
@@ -117,62 +122,7 @@ definePageMeta({
     <LandingFooter />
 
     <!-- Auth Modal -->
-    <Transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div v-if="authMode !== 'none'" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <!-- Overlay -->
-        <div
-          class="absolute inset-0 bg-background/80 backdrop-blur-sm"
-          @click="closeAuth"
-        />
-
-        <!-- Modal -->
-        <div class="relative w-full max-w-md bg-card border border-border/70 rounded-[2rem] shadow-elevation-5 overflow-hidden animate-in zoom-in-95 duration-200">
-          <button
-            class="absolute top-4 right-4 p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground z-10"
-            aria-label="Fechar"
-            @click="closeAuth"
-          >
-            <X class="w-5 h-5" />
-          </button>
-
-          <div class="flex items-center justify-center p-8 pt-14">
-            <SignIn
-              v-if="authMode === 'sign-in'"
-              after-sign-in-url="/dashboard"
-              sign-up-url="#"
-              @click.capture="(e: MouseEvent) => {
-                const target = e.target as HTMLElement
-                if (target.innerText?.includes('Sign up')) {
-                  e.stopPropagation()
-                  e.preventDefault()
-                  openSignUp()
-                }
-              }"
-            />
-            <SignUp
-              v-if="authMode === 'sign-up'"
-              after-sign-up-url="/dashboard"
-              sign-in-url="#"
-              @click.capture="(e: MouseEvent) => {
-                const target = e.target as HTMLElement
-                if (target.innerText?.includes('Sign in')) {
-                  e.stopPropagation()
-                  e.preventDefault()
-                  openSignIn()
-                }
-              }"
-            />
-          </div>
-        </div>
-      </div>
-    </Transition>
+    <AuthModal v-model:open="authOpen" :intent="authIntent" />
   </div>
 </template>
 

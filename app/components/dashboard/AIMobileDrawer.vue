@@ -36,10 +36,10 @@ const isOpen = computed({
       <div class="mx-auto w-full max-w-md flex flex-col h-full">
         <DrawerHeader class="text-left relative pb-0">
           <div class="flex items-center gap-2 mb-2">
-            <div class="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary shadow-glass">
+            <div class="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary-accent shadow-glass">
               <Sparkles class="w-4 h-4" />
             </div>
-            <DrawerTitle class="text-h3">AI Assistant</DrawerTitle>
+            <DrawerTitle class="text-h3">Assistente IA</DrawerTitle>
             <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black tracking-wider bg-primary text-primary-foreground">
               BETA
             </span>

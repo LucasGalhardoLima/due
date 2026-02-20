@@ -19,7 +19,7 @@ const recommendationColor = computed(() => {
   if (!result.value) return ''
   switch (result.value.recommendation.type) {
     case 'antecipate': return 'text-ai-accent bg-ai-accent/10 border-ai-accent/20'
-    case 'pay_full': return 'text-secondary bg-secondary/10 border-secondary/20'
+    case 'pay_full': return 'text-secondary-accent bg-secondary/10 border-secondary/20'
     default: return 'text-ai-accent bg-ai-accent/10 border-ai-accent/20'
   }
 })
@@ -99,7 +99,7 @@ const recommendationColor = computed(() => {
              <span class="font-medium text-sm group-hover:text-ai-accent transition-colors">{{ item.description }}</span>
              <span 
                class="text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase"
-               :class="item.priority === 'high' ? 'bg-secondary/12 text-secondary' : 'bg-muted text-muted-foreground'"
+               :class="item.priority === 'high' ? 'bg-secondary/12 text-secondary-accent' : 'bg-muted text-muted-foreground'"
              >
                {{ item.priority === 'high' ? 'Alta' : item.priority === 'medium' ? 'Média' : 'Baixa' }}
              </span>

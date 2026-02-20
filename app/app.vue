@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Toaster from '@/components/ui/Toaster.vue'
+import UpgradeModal from '@/components/tier/UpgradeModal.vue'
 // @ts-expect-error Nuxt injects analytics types at build time.
 import { Analytics } from '@vercel/analytics/nuxt'
 </script>
@@ -11,6 +12,7 @@ import { Analytics } from '@vercel/analytics/nuxt'
       <NuxtPage />
     </NuxtLayout>
     <Toaster />
+    <UpgradeModal />
     <Analytics />
   </div>
 </template>

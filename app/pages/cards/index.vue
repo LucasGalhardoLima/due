@@ -92,12 +92,12 @@ async function handleDelete() {
       <div class="rounded-[2rem] border border-border/70 bg-card text-card-foreground shadow-elevation-2 overflow-hidden transition-all duration-300 hover:shadow-elevation-3 hover:border-primary/25">
         <div class="bg-secondary/5 px-6 py-4 border-b border-border/60 flex items-center gap-2 transition-colors duration-200">
           <Plus class="w-4 h-4 text-primary" />
-          <h3 class="text-micro text-muted-foreground">Adicionar Novo Cartao</h3>
+          <h3 class="text-micro text-muted-foreground">Adicionar Novo Cartão</h3>
         </div>
         <div class="p-8">
           <form class="grid gap-6 md:grid-cols-6 items-end" @submit.prevent="onSubmit">
             <div class="col-span-2 space-y-2">
-              <label class="text-micro text-muted-foreground ml-1" for="name">Nome do Cartao</label>
+              <label class="text-micro text-muted-foreground ml-1" for="name">Nome do Cartão</label>
               <input
                 id="name"
                 v-model="form.name"
@@ -204,8 +204,8 @@ async function handleDelete() {
               <h3 class="text-micro text-muted-foreground">
                 {{ card.name }}
               </h3>
-              <span v-if="card.isDefault" class="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-micro text-primary border border-primary/20">
-                Padrao
+              <span v-if="card.isDefault" class="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-micro text-primary-accent border border-primary/20">
+                Padrão
               </span>
             </div>
             <button class="inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive/10 text-muted-foreground hover:text-destructive h-9 w-9 opacity-0 group-hover:opacity-100 hover:scale-105 active:scale-[0.97]" aria-label="Remover cartão" @click.stop="confirmDelete(card.id)">
