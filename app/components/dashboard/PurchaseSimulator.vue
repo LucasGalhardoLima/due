@@ -16,9 +16,6 @@ defineProps<{
       class="relative overflow-hidden group transition-all duration-500 border-ai-accent/30 bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.16),hsl(var(--muted)/0.08))] dark:bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.26),hsl(var(--muted)/0.20))] cursor-pointer hover:border-ai-accent/45 active:scale-[0.98]"
       @click="navigateTo('/parcelamentos')"
     >
-      <div class="absolute -right-20 -top-20 w-64 h-64 bg-ai-accent/10 rounded-full blur-[80px] pointer-events-none group-hover:scale-110 transition-transform duration-1000" />
-      <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-muted/10 rounded-full blur-[60px] pointer-events-none group-hover:scale-110 transition-transform duration-1000" />
-
       <!-- Content -->
       <div class="p-5 md:p-6 relative z-10 flex flex-col gap-4 text-left">
           <div class="space-y-3">

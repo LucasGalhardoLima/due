@@ -118,7 +118,7 @@ const verdictBg = computed(() => {
         class="p-4 rounded-xl border flex flex-col gap-3 text-center transition-all duration-200 hover:shadow-elevation-1"
         :class="verdictBg"
       >
-        <div class="mx-auto p-2 bg-background/50 rounded-full w-fit backdrop-blur-sm shadow-sm" :class="verdictColor">
+        <div class="mx-auto p-2 bg-muted rounded-full w-fit shadow-sm" :class="verdictColor">
           <CheckCircle2 v-if="result.evaluation.viable" class="w-6 h-6" />
           <XCircle v-else class="w-6 h-6" />
         </div>

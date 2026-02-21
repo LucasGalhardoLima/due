@@ -48,7 +48,7 @@ definePageMeta({
 <template>
   <div class="min-h-screen bg-background text-foreground font-sans antialiased">
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border/70 bg-card/90 backdrop-blur-md">
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border/70 bg-card">
       <div class="container mx-auto px-6 h-16 flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" class="font-black text-xl flex items-center gap-2 tracking-tight">

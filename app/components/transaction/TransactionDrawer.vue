@@ -634,7 +634,7 @@ async function handleDelete() {
                   {{ tag.name }}
                 </button>
               </div>
-              <p v-else class="text-xs text-muted-foreground">Nenhuma tag criada ainda.</p>
+              <p v-else class="text-xs text-muted-foreground">Sem tags ainda.</p>
 
               <!-- Create New Tag -->
               <div class="flex items-center gap-2 pt-1">

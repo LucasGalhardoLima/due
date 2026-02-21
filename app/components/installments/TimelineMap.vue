@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { AlertTriangle, CalendarRange } from 'lucide-vue-next'
+import EmptyState from '@/components/ui/EmptyState.vue'
 import MonthBar from './MonthBar.vue'
 
 const { timeline, simulationState, timelineStatus } = useInstallments()
@@ -76,8 +77,12 @@ const hasDanger = computed(() => {
     </div>
 
     <!-- Empty State -->
-    <div v-else class="text-center py-10 text-muted-foreground">
-      Nenhum dado encontrado.
+    <div v-else>
+      <EmptyState
+        :icon="CalendarRange"
+        title="Sem parcelamentos no radar"
+        description="Quando você registrar compras parceladas, a linha do tempo aparece aqui."
+      />
     </div>
   </div>
 </template>

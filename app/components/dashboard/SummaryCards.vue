@@ -27,40 +27,40 @@ const colorState = computed(() => {
   return 'safe'
 })
 
-// Gradient classes for each state (Light and Dark friendly) - solid backgrounds
+// Background classes for each state
 const invoiceGradient = computed(() => {
   switch (colorState.value) {
     case 'danger':
-      return 'bg-danger-muted border-danger/20'
+      return 'bg-danger/[0.12] dark:bg-danger/[0.08] border-danger/20'
     case 'warning':
-      return 'bg-warning-muted border-warning/20'
+      return 'bg-warning/[0.12] dark:bg-warning/[0.08] border-warning/20'
     default:
-      return 'bg-[linear-gradient(145deg,hsl(var(--primary)/0.65),hsl(var(--brand-accent)/0.24))] dark:bg-[linear-gradient(145deg,hsl(var(--primary)/0.42),hsl(var(--brand-accent)/0.34))] border-primary/45'
+      return 'bg-card border-border shadow-sm'
   }
 })
 
 const limitGradient = computed(() => {
   switch (colorState.value) {
     case 'danger':
-      return 'bg-danger-muted border-danger/20'
+      return 'bg-danger/[0.12] dark:bg-danger/[0.08] border-danger/20'
     case 'warning':
-      return 'bg-warning-muted border-warning/20'
+      return 'bg-warning/[0.12] dark:bg-warning/[0.08] border-warning/20'
     default:
-      return 'bg-card border-border'
+      return 'bg-card border-border shadow-sm'
   }
 })
 
 const dueGradient = computed(() => {
   if (props.status === 'PAID') {
-    return 'bg-success-muted border-success/20'
+    return 'bg-success/[0.12] dark:bg-success/[0.08] border-success/20'
   }
   switch (dueColorState.value) {
     case 'danger':
-      return 'bg-danger-muted border-danger/20'
+      return 'bg-danger/[0.12] dark:bg-danger/[0.08] border-danger/20'
     case 'warning':
-      return 'bg-warning-muted border-warning/20'
+      return 'bg-warning/[0.12] dark:bg-warning/[0.08] border-warning/20'
     default:
-      return 'bg-[linear-gradient(145deg,hsl(var(--card)),hsl(var(--brand-accent)/0.12))] dark:bg-[linear-gradient(145deg,hsl(var(--card)),hsl(var(--brand-accent)/0.16))] border-border'
+      return 'bg-card border-border shadow-sm'
   }
 })
 
@@ -99,14 +99,12 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
     <!-- Card 1: Invoice Total -->
     <div
-      class="relative overflow-hidden rounded-3xl p-6 border shadow-elevation-2 transition-all hover:scale-[1.01] group min-h-[176px]"
+      class="relative overflow-hidden rounded-3xl p-6 border transition-all hover:scale-[1.01] group min-h-[176px]"
       :class="[invoiceGradient, { 'motion-safe:animate-pulse ring-1 ring-danger/50': shouldPulse && colorState === 'danger' }]"
     >
-      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-background/50 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
-
-      <div class="relative z-10 space-y-4">
+      <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <div class="p-2 rounded-2xl bg-card/80 border border-border/65 shadow-elevation-1">
+          <div class="p-2 rounded-2xl bg-muted">
             <CreditCard class="w-5 h-5 text-primary-foreground dark:text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
           </div>
           <div v-if="colorState === 'danger'" class="px-2 py-0.5 bg-danger/10 border border-danger/20 rounded-full text-micro text-danger">
@@ -125,14 +123,12 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 
     <!-- Card 2: Limit Usage -->
     <div
-      class="relative overflow-hidden rounded-3xl p-6 border shadow-elevation-2 transition-all hover:scale-[1.01] group min-h-[176px]"
+      class="relative overflow-hidden rounded-3xl p-6 border transition-all hover:scale-[1.01] group min-h-[176px]"
       :class="limitGradient"
     >
-      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-background/50 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
-
-      <div class="relative z-10 space-y-4">
+      <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <div class="p-2 rounded-2xl bg-primary/25 dark:bg-primary/20 border border-primary/35 shadow-elevation-1">
+          <div class="p-2 rounded-2xl bg-muted">
             <TrendingUp class="w-5 h-5 text-primary-foreground dark:text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
           </div>
         </div>
@@ -145,7 +141,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 
           <!-- Progress bar -->
           <div class="mt-3">
-             <div class="h-1.5 w-full bg-background/70 rounded-full overflow-hidden border border-border/60">
+             <div class="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                 <div
                   class="h-full bg-primary dark:bg-primary rounded-full transition-all duration-1000 shadow-sm"
                   :style="{ width: `${Math.min(usagePercentage, 100)}%` }"
@@ -158,12 +154,10 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 
     <!-- Card 3: Days to Due -->
     <div
-      class="relative overflow-hidden rounded-3xl p-6 border shadow-elevation-2 transition-all hover:scale-[1.01] group min-h-[176px]"
+      class="relative overflow-hidden rounded-3xl p-6 border transition-all hover:scale-[1.01] group min-h-[176px]"
       :class="[dueGradient, { 'motion-safe:animate-pulse ring-1 ring-danger/50': shouldPulse && dueColorState === 'danger' }]"
     >
-      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-background/50 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
-
-      <div class="relative z-10 space-y-4">
+      <div class="space-y-4">
         <div class="flex items-center justify-between">
           <div class="p-2 rounded-2xl bg-primary/20 border border-primary/35 shadow-elevation-1">
             <Calendar class="w-5 h-5" :class="[status === 'PAID' ? 'text-success' : 'text-primary-foreground dark:text-primary', { 'text-danger': dueColorState === 'danger', 'text-warning': dueColorState === 'warning' }]" />
@@ -196,13 +190,11 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
 
     <!-- Card 4: Top Category -->
     <div
-      class="relative overflow-hidden rounded-3xl p-6 border border-primary/35 shadow-elevation-2 transition-all hover:scale-[1.01] group bg-[linear-gradient(150deg,hsl(var(--primary)/0.46),hsl(var(--secondary)/0.08))] dark:bg-[linear-gradient(150deg,hsl(var(--primary)/0.24),hsl(var(--secondary)/0.22))] min-h-[176px]"
+      class="relative overflow-hidden rounded-3xl p-6 border border-border bg-card shadow-sm transition-all hover:scale-[1.01] group min-h-[176px]"
     >
-      <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-background/50 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
-
-      <div class="relative z-10 space-y-4">
+      <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <div class="p-2 rounded-2xl bg-card/75 border border-primary/35 shadow-elevation-1">
+          <div class="p-2 rounded-2xl bg-muted">
             <component :is="categoryIcon" class="w-5 h-5 text-primary-foreground dark:text-primary" />
           </div>
         </div>

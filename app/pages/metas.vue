@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Target, Plus, Minus, Trash2, Pencil, X, Check } from 'lucide-vue-next'
+import EmptyState from '@/components/ui/EmptyState.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -249,21 +250,14 @@ function formatDeadline(deadline: string | null) {
     </div>
 
     <!-- Empty State -->
-    <Card
-      v-else-if="goals && goals.length === 0"
-      class="p-8 text-center space-y-4"
-    >
-      <Target class="w-12 h-12 mx-auto text-muted-foreground/40" />
-      <div>
-        <h2 class="text-lg font-semibold">Nenhuma meta cadastrada</h2>
-        <p class="text-sm text-muted-foreground mt-1">
-          Crie sua primeira meta de economia para começar a acompanhar seu progresso.
-        </p>
-      </div>
-      <Button @click="showAddForm = true">
-        <Plus class="w-4 h-4 mr-1.5" />
-        Criar primeira meta
-      </Button>
+    <Card v-else-if="goals && goals.length === 0" class="overflow-hidden">
+      <EmptyState
+        :icon="Target"
+        title="Sem metas ainda? Bora criar uma!"
+        description="Defina um objetivo financeiro e acompanhe o progresso com depósitos."
+        action-label="Criar primeira meta"
+        @action="showAddForm = true"
+      />
     </Card>
 
     <!-- Goals List -->

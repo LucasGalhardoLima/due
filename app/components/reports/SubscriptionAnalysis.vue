@@ -59,8 +59,9 @@ const formatCurrency = (val: number) => {
                 </div>
                 {{ win }}
              </li>
-             <li v-if="analysis.quick_wins.length === 0" class="text-muted-foreground text-small">
-               Nenhuma oportunidade óbvia encontrada. Parabéns!
+             <li v-if="analysis.quick_wins.length === 0" class="flex items-center gap-2 text-small">
+               <div class="w-5 h-5 rounded-lg bg-muted flex items-center justify-center text-[8px] font-black text-muted-foreground shrink-0 select-none">Du</div>
+               <span class="text-muted-foreground">Nada pra cortar! Parabéns!</span>
              </li>
           </ul>
        </div>

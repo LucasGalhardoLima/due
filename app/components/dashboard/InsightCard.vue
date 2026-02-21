@@ -36,7 +36,7 @@ function getRandomTip() {
 </script>
 
 <template>
-  <div v-if="insight?.hasData" class="rounded-2xl border border-info/20 bg-info-muted/50 dark:bg-info-muted/20 backdrop-blur-xl p-6 shadow-glass relative overflow-hidden group hover:border-info/40 transition-colors duration-300">
+  <div v-if="insight?.hasData" class="rounded-2xl border border-info/20 bg-info-muted p-6 shadow-elevation-1 relative overflow-hidden group hover:border-info/40 transition-colors duration-300">
      <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
         <Lightbulb class="h-16 w-16 text-info" />
      </div>

@@ -15,7 +15,7 @@ definePageMeta({
 <template>
   <div class="min-h-screen bg-background text-foreground font-sans antialiased transition-colors duration-300">
     <!-- Simple Header -->
-    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/60 backdrop-blur-xl">
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background">
       <div class="container mx-auto px-8 h-16 flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center gap-2 font-bold text-lg hover:text-primary transition-colors">
           <ChevronLeft class="w-4 h-4" />

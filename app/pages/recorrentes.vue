@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { RotateCw, CheckCircle2, Clock, AlertTriangle, Sparkles } from 'lucide-vue-next'
+import { RotateCw, CheckCircle2, Clock, AlertTriangle, Sparkles, UploadCloud } from 'lucide-vue-next'
+import EmptyState from '@/components/ui/EmptyState.vue'
 import { Card } from '@/components/ui/card'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import ListSkeleton from '@/components/ui/ListSkeleton.vue'
@@ -87,9 +88,14 @@ const formatCurrency = (val: number) =>
           Assinaturas Ativas
         </h3>
 
-        <div v-if="data.subscriptions.length === 0" class="text-center py-8">
-          <RotateCw class="w-10 h-10 mx-auto text-muted-foreground/40 mb-3" />
-          <p class="text-sm text-muted-foreground">Nenhuma assinatura registrada.</p>
+        <div v-if="data.subscriptions.length === 0">
+          <EmptyState
+            :icon="RotateCw"
+            title="Nenhuma assinatura detectada"
+            description="Que bom... ou você ainda não importou? Importe seus dados pra gente detectar."
+            action-label="Importar dados"
+            action-to="/import"
+          />
         </div>
 
         <Card

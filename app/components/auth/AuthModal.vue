@@ -16,7 +16,7 @@ defineProps<{
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md p-8">
-      <DialogTitle class="sr-only">Autenticacao</DialogTitle>
+      <DialogTitle class="sr-only">Autenticação</DialogTitle>
       <DialogDescription class="sr-only">Entre ou crie sua conta</DialogDescription>
       <AuthForm :initial-intent="intent" />
     </DialogContent>

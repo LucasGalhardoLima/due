@@ -8,12 +8,6 @@ const emit = defineEmits<{
 
 <template>
   <section class="py-28 relative overflow-hidden">
-    <!-- Gradient background -->
-    <div class="absolute inset-0 -z-10" aria-hidden="true">
-      <div class="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-radial from-primary/10 to-transparent opacity-50" />
-    </div>
-
     <div class="container mx-auto px-6">
       <div class="max-w-4xl mx-auto text-center">
         <!-- Du Avatar -->
@@ -47,7 +41,7 @@ const emit = defineEmits<{
           </NuxtLink>
           <a
             href="#precos"
-            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-16 px-10 rounded-[2rem] border-2 border-border bg-card/70 backdrop-blur-sm font-semibold hover:bg-card hover:border-primary/40 transition-all duration-300"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-16 px-10 rounded-[2rem] border-2 border-border bg-card font-semibold hover:bg-card hover:border-primary/40 transition-all duration-300"
           >
             Ver planos
           </a>

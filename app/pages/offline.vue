@@ -20,9 +20,9 @@ function retry() {
 
       <!-- Message -->
       <div class="space-y-2">
-        <h1 class="text-2xl font-black tracking-tight">Voce esta offline</h1>
+        <h1 class="text-2xl font-black tracking-tight">Você está offline</h1>
         <p class="text-muted-foreground">
-          Parece que voce perdeu a conexao com a internet. Verifique sua conexao e tente novamente.
+          Parece que você perdeu a conexão com a internet. Verifique sua conexão e tente novamente.
         </p>
       </div>
 

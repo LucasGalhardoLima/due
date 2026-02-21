@@ -20,11 +20,11 @@ const colorState = computed(() => {
 const gradientClass = computed(() => {
   switch (colorState.value) {
     case 'danger':
-      return 'bg-danger-muted border-danger/20'
+      return 'bg-danger/[0.12] dark:bg-danger/[0.08] border-danger/20'
     case 'warning':
-      return 'bg-warning-muted border-warning/20'
+      return 'bg-warning/[0.12] dark:bg-warning/[0.08] border-warning/20'
     default:
-      return 'bg-[linear-gradient(145deg,hsl(var(--primary)/0.65),hsl(var(--brand-accent)/0.24))] dark:bg-[linear-gradient(145deg,hsl(var(--primary)/0.42),hsl(var(--brand-accent)/0.34))] border-primary/45'
+      return 'bg-card border-border shadow-sm'
   }
 })
 
@@ -33,16 +33,13 @@ const trendIcon = computed(() => props.remaining >= 0 ? TrendingUp : TrendingDow
 
 <template>
   <div
-    class="relative overflow-hidden rounded-3xl p-6 border shadow-elevation-2 transition-all hover:scale-[1.005] group"
+    class="relative overflow-hidden rounded-3xl p-6 border transition-all hover:scale-[1.005] group"
     :class="gradientClass"
   >
-    <!-- Decorative blur -->
-    <div class="absolute -right-12 -bottom-12 w-40 h-40 bg-background/40 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
-
-    <div class="relative z-10">
+    <div>
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-2xl bg-card/80 border border-border/65 shadow-elevation-1">
+          <div class="p-2.5 rounded-2xl bg-muted">
             <Wallet class="w-5 h-5 text-primary-foreground dark:text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
           </div>
           <div>

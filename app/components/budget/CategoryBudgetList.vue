@@ -50,11 +50,11 @@ function getStatusBadge(status: string) {
       Categorias
     </h3>
 
-    <Card v-if="!categories || categories.length === 0" class="p-6 text-center">
-      <Target class="w-10 h-10 mx-auto text-muted-foreground/50 mb-3" />
-      <p class="text-sm text-muted-foreground">
-        Nenhum gasto registrado neste mês
-      </p>
+    <Card v-if="!categories || categories.length === 0" class="p-4">
+      <div class="flex items-center gap-2 py-2">
+        <div class="w-6 h-6 rounded-xl bg-muted flex items-center justify-center text-[9px] font-black text-muted-foreground shrink-0 select-none">Du</div>
+        <p class="text-sm text-muted-foreground">Mês zerado! Nenhum gasto registrado.</p>
+      </div>
     </Card>
 
     <Card

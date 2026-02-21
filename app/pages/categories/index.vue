@@ -272,8 +272,9 @@ async function deleteRule(id: string) {
         </div>
         </div>
   
-        <div v-if="!categories?.length" class="p-12 text-center text-body text-muted-foreground">
-            Nenhuma categoria cadastrada.
+        <div v-if="!categories?.length" class="flex items-center gap-2 p-6">
+            <div class="w-6 h-6 rounded-xl bg-muted flex items-center justify-center text-[9px] font-black text-muted-foreground shrink-0 select-none">Du</div>
+            <p class="text-sm text-muted-foreground">Cria suas categorias pra organizar tudo!</p>
         </div>
       </Card>
     </template>
@@ -361,9 +362,10 @@ async function deleteRule(id: string) {
           </button>
         </Card>
       </div>
-      <p v-else class="text-sm text-muted-foreground text-center py-4">
-        Nenhuma regra definida. Regras facilitam a categorização durante a importação de CSV.
-      </p>
+      <div v-else class="flex items-center gap-2 py-4 px-1">
+        <div class="w-6 h-6 rounded-xl bg-muted flex items-center justify-center text-[9px] font-black text-muted-foreground shrink-0 select-none">Du</div>
+        <p class="text-sm text-muted-foreground">Regras ajudam na importação. Quer criar uma? Use o formulário acima.</p>
+      </div>
     </div>
 
     <!-- Confirm Dialog -->

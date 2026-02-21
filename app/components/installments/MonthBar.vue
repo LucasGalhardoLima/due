@@ -131,8 +131,9 @@ const formatCurrency = (value: number) => {
              </div>
            </div>
            
-           <div v-if="data.transactions.length === 0" class="text-xs text-muted-foreground italic">
-             Nenhum parcelamento neste mês.
+           <div v-if="data.transactions.length === 0" class="flex items-center gap-2 py-1">
+             <div class="w-5 h-5 rounded-lg bg-muted flex items-center justify-center text-[8px] font-black text-muted-foreground shrink-0 select-none">Du</div>
+             <span class="text-xs text-muted-foreground">Mês livre de parcelas!</span>
            </div>
          </div>
       </div>

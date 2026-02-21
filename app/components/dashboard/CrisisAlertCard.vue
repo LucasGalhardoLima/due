@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { TrendingUp, CalendarClock } from 'lucide-vue-next'
+import { CalendarClock } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
+import DuAvatar from '@/components/ui/DuAvatar.vue'
 import { toast } from 'vue-sonner'
 
 interface TimelineItem {
@@ -71,26 +72,14 @@ const handleAction = (action: string) => {
 </script>
 
 <template>
-  <div class="rounded-3xl border bg-card p-6 shadow-elevation-2 relative overflow-hidden group">
-      <!-- Background Flair -->
-      <div 
-        class="absolute -right-12 -top-12 w-48 h-48 blur-[80px] rounded-full opacity-30 pointer-events-none"
-        :class="alert.type === 'future_shortage' ? 'bg-destructive' : 'bg-warning'"
-      />
-
+  <div class="bg-muted border rounded-2xl p-6 relative overflow-hidden group">
       <!-- Header -->
       <div class="flex items-start justify-between relative z-10 mb-6">
           <div class="flex items-center gap-3">
-              <div 
-                class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm"
-                :class="alert.type === 'future_shortage' ? 'bg-destructive/10 text-destructive' : 'bg-warning/10 text-warning-foreground'"
-              >
-                  <CalendarClock v-if="alert.type === 'future_shortage'" class="w-5 h-5" />
-                  <TrendingUp v-else class="w-5 h-5" />
-              </div>
+              <DuAvatar size="md" variant="primary" />
               <div>
                   <h3 class="text-body font-bold flex items-center gap-2">
-                       {{ alert.title || 'Alerta de Tendência' }}
+                       {{ alert.title || 'Opa, olha só...' }}
                        <Badge v-if="alert.probability" variant="outline" class="text-[10px] h-5">Probabilidade: {{ (alert.probability * 100).toFixed(0) }}%</Badge>
                   </h3>
                   <p v-if="alert.countdown_days" class="text-small text-muted-foreground">
@@ -106,7 +95,7 @@ const handleAction = (action: string) => {
       <!-- CONTENT: Future Shortage -->
       <div v-if="alert.type === 'future_shortage'" class="space-y-6 relative z-10">
           <!-- Timeline Visualization -->
-          <div class="bg-muted/30 rounded-2xl p-4 border border-dashed">
+          <div class="glass-inset p-4 border-dashed">
              <div class="flex justify-between items-end h-[100px] mb-2 px-2 gap-3">
                  <div v-for="(item, idx) in alert.visualization?.timeline" :key="idx" class="flex flex-col items-center gap-2 w-full h-full group/bar">
                      <div class="relative w-full flex justify-center items-end flex-1">

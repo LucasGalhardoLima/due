@@ -89,7 +89,7 @@ const paceStatus = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-3xl p-5 border border-border/80 bg-card shadow-elevation-1 transition-all hover:shadow-elevation-2">
+  <div class="glass-surface p-5">
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center gap-2">
         <div class="p-1.5 rounded-xl" :class="{

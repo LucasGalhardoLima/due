@@ -126,8 +126,11 @@ function prevPage() {
                         </td>
                     </tr>
                     <tr v-if="!transactions?.length">
-                        <td colspan="6" class="px-4 py-12 text-center text-muted-foreground">
-                            Nenhuma transação encontrada.
+                        <td colspan="6" class="px-4 py-8 text-center">
+                          <div class="flex items-center justify-center gap-2">
+                            <div class="w-6 h-6 rounded-xl bg-muted flex items-center justify-center text-[9px] font-black text-muted-foreground shrink-0 select-none">Du</div>
+                            <span class="text-sm text-muted-foreground">Nada por aqui.</span>
+                          </div>
                         </td>
                     </tr>
                 </tbody>
