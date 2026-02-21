@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { AlertTriangle, TrendingUp } from 'lucide-vue-next'
+import { AlertTriangle, TrendingUp, Wallet } from 'lucide-vue-next'
+import EmptyState from '@/components/ui/EmptyState.vue'
 
 interface CategoryBudgetStatus {
   categoryId: string
@@ -45,10 +46,10 @@ function textColor(status: string) {
 </script>
 
 <template>
-  <div class="rounded-3xl p-5 border border-border/80 bg-card shadow-elevation-1 transition-all hover:shadow-elevation-2">
+  <div class="glass-surface p-5">
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
-        <div class="p-1.5 rounded-xl" :class="hasAlerts ? 'bg-warning/10' : 'bg-primary/10'">
+        <div class="p-1.5 rounded-xl" :class="hasAlerts ? 'bg-warning/[0.08]' : 'bg-primary/[0.08]'">
           <AlertTriangle v-if="hasAlerts" class="w-4 h-4 text-warning" />
           <TrendingUp v-else class="w-4 h-4 text-primary-accent" />
         </div>
@@ -59,8 +60,14 @@ function textColor(status: string) {
       </NuxtLink>
     </div>
 
-    <div v-if="trendingCategories.length === 0" class="text-small text-muted-foreground text-center py-4">
-      Nenhum orçamento definido.
+    <div v-if="trendingCategories.length === 0">
+      <EmptyState
+        :icon="Wallet"
+        title="Sem limites definidos"
+        description="Quer montar um orçamento? Defina limites por categoria."
+        action-label="Definir orçamento"
+        action-to="/orcamento"
+      />
     </div>
 
     <div v-else class="space-y-3">
@@ -80,7 +87,7 @@ function textColor(status: string) {
           </span>
         </div>
 
-        <div class="h-1.5 w-full bg-muted/60 rounded-full overflow-hidden">
+        <div class="h-1.5 w-full bg-muted rounded-full overflow-hidden">
           <div
             class="h-full rounded-full transition-all duration-500"
             :class="barColor(cat.status)"

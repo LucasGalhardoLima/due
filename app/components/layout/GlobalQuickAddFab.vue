@@ -38,7 +38,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div v-if="shouldShowFab" class="fixed bottom-8 right-8 z-50">
+  <div v-if="shouldShowFab" class="fixed bottom-8 right-8 z-50 hidden lg:block">
     <button
       class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 hover:scale-110 transition-all duration-300 active:scale-[0.97]"
       aria-label="Adicionar nova despesa"

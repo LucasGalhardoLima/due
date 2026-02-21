@@ -6,13 +6,13 @@ type AuthIntent = 'sign-in' | 'sign-up'
 const CLERK_ERROR_MAP: Record<string, string> = {
   form_identifier_not_found: 'Nenhuma conta encontrada com esse e-mail.',
   form_password_incorrect: 'Senha incorreta.',
-  form_code_incorrect: 'Codigo incorreto. Tente novamente.',
+  form_code_incorrect: 'Código incorreto. Tente novamente.',
   too_many_attempts: 'Muitas tentativas. Aguarde um momento e tente novamente.',
-  form_identifier_exists: 'Esse e-mail ja esta cadastrado.',
-  session_exists: 'Voce ja esta logado. Redirecionando...',
+  form_identifier_exists: 'Esse e-mail já está cadastrado.',
+  session_exists: 'Você já está logado. Redirecionando...',
   form_param_nil: 'Preencha todos os campos.',
-  verification_expired: 'O codigo expirou. Solicite um novo.',
-  verification_failed: 'Verificacao falhou. Tente novamente.',
+  verification_expired: 'O código expirou. Solicite um novo.',
+  verification_failed: 'Verificação falhou. Tente novamente.',
 }
 
 function parseClerkError(err: unknown): string {

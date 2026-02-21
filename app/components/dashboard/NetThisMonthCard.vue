@@ -46,7 +46,7 @@ const spendingWidth = computed(() => `${Math.min((props.totalSpending / total.va
 </script>
 
 <template>
-  <div class="rounded-3xl p-5 border border-border/80 bg-card shadow-elevation-1 transition-all hover:shadow-elevation-2">
+  <div class="glass-surface p-5">
     <div class="flex items-center justify-between mb-3">
       <p class="text-micro text-muted-foreground font-medium">Saldo do Mês</p>
       <!-- Delta badge -->
@@ -74,7 +74,7 @@ const spendingWidth = computed(() => `${Math.min((props.totalSpending / total.va
         <span>Receita</span>
         <span class="font-semibold tabular-nums">{{ formatCurrency(totalIncome) }}</span>
       </div>
-      <div class="h-2 w-full bg-success/20 rounded-full overflow-hidden">
+      <div class="h-2 w-full bg-success/[0.15] dark:bg-success/[0.10] rounded-full overflow-hidden">
         <div class="h-full bg-success rounded-full" :style="{ width: incomeWidth }" />
       </div>
 
@@ -82,7 +82,7 @@ const spendingWidth = computed(() => `${Math.min((props.totalSpending / total.va
         <span>Gastos</span>
         <span class="font-semibold tabular-nums">{{ formatCurrency(totalSpending) }}</span>
       </div>
-      <div class="h-2 w-full bg-danger/20 rounded-full overflow-hidden">
+      <div class="h-2 w-full bg-danger/[0.15] dark:bg-danger/[0.10] rounded-full overflow-hidden">
         <div class="h-full bg-danger/70 rounded-full transition-all duration-500" :style="{ width: spendingWidth }" />
       </div>
     </div>

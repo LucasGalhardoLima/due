@@ -20,6 +20,7 @@ import {
   Heart,
   Zap
 } from 'lucide-vue-next'
+import DuAvatar from '@/components/ui/DuAvatar.vue'
 import { toast } from 'vue-sonner'
 
 const props = defineProps<{
@@ -194,13 +195,11 @@ watch(isOpen, (val) => {
     <DialogContent class="sm:max-w-xl bg-background border-border max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <div class="flex items-center gap-3 mb-2">
-          <div class="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center text-ai-accent shadow-glass ring-1 ring-primary/30">
-            <Sparkles class="w-5 h-5" />
-          </div>
+          <DuAvatar size="md" variant="ai-accent" />
           <div>
-            <DialogTitle class="text-h3">Consultor IA</DialogTitle>
+            <DialogTitle class="text-h3">Consultor Du</DialogTitle>
             <DialogDescription>
-              Análise inteligente de <span class="font-bold text-foreground">{{ monthName }}/{{ year }}</span>
+              E aí! Vamos analisar seus gastos de <span class="font-bold text-foreground">{{ monthName }}/{{ year }}</span>?
             </DialogDescription>
           </div>
         </div>
@@ -269,7 +268,7 @@ watch(isOpen, (val) => {
           <!-- Quick Results -->
           <div v-else-if="quickInsights" class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <!-- Diagnosis Card -->
-            <Card variant="glass-warning" class="p-5 space-y-3 border-warning/20 bg-warning/5">
+            <Card variant="warning" class="p-5 space-y-3">
               <div class="flex items-center gap-2 text-warning">
                 <AlertTriangle class="w-5 h-5" />
                 <h4 class="text-small font-black uppercase tracking-wide">Diagnóstico</h4>

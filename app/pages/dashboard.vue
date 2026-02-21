@@ -6,7 +6,8 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
-import { Sparkles, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Calendar as CalendarIcon  } from 'lucide-vue-next'
+import { Sparkles, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Calendar as CalendarIcon } from 'lucide-vue-next'
+import EmptyState from '@/components/ui/EmptyState.vue'
 
 import TransactionList from '@/components/transaction/TransactionList.vue'
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton.vue'
@@ -22,8 +23,8 @@ import TrendingBudgetsCard from '@/components/dashboard/TrendingBudgetsCard.vue'
 import UpcomingBillsCard from '@/components/dashboard/UpcomingBillsCard.vue'
 import SpendingPaceChart from '@/components/dashboard/SpendingPaceChart.vue'
 import SavingsGoalsWidget from '@/components/dashboard/SavingsGoalsWidget.vue'
+import DuScoreCard from '@/components/dashboard/DuScoreCard.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
-import { Card } from '@/components/ui/card'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
 import type { BudgetSummary } from '@/composables/useBudget'
 
@@ -178,6 +179,17 @@ const { data: upcomingBills } = useFetch<{ bills: UpcomingBill[] }>('/api/dashbo
   key: computed(() => `dashboard-upcoming-bills-v${dataVersion.value}`),
 })
 
+// Fetch Du Score
+interface DuScoreResponse {
+  score: number
+  components: { name: string; score: number; maxScore: number; tip: string }[]
+  trend: 'up' | 'down' | 'stable'
+}
+
+const { data: duScore } = useFetch<DuScoreResponse>('/api/dashboard/du-score', {
+  key: computed(() => `dashboard-du-score-v${dataVersion.value}`),
+})
+
 const isLoading = computed(() => summaryStatus.value === 'pending' || cardsStatus.value === 'pending')
 
 // Select Default Card on Load
@@ -313,7 +325,7 @@ const showPayConfirm = ref(false)
           <div class="flex items-center gap-3">
             <!-- Card Selector -->
             <Select v-model="selectedCardId">
-              <SelectTrigger class="w-[220px] bg-card border-border/70 rounded-2xl shadow-elevation-1">
+              <SelectTrigger class="w-[220px] bg-card border-border rounded-2xl shadow-sm">
                 <SelectValue placeholder="Todos os Cartões" />
               </SelectTrigger>
               <SelectContent>
@@ -324,12 +336,12 @@ const showPayConfirm = ref(false)
             </Select>
 
             <!-- Month Navigation Buttons -->
-            <div class="flex items-center bg-muted/40 rounded-2xl p-1 border border-border/70 shadow-elevation-1">
-              <button class="p-2.5 hover:bg-background rounded-xl transition-colors text-muted-foreground hover:text-foreground" @click="prevMonth">
+            <div class="flex items-center bg-card rounded-2xl p-1 border border-border shadow-sm">
+              <button class="p-2.5 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-primary-accent" @click="prevMonth">
                 <span class="sr-only">Anterior</span>
                 <ChevronLeft class="w-4 h-4" />
               </button>
-              <button class="p-2.5 hover:bg-background rounded-xl transition-colors text-muted-foreground hover:text-foreground" @click="nextMonth">
+              <button class="p-2.5 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-primary-accent" @click="nextMonth">
                 <span class="sr-only">Próximo</span>
                 <ChevronRight class="w-4 h-4" />
               </button>
@@ -349,7 +361,7 @@ const showPayConfirm = ref(false)
         <div class="flex items-center gap-3">
            <!-- Card Selector (Mobile) -->
             <Select v-model="selectedCardId">
-              <SelectTrigger class="flex-1 bg-card border-border/70 shadow-elevation-1 rounded-2xl">
+              <SelectTrigger class="flex-1 bg-card border-border shadow-sm rounded-2xl">
                 <div class="flex items-center gap-2 truncate">
                   <span class="bg-primary/10 p-1 rounded-lg shrink-0">
                     <CreditCardIcon class="w-3.5 h-3.5 text-primary-accent" />
@@ -369,14 +381,14 @@ const showPayConfirm = ref(false)
             </Select>
 
             <!-- Month Navigation (Pill) -->
-            <div class="flex items-center bg-card border border-border/70 rounded-full h-10 shadow-elevation-2 shrink-0 px-1">
-               <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground" @click="prevMonth">
+            <div class="flex items-center bg-card border border-border rounded-full h-10 shadow-sm shrink-0 px-1">
+               <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full hover:bg-muted text-muted-foreground hover:text-primary-accent" @click="prevMonth">
                 <ChevronLeft class="w-4 h-4" />
               </Button>
                <span class="text-small font-bold px-2 whitespace-nowrap text-foreground min-w-[70px] text-center">
                 {{ months[summary.month - 1] }}/{{ summary.year }}
                </span>
-              <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground" @click="nextMonth">
+              <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full hover:bg-muted text-muted-foreground hover:text-primary-accent" @click="nextMonth">
                 <ChevronRight class="w-4 h-4" />
               </Button>
             </div>
@@ -416,7 +428,14 @@ const showPayConfirm = ref(false)
       </div>
 
       <!-- Section 2: Budget Widgets Row -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mt-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+        <DuScoreCard
+          v-if="duScore"
+          :score="duScore.score"
+          :components="duScore.components"
+          :trend="duScore.trend"
+        />
+
         <SpendingPaceChart v-if="budgetSummary" :month="budgetQueryParams.month" :year="budgetQueryParams.year" />
 
         <NetThisMonthCard
@@ -426,7 +445,10 @@ const showPayConfirm = ref(false)
           :remaining="budgetSummary.remaining"
           :previous-remaining="prevBudgetSummary?.remaining ?? null"
         />
+      </div>
 
+      <!-- Section 2b: More Widgets Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
         <TrendingBudgetsCard
           v-if="budgetSummary"
           :categories="budgetSummary.categories"
@@ -440,12 +462,12 @@ const showPayConfirm = ref(false)
       <!-- Section 2: Main + Sidebar -->
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
         <!-- Left: Transactions -->
-        <Card class="p-6 overflow-hidden">
+        <div class="glass-surface p-6 overflow-hidden">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-h2">Lançamentos</h2>
           </div>
           <TransactionList :transactions="summary.transactions || {}" @edit="handleEdit" />
-        </Card>
+        </div>
 
         <!-- Right: Sidebar stack -->
         <div class="space-y-5">
@@ -468,14 +490,14 @@ const showPayConfirm = ref(false)
           </div>
 
           <!-- Future Projection -->
-          <Card v-if="futureProjection" class="overflow-hidden p-0 hidden lg:block">
-            <div class="p-4 border-b border-border bg-muted/30">
+          <div v-if="futureProjection" class="glass-surface overflow-hidden p-0 hidden lg:block">
+            <div class="p-4 border-b border-border bg-muted !rounded-none !border-x-0 !border-t-0">
               <h3 class="text-micro text-muted-foreground">Projeção Futura</h3>
             </div>
             <div class="p-4 space-y-3">
               <div
                 v-for="proj in futureProjection.projections" :key="`${proj.month}-${proj.year}`"
-                class="flex justify-between items-center p-3 rounded-2xl bg-muted/40 border border-border/70 hover:border-secondary/40 transition-colors group"
+                class="flex justify-between items-center p-3 rounded-2xl glass-inset hover:border-secondary/30 transition-colors group"
               >
                 <div class="flex flex-col">
                   <span class="text-micro text-muted-foreground">{{ getMonthName(proj.month) }}/{{ proj.year }}</span>
@@ -483,27 +505,31 @@ const showPayConfirm = ref(false)
                 </div>
                 <span class="text-body font-black group-hover:text-primary-accent transition-colors">{{ formatCurrency(proj.total || 0) }}</span>
               </div>
-              <div v-if="!futureProjection.projections?.length" class="text-small text-muted-foreground text-center py-4">
-                Nenhuma projeção futura.
+              <div v-if="!futureProjection.projections?.length" class="flex items-center gap-2 py-4 px-3">
+                <div class="w-6 h-6 rounded-xl bg-muted flex items-center justify-center text-[9px] font-black text-muted-foreground shrink-0 select-none">Du</div>
+                <p class="text-small text-muted-foreground">Sem compromissos futuros. Tá tranquilo!</p>
               </div>
             </div>
-          </Card>
+          </div>
         </div>
       </div>
     </template>
 
-    <div v-else-if="cardsStatus === 'success' && !cards?.length" class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-      <div class="p-6 rounded-[2rem] bg-card border border-border shadow-elevation-2 max-w-md">
-         <CreditCardIcon class="w-12 h-12 text-primary mx-auto mb-4" />
-         <h2 class="text-h2 mb-2">Nenhum cartão encontrado</h2>
-         <p class="text-muted-foreground mb-6">Você precisa cadastrar seu primeiro cartão para começar a gerenciar suas finanças.</p>
-         <Button class="w-full" @click="navigateTo('/cards')">Cadastrar Cartão</Button>
+    <div v-else-if="cardsStatus === 'success' && !cards?.length" class="flex flex-col items-center justify-center min-h-[60vh]">
+      <div class="glass-surface p-6 max-w-md">
+        <EmptyState
+          :icon="CreditCardIcon"
+          title="Cadastra seu cartão pra gente começar!"
+          description="Preciso saber seus cartões pra organizar faturas, limites e parcelamentos."
+          action-label="Cadastrar cartão"
+          action-to="/cards"
+        />
       </div>
     </div>
 
     <!-- AI FAB (Mobile Only) -->
     <button
-      class="lg:hidden fixed bottom-24 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-card border border-ai-accent/30 shadow-elevation-2 text-ai-accent hover:bg-ai-accent/10 transition-all active:scale-95"
+      class="lg:hidden fixed bottom-24 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-card border border-ai-accent/20 shadow-elevation-2 text-ai-accent hover:bg-ai-accent/10 transition-all active:scale-95"
       aria-label="Abrir assistente IA"
       @click="isAIDrawerOpen = true"
     >

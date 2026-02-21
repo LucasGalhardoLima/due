@@ -1,7 +1,8 @@
 import { z } from 'zod'
-import { addDays, startOfDay } from 'date-fns'
+import { addDays, startOfDay, differenceInCalendarDays } from 'date-fns'
 import prisma from '../../utils/prisma'
 import { moneyToNumber } from '../../utils/money'
+import { createNotification } from '../../utils/notifications'
 
 const querySchema = z.object({
   limit: z.string().optional(),
@@ -71,6 +72,22 @@ export default defineEventHandler(async (event) => {
       categoryName: inst.transaction.category.name,
       categoryColor: inst.transaction.category.color,
     })
+  }
+
+  // Fire-and-forget: bill reminder notifications for bills due within 3 days
+  const now = new Date()
+  for (const bill of bills) {
+    const daysUntilDue = differenceInCalendarDays(new Date(bill.dueDate), now)
+    if (daysUntilDue >= 0 && daysUntilDue <= 3) {
+      const label = daysUntilDue === 0
+        ? `${bill.description} vence hoje!`
+        : `${bill.description} vence em ${daysUntilDue} dia${daysUntilDue > 1 ? 's' : ''}!`
+      createNotification(userId, 'bill_reminder',
+        label,
+        `Fica de olho! O pagamento de ${bill.description} (R$ ${bill.amount.toFixed(2)}) tá chegando.`,
+        '/parcelamentos'
+      ).catch(() => {})
+    }
   }
 
   return { bills }

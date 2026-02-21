@@ -2,6 +2,7 @@
 import { computed, ref, watch, onUnmounted } from 'vue'
 import { Button } from '@/components/ui/button'
 import { X, MessageCircle, AlertTriangle, PartyPopper, Bot } from 'lucide-vue-next'
+import DuAvatar from '@/components/ui/DuAvatar.vue'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
 
 const advisor = useProactiveAdvisor()
@@ -42,7 +43,7 @@ const toneConfig = computed(() => {
 
   const configs = {
     curious: {
-      bg: 'bg-info-muted/95',
+      bg: 'bg-info-muted',
       border: 'border-info/20',
       iconBg: 'bg-info/20',
       iconColor: 'text-info',
@@ -50,7 +51,7 @@ const toneConfig = computed(() => {
       icon: MessageCircle
     },
     warning: {
-      bg: 'bg-warning-muted/95',
+      bg: 'bg-warning-muted',
       border: 'border-warning/20',
       iconBg: 'bg-warning/20',
       iconColor: 'text-warning',
@@ -58,7 +59,7 @@ const toneConfig = computed(() => {
       icon: AlertTriangle
     },
     congratulatory: {
-      bg: 'bg-success-muted/95',
+      bg: 'bg-success-muted',
       border: 'border-success/20',
       iconBg: 'bg-success/20',
       iconColor: 'text-success',
@@ -66,7 +67,7 @@ const toneConfig = computed(() => {
       icon: PartyPopper
     },
     neutral: {
-      bg: 'bg-background/95',
+      bg: 'bg-muted',
       border: 'border-border',
       iconBg: 'bg-muted',
       iconColor: 'text-muted-foreground',
@@ -118,26 +119,17 @@ onUnmounted(() => {
           class="fixed top-4 inset-x-4 sm:inset-x-auto sm:right-4 sm:max-w-sm sm:w-full z-50"
         >
           <div
-            class="rounded-lg border backdrop-blur-md p-4 transition-colors"
+            class="rounded-lg border p-4 transition-colors"
             :class="[
               toneConfig.bg,
               toneConfig.border,
               toneConfig.shadow,
             ]"
           >
-            <!-- Row: icon + message + close -->
+            <!-- Row: Du avatar + message + close -->
             <div class="flex items-start gap-3">
-              <!-- Icon -->
-              <div
-                class="h-8 w-8 rounded-xl flex items-center justify-center shrink-0"
-                :class="[toneConfig.iconBg]"
-              >
-                <component
-                  :is="toneConfig.icon"
-                  class="w-4 h-4"
-                  :class="[toneConfig.iconColor]"
-                />
-              </div>
+              <!-- Du Avatar -->
+              <DuAvatar size="sm" variant="primary" />
 
               <!-- Message -->
               <p class="flex-1 min-w-0 text-sm leading-relaxed">
@@ -146,7 +138,7 @@ onUnmounted(() => {
 
               <!-- Close button — 44px touch target -->
               <button
-                class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-background/50 hover:bg-background/80 text-muted-foreground hover:text-foreground transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                class="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-muted hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                 aria-label="Fechar"
                 @click="handleDismiss"
               >

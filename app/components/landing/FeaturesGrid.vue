@@ -105,12 +105,6 @@ const features = [
 
 <template>
   <section class="py-28 relative overflow-hidden">
-    <!-- Background decoration -->
-    <div class="absolute inset-0 -z-10" aria-hidden="true">
-      <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-accent/5 rounded-full blur-[150px]" />
-      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px]" />
-    </div>
-
     <div class="container mx-auto px-6">
       <div class="max-w-4xl mx-auto text-center mb-20">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border text-sm font-medium mb-6">
@@ -142,18 +136,13 @@ const features = [
               : 'bg-card border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10'
           ]"
         >
-          <!-- Glassmorphism overlay on hover -->
-          <div
-            class="absolute inset-0 rounded-3xl bg-gradient-to-br from-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          />
-
           <!-- Icon -->
           <div>
             <div
               class="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110"
               :class="feature.isAi
-                ? 'bg-gradient-to-br from-ai-accent/20 to-ai-accent/5'
-                : 'bg-gradient-to-br from-primary/15 to-primary/5'"
+                ? 'bg-ai-accent/10'
+                : 'bg-muted'"
             >
               <component
                 :is="feature.icon"

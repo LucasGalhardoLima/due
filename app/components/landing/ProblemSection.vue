@@ -43,11 +43,6 @@ const colorClasses: Record<string, { bg: string; icon: string; border: string }>
 
 <template>
   <section class="py-28 bg-gradient-to-b from-muted/50 to-background relative overflow-hidden">
-    <!-- Background pattern -->
-    <div class="absolute inset-0 -z-10 opacity-30" aria-hidden="true">
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--warning),0.05)_0%,transparent_50%)]" />
-    </div>
-
     <div class="container mx-auto px-6">
       <div class="max-w-4xl mx-auto text-center mb-16">
         <!-- Icon -->

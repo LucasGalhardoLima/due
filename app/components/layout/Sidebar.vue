@@ -23,6 +23,7 @@ import {
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import TierBadge from '@/components/tier/TierBadge.vue'
+import NotificationBell from '@/components/layout/NotificationBell.vue'
 
 const { user } = useUser()
 const clerk = useClerk()
@@ -104,14 +105,17 @@ function closeMobileMenu() {
       </div>
     </NuxtLink>
 
-    <Button variant="ghost" size="icon" @click="isMobileMenuOpen = true">
-      <Menu class="w-5 h-5" />
-    </Button>
+    <div class="flex items-center gap-2">
+      <NotificationBell />
+      <Button variant="ghost" size="icon" @click="isMobileMenuOpen = true">
+        <Menu class="w-5 h-5" />
+      </Button>
+    </div>
   </header>
 
   <!-- Sidebar Container -->
   <aside
-    class="fixed inset-y-0 left-0 z-50 w-72 bg-card/95 backdrop-blur-sm border-r border-border/70 transition-transform duration-300"
+    class="fixed inset-y-0 left-0 z-50 w-72 bg-card border-r border-border/70 transition-transform duration-300"
     :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
   >
     <div class="flex flex-col h-full">
@@ -122,9 +126,12 @@ function closeMobileMenu() {
             Du
           </div>
         </NuxtLink>
-        <Button variant="ghost" size="icon" class="lg:hidden ml-auto" @click="closeMobileMenu">
-          <X class="w-5 h-5" />
-        </Button>
+        <div class="ml-auto flex items-center gap-1">
+          <NotificationBell class="hidden lg:flex" />
+          <Button variant="ghost" size="icon" class="lg:hidden" @click="closeMobileMenu">
+            <X class="w-5 h-5" />
+          </Button>
+        </div>
       </div>
 
       <!-- Navigation Links -->
@@ -232,7 +239,7 @@ function closeMobileMenu() {
   <!-- Mobile Overlay -->
   <div
     v-if="isMobileMenuOpen"
-    class="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+    class="fixed inset-0 bg-background/80 z-40 lg:hidden"
     @click="closeMobileMenu"
   />
 </template>

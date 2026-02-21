@@ -33,6 +33,18 @@ const wizardStep = ref(1)
 const tourSlide = ref(1)
 const isLoading = ref(false)
 
+// Resume from server-persisted step on mount
+onMounted(async () => {
+  try {
+    const { step } = await $fetch<{ completedAt: string | null; step: number }>('/api/user/onboarding')
+    if (step > 0 && step < 5) {
+      wizardStep.value = step + 1 // resume from next step
+    }
+  } catch {
+    // First visit or no user record yet — start from step 1
+  }
+})
+
 const totalWizardSteps = 5
 const totalTourSlides = 5
 
@@ -112,6 +124,15 @@ function handleTouchEnd(e: TouchEvent) {
   }
 }
 
+// Persist step progress on server
+async function saveStepProgress(step: number) {
+  try {
+    await $fetch('/api/user/onboarding', { method: 'PATCH', body: { step } })
+  } catch {
+    // Non-blocking — cookie fallback still works
+  }
+}
+
 // Step 1: Welcome - Choose data mode
 async function handleDataChoice(choice: 'sample' | 'fresh') {
   if (choice === 'sample') {
@@ -119,7 +140,7 @@ async function handleDataChoice(choice: 'sample' | 'fresh') {
     try {
       await $fetch('/api/onboarding/seed-sample', { method: 'POST' })
       toast.success('Dados de exemplo criados!')
-      setOnboardingCookie()
+      await completeOnboarding()
       phase.value = 'tour'
     } catch (e) {
       console.error(e)
@@ -128,6 +149,7 @@ async function handleDataChoice(choice: 'sample' | 'fresh') {
       isLoading.value = false
     }
   } else {
+    await saveStepProgress(1)
     wizardStep.value = 2
   }
 }
@@ -152,6 +174,7 @@ async function handleAddCard() {
       },
     })
     toast.success('Cartão adicionado!')
+    await saveStepProgress(2)
     wizardStep.value = 3
   } catch (e) {
     console.error(e)
@@ -206,6 +229,7 @@ async function handleAddIncome() {
       },
     })
     toast.success('Renda registrada!')
+    await saveStepProgress(4)
     wizardStep.value = 5
   } catch (e) {
     console.error(e)
@@ -216,16 +240,9 @@ async function handleAddIncome() {
 }
 
 // Step 5: Data entry choice
-function handleEntryChoice(choice: 'import' | 'manual' | 'explore') {
-  setOnboardingCookie()
-
-  if (choice === 'import') {
-    phase.value = 'tour'
-  } else if (choice === 'manual') {
-    phase.value = 'tour'
-  } else {
-    phase.value = 'tour'
-  }
+async function handleEntryChoice(choice: 'import' | 'manual' | 'explore') {
+  await completeOnboarding()
+  phase.value = 'tour'
 }
 
 // Tour navigation
@@ -243,10 +260,15 @@ function skipTour() {
   router.push('/dashboard')
 }
 
-// Cookie
-function setOnboardingCookie() {
+// Complete onboarding: persist to server + set cookie
+async function completeOnboarding() {
   const cookie = useCookie('onboarding_complete', { maxAge: 60 * 60 * 24 * 365, path: '/' })
   cookie.value = 'true'
+  try {
+    await $fetch('/api/user/onboarding', { method: 'PATCH', body: { completed: true } })
+  } catch {
+    // Cookie fallback still works
+  }
 }
 </script>
 
@@ -394,7 +416,7 @@ function setOnboardingCookie() {
                 type="button"
                 variant="outline"
                 class="flex-1"
-                @click="wizardStep = 3"
+                @click="saveStepProgress(2); wizardStep = 3"
               >
                 Pular
               </Button>
@@ -438,7 +460,7 @@ function setOnboardingCookie() {
             </div>
           </div>
 
-          <Button class="w-full" :disabled="isLoading" @click="wizardStep = 4">
+          <Button class="w-full" :disabled="isLoading" @click="saveStepProgress(3); wizardStep = 4">
             Continuar
             <ArrowRight class="w-4 h-4 ml-2" />
           </Button>
@@ -479,7 +501,7 @@ function setOnboardingCookie() {
                 type="button"
                 variant="outline"
                 class="flex-1"
-                @click="wizardStep = 5"
+                @click="saveStepProgress(4); wizardStep = 5"
               >
                 Pular
               </Button>

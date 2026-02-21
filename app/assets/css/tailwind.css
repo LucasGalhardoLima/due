@@ -205,6 +205,19 @@
   .app-strip { @apply bg-secondary/5 px-6 py-4 border-b border-border/60; }
   .app-table-row { @apply transition-all duration-200 hover:bg-muted/40; }
 
+  /* Solid surface for dashboard cards */
+  .glass-surface {
+    @apply bg-card border border-border rounded-3xl shadow-elevation-1 transition-all;
+  }
+  .glass-surface:hover {
+    @apply shadow-elevation-2;
+  }
+
+  /* Inset panels inside surfaces (e.g. stat boxes, headers) */
+  .glass-inset {
+    @apply bg-muted border border-border/70 rounded-2xl;
+  }
+
   .app-shell button,
   .app-shell [role="button"] {
     @apply transition-all duration-200;

@@ -141,7 +141,7 @@ export default defineEventHandler(async (event) => {
       
       entry.transactions.push({
         description: inst.transaction.description,
-        amount: inst.amount,
+        amount: moneyToNumber(inst.amount),
         installmentNumber: inst.number,
         totalInstallments: inst.transaction.installmentsCount,
         category: inst.transaction.category?.name || 'Geral'

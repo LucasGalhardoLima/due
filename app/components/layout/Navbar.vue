@@ -122,7 +122,7 @@ function closeMobileMenu() {
     >
       <!-- Overlay -->
       <div
-        class="absolute inset-0 bg-background/80 backdrop-blur-sm overscroll-contain"
+        class="absolute inset-0 bg-background overscroll-contain"
         aria-hidden="true"
         @click="closeMobileMenu"
       />

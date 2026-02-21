@@ -1,3 +1,6 @@
+// Session-level cache to avoid repeated API calls
+let onboardingChecked = false
+
 export default defineNuxtRouteMiddleware(async (to) => {
   const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV
   const isTest = process.env.NODE_ENV === 'test' || !!process.env.VITEST || !!process.env.CI
@@ -23,14 +26,28 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   // Onboarding flow: check if user needs to complete onboarding
-  // Skip if already on onboarding page or if onboarding is complete
-  if (userId.value && !onboardingCookie.value && to.path !== '/onboarding' && !publicRoutes.includes(to.path)) {
-    // Only redirect to onboarding for dashboard-like routes
-    // This allows users to access other pages like /cards if they skip onboarding
-    if (to.path === '/dashboard') {
-      // Check if user has any cards (server-side would be better, but this is a simple client check)
-      // For now, we trust the cookie - if they completed onboarding or have data, they won't be redirected
-      return navigateTo('/onboarding')
+  // Skip if already on onboarding page or if onboarding is complete (cookie = fast path)
+  if (userId.value && to.path === '/dashboard' && to.path !== '/onboarding') {
+    // Fast path: cookie exists, skip server check
+    if (onboardingCookie.value || onboardingChecked) {
+      return
     }
+
+    // No cookie — check server for persisted onboarding state
+    try {
+      const { completedAt } = await $fetch<{ completedAt: string | null }>('/api/user/onboarding')
+
+      if (completedAt) {
+        // Hydrate the cookie so future checks are fast
+        const cookie = useCookie('onboarding_complete', { maxAge: 60 * 60 * 24 * 365, path: '/' })
+        cookie.value = 'true'
+        onboardingChecked = true
+        return
+      }
+    } catch {
+      // If the API call fails, fall through to redirect
+    }
+
+    return navigateTo('/onboarding')
   }
 })

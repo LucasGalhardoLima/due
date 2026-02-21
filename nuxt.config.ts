@@ -114,14 +114,14 @@ export default defineNuxtConfig({
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
-      title: 'Due - Financas Reimaginadas',
+      title: 'Due - Finanças Reimaginadas',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' },
         { name: 'theme-color', content: '#282423' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { name: 'apple-mobile-web-app-title', content: 'Due' },
-        { name: 'description', content: 'Controle inteligente de cartao de credito com projecao futura, Advisor IA e importacao automatica.' }
+        { name: 'description', content: 'Controle inteligente de cartão de crédito com projeção futura, Advisor IA e importação automática.' }
       ],
       link: [
         { rel: 'preload', href: '/fonts/GeistPixel-Square.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },

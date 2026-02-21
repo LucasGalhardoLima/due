@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Target } from 'lucide-vue-next'
+import EmptyState from '@/components/ui/EmptyState.vue'
 
 interface SavingsGoal {
   id: string
@@ -38,7 +39,7 @@ function textColor(progress: number) {
 </script>
 
 <template>
-  <div class="rounded-3xl p-5 border border-border/80 bg-card shadow-elevation-1 transition-all hover:shadow-elevation-2">
+  <div class="glass-surface p-5">
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
         <div class="p-1.5 rounded-xl bg-primary/10">
@@ -51,13 +52,19 @@ function textColor(progress: number) {
       </NuxtLink>
     </div>
 
-    <div v-if="!goals || goals.length === 0" class="text-small text-muted-foreground text-center py-4">
-      Nenhuma meta cadastrada.
+    <div v-if="!goals || goals.length === 0">
+      <EmptyState
+        :icon="Target"
+        title="Bora criar sua primeira meta?"
+        description="Defina um objetivo e acompanhe seu progresso."
+        action-label="Criar meta"
+        action-to="/metas"
+      />
     </div>
 
     <template v-else>
       <!-- Total saved -->
-      <div class="mb-4 p-3 rounded-2xl bg-muted/40 border border-border/70">
+      <div class="mb-4 p-3 rounded-xl bg-muted">
         <p class="text-micro text-muted-foreground">Total guardado</p>
         <p class="text-lg font-black tabular-nums">{{ formatCurrency(totalSaved) }}</p>
       </div>
@@ -72,7 +79,7 @@ function textColor(progress: number) {
             </span>
           </div>
 
-          <div class="h-1.5 w-full bg-muted/60 rounded-full overflow-hidden">
+          <div class="h-1.5 w-full bg-muted rounded-full overflow-hidden">
             <div
               class="h-full rounded-full transition-all duration-500"
               :class="barColor(goal.progress)"

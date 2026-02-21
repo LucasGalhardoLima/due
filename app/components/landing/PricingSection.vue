@@ -102,11 +102,6 @@ function billingLabel(tier: typeof tiers[number]) {
 
 <template>
   <section id="precos" class="py-28 relative overflow-hidden">
-    <!-- Background -->
-    <div class="absolute inset-0 -z-10" aria-hidden="true">
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-gradient-radial from-primary/5 to-transparent rounded-full" />
-    </div>
-
     <div class="container mx-auto px-6">
       <div class="max-w-4xl mx-auto text-center mb-16">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border text-sm font-medium mb-6">

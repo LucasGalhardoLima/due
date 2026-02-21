@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { endOfMonth } from 'date-fns'
 import prisma from '../../utils/prisma'
 import { moneyToNumber } from '../../utils/money'
+import { createNotification } from '../../utils/notifications'
 
 const querySchema = z.object({
   month: z.string(),
@@ -147,6 +148,23 @@ export default defineEventHandler(async (event) => {
       status,
     }
   })
+
+  // Fire-and-forget: budget warning notifications
+  for (const cat of categories) {
+    if (cat.status === 'exceeded') {
+      createNotification(userId, 'budget_warning',
+        `${cat.categoryName} estourou o orçamento!`,
+        `Você gastou ${cat.percentage}% do limite de ${cat.categoryName}. Bora rever os gastos?`,
+        '/orcamento'
+      ).catch(() => {})
+    } else if (cat.status === 'warning') {
+      createNotification(userId, 'budget_warning',
+        `Opa, ${cat.categoryName} já tá em ${cat.percentage}%!`,
+        `${cat.categoryName} tá chegando no limite. Fica de olho!`,
+        '/orcamento'
+      ).catch(() => {})
+    }
+  }
 
   // 6. Compute totals
   const totalIncome = incomes.reduce(

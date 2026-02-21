@@ -17,7 +17,7 @@ export const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-elevation-1 hover:bg-secondary/90",
         ghost: "hover:bg-muted hover:text-foreground",
         link: "text-primary-accent underline-offset-4 hover:underline",
-        glass: "backdrop-blur-xl bg-background/40 border border-border/60 shadow-glass hover:bg-background/60 text-foreground",
+        glass: "bg-card border border-border shadow-sm hover:bg-muted text-foreground",
         success: "bg-success text-success-foreground shadow-elevation-2 hover:bg-success/90 hover:shadow-success-glow/50",
         warning: "bg-warning text-warning-foreground shadow-elevation-2 hover:bg-warning/90 hover:shadow-warning-glow/50",
         info: "bg-info text-info-foreground shadow-elevation-2 hover:bg-info/90 hover:shadow-info-glow/50",

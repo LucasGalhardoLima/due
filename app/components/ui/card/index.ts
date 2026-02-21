@@ -16,12 +16,6 @@ export const cardVariants = cva(
         // Solid variants (default for most use cases)
         default: "bg-card border border-border/80 rounded-[1.75rem] shadow-elevation-1",
         elevated: "bg-card border border-border/80 rounded-[1.75rem] shadow-elevation-3",
-        // Glass variants (reserved for modals/overlays only)
-        glass: "backdrop-blur-2xl bg-background/35 border border-border/60 rounded-[2.25rem] shadow-glass",
-        "glass-success": "backdrop-blur-2xl bg-success-muted/30 dark:bg-success-muted/10 border border-success/20 rounded-[2.25rem] shadow-glass",
-        "glass-warning": "backdrop-blur-2xl bg-warning-muted/30 dark:bg-warning-muted/10 border border-warning/20 rounded-[2.25rem] shadow-glass",
-        "glass-danger": "backdrop-blur-2xl bg-danger-muted/30 dark:bg-danger-muted/10 border border-danger/20 rounded-[2.25rem] shadow-glass",
-        "glass-info": "backdrop-blur-2xl bg-info-muted/30 dark:bg-info-muted/10 border border-info/20 rounded-[2.25rem] shadow-glass",
         // Status variants with solid tinted backgrounds
         success: "bg-success-muted border border-success/20 rounded-[1.75rem] shadow-elevation-1",
         warning: "bg-warning-muted border border-warning/20 rounded-[1.75rem] shadow-elevation-1",

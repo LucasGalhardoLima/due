@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Pencil, Trash2, Plus, RefreshCw, ArrowUpCircle } from 'lucide-vue-next'
+import EmptyState from '@/components/ui/EmptyState.vue'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -65,15 +66,14 @@ function formatCurrency(value: number) {
     </div>
 
     <!-- Empty State -->
-    <Card v-if="!incomes || incomes.length === 0" class="p-6 text-center">
-      <ArrowUpCircle class="w-10 h-10 mx-auto text-muted-foreground/50 mb-3" />
-      <p class="text-sm text-muted-foreground mb-3">
-        Nenhuma receita cadastrada
-      </p>
-      <Button size="sm" @click="emit('add')">
-        <Plus class="w-4 h-4 mr-1.5" />
-        Adicionar primeira receita
-      </Button>
+    <Card v-if="!incomes || incomes.length === 0" class="overflow-hidden">
+      <EmptyState
+        :icon="ArrowUpCircle"
+        title="Me conta sua renda pra eu calcular tudo!"
+        description="Adicionando sua renda mensal eu consigo te mostrar quanto pode gastar por dia."
+        action-label="Adicionar receita"
+        @action="emit('add')"
+      />
     </Card>
 
     <!-- Income Items -->

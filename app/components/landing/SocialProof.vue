@@ -43,7 +43,7 @@ const colorClasses: Record<string, { bg: string; icon: string }> = {
         <div
           v-for="stat in stats"
           :key="stat.label"
-          class="group text-center p-6 rounded-[2rem] bg-card/60 border border-transparent hover:border-border/70 hover:bg-card transition-all duration-300"
+          class="group text-center p-6 rounded-[2rem] bg-card border border-transparent hover:border-border/70 hover:bg-card transition-all duration-300"
         >
           <!-- Icon -->
           <div 

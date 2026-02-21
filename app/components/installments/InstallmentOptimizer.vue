@@ -62,7 +62,7 @@ const recommendationColor = computed(() => {
       <!-- Main Recommendation -->
       <div class="p-4 rounded-xl border space-y-3 transition-all duration-200 hover:shadow-elevation-1" :class="recommendationColor">
          <div class="flex items-start gap-3">
-           <div class="p-2 bg-background/50 backdrop-blur-sm rounded-full shadow-sm">
+           <div class="p-2 bg-muted rounded-full shadow-sm">
              <Zap class="w-4 h-4" />
            </div>
            <div>

@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import { ref, computed } from 'vue'
-import { 
-  LucideShoppingBag, 
-  LucideUtensils, 
-  LucideCar, 
-  LucideHome, 
+import {
+  LucideShoppingBag,
+  LucideUtensils,
+  LucideCar,
+  LucideHome,
   ArrowUpDown,
   Pencil,
+  Receipt,
 } from 'lucide-vue-next'
+import EmptyState from '@/components/ui/EmptyState.vue'
 import {
   Table,
   TableBody,
@@ -105,8 +107,14 @@ function getIcon(categoryName: string) {
 
 <template>
   <div class="transaction-list-container">
-    <div v-if="!transactions || Object.keys(transactions).length === 0" class="text-center py-10 text-muted-foreground border border-border rounded-lg bg-muted/30">
-        Nenhum lançamento nesta fatura.
+    <div v-if="!transactions || Object.keys(transactions).length === 0">
+      <EmptyState
+        :icon="Receipt"
+        title="Nada registrado aqui... ainda"
+        description="Adicione seus gastos pra gente começar a organizar."
+        action-label="Adicionar gasto"
+        @action="$emit('edit', null)"
+      />
     </div>
 
     <template v-else>

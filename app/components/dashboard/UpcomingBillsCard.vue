@@ -43,7 +43,7 @@ function dueColorClass(dateStr: string) {
 </script>
 
 <template>
-  <div class="rounded-3xl p-5 border border-border/80 bg-card shadow-elevation-1 transition-all hover:shadow-elevation-2">
+  <div class="glass-surface p-5">
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
         <div class="p-1.5 rounded-xl bg-brand-accent/10 dark:bg-brand-accent/10">
@@ -53,20 +53,21 @@ function dueColorClass(dateStr: string) {
       </div>
     </div>
 
-    <div v-if="bills.length === 0" class="text-small text-muted-foreground text-center py-4">
-      Nenhum vencimento próximo.
+    <div v-if="bills.length === 0" class="flex items-center gap-2 py-4 px-1">
+      <div class="w-6 h-6 rounded-xl bg-muted flex items-center justify-center text-[9px] font-black text-muted-foreground shrink-0 select-none">Du</div>
+      <p class="text-small text-muted-foreground">Tudo limpo! Sem contas chegando.</p>
     </div>
 
     <div v-else class="space-y-1">
       <div
         v-for="bill in bills"
         :key="bill.id"
-        class="flex items-center gap-3 p-2.5 -mx-1 rounded-2xl hover:bg-muted/40 transition-colors group"
+        class="flex items-center gap-3 p-2.5 -mx-1 rounded-2xl hover:bg-muted/50 dark:hover:bg-muted/50 transition-colors group"
       >
         <!-- Icon -->
         <div
           class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-          :class="bill.isSubscription ? 'bg-brand-accent/10 dark:bg-brand-accent/10' : 'bg-muted/60'"
+          :class="bill.isSubscription ? 'bg-brand-accent/10 dark:bg-brand-accent/10' : 'bg-muted'"
         >
           <RotateCw v-if="bill.isSubscription" class="w-3.5 h-3.5 text-primary-accent" />
           <CreditCard v-else class="w-3.5 h-3.5 text-muted-foreground" />

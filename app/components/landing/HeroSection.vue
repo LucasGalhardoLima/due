@@ -8,22 +8,6 @@ const emit = defineEmits<{
 
 <template>
   <section class="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
-    <!-- Animated gradient background -->
-    <div class="absolute inset-0 -z-10" aria-hidden="true">
-      <!-- Main gradient orbs — reduced intensity for minimalist feel -->
-      <div class="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-gradient-to-br from-brand-accent/10 via-brand-accent/5 to-transparent rounded-full blur-[120px] animate-pulse" style="animation-duration: 8s;" />
-      <div class="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-gradient-to-tl from-primary/8 via-primary/3 to-transparent rounded-full blur-[100px] animate-pulse" style="animation-duration: 12s;" />
-
-      <!-- Grid pattern overlay — complements pixel font aesthetic -->
-      <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black_40%,transparent_100%)]" />
-    </div>
-
-    <!-- Floating decorative elements — reduced to 2 -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div class="absolute top-[15%] left-[10%] w-3 h-3 rounded-full bg-brand-accent/30 animate-bounce" style="animation-duration: 3s; animation-delay: 0s;" />
-      <div class="absolute bottom-[30%] right-[15%] w-2 h-2 rounded-full bg-primary/30 animate-bounce" style="animation-duration: 4s; animation-delay: 1s;" />
-    </div>
-
     <div class="container mx-auto px-6 py-24 text-center relative z-10">
       <div class="max-w-4xl mx-auto space-y-10">
         <!-- Du Avatar/Introduction -->
@@ -39,7 +23,7 @@ const emit = defineEmits<{
         </div>
 
         <!-- Personal greeting -->
-        <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-brand-accent/20 to-primary/5 border border-border backdrop-blur-sm">
+        <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-muted border border-border">
           <Sparkles class="w-4 h-4 text-ai-accent animate-pulse" />
           <span class="text-sm font-bold text-primary-accent">Seu assistente financeiro pessoal</span>
         </div>
@@ -75,7 +59,7 @@ const emit = defineEmits<{
             <ArrowRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </NuxtLink>
           <button
-            class="group w-full sm:w-auto inline-flex items-center justify-center gap-3 h-16 px-10 rounded-[2rem] border-2 border-border bg-card/70 backdrop-blur-sm font-semibold hover:bg-card hover:border-primary/40 transition-all duration-300"
+            class="group w-full sm:w-auto inline-flex items-center justify-center gap-3 h-16 px-10 rounded-[2rem] border-2 border-border bg-card font-semibold hover:bg-card hover:border-primary/40 transition-all duration-300"
             @click="emit('demo')"
           >
             <div class="w-10 h-10 rounded-xl bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors">

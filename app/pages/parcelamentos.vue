@@ -63,8 +63,6 @@ const isLoading = computed(() => timelineStatus.value === 'pending' || healthSta
             
             <!-- Simulator (Phase 3) -->
             <div class="relative overflow-hidden rounded-[2rem] border border-ai-accent/30 bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.16),hsl(var(--secondary)/0.08))] dark:bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.26),hsl(var(--secondary)/0.20))] p-6 shadow-elevation-2 min-h-[400px] transition-all duration-500 hover:border-ai-accent/45">
-               <div class="absolute -right-20 -top-20 w-64 h-64 bg-ai-accent/10 rounded-full blur-[80px] pointer-events-none" />
-               <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-secondary/10 rounded-full blur-[60px] pointer-events-none" />
                <div class="relative z-10">
                  <UnifiedSimulator />
                </div>
@@ -72,8 +70,6 @@ const isLoading = computed(() => timelineStatus.value === 'pending' || healthSta
   
             <!-- Optimizer (Phase 4) -->
              <div class="relative overflow-hidden rounded-[2rem] border border-ai-accent/30 bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.16),hsl(var(--secondary)/0.08))] dark:bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.26),hsl(var(--secondary)/0.20))] p-6 shadow-elevation-2 min-h-[200px] transition-all duration-500 hover:border-ai-accent/45">
-                <div class="absolute -right-20 -top-20 w-64 h-64 bg-ai-accent/10 rounded-full blur-[80px] pointer-events-none" />
-                <div class="absolute -left-20 -bottom-20 w-48 h-48 bg-secondary/10 rounded-full blur-[60px] pointer-events-none" />
                 <div class="relative z-10">
                   <InstallmentOptimizer />
                 </div>

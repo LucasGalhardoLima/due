@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import prisma from '../../utils/prisma'
-import { serializeDecimals } from '../../utils/money'
+import { moneyToNumber, serializeDecimals } from '../../utils/money'
+import { createNotification } from '../../utils/notifications'
 
 const bodySchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -39,6 +40,27 @@ export default defineEventHandler(async (event) => {
     where: { id },
     data: updateData,
   })
+
+  // Fire-and-forget: milestone notifications when currentAmount changes
+  if (result.data.currentAmount !== undefined) {
+    const targetAmount = moneyToNumber(existing.targetAmount)
+    if (targetAmount > 0) {
+      const prevProgress = (moneyToNumber(existing.currentAmount) / targetAmount) * 100
+      const newProgress = (result.data.currentAmount / targetAmount) * 100
+
+      for (const milestone of [25, 50, 75, 100]) {
+        if (prevProgress < milestone && newProgress >= milestone) {
+          const title = milestone === 100
+            ? `Meta atingida: ${existing.name}!`
+            : `${milestone}% da meta ${existing.name}!`
+          const message = milestone === 100
+            ? `Parabéns! Você bateu a meta "${existing.name}"! Mandou bem!`
+            : `Você chegou a ${milestone}% da meta "${existing.name}". Bora continuar!`
+          createNotification(userId, 'goal_milestone', title, message, '/metas').catch(() => {})
+        }
+      }
+    }
+  }
 
   return serializeDecimals(goal)
 })
