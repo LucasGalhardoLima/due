@@ -46,8 +46,8 @@ function dueColorClass(dateStr: string) {
   <div class="rounded-3xl p-5 border border-border/80 bg-card shadow-elevation-1 transition-all hover:shadow-elevation-2">
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
-        <div class="p-1.5 rounded-xl bg-violet-100/60 dark:bg-violet-500/10">
-          <CalendarClock class="w-4 h-4 text-violet-600 dark:text-violet-400" />
+        <div class="p-1.5 rounded-xl bg-brand-accent/10 dark:bg-brand-accent/10">
+          <CalendarClock class="w-4 h-4 text-primary-accent" />
         </div>
         <p class="text-micro text-muted-foreground font-medium">Próximos Vencimentos</p>
       </div>
@@ -66,9 +66,9 @@ function dueColorClass(dateStr: string) {
         <!-- Icon -->
         <div
           class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-          :class="bill.isSubscription ? 'bg-violet-100/60 dark:bg-violet-500/10' : 'bg-muted/60'"
+          :class="bill.isSubscription ? 'bg-brand-accent/10 dark:bg-brand-accent/10' : 'bg-muted/60'"
         >
-          <RotateCw v-if="bill.isSubscription" class="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+          <RotateCw v-if="bill.isSubscription" class="w-3.5 h-3.5 text-primary-accent" />
           <CreditCard v-else class="w-3.5 h-3.5 text-muted-foreground" />
         </div>
 

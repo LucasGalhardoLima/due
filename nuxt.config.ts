@@ -19,8 +19,8 @@ export default defineNuxtConfig({
       name: 'Du - Seu Assistente Financeiro',
       short_name: 'Du',
       description: 'Oi, eu sou o Du! Vou te ajudar a sair do buraco da fatura e conquistar sua liberdade financeira.',
-      theme_color: '#D6FFF6',
-      background_color: '#D6FFF6',
+      theme_color: '#282423',
+      background_color: '#282423',
       display: 'standalone',
       start_url: '/',
       icons: [
@@ -68,16 +68,16 @@ export default defineNuxtConfig({
       variables: {
         colorPrimary: '#231651',
         colorBackground: 'transparent',
-        colorNeutral: '#231651',
-        colorForeground: 'hsl(252, 57%, 20%)',
-        colorMutedForeground: 'hsl(252, 26%, 38%)',
-        colorInput: 'hsl(168, 22%, 86%)',
-        colorInputForeground: 'hsl(252, 57%, 20%)',
-        colorBorder: 'hsl(168, 22%, 84%)',
-        colorDanger: 'hsl(0, 84%, 60%)',
-        colorSuccess: 'hsl(160, 84%, 39%)',
-        fontFamily: '"Manrope", ui-sans-serif, system-ui, sans-serif',
-        fontFamilyButtons: '"Sora", ui-sans-serif, system-ui, sans-serif',
+        colorNeutral: '#1a1a1a',
+        colorForeground: '#1a1a1a',
+        colorMutedForeground: '#737373',
+        colorInput: '#e3e3e3',
+        colorInputForeground: '#1a1a1a',
+        colorBorder: '#e3e3e3',
+        colorDanger: '#cf4814',
+        colorSuccess: '#eaef3a',
+        fontFamily: '"Geist", ui-sans-serif, system-ui, sans-serif',
+        fontFamilyButtons: '"Geist Pixel Square", ui-monospace, monospace',
         borderRadius: '0.75rem',
         fontSize: '0.875rem',
       },
@@ -117,16 +117,15 @@ export default defineNuxtConfig({
       title: 'Due - Financas Reimaginadas',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' },
-        { name: 'theme-color', content: '#D6FFF6' },
+        { name: 'theme-color', content: '#282423' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { name: 'apple-mobile-web-app-title', content: 'Due' },
         { name: 'description', content: 'Controle inteligente de cartao de credito com projecao futura, Advisor IA e importacao automatica.' }
       ],
       link: [
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap' },
+        { rel: 'preload', href: '/fonts/GeistPixel-Square.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
+        { rel: 'preload', href: '/fonts/Geist-Variable.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
         { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.svg' }
       ]
     }

@@ -9,7 +9,7 @@ const label = computed(() => TIER_LABELS[props.tier])
 
 const colorClass = computed(() => {
   switch (props.tier) {
-    case 'pro': return 'bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-500/25'
+    case 'pro': return 'bg-primary/15 text-primary-accent border-primary/25'
     case 'plus': return 'bg-primary/15 text-primary-foreground border-primary/25'
     default: return 'bg-muted text-muted-foreground border-border'
   }

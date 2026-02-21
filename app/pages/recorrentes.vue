@@ -101,10 +101,10 @@ const formatCurrency = (val: number) =>
           <div
             class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
             :style="sub.categoryColor ? { backgroundColor: sub.categoryColor + '20', borderColor: sub.categoryColor + '40' } : {}"
-            :class="!sub.categoryColor && 'bg-violet-100/60 dark:bg-violet-500/10'"
+            :class="!sub.categoryColor && 'bg-brand-accent/10 dark:bg-brand-accent/10'"
           >
             <span v-if="sub.categoryEmoji" class="text-base">{{ sub.categoryEmoji }}</span>
-            <RotateCw v-else class="w-4 h-4 text-violet-600 dark:text-violet-400" />
+            <RotateCw v-else class="w-4 h-4 text-primary-accent" />
           </div>
 
           <!-- Details -->

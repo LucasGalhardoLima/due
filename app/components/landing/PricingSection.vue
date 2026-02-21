@@ -104,13 +104,13 @@ function billingLabel(tier: typeof tiers[number]) {
   <section id="precos" class="py-28 relative overflow-hidden">
     <!-- Background -->
     <div class="absolute inset-0 -z-10" aria-hidden="true">
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-gradient-radial from-secondary/5 to-transparent rounded-full" />
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-gradient-radial from-primary/5 to-transparent rounded-full" />
     </div>
 
     <div class="container mx-auto px-6">
       <div class="max-w-4xl mx-auto text-center mb-16">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border text-sm font-medium mb-6">
-          <Crown class="w-4 h-4 text-secondary-accent" />
+          <Crown class="w-4 h-4 text-primary-accent" />
           Planos
         </div>
         <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6">
@@ -127,7 +127,7 @@ function billingLabel(tier: typeof tiers[number]) {
         <button
           aria-label="Alternar entre mensal e anual"
           class="relative w-14 h-8 rounded-full transition-colors duration-300"
-          :class="isAnnual ? 'bg-secondary' : 'bg-muted'"
+          :class="isAnnual ? 'bg-primary' : 'bg-muted'"
           @click="isAnnual = !isAnnual"
         >
           <div
@@ -151,16 +151,16 @@ function billingLabel(tier: typeof tiers[number]) {
           class="relative rounded-[2rem] p-8 transition-all duration-300"
           :class="[
             tier.highlight
-              ? 'border-2 border-secondary/40 bg-card shadow-lg shadow-secondary/10 md:scale-105 order-first md:order-none'
+              ? 'border-2 border-primary/40 bg-card shadow-lg shadow-primary/10 md:scale-105 order-first md:order-none'
               : tier.name === 'Pro'
-                ? 'border border-border bg-gradient-to-b from-secondary/5 to-card'
+                ? 'border border-border bg-gradient-to-b from-primary/5 to-card'
                 : 'border border-border bg-card'
           ]"
         >
           <!-- Popular badge -->
           <div
             v-if="tier.badge"
-            class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-bold"
+            class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold"
           >
             {{ tier.badge }}
           </div>
@@ -188,10 +188,10 @@ function billingLabel(tier: typeof tiers[number]) {
             class="w-full h-12 rounded-2xl font-bold text-sm transition-all duration-300 mb-8"
             :class="[
               tier.highlight
-                ? 'bg-secondary text-secondary-foreground shadow-lg shadow-secondary/25 hover:shadow-xl hover:shadow-secondary/30 hover:scale-[1.02]'
+                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02]'
                 : tier.name === 'Pro'
                   ? 'bg-foreground text-background hover:opacity-90'
-                  : 'border-2 border-border hover:border-secondary/40 hover:bg-secondary/5'
+                  : 'border-2 border-border hover:border-primary/40 hover:bg-primary/5'
             ]"
             @click="emit('start')"
           >
@@ -205,7 +205,7 @@ function billingLabel(tier: typeof tiers[number]) {
               :key="feature"
               class="flex items-start gap-3 text-sm"
             >
-              <Check class="w-4 h-4 mt-0.5 shrink-0 text-success" />
+              <Check class="w-4 h-4 mt-0.5 shrink-0 text-ai-accent" />
               <span class="text-muted-foreground">{{ feature }}</span>
             </li>
           </ul>
