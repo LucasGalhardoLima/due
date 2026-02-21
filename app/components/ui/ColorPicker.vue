@@ -11,11 +11,11 @@ const isOpen = ref(false)
 const containerRef = ref<HTMLElement | null>(null)
 
 const colors = [
-  '#D6FFF6', '#BFF5E8', '#8FE6D2', '#64CCB8', '#3DAF9E',
-  '#9B8CEA', '#7561D8', '#4E3EA8', '#231651', '#5B4FA0',
-  '#FF6B6B', '#FF8E72', '#FFA94D', '#FFD43B', '#A9E34B',
-  '#69DB7C', '#38D9A9', '#22B8CF', '#4DABF7', '#748FFC',
-  '#DA77F2', '#E599F7', '#F06595', '#FF922B', '#868E96',
+  '#D6FFF6', '#231651', '#7DE289', '#282423', '#FBFBFB',
+  '#CF4814', '#EAEF3A', '#DB805D', '#438DDE', '#868E96',
+  '#FFB3B3', '#FFDAB3', '#FFF3B3', '#B3FFD9', '#B3F0FF',
+  '#FF6B6B', '#FFA94D', '#69DB7C', '#4DABF7', '#DA77F2',
+  '#C92A2A', '#E67700', '#2B8A3E', '#1864AB', '#862E9C',
 ]
 
 const selectedColor = computed(() => props.modelValue)

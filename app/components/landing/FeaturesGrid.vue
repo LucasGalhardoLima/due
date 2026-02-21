@@ -107,8 +107,8 @@ const features = [
   <section class="py-28 relative overflow-hidden">
     <!-- Background decoration -->
     <div class="absolute inset-0 -z-10" aria-hidden="true">
-      <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px]" />
-      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[120px]" />
+      <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-accent/5 rounded-full blur-[150px]" />
+      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px]" />
     </div>
 
     <div class="container mx-auto px-6">
@@ -138,8 +138,8 @@ const features = [
             feature.size === 'tall' ? 'min-h-[320px] flex flex-col' : '',
             'hover:scale-[1.02] hover:-translate-y-1',
             feature.isAi
-              ? 'bg-gradient-to-br from-secondary/15 via-secondary/5 to-transparent border-secondary/20 hover:border-secondary/40 hover:shadow-lg hover:shadow-secondary/10'
-              : 'bg-card border-border hover:border-secondary/30 hover:shadow-lg hover:shadow-secondary/10'
+              ? 'bg-gradient-to-br from-ai-accent/10 via-ai-accent/5 to-transparent border-ai-accent/20 hover:border-ai-accent/40 hover:shadow-lg hover:shadow-ai-accent/10'
+              : 'bg-card border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10'
           ]"
         >
           <!-- Glassmorphism overlay on hover -->
@@ -152,22 +152,22 @@ const features = [
             <div
               class="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110"
               :class="feature.isAi
-                ? 'bg-gradient-to-br from-secondary/20 to-secondary/5'
+                ? 'bg-gradient-to-br from-ai-accent/20 to-ai-accent/5'
                 : 'bg-gradient-to-br from-primary/15 to-primary/5'"
             >
               <component
                 :is="feature.icon"
                 class="w-7 h-7 transition-colors duration-300"
-                :class="feature.isAi ? 'text-secondary-accent' : 'text-secondary-accent'"
+                :class="feature.isAi ? 'text-ai-accent' : 'text-primary-accent'"
               />
             </div>
           </div>
 
           <!-- Content -->
           <div :class="feature.size === 'tall' ? 'mt-auto' : ''">
-            <h3 class="relative text-xl font-bold mb-3 group-hover:text-secondary-accent transition-colors duration-300">
+            <h3 class="relative text-xl font-bold mb-3 group-hover:text-primary-accent transition-colors duration-300">
               {{ feature.title }}
-              <span v-if="feature.isAi" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-secondary/15 text-secondary-accent">
+              <span v-if="feature.isAi" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-ai-accent/15 text-ai-accent">
                 IA
               </span>
               <span v-if="feature.tier" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary-accent">

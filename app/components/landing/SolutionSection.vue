@@ -27,19 +27,19 @@ const steps = [
 
 const colorMap: Record<string, { bg: string; text: string; border: string }> = {
   primary: {
-    bg: 'bg-primary/35',
-    text: 'text-secondary-accent',
-    border: 'border-primary/60'
+    bg: 'bg-brand-accent/20',
+    text: 'text-primary-accent',
+    border: 'border-primary/40'
   },
   secondary: {
-    bg: 'bg-secondary/10',
-    text: 'text-secondary-accent',
-    border: 'border-secondary/30'
+    bg: 'bg-primary/10',
+    text: 'text-primary-accent',
+    border: 'border-primary/30'
   },
   'ai-accent': {
-    bg: 'bg-secondary/10',
-    text: 'text-secondary-accent',
-    border: 'border-secondary/30'
+    bg: 'bg-ai-accent/10',
+    text: 'text-ai-accent',
+    border: 'border-ai-accent/30'
   }
 }
 </script>
@@ -69,7 +69,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
       <div class="max-w-3xl mx-auto">
         <div class="relative">
           <!-- Vertical line -->
-          <div class="absolute left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-primary via-secondary to-secondary/70 opacity-20" />
+          <div class="absolute left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-brand-accent via-primary to-ai-accent/50 opacity-20" />
 
           <div class="space-y-6">
             <div
@@ -107,7 +107,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
                     >
                       {{ step.number }}
                     </span>
-                    <h3 class="text-2xl font-bold group-hover:text-secondary-accent transition-colors">
+                    <h3 class="text-2xl font-bold group-hover:text-primary-accent transition-colors">
                       {{ step.title }}
                     </h3>
                   </div>

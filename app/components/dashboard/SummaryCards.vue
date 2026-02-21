@@ -35,7 +35,7 @@ const invoiceGradient = computed(() => {
     case 'warning':
       return 'bg-warning-muted border-warning/20'
     default:
-      return 'bg-[linear-gradient(145deg,hsl(var(--primary)/0.65),hsl(var(--mint-600)/0.24))] dark:bg-[linear-gradient(145deg,hsl(var(--primary)/0.42),hsl(var(--mint-700)/0.34))] border-primary/45'
+      return 'bg-[linear-gradient(145deg,hsl(var(--primary)/0.65),hsl(var(--brand-accent)/0.24))] dark:bg-[linear-gradient(145deg,hsl(var(--primary)/0.42),hsl(var(--brand-accent)/0.34))] border-primary/45'
   }
 })
 
@@ -60,7 +60,7 @@ const dueGradient = computed(() => {
     case 'warning':
       return 'bg-warning-muted border-warning/20'
     default:
-      return 'bg-[linear-gradient(145deg,hsl(var(--card)),hsl(var(--violet-100)/0.32))] dark:bg-[linear-gradient(145deg,hsl(var(--card)),hsl(var(--violet-500)/0.16))] border-border'
+      return 'bg-[linear-gradient(145deg,hsl(var(--card)),hsl(var(--brand-accent)/0.12))] dark:bg-[linear-gradient(145deg,hsl(var(--card)),hsl(var(--brand-accent)/0.16))] border-border'
   }
 })
 

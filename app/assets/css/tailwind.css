@@ -1,94 +1,88 @@
+@font-face {
+  font-family: 'Geist Pixel Square';
+  src: url('/fonts/GeistPixel-Square.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 168 34% 97%;
-    --foreground: 252 57% 20%;
+    --background: 0 0% 98%;           /* #fbfbfb */
+    --foreground: 0 0% 13%;
 
-    --card: 168 42% 99%;
-    --card-foreground: 252 57% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
 
-    --popover: 168 35% 99%;
-    --popover-foreground: 252 57% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
 
-    /* Brand ramps */
-    --mint-50: 168 100% 98%;
-    --mint-100: 168 100% 94%;
-    --mint-200: 168 82% 86%;
-    --mint-300: 168 68% 77%;
-    --mint-400: 168 58% 67%;
-    --mint-500: 168 48% 56%;
-    --mint-600: 168 42% 45%;
-    --mint-700: 168 38% 35%;
+    /* Brand accent — light mint, used for gradients/highlights only */
+    --brand-accent: 164 100% 92%;     /* #d6fff6 */
+    --brand-accent-foreground: 0 0% 13%;
 
-    --violet-50: 252 58% 95%;
-    --violet-100: 252 54% 88%;
-    --violet-200: 252 48% 77%;
-    --violet-300: 252 44% 65%;
-    --violet-400: 252 48% 54%;
-    --violet-500: 252 54% 42%;
-    --violet-600: 252 57% 31%;
-    --violet-700: 252 57% 20%;
+    /* Primary — deep violet for interactive elements */
+    --primary: 252 57% 20%;           /* #231651 */
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 252 57% 30%;
 
-    --primary: 168 100% 92%;
-    --primary-foreground: 252 57% 20%;
+    --secondary: 0 0% 93%;
+    --secondary-foreground: 0 0% 13%;
+    --secondary-accent: 252 48% 40%;
 
-    --secondary: 252 57% 20%;
-    --secondary-foreground: 168 100% 92%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 45%;
 
-    --muted: 168 30% 93%;
-    --muted-foreground: 252 26% 38%;
+    --accent: 164 40% 94%;
+    --accent-foreground: 0 0% 13%;
 
-    --accent: 168 64% 90%;
-    --accent-foreground: 252 57% 20%;
-
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 17 83% 45%;        /* #cf4814 */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 168 22% 84%;
-    --input: 168 22% 86%;
-    --ring: 168 46% 42%;
+    --border: 0 0% 89%;
+    --input: 0 0% 91%;
+    --ring: 252 57% 20%;
 
     --radius: 1.25rem;
 
-    /* AI Accent aligned to secondary family */
-    --ai-accent: 252 56% 44%;
+    /* AI Accent — green for AI features */
+    --ai-accent: 131 56% 42%;         /* #7de289 darkened for light bg */
     --ai-accent-foreground: 0 0% 98%;
 
-    /* Accent tokens (derived from blending primary & secondary) */
-    --accent-warm: 252 56% 56%;
-    --accent-warm-foreground: 0 0% 100%;
-    --accent-cool: 168 46% 42%;
-    --accent-cool-foreground: 0 0% 100%;
-
-    /* Readable accent tokens (text on light backgrounds) */
-    --primary-accent: 168 48% 40%;
-    --secondary-accent: 252 48% 54%;
+    /* Readable accent tokens */
+    --secondary-accent: 252 48% 40%;
 
     /* Status Colors */
-    --success: 160 84% 39%;
-    --success-foreground: 0 0% 98%;
-    --success-muted: 160 60% 95%;
+    --success: 62 84% 40%;            /* #eaef3a darkened for readability */
+    --success-foreground: 0 0% 10%;
+    --success-muted: 62 60% 93%;
 
-    --warning: 38 92% 50%;
+    --warning: 25 65% 50%;            /* #db805d hue-shifted to 25 */
     --warning-foreground: 0 0% 10%;
-    --warning-muted: 38 90% 95%;
+    --warning-muted: 25 50% 94%;
 
-    --info: 221 83% 53%;
+    --info: 211 70% 57%;              /* #438dde */
     --info-foreground: 0 0% 98%;
-    --info-muted: 221 80% 95%;
+    --info-muted: 211 60% 95%;
 
-    --danger: 0 84% 60%;
+    --danger: 17 83% 45%;             /* #cf4814 */
     --danger-foreground: 0 0% 98%;
-    --danger-muted: 0 80% 95%;
+    --danger-muted: 17 60% 95%;
 
-    --glass-bg: 168 40% 98% / 0.78;
-    --glass-border: 252 28% 62% / 0.16;
+    --glass-bg: 0 0% 100% / 0.78;
+    --glass-border: 0 0% 50% / 0.12;
 
-    --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
-    --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Geist Pixel Square", ui-monospace, monospace;
+    --font-body: "Geist", ui-sans-serif, system-ui, sans-serif;
 
     /* Motion tokens */
     --motion-fast: 140ms;
@@ -99,62 +93,67 @@
   }
 
   .dark {
-    --background: 252 38% 9%;
-    --foreground: 168 34% 90%;
+    --background: 12 7% 15%;          /* #282423 warm charcoal */
+    --foreground: 0 0% 90%;
 
-    --card: 250 24% 14%;
-    --card-foreground: 168 34% 90%;
+    --card: 12 5% 18%;
+    --card-foreground: 0 0% 90%;
 
-    --popover: 250 22% 15%;
-    --popover-foreground: 168 34% 90%;
+    --popover: 12 5% 19%;
+    --popover-foreground: 0 0% 90%;
 
-    --primary: 168 64% 70%;
-    --primary-foreground: 252 57% 14%;
+    /* Brand accent — deep violet for dark mode */
+    --brand-accent: 252 57% 20%;      /* #231651 */
+    --brand-accent-foreground: 0 0% 90%;
 
-    --secondary: 252 44% 36%;
-    --secondary-foreground: 168 90% 92%;
+    --primary: 164 70% 75%;           /* bright mint */
+    --primary-foreground: 12 7% 15%;
+    --primary-accent: 164 60% 65%;
 
-    --muted: 250 14% 19%;
-    --muted-foreground: 168 20% 74%;
+    --secondary: 12 3% 24%;
+    --secondary-foreground: 0 0% 88%;
+    --secondary-accent: 252 50% 65%;
 
-    --accent: 252 20% 21%;
-    --accent-foreground: 168 34% 90%;
+    --muted: 12 3% 20%;
+    --muted-foreground: 0 0% 58%;
 
-    --destructive: 0 62.8% 30.6%;
+    --accent: 252 15% 22%;
+    --accent-foreground: 0 0% 90%;
+
+    --destructive: 17 72% 40%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 250 12% 28%;
-    --input: 250 12% 28%;
-    --ring: 168 64% 62%;
+    --border: 12 4% 24%;
+    --input: 12 4% 24%;
+    --ring: 164 70% 65%;
 
-    --ai-accent: 252 58% 66%;
-    --ai-accent-foreground: 0 0% 98%;
+    /* AI Accent — green for AI features */
+    --ai-accent: 131 56% 69%;         /* #7de289 */
+    --ai-accent-foreground: 0 0% 10%;
 
-    /* Accent tokens - slightly brighter for dark mode */
-    --accent-warm: 252 58% 68%;
-    --accent-warm-foreground: 0 0% 100%;
-    --accent-cool: 168 56% 60%;
-    --accent-cool-foreground: 0 0% 100%;
+    /* Readable accent tokens */
+    --primary-accent: 164 60% 65%;
+    --secondary-accent: 252 50% 65%;
 
-    /* Readable accent tokens (text on dark backgrounds) */
-    --primary-accent: 168 56% 60%;
-    --secondary-accent: 252 58% 68%;
+    /* Status Colors — Dark Mode */
+    --success: 62 84% 58%;            /* #eaef3a full brightness */
+    --success-foreground: 0 0% 10%;
+    --success-muted: 62 30% 18%;
 
-    /* Status Colors - Dark Mode */
-    --success: 160 72% 45%;
-    --success-muted: 160 40% 15%;
+    --warning: 25 65% 61%;            /* #db805d hue-shifted to 25 */
+    --warning-foreground: 0 0% 10%;
+    --warning-muted: 25 30% 18%;
 
-    --warning: 38 85% 55%;
-    --warning-muted: 38 50% 15%;
+    --info: 211 70% 60%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 211 30% 18%;
 
-    --info: 221 75% 60%;
-    --info-muted: 221 50% 15%;
+    --danger: 17 75% 50%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 17 30% 18%;
 
-    --danger: 0 72% 50%;
-    --danger-muted: 0 50% 15%;
-
-    --glass-bg: 250 20% 13% / 0.88;
-    --glass-border: 168 26% 82% / 0.12;
+    --glass-bg: 12 5% 16% / 0.88;
+    --glass-border: 0 0% 70% / 0.08;
   }
 
 }
@@ -185,15 +184,15 @@
 
 @layer components {
   /* Typography utility classes */
-  .text-display { @apply text-4xl md:text-5xl font-extrabold tracking-tight leading-none; font-family: var(--font-display); }
-  .text-h1 { @apply text-3xl font-extrabold tracking-tight leading-tight; font-family: var(--font-display); }
-  .text-h2 { @apply text-xl md:text-2xl font-bold tracking-tight; font-family: var(--font-display); }
-  .text-h3 { @apply text-lg font-bold; font-family: var(--font-display); }
-  .text-h4 { @apply text-base font-semibold; font-family: var(--font-display); }
+  .text-display { @apply text-4xl md:text-5xl font-extrabold tracking-normal leading-none; font-family: var(--font-display); }
+  .text-h1 { @apply text-3xl font-extrabold tracking-normal leading-tight; font-family: var(--font-display); }
+  .text-h2 { @apply text-xl md:text-2xl font-bold tracking-normal; font-family: var(--font-display); }
+  .text-h3 { @apply text-lg font-bold; font-family: var(--font-body); }
+  .text-h4 { @apply text-base font-semibold; font-family: var(--font-body); }
   .text-body { @apply text-sm font-normal leading-relaxed; }
   .text-small { @apply text-xs font-medium; }
   .text-micro { @apply text-[10px] font-bold uppercase tracking-widest; }
-  .text-stat { @apply text-2xl md:text-3xl lg:text-4xl font-extrabold tabular-nums tracking-tighter; font-family: var(--font-display); }
+  .text-stat { @apply text-2xl md:text-3xl lg:text-4xl font-extrabold tabular-nums tracking-normal; font-family: var(--font-display); }
 
   /* Shared micro-interaction helpers */
   .micro-lift { @apply motion-safe:transition-[transform,box-shadow,background-color,border-color,color] motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-elevation-2; }

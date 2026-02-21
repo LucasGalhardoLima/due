@@ -24,7 +24,7 @@ const gradientClass = computed(() => {
     case 'warning':
       return 'bg-warning-muted border-warning/20'
     default:
-      return 'bg-[linear-gradient(145deg,hsl(var(--primary)/0.65),hsl(var(--mint-600)/0.24))] dark:bg-[linear-gradient(145deg,hsl(var(--primary)/0.42),hsl(var(--mint-700)/0.34))] border-primary/45'
+      return 'bg-[linear-gradient(145deg,hsl(var(--primary)/0.65),hsl(var(--brand-accent)/0.24))] dark:bg-[linear-gradient(145deg,hsl(var(--primary)/0.42),hsl(var(--brand-accent)/0.34))] border-primary/45'
   }
 })
 

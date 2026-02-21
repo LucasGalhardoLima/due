@@ -18,14 +18,14 @@ const emit = defineEmits<{
       <div class="max-w-4xl mx-auto text-center">
         <!-- Du Avatar -->
         <div class="flex justify-center mb-8">
-          <div class="w-20 h-20 bg-gradient-to-br from-secondary to-secondary/90 rounded-[2rem] flex items-center justify-center text-secondary-foreground font-black text-3xl shadow-2xl shadow-secondary/30">
+          <div class="w-20 h-20 bg-primary rounded-[2rem] flex items-center justify-center text-primary-foreground font-black text-3xl shadow-2xl shadow-primary/30">
             Du
           </div>
         </div>
 
         <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
           E aí, bora resolver<br class="hidden sm:block" >
-          <span class="bg-gradient-to-r from-secondary to-secondary/70 bg-clip-text text-transparent">isso juntos?</span>
+          <span class="text-primary">isso juntos?</span>
         </h2>
         
         <p class="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
@@ -38,7 +38,7 @@ const emit = defineEmits<{
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
           <NuxtLink
             to="/sign-up"
-            class="group w-full sm:w-auto inline-flex items-center justify-center gap-3 h-16 px-12 rounded-[2rem] bg-gradient-to-r from-secondary to-secondary/90 text-secondary-foreground font-bold text-lg shadow-lg shadow-secondary/25 hover:shadow-xl hover:shadow-secondary/30 hover:scale-[1.02] transition-all duration-300"
+            class="group w-full sm:w-auto inline-flex items-center justify-center gap-3 h-16 px-12 rounded-[2rem] bg-primary text-primary-foreground font-bold text-lg shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] transition-all duration-300"
             @click="emit('start')"
           >
             <Heart class="w-5 h-5" />
@@ -47,7 +47,7 @@ const emit = defineEmits<{
           </NuxtLink>
           <a
             href="#precos"
-            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-16 px-10 rounded-[2rem] border-2 border-border bg-card/70 backdrop-blur-sm font-semibold hover:bg-card hover:border-secondary/40 transition-all duration-300"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-16 px-10 rounded-[2rem] border-2 border-border bg-card/70 backdrop-blur-sm font-semibold hover:bg-card hover:border-primary/40 transition-all duration-300"
           >
             Ver planos
           </a>
