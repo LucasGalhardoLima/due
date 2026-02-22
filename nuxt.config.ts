@@ -19,8 +19,8 @@ export default defineNuxtConfig({
       name: 'Du - Seu Assistente Financeiro',
       short_name: 'Du',
       description: 'Oi, eu sou o Du! Vou te ajudar a sair do buraco da fatura e conquistar sua liberdade financeira.',
-      theme_color: '#282423',
-      background_color: '#282423',
+      theme_color: '#121212',
+      background_color: '#121212',
       display: 'standalone',
       start_url: '/',
       icons: [
@@ -66,7 +66,7 @@ export default defineNuxtConfig({
     localization: ptBR,
     appearance: {
       variables: {
-        colorPrimary: '#231651',
+        colorPrimary: '#171717',
         colorBackground: 'transparent',
         colorNeutral: '#1a1a1a',
         colorForeground: '#1a1a1a',
@@ -74,8 +74,8 @@ export default defineNuxtConfig({
         colorInput: '#e3e3e3',
         colorInputForeground: '#1a1a1a',
         colorBorder: '#e3e3e3',
-        colorDanger: '#cf4814',
-        colorSuccess: '#eaef3a',
+        colorDanger: '#171717',
+        colorSuccess: '#171717',
         fontFamily: '"Geist", ui-sans-serif, system-ui, sans-serif',
         fontFamilyButtons: '"Geist Pixel Square", ui-monospace, monospace',
         borderRadius: '0.75rem',
@@ -117,7 +117,7 @@ export default defineNuxtConfig({
       title: 'Due - Finanças Reimaginadas',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' },
-        { name: 'theme-color', content: '#282423' },
+        { name: 'theme-color', content: '#121212' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { name: 'apple-mobile-web-app-title', content: 'Due' },

@@ -58,7 +58,7 @@ const colorClasses: Record<string, { bg: string; icon: string }> = {
           </div>
 
           <!-- Value -->
-          <div class="text-3xl md:text-4xl font-black tracking-tight mb-1">
+          <div class="text-3xl md:text-4xl font-black tracking-tight mb-1 font-display">
             {{ stat.value }}
           </div>
 

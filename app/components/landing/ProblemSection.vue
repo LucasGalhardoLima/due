@@ -50,7 +50,7 @@ const colorClasses: Record<string, { bg: string; icon: string; border: string }>
           <Frown class="w-10 h-10 text-warning" />
         </div>
         
-        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
+        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight font-display">
           Deixa eu adivinhar...<br class="hidden sm:block" >
           <span class="text-warning">tá difícil, né?</span>
         </h2>
@@ -84,7 +84,7 @@ const colorClasses: Record<string, { bg: string; icon: string; border: string }>
             />
           </div>
 
-          <h3 class="text-xl font-bold mb-3">{{ point.title }}</h3>
+          <h3 class="text-xl font-bold mb-3 font-display">{{ point.title }}</h3>
           <p class="text-muted-foreground leading-relaxed">{{ point.description }}</p>
         </div>
       </div>
