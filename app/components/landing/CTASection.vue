@@ -17,7 +17,7 @@ const emit = defineEmits<{
           </div>
         </div>
 
-        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
+        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight font-display">
           E aí, bora resolver<br class="hidden sm:block" >
           <span class="text-primary">isso juntos?</span>
         </h2>

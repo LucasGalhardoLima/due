@@ -29,7 +29,7 @@ const emit = defineEmits<{
         </div>
 
         <!-- Personal Headline -->
-        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1]">
+        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] font-display">
           <span class="block text-2xl sm:text-3xl text-muted-foreground font-medium mb-4">Oi, eu sou o Du! 👋</span>
           <span class="block mb-2">Vou te ajudar a dominar</span>
           <span class="relative inline-block">

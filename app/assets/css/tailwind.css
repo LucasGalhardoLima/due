@@ -17,66 +17,62 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;           /* #fbfbfb */
-    --foreground: 0 0% 13%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    --popover-foreground: 0 0% 9%;
 
-    /* Brand accent — light mint, used for gradients/highlights only */
-    --brand-accent: 164 100% 92%;     /* #d6fff6 */
-    --brand-accent-foreground: 0 0% 13%;
+    --brand-accent: 0 0% 93%;
+    --brand-accent-foreground: 0 0% 9%;
 
-    /* Primary — deep violet for interactive elements */
-    --primary: 252 57% 20%;           /* #231651 */
+    --primary: 0 0% 9%;
     --primary-foreground: 0 0% 98%;
-    --primary-accent: 252 57% 30%;
+    --primary-accent: 0 0% 25%;
 
     --secondary: 0 0% 93%;
-    --secondary-foreground: 0 0% 13%;
-    --secondary-accent: 252 48% 40%;
+    --secondary-foreground: 0 0% 9%;
+    --secondary-accent: 0 0% 40%;
 
     --muted: 0 0% 95%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 164 40% 94%;
-    --accent-foreground: 0 0% 13%;
+    --accent: 0 0% 95%;
+    --accent-foreground: 0 0% 9%;
 
-    --destructive: 17 83% 45%;        /* #cf4814 */
+    --destructive: 0 0% 9%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 89%;
     --input: 0 0% 91%;
-    --ring: 252 57% 20%;
+    --ring: 0 0% 9%;
 
     --radius: 1.25rem;
 
-    /* AI Accent — green for AI features */
-    --ai-accent: 131 56% 42%;         /* #7de289 darkened for light bg */
+    --ai-accent: 0 0% 20%;
     --ai-accent-foreground: 0 0% 98%;
 
-    /* Readable accent tokens */
-    --secondary-accent: 252 48% 40%;
+    --secondary-accent: 0 0% 40%;
 
     /* Status Colors */
-    --success: 62 84% 40%;            /* #eaef3a darkened for readability */
-    --success-foreground: 0 0% 10%;
-    --success-muted: 62 60% 93%;
+    --success: 0 0% 9%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 0 0% 93%;
 
-    --warning: 25 65% 50%;            /* #db805d hue-shifted to 25 */
-    --warning-foreground: 0 0% 10%;
-    --warning-muted: 25 50% 94%;
+    --warning: 0 0% 30%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 0 0% 93%;
 
-    --info: 211 70% 57%;              /* #438dde */
+    --info: 0 0% 30%;
     --info-foreground: 0 0% 98%;
-    --info-muted: 211 60% 95%;
+    --info-muted: 0 0% 93%;
 
-    --danger: 17 83% 45%;             /* #cf4814 */
+    --danger: 0 0% 9%;
     --danger-foreground: 0 0% 98%;
-    --danger-muted: 17 60% 95%;
+    --danger-muted: 0 0% 93%;
 
     --glass-bg: 0 0% 100% / 0.78;
     --glass-border: 0 0% 50% / 0.12;
@@ -93,66 +89,63 @@
   }
 
   .dark {
-    --background: 12 7% 15%;          /* #282423 warm charcoal */
+    --background: 0 0% 7%;
     --foreground: 0 0% 90%;
 
-    --card: 12 5% 18%;
+    --card: 0 0% 10%;
     --card-foreground: 0 0% 90%;
 
-    --popover: 12 5% 19%;
+    --popover: 0 0% 11%;
     --popover-foreground: 0 0% 90%;
 
-    /* Brand accent — deep violet for dark mode */
-    --brand-accent: 252 57% 20%;      /* #231651 */
+    --brand-accent: 0 0% 20%;
     --brand-accent-foreground: 0 0% 90%;
 
-    --primary: 164 70% 75%;           /* bright mint */
-    --primary-foreground: 12 7% 15%;
-    --primary-accent: 164 60% 65%;
+    --primary: 0 0% 90%;
+    --primary-foreground: 0 0% 7%;
+    --primary-accent: 0 0% 75%;
 
-    --secondary: 12 3% 24%;
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 88%;
-    --secondary-accent: 252 50% 65%;
+    --secondary-accent: 0 0% 60%;
 
-    --muted: 12 3% 20%;
+    --muted: 0 0% 13%;
     --muted-foreground: 0 0% 58%;
 
-    --accent: 252 15% 22%;
+    --accent: 0 0% 15%;
     --accent-foreground: 0 0% 90%;
 
-    --destructive: 17 72% 40%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 0% 90%;
+    --destructive-foreground: 0 0% 7%;
 
-    --border: 12 4% 24%;
-    --input: 12 4% 24%;
-    --ring: 164 70% 65%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 0 0% 75%;
 
-    /* AI Accent — green for AI features */
-    --ai-accent: 131 56% 69%;         /* #7de289 */
-    --ai-accent-foreground: 0 0% 10%;
+    --ai-accent: 0 0% 80%;
+    --ai-accent-foreground: 0 0% 9%;
 
-    /* Readable accent tokens */
-    --primary-accent: 164 60% 65%;
-    --secondary-accent: 252 50% 65%;
+    --primary-accent: 0 0% 75%;
+    --secondary-accent: 0 0% 60%;
 
     /* Status Colors — Dark Mode */
-    --success: 62 84% 58%;            /* #eaef3a full brightness */
-    --success-foreground: 0 0% 10%;
-    --success-muted: 62 30% 18%;
+    --success: 0 0% 80%;
+    --success-foreground: 0 0% 9%;
+    --success-muted: 0 0% 15%;
 
-    --warning: 25 65% 61%;            /* #db805d hue-shifted to 25 */
-    --warning-foreground: 0 0% 10%;
-    --warning-muted: 25 30% 18%;
+    --warning: 0 0% 65%;
+    --warning-foreground: 0 0% 9%;
+    --warning-muted: 0 0% 15%;
 
-    --info: 211 70% 60%;
-    --info-foreground: 0 0% 98%;
-    --info-muted: 211 30% 18%;
+    --info: 0 0% 65%;
+    --info-foreground: 0 0% 9%;
+    --info-muted: 0 0% 15%;
 
-    --danger: 17 75% 50%;
-    --danger-foreground: 0 0% 98%;
-    --danger-muted: 17 30% 18%;
+    --danger: 0 0% 80%;
+    --danger-foreground: 0 0% 9%;
+    --danger-muted: 0 0% 15%;
 
-    --glass-bg: 12 5% 16% / 0.88;
+    --glass-bg: 0 0% 8% / 0.88;
     --glass-border: 0 0% 70% / 0.08;
   }
 

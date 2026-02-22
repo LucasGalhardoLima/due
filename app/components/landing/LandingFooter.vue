@@ -35,7 +35,7 @@ const social = [
       <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
         <!-- Brand -->
         <div class="col-span-2">
-          <NuxtLink to="/" class="font-black text-2xl flex items-center gap-2 mb-4">
+          <NuxtLink to="/" class="font-black text-2xl flex items-center gap-2 mb-4 font-display">
             <div class="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground font-black shadow-lg shadow-primary/25">
               Du
             </div>
@@ -43,7 +43,7 @@ const social = [
           </NuxtLink>
           <p class="text-muted-foreground text-sm max-w-xs leading-relaxed mb-6">
             Oi! Eu sou o Du, seu assistente financeiro pessoal. Tô aqui pra te ajudar a organizar
-            seus gastos, controlar parcelas, planejar metas e conquistar sua liberdade financeira. 💚
+            seus gastos, controlar parcelas, planejar metas e conquistar sua liberdade financeira. 🖤
           </p>
           <!-- Social links -->
           <div class="flex items-center gap-3">
