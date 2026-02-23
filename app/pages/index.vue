@@ -51,7 +51,7 @@ definePageMeta({
     <nav class="fixed top-0 left-0 right-0 z-50 border-b border-border/70 bg-card">
       <div class="container mx-auto px-6 h-16 flex items-center justify-between">
         <!-- Logo -->
-        <NuxtLink to="/" class="font-black text-xl flex items-center gap-2 tracking-tight font-display">
+        <NuxtLink to="/" class="font-black text-xl flex items-center gap-2 tracking-tight">
           <div class="w-9 h-9 bg-secondary rounded-2xl flex items-center justify-center text-secondary-foreground font-black shadow-elevation-2">
             Du
           </div>

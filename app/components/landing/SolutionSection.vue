@@ -52,7 +52,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
           <Wand2 class="w-4 h-4 text-success" />
           Simples assim
         </div>
-        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 font-display">
+        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6">
           Como eu vou te ajudar
         </h2>
         <p class="text-xl text-muted-foreground">
@@ -102,7 +102,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
                     >
                       {{ step.number }}
                     </span>
-                    <h3 class="text-2xl font-bold group-hover:text-primary-accent transition-colors font-display">
+                    <h3 class="text-2xl font-bold group-hover:text-primary-accent transition-colors">
                       {{ step.title }}
                     </h3>
                   </div>

@@ -111,7 +111,7 @@ const features = [
           <Zap class="w-4 h-4 text-primary-accent" />
           Ferramentas poderosas
         </div>
-        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 font-display">
+        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6">
           Tudo que você precisa
         </h2>
         <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -154,7 +154,7 @@ const features = [
 
           <!-- Content -->
           <div :class="feature.size === 'tall' ? 'mt-auto' : ''">
-            <h3 class="relative text-xl font-bold mb-3 group-hover:text-primary-accent transition-colors duration-300 font-display">
+            <h3 class="relative text-xl font-bold mb-3 group-hover:text-primary-accent transition-colors duration-300">
               {{ feature.title }}
               <span v-if="feature.isAi" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-ai-accent/15 text-ai-accent">
                 IA
