@@ -76,7 +76,7 @@ export default defineNuxtConfig({
         colorBorder: '#e3e3e3',
         colorDanger: '#171717',
         colorSuccess: '#171717',
-        fontFamily: '"Geist", ui-sans-serif, system-ui, sans-serif',
+        fontFamily: '"Geist Pixel Square", ui-monospace, monospace',
         fontFamilyButtons: '"Geist Pixel Square", ui-monospace, monospace',
         borderRadius: '0.75rem',
         fontSize: '0.875rem',

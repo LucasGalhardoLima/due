@@ -108,7 +108,7 @@ function billingLabel(tier: typeof tiers[number]) {
           <Crown class="w-4 h-4 text-primary-accent" />
           Planos
         </div>
-        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 font-display">
+        <h2 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6">
           Escolha seu plano
         </h2>
         <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -161,14 +161,14 @@ function billingLabel(tier: typeof tiers[number]) {
           </div>
 
           <!-- Tier name -->
-          <h3 class="text-xl font-bold mb-1 font-display">{{ tier.name }}</h3>
+          <h3 class="text-xl font-bold mb-1">{{ tier.name }}</h3>
           <p class="text-sm text-muted-foreground mb-6">{{ tier.tagline }}</p>
 
           <!-- Price -->
           <div class="mb-6">
             <div class="flex items-baseline gap-1">
               <span class="text-sm text-muted-foreground">R$</span>
-              <span class="text-5xl font-black tracking-tight transition-all duration-300 font-display">
+              <span class="text-5xl font-black tracking-tight transition-all duration-300">
                 {{ currentPrice(tier) }}
               </span>
               <span v-if="tier.monthlyPrice > 0" class="text-sm text-muted-foreground">/mês</span>

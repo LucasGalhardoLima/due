@@ -35,7 +35,7 @@ const social = [
       <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
         <!-- Brand -->
         <div class="col-span-2">
-          <NuxtLink to="/" class="font-black text-2xl flex items-center gap-2 mb-4 font-display">
+          <NuxtLink to="/" class="font-black text-2xl flex items-center gap-2 mb-4">
             <div class="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground font-black shadow-lg shadow-primary/25">
               Du
             </div>
