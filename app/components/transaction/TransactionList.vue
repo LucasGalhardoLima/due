@@ -203,7 +203,7 @@ function getIcon(categoryName: string) {
                 <span class="text-xs px-2 py-0.5 rounded-full bg-muted border font-medium">{{ tx.cardName }}</span>
               </TableCell>
               <TableCell class="text-center py-1">
-                <span v-if="tx.totalInstallments > 1" class="text-xs font-mono">
+                <span v-if="tx.totalInstallments > 1" class="text-xs">
                   {{ tx.installmentNumber }}/{{ tx.totalInstallments }}
                 </span>
                 <span v-else class="text-muted-foreground">-</span>

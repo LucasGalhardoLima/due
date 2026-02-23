@@ -13,8 +13,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
+        sans: ['var(--font-display)'],
+        mono: ['var(--font-display)'],
         display: ['var(--font-display)'],
-        body: ['var(--font-body)'],
+        body: ['var(--font-display)'],
       },
       colors: {
         border: "hsl(var(--border))",
