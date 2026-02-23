@@ -24,7 +24,6 @@ import {
 import { Button } from '@/components/ui/button'
 import TierBadge from '@/components/tier/TierBadge.vue'
 import NotificationBell from '@/components/layout/NotificationBell.vue'
-import PalettePicker from '@/components/layout/PalettePicker.vue'
 
 const { user } = useUser()
 const clerk = useClerk()
@@ -208,8 +207,6 @@ function closeMobileMenu() {
               <Moon v-if="colorMode.value === 'light'" class="w-3.5 h-3.5" />
               <Sun v-else class="w-3.5 h-3.5" />
             </button>
-
-            <PalettePicker />
 
             <button
               class="flex items-center justify-center h-9 w-9 rounded-xl bg-background border border-border hover:bg-danger/10 hover:border-danger/20 hover:text-danger transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-muted-foreground"

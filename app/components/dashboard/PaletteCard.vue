@@ -29,7 +29,7 @@ const { palettes, current, setPalette } = usePalette()
           ]"
           @click="setPalette(palette.id)"
         >
-          <!-- 3-dot swatch -->
+          <!-- 3-dot swatch (primary, secondary, accent) -->
           <div class="relative flex items-center gap-1">
             <span
               class="block w-4 h-4 rounded-full"
@@ -52,6 +52,26 @@ const { palettes, current, setPalette } = usePalette()
             </span>
           </div>
 
+          <!-- 4-dot status swatch -->
+          <div class="flex items-center gap-0.5">
+            <span
+              class="block w-2.5 h-2.5 rounded-full"
+              :style="{ backgroundColor: palette.success }"
+            />
+            <span
+              class="block w-2.5 h-2.5 rounded-full"
+              :style="{ backgroundColor: palette.warning }"
+            />
+            <span
+              class="block w-2.5 h-2.5 rounded-full"
+              :style="{ backgroundColor: palette.info }"
+            />
+            <span
+              class="block w-2.5 h-2.5 rounded-full"
+              :style="{ backgroundColor: palette.danger }"
+            />
+          </div>
+
           <!-- Name -->
           <span class="text-[9px] font-bold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
             {{ palette.label }}
@@ -61,7 +81,7 @@ const { palettes, current, setPalette } = usePalette()
     </div>
 
     <!-- Footer Legend -->
-    <div class="px-5 pb-4 flex items-center gap-4">
+    <div class="px-5 pb-2 flex items-center gap-4">
       <span class="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
         <span class="block w-2 h-2 rounded-full bg-primary" />
         Primária
@@ -73,6 +93,24 @@ const { palettes, current, setPalette } = usePalette()
       <span class="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
         <span class="block w-2 h-2 rounded-full bg-accent" />
         Accent
+      </span>
+    </div>
+    <div class="px-5 pb-4 flex items-center gap-4">
+      <span class="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+        <span class="block w-2 h-2 rounded-full bg-success" />
+        Success
+      </span>
+      <span class="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+        <span class="block w-2 h-2 rounded-full bg-warning" />
+        Warning
+      </span>
+      <span class="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+        <span class="block w-2 h-2 rounded-full bg-info" />
+        Info
+      </span>
+      <span class="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+        <span class="block w-2 h-2 rounded-full bg-danger" />
+        Danger
       </span>
     </div>
   </div>
