@@ -395,6 +395,9 @@ const showPayConfirm = ref(false)
         </div>
       </div>
 
+      <!-- Palette Picker Card -->
+      <PaletteCard class="mb-5" />
+
       <!-- Section 0: Free to Spend Hero -->
       <FreeToSpendCard
         v-if="budgetSummary && budgetSummary.totalIncome > 0"

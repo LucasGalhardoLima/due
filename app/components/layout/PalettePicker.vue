@@ -5,7 +5,7 @@ const { palettes, current, setPalette } = usePalette()
 </script>
 
 <template>
-  <div class="flex items-center gap-1.5" role="radiogroup" aria-label="Paleta de cores">
+  <div class="flex items-center gap-2" role="radiogroup" aria-label="Paleta de cores">
     <button
       v-for="palette in palettes"
       :key="palette.id"
@@ -13,16 +13,26 @@ const { palettes, current, setPalette } = usePalette()
       :aria-label="palette.label"
       :aria-checked="current === palette.id"
       role="radio"
-      class="relative w-5 h-5 rounded-full transition-all duration-200 ease-out shrink-0"
+      class="relative flex items-center gap-0.5 rounded-full px-1 py-1 transition-all duration-200 ease-out"
       :class="[
         current === palette.id
-          ? 'ring-2 ring-foreground/70 ring-offset-2 ring-offset-background scale-110'
-          : 'hover:scale-110 opacity-70 hover:opacity-100'
+          ? 'bg-muted ring-1 ring-foreground/30 ring-offset-1 ring-offset-background'
+          : 'hover:bg-muted/50 opacity-70 hover:opacity-100'
       ]"
-      :style="{
-        background: `linear-gradient(135deg, ${palette.primary} 50%, ${palette.secondary} 50%)`,
-      }"
       @click="setPalette(palette.id)"
-    />
+    >
+      <span
+        class="block w-2.5 h-2.5 rounded-full shrink-0"
+        :style="{ backgroundColor: palette.primary }"
+      />
+      <span
+        class="block w-2.5 h-2.5 rounded-full shrink-0"
+        :style="{ backgroundColor: palette.secondary }"
+      />
+      <span
+        class="block w-2.5 h-2.5 rounded-full shrink-0"
+        :style="{ backgroundColor: palette.accent }"
+      />
+    </button>
   </div>
 </template>
