@@ -198,7 +198,7 @@ function closeMobileMenu() {
           </div>
 
           <!-- Actions Row -->
-          <div class="flex items-center justify-between px-2 gap-2">
+          <div class="flex items-center px-2 gap-2">
             <button
               class="flex items-center justify-center gap-2 h-9 px-3 rounded-xl bg-background border border-border hover:bg-secondary/10 hover:border-primary/30 transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-xs font-medium text-muted-foreground hover:text-foreground"
               aria-label="Alternar Tema"
