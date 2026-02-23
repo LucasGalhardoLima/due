@@ -8,7 +8,6 @@ import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Sparkles, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Calendar as CalendarIcon } from 'lucide-vue-next'
 import EmptyState from '@/components/ui/EmptyState.vue'
-
 import TransactionList from '@/components/transaction/TransactionList.vue'
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton.vue'
 import AIInsights from '@/components/dashboard/AIInsights.vue'
