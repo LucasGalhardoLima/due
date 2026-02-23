@@ -194,7 +194,7 @@ async function handleDelete() {
       </div>
   
       <!-- Cards List (Standardized) -->
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 font-sans">
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card v-for="card in cards" :key="card.id" interactive class="overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-elevation-3 hover:-translate-y-[2px]">
           <div class="flex flex-row items-center justify-between space-y-0 p-6 pb-4 border-b border-border/60 bg-secondary/5 transition-colors duration-200 group-hover:bg-secondary/8">
             <div class="flex items-center gap-3">

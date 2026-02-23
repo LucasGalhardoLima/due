@@ -136,7 +136,7 @@ const verdictBg = computed(() => {
       <div class="space-y-3">
         <div class="p-3 rounded-lg bg-muted/10 border flex items-center justify-between transition-all duration-200 hover:bg-muted/20">
           <div class="text-xs text-muted-foreground">Impacto Mensal</div>
-          <div class="font-mono text-sm font-bold">
+          <div class="text-sm font-bold">
             {{ formatCurrency(result.timeline.monthlyImpact) }}
           </div>
         </div>

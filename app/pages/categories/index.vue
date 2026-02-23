@@ -338,7 +338,7 @@ async function deleteRule(id: string) {
           :key="rule.id"
           class="p-3 flex items-center gap-3"
         >
-          <code class="text-sm bg-muted/60 px-2 py-0.5 rounded-lg font-mono flex-1 truncate">
+          <code class="text-sm bg-muted/60 px-2 py-0.5 rounded-lg flex-1 truncate">
             {{ rule.pattern }}
           </code>
           <span v-if="rule.isRegex" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-info/10 text-info shrink-0">

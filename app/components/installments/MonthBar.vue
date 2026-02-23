@@ -126,7 +126,7 @@ const formatCurrency = (value: number) => {
                  ({{ t.installmentNumber }}/{{ t.totalInstallments }})
                </span>
              </div>
-             <div class="font-mono text-muted-foreground group-hover/item:text-foreground transition-colors whitespace-nowrap ml-2">
+             <div class="text-muted-foreground group-hover/item:text-foreground transition-colors whitespace-nowrap ml-2">
                {{ formatCurrency(t.amount) }}
              </div>
            </div>

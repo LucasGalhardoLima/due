@@ -78,7 +78,7 @@
     --glass-border: 0 0% 50% / 0.12;
 
     --font-display: "Geist Pixel Square", ui-monospace, monospace;
-    --font-body: "Geist", ui-sans-serif, system-ui, sans-serif;
+    --font-body: "Geist Pixel Square", ui-monospace, monospace;
 
     /* Motion tokens */
     --motion-fast: 140ms;

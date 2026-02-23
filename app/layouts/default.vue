@@ -6,7 +6,7 @@ import GlobalQuickAddFab from '@/components/layout/GlobalQuickAddFab.vue'
 </script>
 
 <template>
-  <div class="app-shell min-h-screen bg-background font-sans antialiased relative overflow-hidden">
+  <div class="app-shell min-h-screen bg-background antialiased relative overflow-hidden">
     <DemoBanner />
 
     <div class="flex flex-col lg:flex-row min-h-screen">
