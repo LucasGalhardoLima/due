@@ -16,66 +16,64 @@
 @tailwind utilities;
 
 @layer base {
+  /* ═══════════════════════════════════════════
+     Default palette: Mint & Violet
+     ═══════════════════════════════════════════ */
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 9%;
+    --background: 168 34% 97%;
+    --foreground: 252 57% 20%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card: 168 42% 99%;
+    --card-foreground: 252 57% 20%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover: 168 35% 99%;
+    --popover-foreground: 252 57% 20%;
 
-    --brand-accent: 0 0% 93%;
-    --brand-accent-foreground: 0 0% 9%;
+    --primary: 168 100% 92%;
+    --primary-foreground: 252 57% 20%;
+    --primary-accent: 168 58% 67%;
 
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --primary-accent: 0 0% 25%;
+    --secondary: 252 57% 20%;
+    --secondary-foreground: 168 100% 92%;
+    --secondary-accent: 252 48% 54%;
 
-    --secondary: 0 0% 93%;
-    --secondary-foreground: 0 0% 9%;
-    --secondary-accent: 0 0% 40%;
+    --muted: 168 30% 93%;
+    --muted-foreground: 252 26% 38%;
 
-    --muted: 0 0% 95%;
-    --muted-foreground: 0 0% 45%;
+    --accent: 168 64% 90%;
+    --accent-foreground: 252 57% 20%;
 
-    --accent: 0 0% 95%;
-    --accent-foreground: 0 0% 9%;
-
-    --destructive: 0 0% 9%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 89%;
-    --input: 0 0% 91%;
-    --ring: 0 0% 9%;
+    --border: 168 22% 84%;
+    --input: 168 22% 86%;
+    --ring: 168 46% 42%;
 
     --radius: 1.25rem;
 
-    --ai-accent: 0 0% 20%;
+    --ai-accent: 252 56% 44%;
     --ai-accent-foreground: 0 0% 98%;
 
-    --secondary-accent: 0 0% 40%;
-
-    /* Status Colors */
-    --success: 0 0% 9%;
+    /* Status Colors (universal) */
+    --success: 160 84% 39%;
     --success-foreground: 0 0% 98%;
-    --success-muted: 0 0% 93%;
+    --success-muted: 160 60% 95%;
 
-    --warning: 0 0% 30%;
-    --warning-foreground: 0 0% 98%;
-    --warning-muted: 0 0% 93%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 10%;
+    --warning-muted: 38 90% 95%;
 
-    --info: 0 0% 30%;
+    --info: 221 83% 53%;
     --info-foreground: 0 0% 98%;
-    --info-muted: 0 0% 93%;
+    --info-muted: 221 80% 95%;
 
-    --danger: 0 0% 9%;
+    --danger: 0 84% 60%;
     --danger-foreground: 0 0% 98%;
-    --danger-muted: 0 0% 93%;
+    --danger-muted: 0 80% 95%;
 
-    --glass-bg: 0 0% 100% / 0.78;
-    --glass-border: 0 0% 50% / 0.12;
+    --glass-bg: 168 40% 98% / 0.78;
+    --glass-border: 252 28% 62% / 0.16;
 
     --font-display: "Geist Pixel Square", ui-monospace, monospace;
     --font-body: "Geist Pixel Square", ui-monospace, monospace;
@@ -89,65 +87,352 @@
   }
 
   .dark {
-    --background: 0 0% 7%;
-    --foreground: 0 0% 90%;
+    --background: 252 38% 9%;
+    --foreground: 168 34% 90%;
 
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 90%;
+    --card: 250 24% 14%;
+    --card-foreground: 168 34% 90%;
 
-    --popover: 0 0% 11%;
-    --popover-foreground: 0 0% 90%;
+    --popover: 250 22% 15%;
+    --popover-foreground: 168 34% 90%;
 
-    --brand-accent: 0 0% 20%;
-    --brand-accent-foreground: 0 0% 90%;
+    --primary: 168 64% 70%;
+    --primary-foreground: 252 57% 14%;
+    --primary-accent: 168 56% 60%;
 
-    --primary: 0 0% 90%;
-    --primary-foreground: 0 0% 7%;
-    --primary-accent: 0 0% 75%;
+    --secondary: 252 44% 36%;
+    --secondary-foreground: 168 90% 92%;
+    --secondary-accent: 252 58% 66%;
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 88%;
-    --secondary-accent: 0 0% 60%;
+    --muted: 250 14% 19%;
+    --muted-foreground: 168 20% 74%;
 
-    --muted: 0 0% 13%;
-    --muted-foreground: 0 0% 58%;
+    --accent: 252 20% 21%;
+    --accent-foreground: 168 34% 90%;
 
-    --accent: 0 0% 15%;
-    --accent-foreground: 0 0% 90%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
 
-    --destructive: 0 0% 90%;
-    --destructive-foreground: 0 0% 7%;
+    --border: 250 12% 28%;
+    --input: 250 12% 28%;
+    --ring: 168 64% 62%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 0 0% 75%;
-
-    --ai-accent: 0 0% 80%;
-    --ai-accent-foreground: 0 0% 9%;
-
-    --primary-accent: 0 0% 75%;
-    --secondary-accent: 0 0% 60%;
+    --ai-accent: 252 58% 66%;
+    --ai-accent-foreground: 0 0% 98%;
 
     /* Status Colors — Dark Mode */
-    --success: 0 0% 80%;
-    --success-foreground: 0 0% 9%;
-    --success-muted: 0 0% 15%;
+    --success: 160 72% 45%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 160 40% 15%;
 
-    --warning: 0 0% 65%;
-    --warning-foreground: 0 0% 9%;
-    --warning-muted: 0 0% 15%;
+    --warning: 38 85% 55%;
+    --warning-foreground: 0 0% 10%;
+    --warning-muted: 38 50% 15%;
 
-    --info: 0 0% 65%;
-    --info-foreground: 0 0% 9%;
-    --info-muted: 0 0% 15%;
+    --info: 221 75% 60%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 221 50% 15%;
 
-    --danger: 0 0% 80%;
-    --danger-foreground: 0 0% 9%;
-    --danger-muted: 0 0% 15%;
+    --danger: 0 72% 50%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 0 50% 15%;
 
-    --glass-bg: 0 0% 8% / 0.88;
-    --glass-border: 0 0% 70% / 0.08;
+    --glass-bg: 250 20% 13% / 0.88;
+    --glass-border: 168 26% 82% / 0.12;
   }
+
+  /* ═══════════════════════════════════════════
+     Palette: Mint & Violet (explicit class)
+     Mirrors :root/.dark for uniform switching
+     ═══════════════════════════════════════════ */
+  .palette-mint {
+    --background: 168 34% 97%;
+    --foreground: 252 57% 20%;
+    --card: 168 42% 99%;
+    --card-foreground: 252 57% 20%;
+    --popover: 168 35% 99%;
+    --popover-foreground: 252 57% 20%;
+    --primary: 168 100% 92%;
+    --primary-foreground: 252 57% 20%;
+    --primary-accent: 168 58% 67%;
+    --secondary: 252 57% 20%;
+    --secondary-foreground: 168 100% 92%;
+    --secondary-accent: 252 48% 54%;
+    --muted: 168 30% 93%;
+    --muted-foreground: 252 26% 38%;
+    --accent: 168 64% 90%;
+    --accent-foreground: 252 57% 20%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 168 22% 84%;
+    --input: 168 22% 86%;
+    --ring: 168 46% 42%;
+    --ai-accent: 252 56% 44%;
+    --ai-accent-foreground: 0 0% 98%;
+    --glass-bg: 168 40% 98% / 0.78;
+    --glass-border: 252 28% 62% / 0.16;
+  }
+  .palette-mint.dark {
+    --background: 252 38% 9%;
+    --foreground: 168 34% 90%;
+    --card: 250 24% 14%;
+    --card-foreground: 168 34% 90%;
+    --popover: 250 22% 15%;
+    --popover-foreground: 168 34% 90%;
+    --primary: 168 64% 70%;
+    --primary-foreground: 252 57% 14%;
+    --primary-accent: 168 56% 60%;
+    --secondary: 252 44% 36%;
+    --secondary-foreground: 168 90% 92%;
+    --secondary-accent: 252 58% 66%;
+    --muted: 250 14% 19%;
+    --muted-foreground: 168 20% 74%;
+    --accent: 252 20% 21%;
+    --accent-foreground: 168 34% 90%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 250 12% 28%;
+    --input: 250 12% 28%;
+    --ring: 168 64% 62%;
+    --ai-accent: 252 58% 66%;
+    --ai-accent-foreground: 0 0% 98%;
+    --glass-bg: 250 20% 13% / 0.88;
+    --glass-border: 168 26% 82% / 0.12;
+  }
+
+  /* ═══════════════════════════════════════════
+     Palette: Cyan & Magenta — Cyberpunk classic
+     ═══════════════════════════════════════════ */
+  .palette-cyan {
+    --background: 190 34% 97%;
+    --foreground: 330 50% 22%;
+    --card: 190 42% 99%;
+    --card-foreground: 330 50% 22%;
+    --popover: 190 35% 99%;
+    --popover-foreground: 330 50% 22%;
+    --primary: 190 90% 90%;
+    --primary-foreground: 330 50% 22%;
+    --primary-accent: 190 55% 62%;
+    --secondary: 330 50% 22%;
+    --secondary-foreground: 190 90% 90%;
+    --secondary-accent: 330 42% 50%;
+    --muted: 190 28% 93%;
+    --muted-foreground: 330 22% 38%;
+    --accent: 190 60% 90%;
+    --accent-foreground: 330 50% 22%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 190 20% 84%;
+    --input: 190 20% 86%;
+    --ring: 190 44% 42%;
+    --ai-accent: 330 48% 42%;
+    --ai-accent-foreground: 0 0% 98%;
+    --glass-bg: 190 38% 98% / 0.78;
+    --glass-border: 330 26% 62% / 0.16;
+  }
+  .palette-cyan.dark {
+    --background: 330 38% 9%;
+    --foreground: 190 34% 90%;
+    --card: 328 24% 14%;
+    --card-foreground: 190 34% 90%;
+    --popover: 328 22% 15%;
+    --popover-foreground: 190 34% 90%;
+    --primary: 190 60% 68%;
+    --primary-foreground: 330 50% 14%;
+    --primary-accent: 190 52% 58%;
+    --secondary: 330 42% 36%;
+    --secondary-foreground: 190 85% 90%;
+    --secondary-accent: 330 52% 62%;
+    --muted: 328 14% 19%;
+    --muted-foreground: 190 20% 74%;
+    --accent: 330 20% 21%;
+    --accent-foreground: 190 34% 90%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 328 12% 28%;
+    --input: 328 12% 28%;
+    --ring: 190 60% 60%;
+    --ai-accent: 330 52% 62%;
+    --ai-accent-foreground: 0 0% 98%;
+    --glass-bg: 328 20% 13% / 0.88;
+    --glass-border: 190 26% 82% / 0.12;
+  }
+
+  /* ═══════════════════════════════════════════
+     Palette: Amber & Slate — Warm tech noir
+     ═══════════════════════════════════════════ */
+  .palette-amber {
+    --background: 38 34% 97%;
+    --foreground: 220 44% 22%;
+    --card: 38 42% 99%;
+    --card-foreground: 220 44% 22%;
+    --popover: 38 35% 99%;
+    --popover-foreground: 220 44% 22%;
+    --primary: 38 92% 88%;
+    --primary-foreground: 220 44% 22%;
+    --primary-accent: 38 60% 58%;
+    --secondary: 220 44% 22%;
+    --secondary-foreground: 38 92% 88%;
+    --secondary-accent: 220 38% 50%;
+    --muted: 38 26% 93%;
+    --muted-foreground: 220 20% 38%;
+    --accent: 38 58% 90%;
+    --accent-foreground: 220 44% 22%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 38 18% 84%;
+    --input: 38 18% 86%;
+    --ring: 38 48% 42%;
+    --ai-accent: 220 42% 42%;
+    --ai-accent-foreground: 0 0% 98%;
+    --glass-bg: 38 36% 98% / 0.78;
+    --glass-border: 220 24% 62% / 0.16;
+  }
+  .palette-amber.dark {
+    --background: 220 38% 9%;
+    --foreground: 38 34% 90%;
+    --card: 218 24% 14%;
+    --card-foreground: 38 34% 90%;
+    --popover: 218 22% 15%;
+    --popover-foreground: 38 34% 90%;
+    --primary: 38 68% 68%;
+    --primary-foreground: 220 44% 14%;
+    --primary-accent: 38 58% 56%;
+    --secondary: 220 38% 36%;
+    --secondary-foreground: 38 88% 90%;
+    --secondary-accent: 220 46% 62%;
+    --muted: 218 14% 19%;
+    --muted-foreground: 38 20% 74%;
+    --accent: 220 20% 21%;
+    --accent-foreground: 38 34% 90%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 218 12% 28%;
+    --input: 218 12% 28%;
+    --ring: 38 64% 58%;
+    --ai-accent: 220 48% 62%;
+    --ai-accent-foreground: 0 0% 98%;
+    --glass-bg: 218 20% 13% / 0.88;
+    --glass-border: 38 26% 82% / 0.12;
+  }
+
+  /* ═══════════════════════════════════════════
+     Palette: Rose & Emerald — Garden neon
+     ═══════════════════════════════════════════ */
+  .palette-rose {
+    --background: 350 34% 97%;
+    --foreground: 160 48% 20%;
+    --card: 350 42% 99%;
+    --card-foreground: 160 48% 20%;
+    --popover: 350 35% 99%;
+    --popover-foreground: 160 48% 20%;
+    --primary: 350 88% 92%;
+    --primary-foreground: 160 48% 20%;
+    --primary-accent: 350 52% 64%;
+    --secondary: 160 48% 20%;
+    --secondary-foreground: 350 88% 92%;
+    --secondary-accent: 160 40% 48%;
+    --muted: 350 26% 93%;
+    --muted-foreground: 160 22% 38%;
+    --accent: 350 56% 90%;
+    --accent-foreground: 160 48% 20%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 350 18% 84%;
+    --input: 350 18% 86%;
+    --ring: 350 42% 48%;
+    --ai-accent: 160 44% 38%;
+    --ai-accent-foreground: 0 0% 98%;
+    --glass-bg: 350 36% 98% / 0.78;
+    --glass-border: 160 24% 58% / 0.16;
+  }
+  .palette-rose.dark {
+    --background: 160 38% 9%;
+    --foreground: 350 34% 90%;
+    --card: 158 24% 14%;
+    --card-foreground: 350 34% 90%;
+    --popover: 158 22% 15%;
+    --popover-foreground: 350 34% 90%;
+    --primary: 350 58% 72%;
+    --primary-foreground: 160 48% 14%;
+    --primary-accent: 350 50% 62%;
+    --secondary: 160 38% 36%;
+    --secondary-foreground: 350 85% 92%;
+    --secondary-accent: 160 48% 58%;
+    --muted: 158 14% 19%;
+    --muted-foreground: 350 20% 74%;
+    --accent: 160 20% 21%;
+    --accent-foreground: 350 34% 90%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 158 12% 28%;
+    --input: 158 12% 28%;
+    --ring: 350 56% 64%;
+    --ai-accent: 160 48% 58%;
+    --ai-accent-foreground: 0 0% 98%;
+    --glass-bg: 158 20% 13% / 0.88;
+    --glass-border: 350 26% 82% / 0.12;
+  }
+
+  /* ═══════════════════════════════════════════
+     Palette: Peach & Indigo — Sunset digital
+     ═══════════════════════════════════════════ */
+  .palette-peach {
+    --background: 20 34% 97%;
+    --foreground: 240 50% 22%;
+    --card: 20 42% 99%;
+    --card-foreground: 240 50% 22%;
+    --popover: 20 35% 99%;
+    --popover-foreground: 240 50% 22%;
+    --primary: 20 92% 90%;
+    --primary-foreground: 240 50% 22%;
+    --primary-accent: 20 56% 62%;
+    --secondary: 240 50% 22%;
+    --secondary-foreground: 20 92% 90%;
+    --secondary-accent: 240 44% 52%;
+    --muted: 20 26% 93%;
+    --muted-foreground: 240 22% 38%;
+    --accent: 20 60% 90%;
+    --accent-foreground: 240 50% 22%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 20 18% 84%;
+    --input: 20 18% 86%;
+    --ring: 20 46% 44%;
+    --ai-accent: 240 46% 42%;
+    --ai-accent-foreground: 0 0% 98%;
+    --glass-bg: 20 36% 98% / 0.78;
+    --glass-border: 240 26% 62% / 0.16;
+  }
+  .palette-peach.dark {
+    --background: 240 38% 9%;
+    --foreground: 20 34% 90%;
+    --card: 238 24% 14%;
+    --card-foreground: 20 34% 90%;
+    --popover: 238 22% 15%;
+    --popover-foreground: 20 34% 90%;
+    --primary: 20 64% 70%;
+    --primary-foreground: 240 50% 14%;
+    --primary-accent: 20 54% 58%;
+    --secondary: 240 42% 36%;
+    --secondary-foreground: 20 88% 92%;
+    --secondary-accent: 240 50% 64%;
+    --muted: 238 14% 19%;
+    --muted-foreground: 20 20% 74%;
+    --accent: 240 20% 21%;
+    --accent-foreground: 20 34% 90%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 238 12% 28%;
+    --input: 238 12% 28%;
+    --ring: 20 60% 62%;
+    --ai-accent: 240 50% 64%;
+    --ai-accent-foreground: 0 0% 98%;
+    --glass-bg: 238 20% 13% / 0.88;
+    --glass-border: 20 26% 82% / 0.12;
+  }
+
+  /* Status colors are universal (same for all palettes) */
 
 }
 

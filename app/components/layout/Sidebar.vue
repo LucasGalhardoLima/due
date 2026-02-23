@@ -24,6 +24,7 @@ import {
 import { Button } from '@/components/ui/button'
 import TierBadge from '@/components/tier/TierBadge.vue'
 import NotificationBell from '@/components/layout/NotificationBell.vue'
+import PalettePicker from '@/components/layout/PalettePicker.vue'
 
 const { user } = useUser()
 const clerk = useClerk()
@@ -199,15 +200,16 @@ function closeMobileMenu() {
 
           <!-- Actions Row -->
           <div class="flex items-center justify-between px-2 gap-2">
-            <button 
-              class="flex-1 flex items-center justify-center gap-2 h-9 px-3 rounded-xl bg-background border border-border hover:bg-secondary/10 hover:border-primary/30 transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-xs font-medium text-muted-foreground hover:text-foreground" 
+            <button
+              class="flex items-center justify-center gap-2 h-9 px-3 rounded-xl bg-background border border-border hover:bg-secondary/10 hover:border-primary/30 transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-xs font-medium text-muted-foreground hover:text-foreground"
               aria-label="Alternar Tema"
               @click="toggleTheme"
             >
               <Moon v-if="colorMode.value === 'light'" class="w-3.5 h-3.5" />
               <Sun v-else class="w-3.5 h-3.5" />
-              <span>{{ colorMode.value === 'light' ? 'Escuro' : 'Claro' }}</span>
             </button>
+
+            <PalettePicker />
 
             <button
               class="flex items-center justify-center h-9 w-9 rounded-xl bg-background border border-border hover:bg-danger/10 hover:border-danger/20 hover:text-danger transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-muted-foreground"

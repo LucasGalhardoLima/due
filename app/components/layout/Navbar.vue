@@ -15,6 +15,7 @@ import {
   User
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import PalettePicker from '@/components/layout/PalettePicker.vue'
 
 const { user } = useUser()
 const clerk = useClerk()
@@ -76,6 +77,7 @@ function closeMobileMenu() {
 
           <!-- Actions -->
           <div class="ml-4 flex items-center gap-4">
+            <PalettePicker />
             <button
               class="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
               title="Alternar Tema"
@@ -169,6 +171,9 @@ function closeMobileMenu() {
                 <span class="text-sm font-bold truncate">{{ user?.firstName || 'Usuário' }}</span>
                 <span class="text-xs text-muted-foreground truncate">{{ user?.primaryEmailAddress?.emailAddress }}</span>
               </div>
+            </div>
+            <div class="flex items-center justify-center mb-3">
+              <PalettePicker />
             </div>
             <Button variant="outline" class="w-full text-danger hover:bg-danger/10 hover:text-danger" @click="handleSignOut">
               <LogOut class="w-4 h-4 mr-2" />
