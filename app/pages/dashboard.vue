@@ -8,6 +8,7 @@ import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Sparkles, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Calendar as CalendarIcon } from 'lucide-vue-next'
 import EmptyState from '@/components/ui/EmptyState.vue'
+import PaletteSelector from '@/components/dashboard/PaletteSelector.vue'
 
 import TransactionList from '@/components/transaction/TransactionList.vue'
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton.vue'
@@ -394,6 +395,9 @@ const showPayConfirm = ref(false)
             </div>
         </div>
       </div>
+
+      <!-- Palette Selector (for testing) -->
+      <PaletteSelector class="mb-5" />
 
       <!-- Section 0: Free to Spend Hero -->
       <FreeToSpendCard
