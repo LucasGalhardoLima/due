@@ -3,10 +3,6 @@ import Toaster from '@/components/ui/Toaster.vue'
 import UpgradeModal from '@/components/tier/UpgradeModal.vue'
 // @ts-expect-error Nuxt injects analytics types at build time.
 import { Analytics } from '@vercel/analytics/nuxt'
-import { useColorPalette } from '@/composables/useColorPalette'
-
-// Initialize palette globally so it applies on every page (including landing)
-useColorPalette()
 </script>
 
 <template>
