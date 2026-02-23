@@ -56,22 +56,22 @@
     --ai-accent: 0 0% 36%;
     --ai-accent-foreground: 0 0% 98%;
 
-    /* Status Colors (universal — same for all palettes) */
-    --success: 160 84% 39%;
+    /* Status Colors — Mono: pure grayscale */
+    --success: 0 0% 36%;
     --success-foreground: 0 0% 98%;
-    --success-muted: 160 60% 95%;
+    --success-muted: 0 0% 94%;
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 10%;
-    --warning-muted: 38 90% 95%;
+    --warning: 0 0% 42%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 0 0% 94%;
 
-    --info: 221 83% 53%;
+    --info: 0 0% 48%;
     --info-foreground: 0 0% 98%;
-    --info-muted: 221 80% 95%;
+    --info-muted: 0 0% 94%;
 
-    --danger: 0 84% 60%;
+    --danger: 0 0% 30%;
     --danger-foreground: 0 0% 98%;
-    --danger-muted: 0 80% 95%;
+    --danger-muted: 0 0% 94%;
 
     --glass-bg: 0 0% 100% / 0.78;
     --glass-border: 0 0% 50% / 0.16;
@@ -121,22 +121,22 @@
     --ai-accent: 0 0% 64%;
     --ai-accent-foreground: 0 0% 98%;
 
-    /* Status Colors — Dark Mode */
-    --success: 160 72% 45%;
-    --success-foreground: 0 0% 98%;
-    --success-muted: 160 40% 15%;
+    /* Status Colors — Mono dark: inverted grayscale */
+    --success: 0 0% 64%;
+    --success-foreground: 0 0% 6%;
+    --success-muted: 0 0% 16%;
 
-    --warning: 38 85% 55%;
-    --warning-foreground: 0 0% 10%;
-    --warning-muted: 38 50% 15%;
+    --warning: 0 0% 58%;
+    --warning-foreground: 0 0% 6%;
+    --warning-muted: 0 0% 16%;
 
-    --info: 221 75% 60%;
-    --info-foreground: 0 0% 98%;
-    --info-muted: 221 50% 15%;
+    --info: 0 0% 52%;
+    --info-foreground: 0 0% 6%;
+    --info-muted: 0 0% 16%;
 
-    --danger: 0 72% 50%;
-    --danger-foreground: 0 0% 98%;
-    --danger-muted: 0 50% 15%;
+    --danger: 0 0% 70%;
+    --danger-foreground: 0 0% 6%;
+    --danger-muted: 0 0% 16%;
 
     --glass-bg: 0 0% 8% / 0.88;
     --glass-border: 0 0% 60% / 0.12;
@@ -158,6 +158,18 @@
     --ring: 168 46% 42%;
     --ai-accent: 252 56% 44%;
     --ai-accent-foreground: 0 0% 98%;
+    --success: 160 58% 42%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 160 40% 93%;
+    --warning: 46 62% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 46 40% 93%;
+    --info: 210 56% 50%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 210 40% 93%;
+    --danger: 350 55% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 350 35% 93%;
   }
   .palette-cyber-mint.dark {
     --primary: 168 64% 70%;
@@ -171,6 +183,18 @@
     --ring: 168 64% 62%;
     --ai-accent: 252 58% 66%;
     --ai-accent-foreground: 0 0% 98%;
+    --success: 160 52% 52%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 160 30% 14%;
+    --warning: 46 56% 56%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 46 30% 14%;
+    --info: 210 50% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 210 30% 14%;
+    --danger: 350 48% 54%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 350 25% 14%;
   }
 
   /* ═══════════════════════════════════════════
@@ -188,6 +212,18 @@
     --ring: 142 38% 40%;
     --ai-accent: 270 44% 44%;
     --ai-accent-foreground: 0 0% 98%;
+    --success: 155 52% 40%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 155 36% 93%;
+    --warning: 38 58% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 38 36% 93%;
+    --info: 220 50% 50%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 220 36% 93%;
+    --danger: 0 50% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 0 32% 93%;
   }
   .palette-neon-sage.dark {
     --primary: 142 44% 62%;
@@ -201,6 +237,18 @@
     --ring: 142 44% 56%;
     --ai-accent: 270 42% 62%;
     --ai-accent-foreground: 0 0% 98%;
+    --success: 155 46% 50%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 155 26% 14%;
+    --warning: 38 52% 54%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 38 26% 14%;
+    --info: 220 44% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 220 26% 14%;
+    --danger: 0 44% 52%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 0 22% 14%;
   }
 
   /* ═══════════════════════════════════════════
@@ -218,6 +266,18 @@
     --ring: 260 42% 48%;
     --ai-accent: 340 46% 44%;
     --ai-accent-foreground: 0 0% 98%;
+    --success: 170 54% 42%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 170 38% 93%;
+    --warning: 42 60% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 42 38% 93%;
+    --info: 230 52% 52%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 230 38% 93%;
+    --danger: 340 52% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 340 34% 93%;
   }
   .palette-tokyo-night.dark {
     --primary: 260 50% 72%;
@@ -231,6 +291,18 @@
     --ring: 260 50% 66%;
     --ai-accent: 340 50% 62%;
     --ai-accent-foreground: 0 0% 98%;
+    --success: 170 48% 52%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 170 28% 14%;
+    --warning: 42 54% 56%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 42 28% 14%;
+    --info: 230 46% 60%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 230 28% 14%;
+    --danger: 340 46% 54%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 340 24% 14%;
   }
 
   /* ═══════════════════════════════════════════
@@ -248,6 +320,18 @@
     --ring: 150 40% 42%;
     --ai-accent: 265 44% 44%;
     --ai-accent-foreground: 0 0% 98%;
+    --success: 158 56% 40%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 158 38% 93%;
+    --warning: 44 60% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 44 38% 93%;
+    --info: 215 52% 50%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 215 38% 93%;
+    --danger: 355 52% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 355 34% 93%;
   }
   .palette-aurora.dark {
     --primary: 150 44% 62%;
@@ -261,6 +345,18 @@
     --ring: 150 44% 56%;
     --ai-accent: 265 42% 62%;
     --ai-accent-foreground: 0 0% 98%;
+    --success: 158 50% 50%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 158 28% 14%;
+    --warning: 44 54% 54%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 44 28% 14%;
+    --info: 215 46% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 215 28% 14%;
+    --danger: 355 46% 52%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 355 24% 14%;
   }
 
   /* ═══════════════════════════════════════════
@@ -278,6 +374,18 @@
     --ring: 175 42% 42%;
     --ai-accent: 268 44% 44%;
     --ai-accent-foreground: 0 0% 98%;
+    --success: 162 54% 42%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 162 38% 93%;
+    --warning: 36 58% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 36 38% 93%;
+    --info: 205 52% 50%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 205 38% 93%;
+    --danger: 5 52% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 5 34% 93%;
   }
   .palette-vapor.dark {
     --primary: 175 48% 64%;
@@ -291,6 +399,18 @@
     --ring: 175 46% 58%;
     --ai-accent: 268 42% 62%;
     --ai-accent-foreground: 0 0% 98%;
+    --success: 162 48% 52%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 162 28% 14%;
+    --warning: 36 52% 54%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 36 28% 14%;
+    --info: 205 46% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 205 28% 14%;
+    --danger: 5 46% 52%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 5 24% 14%;
   }
 
 }
