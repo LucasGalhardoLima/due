@@ -1,4 +1,4 @@
-export type PaletteId = 'mono' | 'cyber-mint' | 'neon-sage' | 'tokyo-night' | 'aurora' | 'vapor' | 'sunset' | 'ocean' | 'forest' | 'berry' | 'solar'
+export type PaletteId = 'mono' | 'cyber-mint' | 'neon-sage' | 'tokyo-night' | 'aurora' | 'vapor' | 'sunset' | 'ocean' | 'forest' | 'berry' | 'solar' | 'rose' | 'midnight'
 
 export interface PaletteInfo {
   id: PaletteId
@@ -24,6 +24,8 @@ export const PALETTES: readonly PaletteInfo[] = [
   { id: 'forest', label: 'Forest', primary: 'hsl(152,55%,52%)', secondary: 'hsl(340,45%,45%)', accent: 'hsl(42,52%,52%)', success: 'hsl(145,55%,48%)', warning: 'hsl(44,60%,54%)', info: 'hsl(215,50%,58%)', danger: 'hsl(355,52%,52%)' },
   { id: 'berry', label: 'Berry', primary: 'hsl(315,58%,60%)', secondary: 'hsl(185,45%,45%)', accent: 'hsl(270,45%,58%)', success: 'hsl(158,55%,50%)', warning: 'hsl(40,60%,55%)', info: 'hsl(225,50%,58%)', danger: 'hsl(0,50%,54%)' },
   { id: 'solar', label: 'Solar', primary: 'hsl(42,78%,58%)', secondary: 'hsl(220,45%,45%)', accent: 'hsl(28,58%,55%)', success: 'hsl(150,55%,50%)', warning: 'hsl(32,62%,55%)', info: 'hsl(210,52%,58%)', danger: 'hsl(5,55%,54%)' },
+  { id: 'rose', label: 'Rosé', primary: 'hsl(345,50%,68%)', secondary: 'hsl(215,18%,46%)', accent: 'hsl(20,48%,55%)', success: 'hsl(155,48%,50%)', warning: 'hsl(40,54%,54%)', info: 'hsl(210,46%,58%)', danger: 'hsl(0,48%,54%)' },
+  { id: 'midnight', label: 'Midnight', primary: 'hsl(235,42%,70%)', secondary: 'hsl(220,8%,52%)', accent: 'hsl(195,42%,55%)', success: 'hsl(158,48%,50%)', warning: 'hsl(42,52%,54%)', info: 'hsl(220,44%,58%)', danger: 'hsl(352,48%,54%)' },
 ] as const
 
 const VALID_IDS = new Set<string>(PALETTES.map(p => p.id))
