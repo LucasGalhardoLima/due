@@ -1,4 +1,4 @@
-export type PaletteId = 'mono' | 'cyber-mint' | 'neon-sage' | 'tokyo-night' | 'aurora' | 'vapor'
+export type PaletteId = 'mono' | 'cyber-mint' | 'neon-sage' | 'tokyo-night' | 'aurora' | 'vapor' | 'sunset' | 'ocean' | 'forest' | 'berry' | 'solar'
 
 export interface PaletteInfo {
   id: PaletteId
@@ -19,6 +19,11 @@ export const PALETTES: readonly PaletteInfo[] = [
   { id: 'tokyo-night', label: 'Tokyo Night', primary: 'hsl(260,50%,72%)', secondary: 'hsl(340,50%,28%)', accent: 'hsl(200,55%,60%)', success: 'hsl(170,54%,42%)', warning: 'hsl(42,60%,48%)', info: 'hsl(230,52%,52%)', danger: 'hsl(340,52%,48%)' },
   { id: 'aurora', label: 'Aurora', primary: 'hsl(150,44%,62%)', secondary: 'hsl(265,44%,22%)', accent: 'hsl(42,60%,56%)', success: 'hsl(158,56%,40%)', warning: 'hsl(44,60%,48%)', info: 'hsl(215,52%,50%)', danger: 'hsl(355,52%,48%)' },
   { id: 'vapor', label: 'Vapor', primary: 'hsl(175,48%,64%)', secondary: 'hsl(268,44%,22%)', accent: 'hsl(24,55%,60%)', success: 'hsl(162,54%,42%)', warning: 'hsl(36,58%,48%)', info: 'hsl(205,52%,50%)', danger: 'hsl(5,52%,48%)' },
+  { id: 'sunset', label: 'Sunset', primary: 'hsl(15,80%,62%)', secondary: 'hsl(240,42%,45%)', accent: 'hsl(340,55%,58%)', success: 'hsl(155,58%,50%)', warning: 'hsl(42,65%,55%)', info: 'hsl(210,55%,58%)', danger: 'hsl(350,58%,55%)' },
+  { id: 'ocean', label: 'Ocean', primary: 'hsl(205,72%,62%)', secondary: 'hsl(10,55%,52%)', accent: 'hsl(175,50%,50%)', success: 'hsl(162,58%,50%)', warning: 'hsl(38,62%,55%)', info: 'hsl(220,55%,58%)', danger: 'hsl(0,55%,54%)' },
+  { id: 'forest', label: 'Forest', primary: 'hsl(152,55%,52%)', secondary: 'hsl(340,45%,45%)', accent: 'hsl(42,52%,52%)', success: 'hsl(145,55%,48%)', warning: 'hsl(44,60%,54%)', info: 'hsl(215,50%,58%)', danger: 'hsl(355,52%,52%)' },
+  { id: 'berry', label: 'Berry', primary: 'hsl(315,58%,60%)', secondary: 'hsl(185,45%,45%)', accent: 'hsl(270,45%,58%)', success: 'hsl(158,55%,50%)', warning: 'hsl(40,60%,55%)', info: 'hsl(225,50%,58%)', danger: 'hsl(0,50%,54%)' },
+  { id: 'solar', label: 'Solar', primary: 'hsl(42,78%,58%)', secondary: 'hsl(220,45%,45%)', accent: 'hsl(28,58%,55%)', success: 'hsl(150,55%,50%)', warning: 'hsl(32,62%,55%)', info: 'hsl(210,52%,58%)', danger: 'hsl(5,55%,54%)' },
 ] as const
 
 const VALID_IDS = new Set<string>(PALETTES.map(p => p.id))
