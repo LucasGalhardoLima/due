@@ -23,7 +23,6 @@ import UpcomingBillsCard from '@/components/dashboard/UpcomingBillsCard.vue'
 import SpendingPaceChart from '@/components/dashboard/SpendingPaceChart.vue'
 import SavingsGoalsWidget from '@/components/dashboard/SavingsGoalsWidget.vue'
 import DuScoreCard from '@/components/dashboard/DuScoreCard.vue'
-import PaletteCard from '@/components/dashboard/PaletteCard.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
 import type { BudgetSummary } from '@/composables/useBudget'
@@ -394,9 +393,6 @@ const showPayConfirm = ref(false)
             </div>
         </div>
       </div>
-
-      <!-- Palette Picker Card -->
-      <PaletteCard class="mb-5" />
 
       <!-- Section 0: Free to Spend Hero -->
       <FreeToSpendCard
