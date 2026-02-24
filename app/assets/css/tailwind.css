@@ -147,16 +147,16 @@
      Only overrides accent color variables
      ═══════════════════════════════════════════ */
   .palette-cyber-mint {
-    --primary: 168 100% 92%;
-    --primary-foreground: 252 57% 20%;
-    --primary-accent: 168 58% 67%;
-    --secondary: 252 57% 20%;
-    --secondary-foreground: 168 100% 92%;
-    --secondary-accent: 252 48% 54%;
-    --accent: 210 70% 92%;
-    --accent-foreground: 210 50% 20%;
-    --ring: 168 46% 42%;
-    --ai-accent: 252 56% 44%;
+    --primary: 168 70% 38%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 168 60% 50%;
+    --secondary: 252 50% 32%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 252 45% 48%;
+    --accent: 210 55% 45%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 168 60% 40%;
+    --ai-accent: 252 50% 42%;
     --ai-accent-foreground: 0 0% 98%;
     --success: 160 58% 42%;
     --success-foreground: 0 0% 98%;
@@ -201,16 +201,16 @@
      Palette: Neon Sage — muted green + soft purple
      ═══════════════════════════════════════════ */
   .palette-neon-sage {
-    --primary: 142 50% 88%;
-    --primary-foreground: 270 40% 22%;
-    --primary-accent: 142 42% 56%;
-    --secondary: 270 40% 22%;
-    --secondary-foreground: 142 50% 88%;
-    --secondary-accent: 270 38% 50%;
-    --accent: 12 60% 90%;
-    --accent-foreground: 12 50% 24%;
-    --ring: 142 38% 40%;
-    --ai-accent: 270 44% 44%;
+    --primary: 142 45% 38%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 142 40% 50%;
+    --secondary: 270 38% 32%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 270 35% 48%;
+    --accent: 12 50% 48%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 142 42% 40%;
+    --ai-accent: 270 40% 42%;
     --ai-accent-foreground: 0 0% 98%;
     --success: 155 52% 40%;
     --success-foreground: 0 0% 98%;
@@ -255,16 +255,16 @@
      Palette: Tokyo Night — lavender + pink
      ═══════════════════════════════════════════ */
   .palette-tokyo-night {
-    --primary: 260 60% 90%;
-    --primary-foreground: 260 50% 20%;
-    --primary-accent: 260 46% 62%;
-    --secondary: 340 50% 28%;
-    --secondary-foreground: 340 80% 92%;
-    --secondary-accent: 340 44% 52%;
-    --accent: 200 65% 90%;
-    --accent-foreground: 200 50% 22%;
-    --ring: 260 42% 48%;
-    --ai-accent: 340 46% 44%;
+    --primary: 260 52% 48%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 260 46% 58%;
+    --secondary: 340 48% 38%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 340 42% 52%;
+    --accent: 200 50% 45%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 260 48% 48%;
+    --ai-accent: 340 44% 42%;
     --ai-accent-foreground: 0 0% 98%;
     --success: 170 54% 42%;
     --success-foreground: 0 0% 98%;
@@ -309,16 +309,16 @@
      Palette: Aurora — sage green + purple + gold
      ═══════════════════════════════════════════ */
   .palette-aurora {
-    --primary: 150 52% 88%;
-    --primary-foreground: 265 44% 22%;
-    --primary-accent: 150 44% 54%;
-    --secondary: 265 44% 22%;
-    --secondary-foreground: 150 52% 88%;
-    --secondary-accent: 265 40% 50%;
-    --accent: 42 70% 88%;
-    --accent-foreground: 42 50% 22%;
-    --ring: 150 40% 42%;
-    --ai-accent: 265 44% 44%;
+    --primary: 150 48% 36%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 150 42% 48%;
+    --secondary: 265 42% 32%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 265 38% 48%;
+    --accent: 42 60% 48%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 150 44% 38%;
+    --ai-accent: 265 40% 42%;
     --ai-accent-foreground: 0 0% 98%;
     --success: 158 56% 40%;
     --success-foreground: 0 0% 98%;
@@ -363,16 +363,16 @@
      Palette: Vapor — teal + purple + warm orange
      ═══════════════════════════════════════════ */
   .palette-vapor {
-    --primary: 175 56% 88%;
-    --primary-foreground: 268 44% 22%;
-    --primary-accent: 175 46% 54%;
-    --secondary: 268 44% 22%;
-    --secondary-foreground: 175 56% 88%;
-    --secondary-accent: 268 40% 50%;
-    --accent: 24 64% 90%;
-    --accent-foreground: 24 50% 22%;
-    --ring: 175 42% 42%;
-    --ai-accent: 268 44% 44%;
+    --primary: 175 50% 38%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 175 44% 50%;
+    --secondary: 268 42% 32%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 268 38% 48%;
+    --accent: 24 55% 48%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 175 48% 40%;
+    --ai-accent: 268 40% 42%;
     --ai-accent-foreground: 0 0% 98%;
     --success: 162 54% 42%;
     --success-foreground: 0 0% 98%;
@@ -411,6 +411,276 @@
     --danger: 5 46% 52%;
     --danger-foreground: 0 0% 98%;
     --danger-muted: 5 24% 14%;
+  }
+
+  /* ═══════════════════════════════════════════
+     Palette: Sunset — warm coral + deep indigo
+     ═══════════════════════════════════════════ */
+  .palette-sunset {
+    --primary: 15 85% 52%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 15 75% 60%;
+    --secondary: 240 50% 30%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 240 45% 48%;
+    --accent: 340 65% 52%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 15 70% 48%;
+    --ai-accent: 240 48% 42%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 155 65% 38%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 155 40% 93%;
+    --warning: 42 75% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 42 40% 93%;
+    --info: 210 65% 48%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 210 40% 93%;
+    --danger: 350 65% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 350 40% 93%;
+  }
+  .palette-sunset.dark {
+    --primary: 15 80% 62%;
+    --primary-foreground: 15 70% 10%;
+    --primary-accent: 15 70% 55%;
+    --secondary: 240 42% 45%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 240 48% 62%;
+    --accent: 340 55% 58%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 15 75% 58%;
+    --ai-accent: 240 48% 60%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 155 58% 50%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 155 30% 14%;
+    --warning: 42 65% 55%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 42 30% 14%;
+    --info: 210 55% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 210 30% 14%;
+    --danger: 350 58% 55%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 350 28% 14%;
+  }
+
+  /* ═══════════════════════════════════════════
+     Palette: Ocean — electric blue + coral
+     ═══════════════════════════════════════════ */
+  .palette-ocean {
+    --primary: 205 80% 48%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 205 68% 56%;
+    --secondary: 10 65% 42%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 10 55% 52%;
+    --accent: 175 60% 40%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 205 72% 48%;
+    --ai-accent: 10 58% 44%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 162 65% 38%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 162 40% 93%;
+    --warning: 38 70% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 38 40% 93%;
+    --info: 220 62% 50%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 220 40% 93%;
+    --danger: 0 62% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 0 38% 93%;
+  }
+  .palette-ocean.dark {
+    --primary: 205 72% 62%;
+    --primary-foreground: 205 70% 10%;
+    --primary-accent: 205 64% 55%;
+    --secondary: 10 55% 52%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 10 50% 62%;
+    --accent: 175 50% 50%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 205 68% 58%;
+    --ai-accent: 10 52% 58%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 162 58% 50%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 162 28% 14%;
+    --warning: 38 62% 55%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 38 28% 14%;
+    --info: 220 55% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 220 28% 14%;
+    --danger: 0 55% 54%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 0 26% 14%;
+  }
+
+  /* ═══════════════════════════════════════════
+     Palette: Forest — emerald + burgundy
+     ═══════════════════════════════════════════ */
+  .palette-forest {
+    --primary: 152 65% 34%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 152 55% 44%;
+    --secondary: 340 55% 32%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 340 48% 48%;
+    --accent: 42 62% 45%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 152 58% 36%;
+    --ai-accent: 340 50% 40%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 145 62% 36%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 145 38% 93%;
+    --warning: 44 68% 46%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 44 38% 93%;
+    --info: 215 58% 48%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 215 38% 93%;
+    --danger: 355 60% 46%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 355 36% 93%;
+  }
+  .palette-forest.dark {
+    --primary: 152 55% 52%;
+    --primary-foreground: 152 60% 10%;
+    --primary-accent: 152 50% 46%;
+    --secondary: 340 45% 45%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 340 50% 60%;
+    --accent: 42 52% 52%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 152 52% 48%;
+    --ai-accent: 340 48% 56%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 145 55% 48%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 145 28% 14%;
+    --warning: 44 60% 54%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 44 28% 14%;
+    --info: 215 50% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 215 28% 14%;
+    --danger: 355 52% 52%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 355 26% 14%;
+  }
+
+  /* ═══════════════════════════════════════════
+     Palette: Berry — magenta/fuchsia + deep teal
+     ═══════════════════════════════════════════ */
+  .palette-berry {
+    --primary: 315 65% 48%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 315 55% 56%;
+    --secondary: 185 55% 30%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 185 48% 45%;
+    --accent: 270 52% 50%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 315 58% 46%;
+    --ai-accent: 185 50% 38%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 158 62% 38%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 158 38% 93%;
+    --warning: 40 68% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 40 38% 93%;
+    --info: 225 58% 50%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 225 38% 93%;
+    --danger: 0 58% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 0 36% 93%;
+  }
+  .palette-berry.dark {
+    --primary: 315 58% 60%;
+    --primary-foreground: 315 60% 10%;
+    --primary-accent: 315 52% 54%;
+    --secondary: 185 45% 45%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 185 50% 60%;
+    --accent: 270 45% 58%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 315 55% 56%;
+    --ai-accent: 185 48% 54%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 158 55% 50%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 158 28% 14%;
+    --warning: 40 60% 55%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 40 28% 14%;
+    --info: 225 50% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 225 28% 14%;
+    --danger: 0 50% 54%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 0 26% 14%;
+  }
+
+  /* ═══════════════════════════════════════════
+     Palette: Solar — golden + navy
+     ═══════════════════════════════════════════ */
+  .palette-solar {
+    --primary: 42 85% 48%;
+    --primary-foreground: 42 80% 8%;
+    --primary-accent: 42 72% 55%;
+    --secondary: 220 55% 28%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 220 48% 45%;
+    --accent: 28 70% 50%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 42 78% 46%;
+    --ai-accent: 220 50% 40%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 150 62% 38%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 150 38% 93%;
+    --warning: 32 72% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 32 40% 93%;
+    --info: 210 60% 48%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 210 38% 93%;
+    --danger: 5 62% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 5 38% 93%;
+  }
+  .palette-solar.dark {
+    --primary: 42 78% 58%;
+    --primary-foreground: 42 75% 8%;
+    --primary-accent: 42 68% 52%;
+    --secondary: 220 45% 45%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 220 50% 60%;
+    --accent: 28 58% 55%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 42 72% 54%;
+    --ai-accent: 220 48% 56%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 150 55% 50%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 150 28% 14%;
+    --warning: 32 62% 55%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 32 28% 14%;
+    --info: 210 52% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 210 28% 14%;
+    --danger: 5 55% 54%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 5 26% 14%;
   }
 
 }
