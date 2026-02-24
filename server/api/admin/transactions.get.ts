@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
     take: pageSize,
     where,
     orderBy: {
-      purchaseDate: 'desc'
+      createdAt: 'desc'
     },
     include: {
       card: {

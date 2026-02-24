@@ -87,6 +87,7 @@ const groups = [
       { name: 'Cartões', path: '/cards', icon: CreditCard },
       { name: 'Importar CSV', path: '/import', icon: UploadCloud },
       { name: 'Auditoria', path: '/audit', icon: ShieldCheck },
+      { name: 'Configurações', path: '/settings', icon: Settings },
     ]
   },
 ]

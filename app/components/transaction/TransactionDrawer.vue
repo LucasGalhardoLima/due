@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import { toast } from 'vue-sonner'
 import {
   Drawer,
@@ -63,7 +63,8 @@ const isCreatingTag = ref(false)
 const showTagPicker = ref(false)
 
 // AI Mode State
-const isAiMode = ref(false)
+const aiTextareaRef = ref<InstanceType<typeof Textarea> | null>(null)
+const isAiMode = ref(true)
 const aiText = ref('')
 const isAnalyzing = ref(false)
 const aiParseError = ref('')
@@ -199,12 +200,18 @@ watch(() => props.open, async (isOpen) => {
     
     // Reset AI Mode and tag picker when opening
     if (isOpen) {
-        isAiMode.value = false
+        isAiMode.value = true
         aiText.value = ''
         aiParsedResult.value = null
         aiParseError.value = ''
         newTagName.value = ''
         showTagPicker.value = false
+        // Autofocus AI textarea
+        nextTick(() => {
+          const el = aiTextareaRef.value?.$el as HTMLElement | undefined
+          const textarea = el?.querySelector('textarea') ?? el
+          textarea?.focus()
+        })
     }
 })
 
@@ -487,6 +494,7 @@ async function handleDelete() {
           <div v-if="isAiMode" class="space-y-4 animate-in fade-in zoom-in-95 duration-200">
              <div class="space-y-2">
                 <Textarea
+                  ref="aiTextareaRef"
                   v-model="aiText"
                   placeholder="Ex: Uber de 25 reais ontem..."
                   class="min-h-[100px] text-base resize-none"
