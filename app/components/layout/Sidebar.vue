@@ -201,7 +201,7 @@ function closeMobileMenu() {
           <!-- Actions Row -->
           <div class="flex items-center px-2 gap-2">
             <button
-              class="flex items-center justify-center gap-2 h-9 px-3 rounded-xl bg-muted/60 border border-border/80 hover:bg-muted hover:border-foreground/20 transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+              class="flex items-center justify-center gap-2 h-9 px-3 rounded-xl bg-muted border border-border hover:bg-muted/80 hover:border-foreground/20 transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-xs font-medium text-muted-foreground hover:text-foreground"
               aria-label="Alternar Tema"
               @click="toggleTheme"
             >

@@ -105,7 +105,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
       <div class="space-y-4">
         <div class="flex items-center justify-between">
           <div class="p-2 rounded-2xl bg-muted">
-            <CreditCard class="w-5 h-5 text-primary-foreground dark:text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
+            <CreditCard class="w-5 h-5 text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
           </div>
           <div v-if="colorState === 'danger'" class="px-2 py-0.5 bg-danger/10 border border-danger/20 rounded-full text-micro text-danger">
             Alerta
@@ -129,7 +129,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
       <div class="space-y-4">
         <div class="flex items-center justify-between">
           <div class="p-2 rounded-2xl bg-muted">
-            <TrendingUp class="w-5 h-5 text-primary-foreground dark:text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
+            <TrendingUp class="w-5 h-5 text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
           </div>
         </div>
         <div>
@@ -160,7 +160,7 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
       <div class="space-y-4">
         <div class="flex items-center justify-between">
           <div class="p-2 rounded-2xl bg-primary/20 border border-primary/35 shadow-elevation-1">
-            <Calendar class="w-5 h-5" :class="[status === 'PAID' ? 'text-success' : 'text-primary-foreground dark:text-primary', { 'text-danger': dueColorState === 'danger', 'text-warning': dueColorState === 'warning' }]" />
+            <Calendar class="w-5 h-5" :class="[status === 'PAID' ? 'text-success' : 'text-primary', { 'text-danger': dueColorState === 'danger', 'text-warning': dueColorState === 'warning' }]" />
           </div>
           <div v-if="dueColorState === 'danger' && status !== 'PAID'" class="px-2 py-0.5 bg-danger/10 border border-danger/20 rounded-full text-micro text-danger">
             Urgente
@@ -195,13 +195,13 @@ const shouldPulse = computed(() => colorState.value === 'danger' || dueColorStat
       <div class="space-y-4">
         <div class="flex items-center justify-between">
           <div class="p-2 rounded-2xl bg-muted">
-            <component :is="categoryIcon" class="w-5 h-5 text-primary-foreground dark:text-primary" />
+            <component :is="categoryIcon" class="w-5 h-5 text-primary" />
           </div>
         </div>
         <div>
           <p class="text-micro text-muted-foreground">Maior Gasto</p>
           <p class="text-xl md:text-2xl lg:text-3xl font-black text-foreground mt-1.5 truncate">{{ topCategory?.name || '---' }}</p>
-          <p class="text-small font-black text-primary-foreground dark:text-primary mt-1.5 tabular-nums">
+          <p class="text-small font-black text-primary mt-1.5 tabular-nums">
             {{ topCategory ? formatCurrency(topCategory.amount) : 'Sem gastos' }}
           </p>
         </div>

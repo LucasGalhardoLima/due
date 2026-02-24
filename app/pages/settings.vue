@@ -29,7 +29,7 @@ function toggleTheme() {
           <p class="text-small text-muted-foreground">Alternar entre modo claro e escuro</p>
         </div>
         <button
-          class="flex items-center justify-center gap-2 h-9 px-4 rounded-xl bg-muted/60 border border-border/80 hover:bg-muted hover:border-foreground/20 transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-sm font-medium text-muted-foreground hover:text-foreground"
+          class="flex items-center justify-center gap-2 h-9 px-4 rounded-xl bg-muted border border-border hover:bg-muted/80 hover:border-foreground/20 transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-elevation-1 text-sm font-medium text-muted-foreground hover:text-foreground"
           @click="toggleTheme"
         >
           <Moon v-if="colorMode.value === 'light'" class="w-4 h-4" />
