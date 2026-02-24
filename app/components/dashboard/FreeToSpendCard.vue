@@ -40,7 +40,7 @@ const trendIcon = computed(() => props.remaining >= 0 ? TrendingUp : TrendingDow
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
           <div class="p-2.5 rounded-2xl bg-muted">
-            <Wallet class="w-5 h-5 text-primary-foreground dark:text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
+            <Wallet class="w-5 h-5 text-primary" :class="{ 'text-danger': colorState === 'danger', 'text-warning': colorState === 'warning' }" />
           </div>
           <div>
             <p class="text-micro text-muted-foreground font-medium">Livre para Gastar</p>
