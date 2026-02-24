@@ -141,11 +141,17 @@
     --glass-bg: 0 0% 8% / 0.88;
     --glass-border: 0 0% 60% / 0.12;
   }
+}
 
-  /* ═══════════════════════════════════════════
-     Palette: Cyber Mint — teal mint + violet
-     Only overrides accent color variables
-     ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   Palette overrides — UNLAYERED so they always beat
+   any @layer base rules regardless of specificity.
+   ═══════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════
+   Palette: Cyber Mint — teal mint + violet
+   Only overrides accent color variables
+   ═══════════════════════════════════════════ */
   :root.palette-cyber-mint {
     --primary: 168 70% 38%;
     --primary-foreground: 0 0% 98%;
@@ -683,7 +689,113 @@
     --danger-muted: 5 26% 14%;
   }
 
-}
+  /* ═══════════════════════════════════════════
+     Palette: Rosé — rose pink + slate + peach
+     ═══════════════════════════════════════════ */
+  :root.palette-rose {
+    --primary: 345 55% 48%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 345 48% 58%;
+    --secondary: 215 20% 36%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 215 18% 48%;
+    --accent: 20 60% 52%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 345 50% 46%;
+    --ai-accent: 215 22% 42%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 155 55% 40%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 155 36% 93%;
+    --warning: 40 62% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 40 36% 93%;
+    --info: 210 52% 50%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 210 36% 93%;
+    --danger: 0 55% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 0 34% 93%;
+  }
+  :root.palette-rose.dark {
+    --primary: 345 50% 68%;
+    --primary-foreground: 345 50% 10%;
+    --primary-accent: 345 44% 58%;
+    --secondary: 215 18% 46%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 215 22% 62%;
+    --accent: 20 48% 24%;
+    --accent-foreground: 20 55% 86%;
+    --ring: 345 48% 62%;
+    --ai-accent: 215 24% 58%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 155 48% 50%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 155 26% 14%;
+    --warning: 40 54% 54%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 40 26% 14%;
+    --info: 210 46% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 210 26% 14%;
+    --danger: 0 48% 54%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 0 24% 14%;
+  }
+
+  /* ═══════════════════════════════════════════
+     Palette: Midnight — deep indigo + silver + ice blue
+     ═══════════════════════════════════════════ */
+  :root.palette-midnight {
+    --primary: 235 45% 40%;
+    --primary-foreground: 0 0% 98%;
+    --primary-accent: 235 40% 52%;
+    --secondary: 220 10% 46%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 220 10% 56%;
+    --accent: 195 55% 48%;
+    --accent-foreground: 0 0% 98%;
+    --ring: 235 42% 42%;
+    --ai-accent: 220 14% 44%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 158 55% 40%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 158 36% 93%;
+    --warning: 42 60% 48%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 42 36% 93%;
+    --info: 220 52% 50%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 220 36% 93%;
+    --danger: 352 55% 48%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 352 34% 93%;
+  }
+  :root.palette-midnight.dark {
+    --primary: 235 42% 70%;
+    --primary-foreground: 235 44% 10%;
+    --primary-accent: 235 38% 58%;
+    --secondary: 220 8% 52%;
+    --secondary-foreground: 0 0% 98%;
+    --secondary-accent: 220 12% 64%;
+    --accent: 195 42% 22%;
+    --accent-foreground: 195 50% 86%;
+    --ring: 235 40% 64%;
+    --ai-accent: 220 14% 58%;
+    --ai-accent-foreground: 0 0% 98%;
+    --success: 158 48% 50%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 158 26% 14%;
+    --warning: 42 52% 54%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 42 26% 14%;
+    --info: 220 44% 58%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 220 26% 14%;
+    --danger: 352 48% 54%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 352 24% 14%;
+  }
 
 @layer base {
   * {

@@ -5,7 +5,7 @@ export default defineNitroPlugin((nitroApp) => {
   try {
     var m = document.cookie.match(/(?:^|;\\s*)due-palette=([^;]*)/);
     var p = m ? decodeURIComponent(m[1]) : 'neon-sage';
-    var valid = ['mono','cyber-mint','neon-sage','tokyo-night','aurora','vapor'];
+    var valid = ['mono','cyber-mint','neon-sage','tokyo-night','aurora','vapor','sunset','ocean','forest','berry','solar','rose','midnight'];
     if (valid.indexOf(p) === -1) p = 'neon-sage';
     if (p !== 'mono') document.documentElement.classList.add('palette-' + p);
   } catch(e) {}
