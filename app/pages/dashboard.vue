@@ -6,7 +6,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
-import { Sparkles, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Calendar as CalendarIcon } from 'lucide-vue-next'
+import { Sparkles, ChevronLeft, ChevronRight, CreditCard as CreditCardIcon, Calendar as CalendarIcon, Wallet } from 'lucide-vue-next'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import TransactionList from '@/components/transaction/TransactionList.vue'
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton.vue'
@@ -34,6 +34,7 @@ const { dataVersion } = useDataVersion()
 // Global State
 const currentDate = ref(new Date())
 const selectedCardId = ref<string>('')
+const activeTab = ref<'card' | 'cashflow'>('card')
 const editingTransactionId = ref<string | null>(null)
 
 // API Query Params
@@ -323,7 +324,7 @@ const showPayConfirm = ref(false)
         <template #actions>
           <div class="flex items-center gap-3">
             <!-- Card Selector -->
-            <Select v-model="selectedCardId">
+            <Select v-show="activeTab === 'card'" v-model="selectedCardId">
               <SelectTrigger class="w-[220px] bg-card border-border rounded-2xl shadow-sm">
                 <SelectValue placeholder="Todos os Cartões" />
               </SelectTrigger>
@@ -349,6 +350,24 @@ const showPayConfirm = ref(false)
         </template>
       </PageHeader>
 
+      <!-- Desktop Tab Bar -->
+      <div class="hidden lg:flex p-1.5 bg-muted/40 rounded-[1.25rem] w-fit border border-border/70 shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2 mb-6">
+        <button
+          class="px-6 py-2 rounded-xl text-small font-medium transition-all duration-200 active:scale-[0.98]"
+          :class="activeTab === 'card' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-background/60'"
+          @click="activeTab = 'card'"
+        >
+          Cartão de Crédito
+        </button>
+        <button
+          class="px-6 py-2 rounded-xl text-small font-medium transition-all duration-200 active:scale-[0.98]"
+          :class="activeTab === 'cashflow' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-background/60'"
+          @click="activeTab = 'cashflow'"
+        >
+          Fluxo de Caixa
+        </button>
+      </div>
+
       <!-- Mobile Header & Navigation (New) -->
       <div class="lg:hidden space-y-4 mb-7">
         <div>
@@ -359,7 +378,7 @@ const showPayConfirm = ref(false)
         <!-- Mobile Controls Row -->
         <div class="flex items-center gap-3">
            <!-- Card Selector (Mobile) -->
-            <Select v-model="selectedCardId">
+            <Select v-show="activeTab === 'card'" v-model="selectedCardId">
               <SelectTrigger class="flex-1 bg-card border-border shadow-sm rounded-2xl">
                 <div class="flex items-center gap-2 truncate">
                   <span class="bg-primary/10 p-1 rounded-lg shrink-0">
@@ -392,10 +411,29 @@ const showPayConfirm = ref(false)
               </Button>
             </div>
         </div>
+
+        <!-- Mobile Tab Bar -->
+        <div class="flex p-1.5 bg-muted/40 rounded-[1.25rem] w-fit border border-border/70 shadow-elevation-1 transition-all duration-200 hover:shadow-elevation-2">
+          <button
+            class="px-6 py-2 rounded-xl text-small font-medium transition-all duration-200 active:scale-[0.98]"
+            :class="activeTab === 'card' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-background/60'"
+            @click="activeTab = 'card'"
+          >
+            Cartão de Crédito
+          </button>
+          <button
+            class="px-6 py-2 rounded-xl text-small font-medium transition-all duration-200 active:scale-[0.98]"
+            :class="activeTab === 'cashflow' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-background/60'"
+            @click="activeTab = 'cashflow'"
+          >
+            Fluxo de Caixa
+          </button>
+        </div>
       </div>
 
-      <!-- Section 0: Free to Spend Hero -->
+      <!-- Section 0: Free to Spend Hero (Cash Flow Tab) -->
       <FreeToSpendCard
+        v-show="activeTab === 'cashflow'"
         v-if="budgetSummary && budgetSummary.totalIncome > 0"
         :total-income="budgetSummary.totalIncome"
         :total-spending="budgetSummary.totalSpending"
@@ -404,8 +442,8 @@ const showPayConfirm = ref(false)
         class="mb-5"
       />
 
-      <!-- Section 1: Crisis Alerts + Summary -->
-      <div class="space-y-5">
+      <!-- Section 1: Crisis Alerts + Summary (Credit Card Tab) -->
+      <div v-show="activeTab === 'card'" class="space-y-5">
         <!-- Crisis Alerts -->
         <div v-if="crisisAlerts && crisisAlerts.length > 0" class="space-y-4">
           <div v-for="(alert, idx) in crisisAlerts" :key="idx" class="animate-in fade-in slide-in-from-top-4 duration-500">
@@ -426,8 +464,8 @@ const showPayConfirm = ref(false)
         />
       </div>
 
-      <!-- Section 2: Budget Widgets Row -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+      <!-- Section 2: Budget Widgets Row (Cash Flow Tab) -->
+      <div v-show="activeTab === 'cashflow'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
         <DuScoreCard
           v-if="duScore"
           :score="duScore.score"
@@ -446,8 +484,8 @@ const showPayConfirm = ref(false)
         />
       </div>
 
-      <!-- Section 2b: More Widgets Row -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+      <!-- Section 2b: More Widgets Row (Cash Flow Tab) -->
+      <div v-show="activeTab === 'cashflow'" class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
         <TrendingBudgetsCard
           v-if="budgetSummary"
           :categories="budgetSummary.categories"
@@ -458,8 +496,26 @@ const showPayConfirm = ref(false)
         />
       </div>
 
-      <!-- Section 2: Main + Sidebar -->
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+      <!-- Section 2c: Savings Goals (Cash Flow Tab) -->
+      <div v-show="activeTab === 'cashflow'" class="mt-5">
+        <SavingsGoalsWidget />
+      </div>
+
+      <!-- Cash Flow Empty State -->
+      <div v-show="activeTab === 'cashflow'" v-if="!budgetSummary || budgetSummary.totalIncome === 0" class="mt-6">
+        <div class="glass-surface p-6 max-w-md mx-auto">
+          <EmptyState
+            :icon="Wallet"
+            title="Configure seu orçamento"
+            description="Adicione sua renda e metas para acompanhar seu fluxo de caixa."
+            action-label="Configurar Orçamento"
+            action-to="/orcamento"
+          />
+        </div>
+      </div>
+
+      <!-- Section 3: Main + Sidebar (Credit Card Tab) -->
+      <div v-show="activeTab === 'card'" class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 mt-6">
         <!-- Left: Transactions -->
         <div class="glass-surface p-6 overflow-hidden">
           <div class="flex items-center justify-between mb-6">
@@ -481,11 +537,6 @@ const showPayConfirm = ref(false)
               :card-id="selectedCardId"
               :card-name="cards.find(c => c.id === selectedCardId)?.name || ''"
             />
-          </div>
-
-          <!-- Savings Goals Widget -->
-          <div class="hidden lg:block">
-            <SavingsGoalsWidget />
           </div>
 
           <!-- Future Projection -->
