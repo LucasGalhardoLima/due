@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2026-02-20
 
 ## Active Technologies
+- TypeScript 5.9, Vue 3.5, Nuxt 4.2 + Vue 3 (Composition API), shadcn-vue, Lucide icons — no new dependencies (002-dashboard-tabs)
+- N/A — no data model changes (002-dashboard-tabs)
 
 - **Web**: TypeScript 5.9, Vue 3.5, Nuxt 4.2 + Prisma 6.2, Zod, date-fns, Vercel AI SDK, shadcn-vue (reka-ui), Lucide icons (001-orcamento-mensal)
 - **iOS**: Swift 6.0, SwiftUI, iOS 17.0+, XcodeGen, Clerk iOS SDK >= 0.40.0, MVVM with @Observable (Due iOS app)
@@ -55,6 +57,7 @@ Seven core principles — **every PR MUST self-check against them**:
 7. **Testing Standards** — 80% ViewModel/Networking coverage, mock URLProtocol, currency formatter tests
 
 ## Recent Changes
+- 002-dashboard-tabs: Added TypeScript 5.9, Vue 3.5, Nuxt 4.2 + Vue 3 (Composition API), shadcn-vue, Lucide icons — no new dependencies
 
 - 001-orcamento-mensal: Added TypeScript 5.9, Vue 3.5, Nuxt 4.2 + Prisma 6.2, Zod, date-fns, Vercel AI SDK, shadcn-vue (reka-ui), Lucide icons
 - Due iOS: Swift 6.0 native app with Dashboard, Transactions, Installments, Onboarding, Settings screens
