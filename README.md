@@ -1,6 +1,6 @@
-# Due
+# Du
 
-Finanças reimaginadas para quem vive no crédito. O Due é um app de gestão financeira pessoal focado em cartões de crédito, com projeção de faturas, parcelamentos e insights por IA.
+Finanças reimaginadas para quem vive no crédito. O Du é um app de gestão financeira pessoal focado em cartões de crédito, com projeção de faturas, parcelamentos e insights por IA.
 
 ## Stack
 

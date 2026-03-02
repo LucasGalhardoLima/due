@@ -35,7 +35,19 @@ function isValidPaletteId(value: unknown): value is PaletteId {
 }
 
 export function usePalette() {
-  const cookie = useCookie<string>('due-palette', {
+  // Migrate old cookie name
+  if (import.meta.client) {
+    const oldCookie = useCookie<string>('due-palette')
+    if (oldCookie.value) {
+      const newCookie = useCookie<string>('du-palette', { maxAge: 60 * 60 * 24 * 365, path: '/' })
+      if (!newCookie.value) {
+        newCookie.value = oldCookie.value
+      }
+      oldCookie.value = null as unknown as string // delete old cookie
+    }
+  }
+
+  const cookie = useCookie<string>('du-palette', {
     maxAge: 60 * 60 * 24 * 365,
     path: '/',
     default: () => 'neon-sage',

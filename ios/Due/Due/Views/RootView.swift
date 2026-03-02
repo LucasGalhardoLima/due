@@ -15,7 +15,7 @@ struct RootView: View {
 
     var body: some View {
         tabContent
-            .tint(Color.dueVioletAdaptive)
+            .tint(Color.duVioletAdaptive)
             .preferredColorScheme(resolvedColorScheme)
             .onChange(of: selectedTab) {
                 HapticManager.selection()
@@ -73,7 +73,7 @@ struct RootView: View {
                 } label: {
                     Image(systemName: "plus")
                         .font(.title2.weight(.semibold))
-                        .foregroundStyle(Color.dueTabAccent)
+                        .foregroundStyle(Color.duTabAccent)
                         .frame(width: 48, height: 48)
                 }
                 .glassEffect(.regular.interactive(), in: .circle)
@@ -86,7 +86,7 @@ struct RootView: View {
     @available(iOS 26, *)
     private func tabBarButton(_ title: String, icon: String, tag: Int) -> some View {
         Button {
-            withAnimation(DueTheme.snappySpring) {
+            withAnimation(DuTheme.snappySpring) {
                 selectedTab = tag
             }
             HapticManager.selection()
@@ -97,7 +97,7 @@ struct RootView: View {
                 Text(title)
                     .font(.caption2.weight(selectedTab == tag ? .medium : .regular))
             }
-            .foregroundStyle(selectedTab == tag ? Color.dueTabAccent : .secondary)
+            .foregroundStyle(selectedTab == tag ? Color.duTabAccent : .secondary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
         }
@@ -142,8 +142,8 @@ struct RootView: View {
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.white)
                 .frame(width: 56, height: 56)
-                .background(Color.dueVioletAdaptive, in: Circle())
-                .shadow(color: Color.dueVioletAdaptive.opacity(0.4), radius: 8, y: 4)
+                .background(Color.duVioletAdaptive, in: Circle())
+                .shadow(color: Color.duVioletAdaptive.opacity(0.4), radius: 8, y: 4)
         }
         .pressableStyle()
     }

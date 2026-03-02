@@ -27,9 +27,37 @@ const COOLDOWNS = {
 } as const
 
 // LocalStorage keys
-const STORAGE_PREFIX = 'due:advisor:'
+const STORAGE_PREFIX = 'du:advisor:'
 const getLastShownKey = (type: string) => `${STORAGE_PREFIX}lastShown:${type}`
 const SESSION_KEY = `${STORAGE_PREFIX}sessionId`
+
+// Migrate old 'due:advisor:' keys to 'du:advisor:'
+function migrateAdvisorStorageKeys() {
+  if (typeof window === 'undefined') return
+  const OLD_PREFIX = 'due:advisor:'
+  const keysToMigrate: string[] = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key?.startsWith(OLD_PREFIX)) keysToMigrate.push(key)
+  }
+  for (const oldKey of keysToMigrate) {
+    const newKey = STORAGE_PREFIX + oldKey.slice(OLD_PREFIX.length)
+    if (!localStorage.getItem(newKey)) {
+      localStorage.setItem(newKey, localStorage.getItem(oldKey)!)
+    }
+    localStorage.removeItem(oldKey)
+  }
+  // Also migrate sessionStorage
+  const oldSessionKey = `${OLD_PREFIX}sessionId`
+  const sessionVal = sessionStorage.getItem(oldSessionKey)
+  if (sessionVal) {
+    if (!sessionStorage.getItem(SESSION_KEY)) {
+      sessionStorage.setItem(SESSION_KEY, sessionVal)
+    }
+    sessionStorage.removeItem(oldSessionKey)
+  }
+}
+migrateAdvisorStorageKeys()
 
 function getStorageValue(key: string): number | null {
   if (typeof window === 'undefined') return null
