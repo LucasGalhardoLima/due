@@ -9,7 +9,7 @@ const currentYear = new Date().getFullYear()
         <!-- Brand -->
         <div class="space-y-8">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center">
+            <div class="w-12 h-12 bg-white rounded-[22%] flex items-center justify-center">
               <span class="text-black font-black text-sm uppercase">DU</span>
             </div>
           </div>

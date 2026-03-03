@@ -46,7 +46,7 @@ definePageMeta({
     <nav class="fixed top-0 left-0 right-0 h-20 bg-background border-b border-white/5 z-50 px-8 lg:px-16 flex items-center justify-between">
       <div class="flex items-center gap-12">
         <NuxtLink to="/" class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center pulse-avatar">
+          <div class="w-8 h-8 bg-white rounded-[22%] flex items-center justify-center pulse-avatar">
             <span class="text-black font-black text-[10px]">DU</span>
           </div>
         </NuxtLink>
