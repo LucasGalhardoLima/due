@@ -5,6 +5,7 @@ import SolutionSection from '@/components/landing/SolutionSection.vue'
 import FeaturesGrid from '@/components/landing/FeaturesGrid.vue'
 import AIChatSection from '@/components/landing/AIChatSection.vue'
 import BeforeAfterSection from '@/components/landing/BeforeAfterSection.vue'
+import PricingSection from '@/components/landing/PricingSection.vue'
 import CTASection from '@/components/landing/CTASection.vue'
 import LandingFooter from '@/components/landing/LandingFooter.vue'
 
@@ -52,6 +53,7 @@ definePageMeta({
         <div class="hidden lg:flex items-center gap-8 text-[11px] font-bold uppercase tracking-widest text-white/40">
           <a href="#solution-section" class="hover:text-white transition-colors">Como Funciona</a>
           <a href="#features-section" class="hover:text-white transition-colors">Recursos</a>
+          <a href="#pricing-section" class="hover:text-white transition-colors">Precos</a>
         </div>
       </div>
       <div class="flex items-center gap-6">
@@ -96,6 +98,8 @@ definePageMeta({
         <AIChatSection />
         <div class="particle-divider"><div class="dot" /><div class="dot" /><div class="dot" /></div>
         <BeforeAfterSection />
+        <div class="particle-divider"><div class="dot" /><div class="dot" /><div class="dot" /></div>
+        <PricingSection @start="openSignUp" />
         <div class="particle-divider"><div class="dot" /><div class="dot" /><div class="dot" /></div>
         <CTASection @start="openSignUp" />
       </template>
