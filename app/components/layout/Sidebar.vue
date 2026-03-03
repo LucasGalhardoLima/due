@@ -101,7 +101,7 @@ function closeMobileMenu() {
   <!-- Mobile Header -->
   <header class="lg:hidden h-14 border-b border-border bg-card sticky top-0 z-40 px-4 flex items-center justify-between">
     <NuxtLink to="/" class="font-bold text-lg flex items-center gap-2">
-      <div class="w-8 h-8 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground shadow-elevation-2 text-sm">
+      <div class="w-8 h-8 bg-primary rounded-[22%] flex items-center justify-center text-primary-foreground shadow-elevation-2 text-sm">
         Du
       </div>
     </NuxtLink>
@@ -123,7 +123,7 @@ function closeMobileMenu() {
       <!-- Sidebar Header (Desktop) -->
       <div class="h-16 flex items-center px-6 border-b border-border/50 shrink-0">
         <NuxtLink to="/" class="font-bold text-xl flex items-center gap-2">
-          <div class="w-9 h-9 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground shadow-elevation-2 text-sm">
+          <div class="w-9 h-9 bg-primary rounded-[22%] flex items-center justify-center text-primary-foreground shadow-elevation-2 text-sm">
             Du
           </div>
         </NuxtLink>
