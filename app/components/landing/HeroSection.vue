@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRight, Play, Sparkles, MessageCircle } from 'lucide-vue-next'
+import { ArrowRight, PlayCircle, Bot } from 'lucide-vue-next'
 
 const emit = defineEmits<{
   (e: 'start' | 'demo'): void
@@ -7,98 +7,92 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section class="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
-    <div class="container mx-auto px-6 py-24 text-center relative z-10">
-      <div class="max-w-4xl mx-auto space-y-10">
-        <!-- Du Avatar/Introduction -->
-        <div class="flex flex-col items-center gap-4 mb-4">
-          <div class="relative">
-            <div class="w-24 h-24 bg-primary rounded-[2rem] flex items-center justify-center text-primary-foreground font-black text-4xl shadow-2xl shadow-primary/25 rotate-3 hover:rotate-0 transition-transform duration-300">
-              Du
-            </div>
-            <div class="absolute -bottom-1 -right-1 w-8 h-8 bg-ai-accent rounded-full flex items-center justify-center border-4 border-background">
-              <MessageCircle class="w-4 h-4 text-ai-accent-foreground" />
-            </div>
-          </div>
+  <header class="relative pt-48 pb-32 px-8 lg:px-20 w-full min-h-screen flex flex-col justify-between overflow-hidden">
+    <div class="mesh-bg" />
+
+    <div class="w-full flex flex-col lg:flex-row items-center gap-16 lg:gap-24 relative z-10">
+      <!-- Text -->
+      <div class="flex-1 text-left">
+        <div class="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-5 py-2 rounded-full mb-8">
+          <span class="flex h-2 w-2 rounded-full bg-white" />
+          <span class="text-[10px] uppercase tracking-widest font-bold opacity-50">Oi, eu sou o Du! 👋</span>
         </div>
 
-        <!-- Personal greeting -->
-        <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-muted border border-border">
-          <Sparkles class="w-4 h-4 text-ai-accent animate-pulse" />
-          <span class="text-sm font-bold text-primary-accent">Seu assistente financeiro pessoal</span>
-        </div>
-
-        <!-- Personal Headline -->
-        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1]">
-          <span class="block text-2xl sm:text-3xl text-muted-foreground font-medium mb-4">Oi, eu sou o Du! 👋</span>
-          <span class="block mb-2">Vou te ajudar a dominar</span>
-          <span class="relative inline-block">
-            <span class="text-primary">sua vida financeira.</span>
-            <!-- Underline decoration -->
-            <svg class="absolute -bottom-2 left-0 w-full h-3 text-brand-accent/30" viewBox="0 0 200 8" preserveAspectRatio="none">
-              <path d="M0,5 Q50,0 100,5 T200,5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
-            </svg>
-          </span>
+        <h1 class="text-5xl lg:text-8xl font-bold mb-10 leading-[1.05] tracking-tighter text-gradient uppercase">
+          Cansou de se perder nas faturas e viver de planilha?
         </h1>
 
-        <!-- Personal Subheadline -->
-        <p class="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Eu organizo seus gastos, controlo suas parcelas, projeto seu orçamento e te mostro
-          <span class="text-foreground font-semibold">exatamente o que fazer</span> pra
-          você respirar financeiramente. Sem julgamento, só solução. 💪
+        <p class="text-sm lg:text-lg text-white/50 max-w-xl mb-12 leading-relaxed font-medium">
+          A fatura chega e você não faz ideia de onde veio tudo aquilo. Chega de brigar com planilhas manuais no Excel ou Google Sheets e apps de banco que escondem a realidade. Eu automatizo tudo para você ter o controle real do seu dinheiro. 💪
         </p>
 
-        <!-- CTAs -->
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-          <NuxtLink
-            to="/sign-up"
-            class="group w-full sm:w-auto inline-flex items-center justify-center gap-3 h-16 px-10 rounded-[2rem] bg-primary text-primary-foreground font-bold text-lg shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] transition-all duration-300"
+        <div class="flex flex-col sm:flex-row gap-6 mb-16">
+          <button
+            class="bg-white text-black px-12 py-6 rounded-full font-bold uppercase text-[11px] flex items-center justify-center gap-4 hover:scale-[1.05] transition-transform shadow-[0_20px_60px_rgba(255,255,255,0.05)]"
             @click="emit('start')"
           >
-            Bora resolver isso juntos!
-            <ArrowRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </NuxtLink>
+            Matar minha Planilha <ArrowRight class="w-4 h-4" />
+          </button>
           <button
-            class="group w-full sm:w-auto inline-flex items-center justify-center gap-3 h-16 px-10 rounded-[2rem] border-2 border-border bg-card font-semibold hover:bg-card hover:border-primary/40 transition-all duration-300"
+            class="landing-glass px-12 py-6 rounded-full font-bold uppercase text-[11px] flex items-center justify-center gap-4 hover:bg-white/10 transition-all"
             @click="emit('demo')"
           >
-            <div class="w-10 h-10 rounded-xl bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-              <Play class="w-4 h-4 text-muted-foreground group-hover:text-primary-accent transition-colors" />
-            </div>
-            Ver como funciona
+            <PlayCircle class="w-4 h-4" /> Ver Demo
           </button>
         </div>
+      </div>
 
-        <!-- Trust indicators -->
-        <div class="flex flex-wrap items-center justify-center gap-6 pt-8 text-sm text-muted-foreground">
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-ai-accent" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-            </svg>
-            <span>Comece de graça</span>
+      <!-- Dashboard Mockup -->
+      <div class="flex-1 relative w-full lg:max-w-3xl">
+        <div class="landing-glass p-8 rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.5)] rotate-1 relative border-white/10 transition-transform duration-700 hover:rotate-0">
+          <div class="flex items-center justify-between mb-8">
+            <div class="flex gap-2">
+              <div class="w-3 h-3 rounded-full bg-white/10" />
+              <div class="w-3 h-3 rounded-full bg-white/10" />
+              <div class="w-3 h-3 rounded-full bg-white/10" />
+            </div>
+            <span class="text-[10px] opacity-20 font-bold uppercase tracking-[0.3em]">Análise Familiar Ativa</span>
           </div>
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-ai-accent" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-            </svg>
-            <span>Pronto em 2 minutos</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-ai-accent" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-            </svg>
-            <span>Seus dados são só seus</span>
+          <div class="space-y-6">
+            <!-- Fatura row -->
+            <div class="h-20 bg-white/5 rounded-[1.5rem] border border-white/10 flex items-center px-6 justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+                  <span class="text-[9px] font-black">NU</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[10px] font-bold uppercase">Fatura Atual</span>
+                  <span class="text-[9px] opacity-30">Previsão de fechamento</span>
+                </div>
+              </div>
+              <span class="text-lg font-bold">R$ 4.450,00</span>
+            </div>
+            <!-- Stats row -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="h-36 bg-white/5 rounded-[2rem] border border-white/10 p-6 flex flex-col justify-between">
+                <span class="text-[10px] uppercase opacity-30 tracking-widest">Entradas Totais</span>
+                <span class="text-2xl font-bold uppercase tracking-tighter">R$ 8.500</span>
+              </div>
+              <div class="h-36 bg-white/[0.08] rounded-[2rem] border border-white/10 p-6 flex flex-col justify-between">
+                <span class="text-[10px] uppercase text-white/50 tracking-widest">Sobra Livre</span>
+                <span class="text-2xl font-bold text-white tracking-tighter uppercase">R$ 1.200</span>
+              </div>
+            </div>
+            <!-- AI Insight -->
+            <div class="bg-white text-black p-6 rounded-[2rem] relative overflow-hidden">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-6 h-6 bg-black rounded-lg flex items-center justify-center">
+                  <Bot class="w-3 h-3 text-white" />
+                </div>
+                <span class="text-[10px] font-bold uppercase">Du decifrou sua fatura</span>
+              </div>
+              <p class="text-xs font-bold leading-relaxed uppercase">
+                Identifiquei um aumento em Restaurantes e 3 parcelas que acabam este mês. Quer ver o impacto no seu saldo?
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Scroll indicator -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground animate-bounce">
-      <span class="text-xs font-medium">Deixa eu te mostrar</span>
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-      </svg>
-    </div>
-  </section>
+  </header>
 </template>

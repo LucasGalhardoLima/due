@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Du - Domine sua Vida Financeira</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap');
+
+    :root {
+      --bg-main: hsl(0, 0%, 6%);
+      --bg-card: hsl(0, 0%, 10%);
+      --border-color: hsl(0, 0%, 18%);
+      --text-main: hsl(0, 0%, 92%);
+      --text-muted: hsl(0, 0%, 50%);
+      --primary: hsl(0, 0%, 100%);
+      --secondary: hsl(0, 0%, 20%);
+    }
+
+    body {
+      font-family: 'Geist Mono', monospace;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      letter-spacing: -0.02em;
+    }
+
+    h1, h2, h3, h4, .heading-font, button, a, span, p, li {
+      font-family: 'Geist Mono', monospace !important;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .text-gradient {
+      background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.4) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .mesh-bg {
+      position: absolute;
+      width: 150%;
+      height: 150%;
+      top: -25%;
+      left: -25%;
+      background: 
+        radial-gradient(at 0% 0%, hsla(0, 0%, 100%, 0.05) 0, transparent 40%),
+        radial-gradient(at 50% 50%, hsla(0, 0%, 100%, 0.03) 0, transparent 40%),
+        radial-gradient(at 100% 100%, hsla(0, 0%, 100%, 0.04) 0, transparent 40%);
+      animation: mesh-move 20s ease infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes mesh-move {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      100% { transform: translate(30px, 20px) rotate(2deg); }
+    }
+
+    .pulse-avatar {
+      position: relative;
+    }
+    .pulse-avatar::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border: 2px solid hsla(0, 0%, 100%, 0.2);
+      border-radius: inherit;
+      animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    .tilt-card {
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      transform-style: preserve-3d;
+    }
+
+    .tilt-card:hover {
+      transform: perspective(1000px) rotateX(1deg) rotateY(1deg) translateY(-2px);
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .particle-divider {
+      height: 1px;
+      width: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin: 60px 0;
+    }
+
+    .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    @view-transition { navigation: auto; }
+  </style>
+
+<meta name="preview-version" content="f623f302-99a0-4487-948a-dcaea6dec6f4" />
+<meta name="preview-timestamp" content="2026-03-03T16:33:36.766Z" />
+
+<style>
+  html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar {
+    display: none !important; width: 0 !important; height: 0 !important;
+  }
+  html, body, * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+</style>
+<style>
+          body:not(.sd-ready) { opacity: 0 !important; }
+          body.sd-ready { opacity: 1 !important; transition: opacity 0.1s ease-in; }
+          sd-component { display: block; }
+        </style>
+
+<script type="module">
+  (function() {
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+  })();
+</script>
+<script type="module">
+    // SuperDesign Runtime
+    console.log('[SuperDesign] Preview loaded for versionId:', "f623f302-99a0-4487-948a-dcaea6dec6f4");
+
+    window.__SUPERDESIGN_PREVIEW__ = {
+      versionId: "f623f302-99a0-4487-948a-dcaea6dec6f4",
+      timestamp: "2026-03-03T16:33:36.766Z",
+      _modernScreenshotModule: null,
+
+      sendMessage: function(type, data) {
+        if (window.parent) {
+          window.parent.postMessage({
+            source: 'superdesign-preview',
+            type: type,
+            data: data,
+            versionId: this.versionId
+          }, '*');
+        }
+      },
+
+      ready: function() {
+        this.sendMessage('ready', { timestamp: Date.now() });
+      },
+
+      
+      _captureScreenshotInternal: async function() {
+        if (!this._modernScreenshotModule) {
+          console.log('[SuperDesign] Loading modern-screenshot library...');
+          this._modernScreenshotModule = await import('https://esm.sh/modern-screenshot@4.6.6');
+        }
+        var modernScreenshot = this._modernScreenshotModule;
+        if (!modernScreenshot || !modernScreenshot.domToCanvas) {
+          throw new Error('modern-screenshot library not loaded');
+        }
+
+        var scrollX = window.scrollX || window.pageXOffset;
+        var scrollY = window.scrollY || window.pageYOffset;
+        var viewportWidth = window.innerWidth;
+        var viewportHeight = window.innerHeight;
+        var documentWidth = Math.max(
+          document.documentElement.scrollWidth,
+          document.documentElement.offsetWidth,
+          document.documentElement.clientWidth,
+          document.body.scrollWidth,
+          document.body.offsetWidth
+        );
+        var documentHeight = Math.max(
+          document.documentElement.scrollHeight,
+          document.documentElement.offsetHeight,
+          document.documentElement.clientHeight,
+          document.body.scrollHeight,
+          document.body.offsetHeight
+        );
+
+        var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        var pixelRatio = isMobile ? 1 : (window.devicePixelRatio || 1);
+
+        var dataUrl;
+
+        if (isMobile) {
+          var wrapper = document.createElement('div');
+          wrapper.style.cssText = 'position:fixed;top:0;left:0;width:' + viewportWidth + 'px;height:' + viewportHeight + 'px;overflow:hidden;z-index:999999;pointer-events:none;';
+          var clone = document.body.cloneNode(true);
+          clone.style.cssText = 'position:absolute;top:' + (-scrollY) + 'px;left:' + (-scrollX) + 'px;margin:0;width:' + documentWidth + 'px;';
+          wrapper.appendChild(clone);
+          document.body.appendChild(wrapper);
+          try {
+            var viewportCanvas = await modernScreenshot.domToCanvas(wrapper, {
+              scale: 1, backgroundColor: '#ffffff',
+              width: viewportWidth, height: viewportHeight,
+            });
+            dataUrl = viewportCanvas.toDataURL('image/png', 0.5);
+          } finally {
+            document.body.removeChild(wrapper);
+          }
+        } else {
+          var fullCanvas = await modernScreenshot.domToCanvas(document.documentElement, {
+            scale: pixelRatio, backgroundColor: '#ffffff',
+            width: documentWidth, height: documentHeight,
+          });
+          var viewportCanvas = document.createElement('canvas');
+          viewportCanvas.width = viewportWidth * pixelRatio;
+          viewportCanvas.height = viewportHeight * pixelRatio;
+          var ctx = viewportCanvas.getContext('2d');
+          if (!ctx) throw new Error('Failed to get canvas context');
+          ctx.drawImage(
+            fullCanvas,
+            scrollX * pixelRatio, scrollY * pixelRatio,
+            viewportWidth * pixelRatio, viewportHeight * pixelRatio,
+            0, 0, viewportWidth * pixelRatio, viewportHeight * pixelRatio
+          );
+          dataUrl = viewportCanvas.toDataURL('image/png', 1.0);
+        }
+
+        if (!dataUrl || !dataUrl.startsWith('data:image/png;base64,') || dataUrl.length < 100) {
+          throw new Error('Invalid screenshot data');
+        }
+
+        return {
+          dataUrl: dataUrl,
+          viewportWidth: viewportWidth,
+          viewportHeight: viewportHeight,
+          pixelRatio: pixelRatio
+        };
+      },
+
+      autoCapture: async function() {
+        if (window === window.parent) return;
+        try {
+          var result = await this._captureScreenshotInternal();
+          this.sendMessage('auto-screenshot', {
+            dataUrl: result.dataUrl,
+            timestamp: Date.now(),
+            viewportWidth: result.viewportWidth,
+            viewportHeight: result.viewportHeight,
+            pixelRatio: result.pixelRatio,
+          });
+        } catch (error) {
+          console.error('[SuperDesign] Auto-capture failed:', error);
+        }
+      },
+
+      captureScreenshot: async function(requestId, autoCaptureId) {
+        try {
+          this._currentRequestId = requestId;
+          this._currentAutoCaptureId = autoCaptureId;
+          var result = await this._captureScreenshotInternal();
+          this.sendMessage('screenshot-captured', {
+            dataUrl: result.dataUrl,
+            timestamp: Date.now(),
+            viewportWidth: result.viewportWidth,
+            viewportHeight: result.viewportHeight,
+            pixelRatio: result.pixelRatio,
+            requestId: this._currentRequestId,
+            autoCaptureId: this._currentAutoCaptureId
+          });
+          return result.dataUrl;
+        } catch (error) {
+          console.error('[SuperDesign] Screenshot capture failed:', error);
+          this.sendMessage('screenshot-error', {
+            error: error.message || String(error),
+            timestamp: Date.now(),
+            requestId: this._currentRequestId,
+            autoCaptureId: this._currentAutoCaptureId
+          });
+          throw error;
+        }
+      }
+  
+    };
+
+    
+    // Font loading helpers
+    window.__SUPERDESIGN_PREVIEW__.loadedFonts = new Set();
+    window.__SUPERDESIGN_PREVIEW__.loadGoogleFont = function(fontFamily) {
+      if (!fontFamily || this.loadedFonts.has(fontFamily)) return;
+      if (fontFamily.startsWith('Custom-')) return;
+
+      var systemFonts = ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI',
+        'Roboto', 'Helvetica', 'Arial', 'sans-serif', 'Georgia', 'Times New Roman',
+        'Times', 'serif', 'Menlo', 'Monaco', 'Consolas', 'Courier New', 'monospace'];
+      if (systemFonts.some(function(sf) { return fontFamily.toLowerCase().includes(sf.toLowerCase()); })) return;
+
+      if (!document.querySelector('link[href*="fonts.googleapis.com"]')) {
+        var preconnect1 = document.createElement('link');
+        preconnect1.rel = 'preconnect';
+        preconnect1.href = 'https://fonts.googleapis.com';
+        document.head.appendChild(preconnect1);
+        var preconnect2 = document.createElement('link');
+        preconnect2.rel = 'preconnect';
+        preconnect2.href = 'https://fonts.gstatic.com';
+        preconnect2.crossOrigin = 'anonymous';
+        document.head.appendChild(preconnect2);
+      }
+
+      var linkId = 'google-font-' + fontFamily.replace(/\\s+/g, '-').toLowerCase();
+      if (!document.getElementById(linkId)) {
+        var link = document.createElement('link');
+        link.id = linkId;
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(fontFamily) + ':wght@400;500;600;700&display=swap';
+        link.onerror = function() { console.error('[SuperDesign] Failed to load Google Font:', fontFamily); };
+        document.head.appendChild(link);
+      }
+      this.loadedFonts.add(fontFamily);
+    };
+
+    window.__SUPERDESIGN_PREVIEW__.loadedCustomFonts = new Set();
+    window.__SUPERDESIGN_PREVIEW__.loadCustomFont = function(fontInfo) {
+      if (!fontInfo || !fontInfo.family || !fontInfo.url) return;
+      if (this.loadedCustomFonts.has(fontInfo.family)) return;
+      var styleId = 'custom-font-' + fontInfo.family.replace(/[^a-zA-Z0-9]/g, '-');
+      if (document.getElementById(styleId)) return;
+      var style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = '@font-face { ' +
+        'font-family: "' + fontInfo.family + '"; ' +
+        'src: url("' + fontInfo.url + '") format("' + (fontInfo.format || 'woff2') + '"); ' +
+        'font-weight: 100 900; font-style: normal; font-display: swap; }';
+      document.head.appendChild(style);
+      this.loadedCustomFonts.add(fontInfo.family);
+    };
+  
+    
+    // Theme sync
+    window.__SUPERDESIGN_PREVIEW__.applyTheme = function(payload, isDark) {
+      var root = document.documentElement;
+      var colorVars = isDark ? payload.dark : payload.light;
+      for (var name in colorVars) {
+        if (colorVars.hasOwnProperty(name)) {
+          root.style.setProperty(name, colorVars[name]);
+        }
+      }
+
+      if (payload.customFonts && Array.isArray(payload.customFonts)) {
+        payload.customFonts.forEach(function(fontInfo) {
+          window.__SUPERDESIGN_PREVIEW__.loadCustomFont(fontInfo);
+        });
+      }
+
+      if (payload.typography) {
+        var t = payload.typography;
+        if (t.fontSans && !t.fontSans.startsWith('Custom-')) window.__SUPERDESIGN_PREVIEW__.loadGoogleFont(t.fontSans);
+        if (t.fontSerif && !t.fontSerif.startsWith('Custom-')) window.__SUPERDESIGN_PREVIEW__.loadGoogleFont(t.fontSerif);
+        if (t.fontMono && !t.fontMono.startsWith('Custom-')) window.__SUPERDESIGN_PREVIEW__.loadGoogleFont(t.fontMono);
+
+        var formatFontValue = function(ff) {
+          if (!ff) return ff;
+          var first = ff.split(',')[0].trim().replace(/^["']|["']$/g, '');
+          return first.startsWith('var(') ? first : '"' + first + '"';
+        };
+        root.style.setProperty('--font-sans', formatFontValue(t.fontSans));
+        root.style.setProperty('--font-serif', formatFontValue(t.fontSerif));
+        root.style.setProperty('--font-mono', formatFontValue(t.fontMono));
+        root.style.setProperty('--font-size', t.fontSize);
+        root.style.setProperty('--line-height', t.lineHeight);
+        root.style.setProperty('--letter-spacing-body', t.letterSpacing);
+        root.style.setProperty('--letter-spacing-heading', t.headingLetterSpacing);
+        root.style.setProperty('--font-weight-regular', t.fontWeightRegular);
+        root.style.setProperty('--font-weight-bold', t.fontWeightBold);
+      }
+
+      if (payload.effects) {
+        root.style.setProperty('--radius', payload.effects.radius);
+        root.style.setProperty('--shadow', payload.effects.shadow);
+      }
+
+      if (isDark) { root.classList.add('dark'); } else { root.classList.remove('dark'); }
+    };
+  
+    
+    // Message listener
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'request-screenshot') {
+        if (window.__SUPERDESIGN_PREVIEW__) {
+          window.__SUPERDESIGN_PREVIEW__.captureScreenshot(event.data.requestId, event.data.autoCaptureId);
+        }
+      }
+
+      if (event.data && event.data.type === 'superdesign-theme-update') {
+        if (window.__SUPERDESIGN_PREVIEW__ && event.data.payload) {
+          var isDark = event.data.isDark || false;
+          window.__SUPERDESIGN_PREVIEW__.applyTheme(event.data.payload, isDark);
+          window.__SUPERDESIGN_PREVIEW__.sendMessage('theme-applied', { timestamp: Date.now(), isDark: isDark });
+        }
+      }
+
+      if (event.data && event.data.type === 'navigate-to-route') {
+        var route = event.data.route;
+        if (route) {
+          if (route === '/') {
+            if (window.location.hash) {
+              history.pushState(null, '', window.location.pathname + window.location.search);
+              window.dispatchEvent(new HashChangeEvent('hashchange'));
+            }
+          } else {
+            var newHash = '#' + route;
+            if (window.location.hash !== newHash) {
+              window.location.hash = route;
+            }
+          }
+        }
+      }
+    });
+  
+    
+    // Page lifecycle
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() { window.__SUPERDESIGN_PREVIEW__.ready(); });
+    } else {
+      window.__SUPERDESIGN_PREVIEW__.ready();
+    }
+
+    function onPageFullyLoaded() {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          setTimeout(function() {
+            window.__SUPERDESIGN_PREVIEW__.sendMessage('loaded', { timestamp: Date.now() });
+          }, 1500);
+          // Auto-capture disabled for this preview type
+        });
+      });
+    }
+
+    if (document.readyState === 'complete') {
+      onPageFullyLoaded();
+    } else {
+      window.addEventListener('load', onPageFullyLoaded);
+    }
+  
+  </script>
+<script  src="https://cdn.jsdelivr.net/npm/petite-vue@0.4.1/dist/petite-vue.iife.js"></script>
+</head>
+<body class="bg-[#0f0f0f]">
+  <div class="min-h-screen relative">
+    
+    <!-- NAV -->
+    <nav class="fixed top-0 left-0 right-0 h-20 bg-[#0f0f0f] border-b border-white/5 z-50 px-8 lg:px-16 flex items-center justify-between">
+      <div class="flex items-center gap-12">
+        <a href="#" id="nav-logo" class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center pulse-avatar">
+            <span class="text-black font-black text-[10px]">DU</span>
+          </div>
+        </a>
+        <div class="hidden lg:flex items-center gap-8 text-[11px] font-bold uppercase tracking-widest text-white/40">
+          <a href="#solution-section" id="nav-how-it-works" class="hover:text-white transition-colors">Como Funciona</a>
+          <a href="#features-section" id="nav-features" class="hover:text-white transition-colors">Recursos</a>
+          <a href="#pricing-section" id="nav-pricing" class="hover:text-white transition-colors">Preços</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="#" id="nav-login" class="text-[11px] font-bold uppercase tracking-widest text-white/50 hover:text-white">Entrar</a>
+        <a href="#" id="nav-cta" class="bg-white text-black px-6 py-3 rounded-full text-[11px] font-bold uppercase hover:bg-neutral-200 transition-all">
+          Criar Conta
+        </a>
+      </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="relative pt-48 pb-32 px-8 lg:px-20 w-full min-h-screen flex flex-col justify-between overflow-hidden">
+      <div class="mesh-bg"></div>
+      
+      <div class="w-full flex flex-col lg:flex-row items-center gap-16 lg:gap-24 relative z-10">
+        <div class="flex-1 text-left">
+          <div class="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-5 py-2 rounded-full mb-8">
+            <span class="flex h-2 w-2 rounded-full bg-white"></span>
+            <span class="text-[10px] uppercase tracking-widest font-bold opacity-50">Oi, eu sou o Du! 👋</span>
+          </div>
+          
+          <h1 class="text-5xl lg:text-8xl font-bold mb-10 leading-[1.05] tracking-tighter text-gradient uppercase">
+            Cansou de se perder nas faturas e viver de planilha?
+          </h1>
+          
+          <p class="text-sm lg:text-lg text-white/50 max-w-xl mb-12 leading-relaxed font-medium">
+            A fatura chega e você não faz ideia de onde veio tudo aquilo. Chega de brigar com planilhas manuais no Excel ou Google Sheets e apps de banco que escondem a realidade. Eu automatizo tudo para você ter o controle real do seu dinheiro. 💪
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-6 mb-16">
+            <a href="#" id="hero-primary" class="bg-white text-black px-12 py-6 rounded-full font-bold uppercase text-[11px] flex items-center justify-center gap-4 hover:scale-[1.05] transition-transform shadow-[0_20px_60px_rgba(255,255,255,0.05)]">
+              Matar minha Planilha <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+            </a>
+            <a href="#" id="hero-secondary" class="glass px-12 py-6 rounded-full font-bold uppercase text-[11px] flex items-center justify-center gap-4 hover:bg-white/10 transition-all">
+              <iconify-icon icon="lucide:play-circle"></iconify-icon> Ver Demo
+            </a>
+          </div>
+        </div>
+
+        <!-- Dashboard Mockup -->
+        <div class="flex-1 relative w-full lg:max-w-3xl">
+          <div class="glass p-8 rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.5)] rotate-1 relative border-white/10 transition-transform duration-700 hover:rotate-0">
+            <div class="flex items-center justify-between mb-8">
+              <div class="flex gap-2">
+                <div class="w-3 h-3 rounded-full bg-white/10"></div>
+                <div class="w-3 h-3 rounded-full bg-white/10"></div>
+                <div class="w-3 h-3 rounded-full bg-white/10"></div>
+              </div>
+              <span class="text-[10px] opacity-20 font-bold uppercase tracking-[0.3em]">Análise Familiar Ativa</span>
+            </div>
+            <div class="space-y-6">
+              <div class="h-20 bg-white/5 rounded-[1.5rem] border border-white/10 flex items-center px-6 justify-between">
+                <div class="flex items-center gap-4">
+                   <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center grayscale"><iconify-icon icon="logos:nubank" class="text-2xl"></iconify-icon></div>
+                   <div class="flex flex-col">
+                     <span class="text-[10px] font-bold uppercase">Fatura Atual</span>
+                     <span class="text-[9px] opacity-30">Previsão de fechamento</span>
+                   </div>
+                </div>
+                <span class="text-lg font-bold">R$ 4.450,00</span>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="h-36 bg-white/5 rounded-[2rem] border border-white/10 p-6 flex flex-col justify-between">
+                  <span class="text-[10px] uppercase opacity-30 tracking-widest">Entradas Totais</span>
+                  <span class="text-2xl font-bold uppercase tracking-tighter">R$ 8.500</span>
+                </div>
+                <div class="h-36 bg-white/[0.08] rounded-[2rem] border border-white/10 p-6 flex flex-col justify-between">
+                  <span class="text-[10px] uppercase text-white/50 tracking-widest">Sobra Livre</span>
+                  <span class="text-2xl font-bold text-white tracking-tighter uppercase">R$ 1.200</span>
+                </div>
+              </div>
+              <div class="bg-white text-black p-6 rounded-[2rem] relative overflow-hidden">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-6 h-6 bg-black rounded-lg flex items-center justify-center">
+                    <iconify-icon icon="lucide:bot" class="text-white text-[10px]"></iconify-icon>
+                  </div>
+                  <span class="text-[10px] font-bold uppercase">Du decifrou sua fatura</span>
+                </div>
+                <p class="text-xs font-bold leading-relaxed uppercase">Identifiquei um aumento em Restaurantes e 3 parcelas que acabam este mês. Quer ver o impacto no seu saldo?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="particle-divider"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+    <!-- PROBLEM SECTION -->
+    <section class="py-32 px-8 lg:px-20">
+      <div class="max-w-4xl mx-auto text-center">
+        <span class="text-[11px] font-bold uppercase tracking-[0.5em] text-white/30 mb-8 block">A Realidade</span>
+        <h2 class="text-4xl lg:text-7xl font-bold uppercase tracking-tighter mb-12 leading-tight">Onde foi parar o dinheiro que sobrou?</h2>
+        <div class="grid md:grid-cols-3 gap-8 text-left">
+          <div class="glass p-10 rounded-[2rem] tilt-card">
+            <iconify-icon icon="lucide:search-x" class="text-3xl text-white/40 mb-6"></iconify-icon>
+            <h4 class="text-lg font-bold uppercase mb-4">Fatura Misteriosa</h4>
+            <p class="text-[11px] text-white/40 uppercase leading-relaxed">Nomes que você não reconhece e valores que não batem. O app do banco dificulta o detalhamento e você acaba perdendo o controle do que realmente gastou.</p>
+          </div>
+          <div class="glass p-10 rounded-[2rem] tilt-card">
+            <iconify-icon icon="lucide:table-2" class="text-3xl text-white/40 mb-6"></iconify-icon>
+            <h4 class="text-lg font-bold uppercase mb-4">Planilha Manual</h4>
+            <p class="text-[11px] text-white/40 uppercase leading-relaxed">Você e seu parceiro gastam horas reconstruindo o controle no Excel ou Google Sheets. Um trabalho braçal, tedioso e que nunca parece estar 100% atualizado.</p>
+          </div>
+          <div class="glass p-10 rounded-[2rem] tilt-card">
+            <iconify-icon icon="lucide:trending-down" class="text-3xl text-white/40 mb-6"></iconify-icon>
+            <h4 class="text-lg font-bold uppercase mb-4">O Dinheiro Sumiu</h4>
+            <p class="text-[11px] text-white/40 uppercase leading-relaxed">Entre parcelas antigas e assinaturas que você esqueceu de cancelar, o saldo evapora sem você perceber. Ter o controle do seu dinheiro significa ter visibilidade do futuro.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="particle-divider"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+    <!-- SOLUTION SECTION -->
+    <section id="solution-section" class="py-48 px-8 lg:px-20 bg-white/[0.02]">
+      <div class="max-w-6xl mx-auto">
+         <div class="text-center mb-24">
+            <span class="text-[11px] font-bold uppercase tracking-[0.5em] text-white/30 mb-8 block">A Solução</span>
+            <h2 class="text-4xl lg:text-7xl font-bold uppercase tracking-tighter">Do Caos à Automação.</h2>
+         </div>
+         <div class="grid lg:grid-cols-3 gap-16">
+            <div class="relative">
+               <div class="text-8xl font-black opacity-5 absolute -top-12 -left-4">01</div>
+               <h3 class="text-2xl font-bold uppercase mb-6">Importação Inteligente</h3>
+               <p class="text-sm text-white/40 uppercase leading-loose">Eu decifro descrições enigmáticas do banco e mostro exatamente onde seu dinheiro está indo, organizado por categorias que fazem sentido.</p>
+            </div>
+            <div class="relative">
+               <div class="text-8xl font-black opacity-5 absolute -top-12 -left-4">02</div>
+               <h3 class="text-2xl font-bold uppercase mb-6">Adeus Planilha</h3>
+               <p class="text-sm text-white/40 uppercase leading-loose">Tudo o que sua planilha manual faz, mas de forma automática e em tempo real. Saiba exatamente o que já foi pago e o que ainda resta para o mês.</p>
+            </div>
+            <div class="relative">
+               <div class="text-8xl font-black opacity-5 absolute -top-12 -left-4">03</div>
+               <h3 class="text-2xl font-bold uppercase mb-6">Projeção Real</h3>
+               <p class="text-sm text-white/40 uppercase leading-loose">Visualize seus compromissos financeiros para os próximos 6 a 12 meses. Tome decisões de compra hoje sabendo como estará seu saldo amanhã.</p>
+            </div>
+         </div>
+      </div>
+    </section>
+
+    <div class="particle-divider"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+    <!-- BENTO FEATURES GRID -->
+    <section id="features-section" class="py-48 px-8 lg:px-20">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-24">
+          <span class="text-[11px] font-bold uppercase tracking-[0.5em] text-white/30 mb-8 block">Fim do trabalho manual</span>
+          <h2 class="text-4xl lg:text-7xl font-bold uppercase tracking-tighter mb-4">Controle de Nível Executivo.</h2>
+          <h3 class="text-2xl lg:text-4xl font-light uppercase tracking-widest text-white/20">Seu tempo vale mais que preencher Excel.</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <!-- 1. Projeção de Faturas -->
+          <div class="md:col-span-8 glass rounded-[3rem] p-10 flex flex-col lg:flex-row gap-8 hover:bg-white/5 transition-all tilt-card">
+            <div class="flex-1">
+               <h3 class="text-2xl font-bold uppercase mb-4">Projeção de Faturas</h3>
+               <p class="text-[11px] text-white/40 uppercase leading-relaxed mb-6">
+                 "Descobri que em Março sua fatura terá um pico por causa das parcelas acumuladas". Antecipe-se ao susto.
+               </p>
+               <div class="flex gap-2">
+                 <span class="bg-white/10 text-white/60 px-3 py-1 rounded-full text-[8px] font-bold uppercase">Antecipação 12 Meses</span>
+               </div>
+            </div>
+            <div class="flex-1 bg-black/20 rounded-3xl p-6 flex items-end justify-between gap-2 border border-white/5">
+              <div class="w-full bg-white/10 rounded-t-xl" style="height: 40%"></div>
+              <div class="w-full bg-white/20 rounded-t-xl" style="height: 60%"></div>
+              <div class="w-full bg-white/60 rounded-t-xl relative" style="height: 90%">
+                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-white text-black text-[9px] px-2 py-1 rounded-md font-bold whitespace-nowrap">MAR: R$ 4.2k</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Advisor IA -->
+          <div class="md:col-span-4 glass rounded-[3rem] p-10 flex flex-col justify-between tilt-card">
+            <div>
+              <h3 class="text-2xl font-bold uppercase mb-4">Advisor IA</h3>
+              <p class="text-[11px] text-white/40 uppercase leading-relaxed">Insights reais: Descubra que sua maior variação de custo veio de assinaturas ou lazer sem você perceber.</p>
+            </div>
+            <div class="space-y-3 mt-8">
+               <div class="bg-white/5 p-4 rounded-2xl rounded-bl-none border border-white/10 text-[9px] uppercase">Por que a fatura subiu?</div>
+               <div class="bg-white/20 p-4 rounded-2xl rounded-br-none ml-auto text-[9px] uppercase">Restaurantes (R$850) e a nova parcela da Apple.</div>
+            </div>
+          </div>
+
+          <!-- 3. Simulador de Compras -->
+          <div class="md:col-span-4 glass rounded-[3rem] p-10 flex flex-col justify-between tilt-card">
+            <div>
+              <h3 class="text-xl font-bold uppercase mb-3">Pode parcelar?</h3>
+              <p class="text-[10px] text-white/40 uppercase">Simule o impacto de parcelas no seu fluxo de caixa antes mesmo de passar o cartão.</p>
+            </div>
+            <div class="bg-black/40 p-6 rounded-3xl border border-white/10 mt-8">
+               <div class="flex justify-between text-[11px] mb-2"><span>ITEM:</span> <span>IPHONE</span></div>
+               <div class="flex justify-between text-[11px] mb-6"><span>VALOR 12X:</span> <span class="text-white">R$ 790,00</span></div>
+               <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-white" style="width: 85%"></div></div>
+            </div>
+          </div>
+
+          <!-- 4. Planilha Inteligente -->
+          <div class="md:col-span-4 glass rounded-[3rem] p-10 flex flex-col justify-between tilt-card">
+            <div>
+              <h3 class="text-xl font-bold uppercase mb-3">Planilha Inteligente</h3>
+              <p class="text-[10px] text-white/40 uppercase">Sua lógica de controle, mas alimentada sem você digitar uma linha de texto.</p>
+            </div>
+            <div class="space-y-4 mt-8">
+              <div class="flex justify-between text-[8px] uppercase opacity-40"><span>Mercado</span><span>R$ 1.2k</span></div>
+              <div class="h-1 bg-white/10 w-full rounded-full"><div class="h-full bg-white/60 w-[90%]"></div></div>
+              <div class="flex justify-between text-[8px] uppercase opacity-40"><span>Educação</span><span>R$ 1.1k</span></div>
+              <div class="h-1 bg-white/10 w-full rounded-full"><div class="h-full bg-white/30 w-[40%]"></div></div>
+            </div>
+          </div>
+
+          <!-- 5. Importação CSV -->
+          <div class="md:col-span-4 glass rounded-[3rem] p-10 flex flex-col justify-between tilt-card">
+            <div>
+               <h3 class="text-xl font-bold uppercase mb-3">Import CSV</h3>
+               <p class="text-[10px] text-white/40 uppercase">Arraste o arquivo do Nubank ou Itáu. Categorizamos em 10 segundos.</p>
+            </div>
+            <div class="flex items-center justify-center py-4">
+               <div class="w-16 h-16 border-2 border-dashed border-white/10 rounded-2xl flex items-center justify-center">
+                  <iconify-icon icon="lucide:upload-cloud" class="text-2xl opacity-20"></iconify-icon>
+               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="particle-divider"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+    <!-- AI CHAT EXAMPLES -->
+    <section class="py-48 px-8 lg:px-20 overflow-hidden">
+      <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+         <div class="space-y-6">
+            <div class="glass p-6 rounded-[2rem] rounded-bl-none border-white/20 max-w-[85%] tilt-card">
+               <p class="text-[11px] font-bold uppercase leading-relaxed text-white/80">"Du, por que minha fatura tá tão alta esse mês?"</p>
+            </div>
+            <div class="glass bg-white/10 p-6 rounded-[2rem] rounded-br-none ml-auto border-white/30 max-w-[85%] tilt-card">
+               <p class="text-[11px] font-bold uppercase leading-relaxed text-white">"Achei o motivo: Gastos com Restaurantes e Delivery subiram 40% em relação ao mês passado. Quer ver um plano para reduzir?"</p>
+            </div>
+            <div class="glass p-6 rounded-[2rem] rounded-bl-none border-white/20 max-w-[85%] tilt-card">
+               <p class="text-[11px] font-bold uppercase leading-relaxed text-white/80">"Nossa, eu não tinha percebido esse volume. Vamos organizar isso."</p>
+            </div>
+         </div>
+         <div>
+            <span class="text-[11px] font-bold uppercase tracking-[0.5em] text-white/30 mb-8 block">Conversa Inteligente</span>
+            <h2 class="text-4xl lg:text-6xl font-bold uppercase tracking-tighter mb-8 leading-tight">O Du decifra seu caos.</h2>
+            <p class="text-sm text-white/40 uppercase leading-loose font-medium">
+               Enquanto o app do banco te dá uma lista de nomes confusos, o Du agrupa tudo e te mostra a realidade familiar em segundos. Menos tempo no extrato, mais tempo com quem importa.
+            </p>
+         </div>
+      </div>
+    </section>
+
+    <div class="particle-divider"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+    <!-- BEFORE & AFTER SECTION -->
+    <section class="py-48 px-8 lg:px-20">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-24">
+           <span class="text-[11px] font-bold uppercase tracking-[0.5em] text-white/30 mb-8 block">A Transformação</span>
+           <h2 class="text-4xl lg:text-7xl font-bold uppercase tracking-tighter">O Fim do Caos Financeiro.</h2>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-12">
+           
+           <!-- SEM O DU -->
+           <div class="glass border-white/5 p-12 rounded-[3rem] relative overflow-hidden group hover:bg-white/[0.02] transition-colors">
+              <div class="absolute top-8 right-10 flex items-center gap-2">
+                 <span class="text-[10px] font-bold uppercase text-white/30">Sem o Du</span>
+                 <div class="w-2 h-2 rounded-full bg-white/20"></div>
+              </div>
+              <h3 class="text-2xl font-bold uppercase mb-12 opacity-30 italic line-through tracking-tighter">O Caos Manual</h3>
+              
+              <div class="space-y-6">
+                 <div class="p-6 bg-white/5 rounded-2xl border border-white/5 opacity-30 grayscale">
+                    <div class="flex justify-between items-center mb-4">
+                       <span class="text-[9px] uppercase font-bold">Extrato Bancário</span>
+                       <iconify-icon icon="lucide:alert-circle"></iconify-icon>
+                    </div>
+                    <div class="space-y-4">
+                       <div class="flex justify-between text-[10px] font-bold"><span>PAG*JOSE-SAOP-192</span> <span>R$ 142,50</span></div>
+                       <div class="flex justify-between text-[10px] font-bold"><span>MERCPAGO*LUZ-823</span> <span>R$ 2.450,00</span></div>
+                       <div class="flex justify-between text-[10px] font-bold"><span>IFD*REST-S-392</span> <span>R$ 89,90</span></div>
+                    </div>
+                 </div>
+                 
+                 <div class="flex flex-col items-center justify-center py-12 border-2 border-dashed border-white/5 rounded-3xl">
+                    <iconify-icon icon="lucide:table-2" class="text-4xl text-white/5 mb-4"></iconify-icon>
+                    <p class="text-[10px] font-bold uppercase text-white/10">Planilha desatualizada</p>
+                    <div class="mt-4 px-4 py-2 bg-white/5 rounded-lg">
+                       <span class="text-[8px] font-bold text-white/30 uppercase tracking-widest">ERRO: #REF!</span>
+                    </div>
+                 </div>
+              </div>
+           </div>
+
+           <!-- COM O DU -->
+           <div class="glass border-white/20 p-12 rounded-[3rem] relative overflow-hidden bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+              <div class="absolute top-8 right-10 flex items-center gap-2">
+                 <span class="text-[10px] font-bold uppercase text-white">Com o Du</span>
+                 <div class="w-2 h-2 rounded-full bg-white pulse-avatar"></div>
+              </div>
+              <h3 class="text-2xl font-bold uppercase mb-12 tracking-tighter">Domínio Absoluto</h3>
+
+              <div class="space-y-6">
+                 <div class="p-6 bg-black/40 rounded-2xl border border-white/10 shadow-2xl">
+                    <div class="flex justify-between items-center mb-6">
+                       <span class="text-[9px] uppercase font-bold text-white/70">Categorização Ativa</span>
+                       <iconify-icon icon="lucide:check-circle" class="text-white"></iconify-icon>
+                    </div>
+                    <div class="space-y-4">
+                       <div class="flex justify-between items-center">
+                          <div class="flex items-center gap-3">
+                             <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center"><iconify-icon icon="lucide:utensils" class="text-white/60"></iconify-icon></div>
+                             <span class="text-[10px] font-bold uppercase">Almoço Sábado (Restaurante)</span>
+                          </div>
+                          <span class="text-[10px] font-bold">R$ 142,50</span>
+                       </div>
+                       <div class="flex justify-between items-center">
+                          <div class="flex items-center gap-3">
+                             <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center"><iconify-icon icon="lucide:home" class="text-white/60"></iconify-icon></div>
+                             <span class="text-[10px] font-bold uppercase">Parcela Sofá (8/12)</span>
+                          </div>
+                          <span class="text-[10px] font-bold">R$ 2.450,00</span>
+                       </div>
+                    </div>
+                 </div>
+
+                 <div class="p-6 bg-black/40 rounded-2xl border border-white/10">
+                    <div class="flex justify-between text-[9px] font-bold uppercase mb-4"><span>Progresso Orçamentário</span> <span class="text-white">72% Utilizado</span></div>
+                    <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                       <div class="h-full bg-white/80" style="width: 72%"></div>
+                    </div>
+                    <div class="mt-6 flex justify-between items-center">
+                       <span class="text-[9px] font-bold uppercase opacity-30">Projeção Próximo Mês</span>
+                       <span class="text-sm font-bold tracking-tighter uppercase text-white">R$ 4.280,00</span>
+                    </div>
+                 </div>
+              </div>
+           </div>
+
+        </div>
+      </div>
+    </section>
+
+    <div class="particle-divider"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+    <!-- FINAL CTA -->
+    <section class="py-64 px-8 lg:px-20">
+       <div class="w-full bg-gradient-to-br from-[#1a1a1a] via-[#0f0f0f] to-[#222222] rounded-[4rem] p-20 text-center relative overflow-hidden border border-white/10">
+          <div class="mesh-bg opacity-20"></div>
+          <div class="relative z-10">
+             <h2 class="text-5xl lg:text-8xl font-bold uppercase tracking-tighter text-white mb-10">Cansado de brigar com a própria fatura?</h2>
+             <p class="text-sm lg:text-xl text-white/50 font-bold uppercase mb-16 max-w-3xl mx-auto">Abandone o caos das planilhas manuais e deixe o Du organizar sua vida financeira de forma automática.</p>
+             <a href="#" id="final-cta-btn" class="inline-flex bg-white text-black px-20 py-8 rounded-full font-bold uppercase text-sm lg:text-base hover:scale-110 transition-transform shadow-2xl">
+                Automatizar minhas Finanças
+             </a>
+          </div>
+       </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-32 px-8 lg:px-20 border-t border-white/5">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-20 mb-24">
+          <div class="space-y-8">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center">
+                <span class="text-black font-black text-sm uppercase">DU</span>
+              </div>
+            </div>
+            <p class="text-xs text-white/30 max-w-xs uppercase leading-loose">Soluções automáticas para quem não tem tempo a perder com planilhas manuais.</p>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-16">
+             <div class="space-y-6">
+                <h5 class="text-[11px] font-bold uppercase tracking-[0.3em] opacity-20">Produto</h5>
+                <div class="flex flex-col gap-4 text-[11px] font-bold uppercase text-white/40">
+                   <a href="#" id="footer-link-features" class="hover:text-white transition-colors">Recursos</a>
+                   <a href="#" id="footer-link-security" class="hover:text-white transition-colors">Segurança</a>
+                   <a href="#" id="footer-link-pricing" class="hover:text-white transition-colors">Preços</a>
+                </div>
+             </div>
+             <div class="space-y-6">
+                <h5 class="text-[11px] font-bold uppercase tracking-[0.3em] opacity-20">Legal</h5>
+                <div class="flex flex-col gap-4 text-[11px] font-bold uppercase text-white/40">
+                   <a href="#" id="footer-link-privacy" class="hover:text-white transition-colors">Privacidade</a>
+                   <a href="#" id="footer-link-terms" class="hover:text-white transition-colors">Termos</a>
+                </div>
+             </div>
+             <div class="space-y-6">
+                <h5 class="text-[11px] font-bold uppercase tracking-[0.3em] opacity-20">Social</h5>
+                <div class="flex flex-col gap-4 text-[11px] font-bold uppercase text-white/40">
+                   <a href="#" id="footer-link-insta" class="hover:text-white transition-colors">Instagram</a>
+                   <a href="#" id="footer-link-twitter" class="hover:text-white transition-colors">Twitter</a>
+                </div>
+             </div>
+          </div>
+        </div>
+        <div class="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+          <p class="text-[10px] font-bold uppercase tracking-[0.5em] opacity-10">
+            © 2024 Du Finance S.A. Controle Real.
+          </p>
+          <div class="flex items-center gap-2 opacity-10">
+             <div class="w-2 h-2 rounded-full bg-white"></div>
+             <span class="text-[9px] font-bold uppercase">Sistemas Auditados</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+<script defer type="module">
+  window.addEventListener('error', function(event) {
+    var msg = event.message || '';
+    var name = (event.error && event.error.name) || msg.split(':')[0] || '';
+    if (name === 'HierarchyRequestError' || msg.includes("Failed to execute 'appendChild' on 'Node'")) return;
+    if (window.__SUPERDESIGN_PREVIEW__) {
+      var err = event.error;
+      window.__SUPERDESIGN_PREVIEW__.sendMessage('error', {
+        message: event.message, filename: event.filename,
+        lineno: event.lineno, colno: event.colno,
+        name: (err && err.name) || name || 'Error',
+        stack: (err && err.stack) || null
+      });
+    }
+  });
+  window.addEventListener('unhandledrejection', function(event) {
+    var reason = event.reason;
+    var msg = (reason && reason.message) || (typeof reason === 'string' ? reason : '');
+    var name = (reason && reason.name) || 'UnhandledRejection';
+    if (name === 'HierarchyRequestError' || msg.includes("Failed to execute 'appendChild' on 'Node'")) return;
+    if (window.__SUPERDESIGN_PREVIEW__) {
+      window.__SUPERDESIGN_PREVIEW__.sendMessage('unhandled-rejection', {
+        reason: (reason && reason.message) || String(reason),
+        name: name,
+        stack: (reason && reason.stack) || null
+      });
+    }
+  });
+</script>
+<script defer type="module">import '/__visual-edit-bridge/iframe-runtime.mjs?v=e62d2259';</script>
+<script defer type="module">
+  (function() {
+    'use strict';
+
+    var MAX_RENDER_DEPTH = 5;
+
+    function showPage() {
+      document.body.classList.add('sd-ready');
+    }
+
+    var componentRegistry = new Map();
+    var instanceRegistry = new Map();
+    var API_BASE = "https://api.superdesign.dev";
+    var DRAFT_ID = "f623f302-99a0-4487-948a-dcaea6dec6f4";
+
+    function buildDefaultProps(definition) {
+      var defaultProps = {};
+      var props = definition.props;
+      if (!props || !Array.isArray(props)) return defaultProps;
+      for (var i = 0; i < props.length; i++) {
+        var prop = props[i];
+        if (prop.defaultValue === undefined) continue;
+        var path = prop.name.split('.');
+        var current = defaultProps;
+        for (var j = 0; j < path.length - 1; j++) {
+          var key = path[j];
+          if (!(key in current) || typeof current[key] !== 'object' || current[key] === null) {
+            current[key] = {};
+          }
+          current = current[key];
+        }
+        current[path[path.length - 1]] = prop.defaultValue;
+      }
+      return defaultProps;
+    }
+
+    function deepMerge(target, source) {
+      var result = Object.assign({}, target);
+      for (var key in source) {
+        if (!source.hasOwnProperty(key)) continue;
+        if (
+          source[key] && typeof source[key] === 'object' && !Array.isArray(source[key]) &&
+          result[key] && typeof result[key] === 'object' && !Array.isArray(result[key])
+        ) {
+          result[key] = deepMerge(result[key], source[key]);
+        } else {
+          result[key] = source[key];
+        }
+      }
+      return result;
+    }
+
+    function registerComponent(id, definition) {
+      componentRegistry.set(id, definition);
+      console.log('[SDComponent] Registered component:', id);
+    }
+
+    function renderComponent(element, depth) {
+      depth = depth || 0;
+      var componentId = element.getAttribute('componentid') || element.getAttribute('ref');
+      var instanceId = element.getAttribute('instance');
+      var propsAttr = element.getAttribute('props');
+
+      if (!componentId) {
+        console.warn('[SDComponent] Missing componentId attribute on sd-component');
+        return;
+      }
+
+      if (depth >= MAX_RENDER_DEPTH) {
+        console.warn('[SDComponent] Max render depth reached for:', componentId);
+        element.setAttribute('data-error', 'max-depth');
+        return;
+      }
+
+      var definition = componentRegistry.get(componentId);
+      if (!definition) {
+        console.warn('[SDComponent] Component not found:', componentId);
+        element.setAttribute('data-pending', 'true');
+        return;
+      }
+
+      var instanceProps = {};
+      if (propsAttr) {
+        try { instanceProps = JSON.parse(propsAttr); }
+        catch (e) { console.warn('[SDComponent] Invalid props JSON:', propsAttr); }
+      }
+
+      var defaultProps = buildDefaultProps(definition);
+      var finalProps = deepMerge(defaultProps, instanceProps);
+
+      element.innerHTML = definition.htmlContent;
+
+      if (window.PetiteVue) {
+        finalProps.$emit = function(eventName, payload) {
+          if (payload && typeof payload === 'object' && payload.href) {
+            window.location.href = payload.href;
+            return;
+          }
+          var customEvent = new CustomEvent('sd-' + eventName, {
+            detail: payload, bubbles: true, composed: true,
+          });
+          element.dispatchEvent(customEvent);
+        };
+        window.PetiteVue.createApp(finalProps).mount(element);
+      } else {
+        console.warn('[SDComponent] Petite-Vue not loaded, template syntax will not be resolved');
+      }
+
+      instanceRegistry.set(instanceId, {
+        componentId: componentId,
+        element: element,
+        props: finalProps,
+        version: definition.version,
+      });
+
+      element.removeAttribute('data-pending');
+      element.setAttribute('data-rendered', 'true');
+      element.setAttribute('data-version', String(definition.version));
+      console.log('[SDComponent] Rendered:', componentId, instanceId);
+
+      // Render any nested sd-component children that were just injected
+      var nestedElements = element.querySelectorAll('sd-component[componentid], sd-component[ref]');
+      if (nestedElements.length > 0) {
+        var missingIds = [];
+        nestedElements.forEach(function(nested) {
+          var nestedId = nested.getAttribute('componentid') || nested.getAttribute('ref');
+          if (nestedId && !componentRegistry.has(nestedId)) {
+            missingIds.push(nestedId);
+          }
+        });
+
+        if (missingIds.length > 0) {
+          // Fetch missing nested components, then render
+          loadComponentsByIds(missingIds).then(function() {
+            nestedElements.forEach(function(nested) {
+              if (!nested.getAttribute('data-rendered')) {
+                renderComponent(nested, depth + 1);
+              }
+            });
+          });
+        } else {
+          // All nested definitions already loaded — render immediately
+          nestedElements.forEach(function(nested) {
+            if (!nested.getAttribute('data-rendered')) {
+              renderComponent(nested, depth + 1);
+            }
+          });
+        }
+      }
+    }
+
+    function updateComponentInstances(componentId) {
+      var elements = document.querySelectorAll('sd-component[componentid="' + componentId + '"], sd-component[ref="' + componentId + '"]');
+      elements.forEach(function(el) { renderComponent(el); });
+    }
+
+    function initializeComponents() {
+      var elements = document.querySelectorAll('sd-component[componentid], sd-component[ref]');
+      elements.forEach(function(el) {
+        if (!el.getAttribute('data-rendered')) { renderComponent(el); }
+      });
+    }
+
+    async function loadComponentsByIds(ids) {
+      if (!ids || ids.length === 0) return;
+      // Deduplicate and filter already-loaded
+      var uniqueIds = ids.filter(function(id, i, arr) {
+        return arr.indexOf(id) === i && !componentRegistry.has(id);
+      });
+      if (uniqueIds.length === 0) return;
+
+      try {
+        console.log('[SDComponent] Batch loading components:', uniqueIds);
+        var response = await fetch(API_BASE + '/v1/design-drafts/components/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ componentIds: uniqueIds }),
+        });
+        if (!response.ok) throw new Error('Batch load failed: ' + response.status);
+        var components = await response.json();
+        console.log('[SDComponent] Batch loaded', components.length, 'components');
+        components.forEach(function(comp) { registerComponent(comp.id, comp); });
+      } catch (error) {
+        console.error('[SDComponent] Failed to batch load components:', error);
+      }
+    }
+
+    async function loadComponentsForDraft() {
+      if (!DRAFT_ID) {
+        console.warn('[SDComponent] No draft ID configured');
+        showPage();
+        return;
+      }
+      try {
+        console.log('[SDComponent] Loading components for draft:', DRAFT_ID);
+        var response = await fetch(API_BASE + '/v1/design-drafts/' + DRAFT_ID + '/components', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) throw new Error('Failed to load components: ' + response.status);
+        var components = await response.json();
+        console.log('[SDComponent] Loaded', components.length, 'components');
+        components.forEach(function(comp) { registerComponent(comp.id, comp); });
+        initializeComponents();
+        showPage();
+      } catch (error) {
+        console.error('[SDComponent] Failed to load components:', error);
+        showPage();
+      }
+    }
+
+    function findReferencedComponents() {
+      var elements = document.querySelectorAll('sd-component[componentid], sd-component[ref]');
+      var ids = new Set();
+      elements.forEach(function(el) {
+        var ref = el.getAttribute('componentid') || el.getAttribute('ref');
+        if (ref) ids.add(ref);
+      });
+      return Array.from(ids);
+    }
+
+    window.__SD_COMPONENTS__ = {
+      register: registerComponent,
+      render: renderComponent,
+      update: updateComponentInstances,
+      loadForDraft: loadComponentsForDraft,
+      loadByIds: loadComponentsByIds,
+      init: initializeComponents,
+      findRefs: findReferencedComponents,
+      getRegistry: function() { return componentRegistry; },
+      getInstances: function() { return instanceRegistry; },
+      getDraftId: function() { return DRAFT_ID; },
+    };
+
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'SD_COMPONENT_UPDATE') {
+        var cId = event.data.componentId;
+        var def = event.data.definition;
+        if (cId && def) { registerComponent(cId, def); updateComponentInstances(cId); }
+      }
+      if (event.data && event.data.type === 'SD_COMPONENTS_REGISTER') {
+        var comps = event.data.components;
+        if (Array.isArray(comps)) {
+          comps.forEach(function(c) { registerComponent(c.id, c); });
+          initializeComponents();
+        }
+      }
+    });
+
+    function bootComponents() {
+      // Pre-register components from __SD_COMPONENT_PRELOAD__ (injected by backend for standalone previews)
+      if (window.__SD_COMPONENT_PRELOAD__ && Array.isArray(window.__SD_COMPONENT_PRELOAD__)) {
+        console.log('[SDComponent] Pre-registering', window.__SD_COMPONENT_PRELOAD__.length, 'preloaded components');
+        window.__SD_COMPONENT_PRELOAD__.forEach(function(comp) {
+          registerComponent(comp.id, comp);
+        });
+      }
+
+      var refs = findReferencedComponents();
+      var unloaded = refs.filter(function(id) { return !componentRegistry.has(id); });
+
+      if (unloaded.length > 0) {
+        if (DRAFT_ID) {
+          loadComponentsForDraft();
+        } else {
+          // No draft ID — try batch loading the missing IDs directly
+          loadComponentsByIds(unloaded).then(function() {
+            initializeComponents();
+            showPage();
+          });
+        }
+      } else if (refs.length > 0) {
+        // All components already registered (e.g. from preload) — render immediately
+        initializeComponents();
+        showPage();
+      } else {
+        showPage();
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootComponents);
+    } else {
+      bootComponents();
+    }
+
+    var observer = new MutationObserver(function(mutations) {
+      var hasNew = false;
+      mutations.forEach(function(m) {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 1) {
+            if (node.tagName === 'SD-COMPONENT') { hasNew = true; }
+            else if (node.querySelector) {
+              if (node.querySelectorAll('sd-component[componentid], sd-component[ref]').length > 0) hasNew = true;
+            }
+          }
+        });
+      });
+      if (hasNew) {
+        var refs = findReferencedComponents();
+        var unloaded = refs.filter(function(id) { return !componentRegistry.has(id); });
+        if (unloaded.length > 0) {
+          loadComponentsByIds(unloaded).then(function() {
+            initializeComponents();
+          });
+        } else {
+          initializeComponents();
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    console.log('[SDComponent] Runtime initialized');
+  })();
+  </script>
+</body>
+</html>

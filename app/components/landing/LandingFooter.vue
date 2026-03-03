@@ -1,111 +1,59 @@
 <script setup lang="ts">
-import { Github, Twitter, Linkedin, Mail, Heart } from 'lucide-vue-next'
-
 const currentYear = new Date().getFullYear()
-
-const links = {
-  product: [
-    { name: 'Como funciona', href: '#how-it-works' },
-    { name: 'Recursos', href: '#features' },
-    { name: 'Segurança', href: '#security' },
-    { name: 'Preços', href: '#precos' }
-  ],
-  company: [
-    { name: 'Sobre o Du', href: '/about' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Contato', href: '/contact' }
-  ],
-  legal: [
-    { name: 'Privacidade', href: '/privacy' },
-    { name: 'Termos', href: '/terms' }
-  ]
-}
-
-const social = [
-  { name: 'GitHub', icon: Github, href: 'https://github.com' },
-  { name: 'Twitter', icon: Twitter, href: 'https://twitter.com' },
-  { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com' },
-  { name: 'Email', icon: Mail, href: 'mailto:oi@du.app' }
-]
 </script>
 
 <template>
-  <footer class="bg-card border-t border-border">
-    <div class="container mx-auto px-6 py-16">
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+  <footer class="py-32 px-8 lg:px-20 border-t border-white/5">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-start gap-20 mb-24">
         <!-- Brand -->
-        <div class="col-span-2">
-          <NuxtLink to="/" class="font-black text-2xl flex items-center gap-2 mb-4">
-            <div class="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground font-black shadow-lg shadow-primary/25">
-              Du
+        <div class="space-y-8">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center">
+              <span class="text-black font-black text-sm uppercase">DU</span>
             </div>
-            Du
-          </NuxtLink>
-          <p class="text-muted-foreground text-sm max-w-xs leading-relaxed mb-6">
-            Oi! Eu sou o Du, seu assistente financeiro pessoal. Tô aqui pra te ajudar a organizar
-            seus gastos, controlar parcelas, planejar metas e conquistar sua liberdade financeira. 🖤
-          </p>
-          <!-- Social links -->
-          <div class="flex items-center gap-3">
-            <a
-              v-for="item in social"
-              :key="item.name"
-              :href="item.href"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="w-10 h-10 rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-primary-accent hover:bg-primary/10 transition-all duration-200"
-              :aria-label="item.name"
-            >
-              <component :is="item.icon" class="w-5 h-5" />
-            </a>
           </div>
+          <p class="text-xs text-white/30 max-w-xs uppercase leading-loose">
+            Soluções automáticas para quem não tem tempo a perder com planilhas manuais.
+          </p>
         </div>
 
-        <!-- Product -->
-        <div>
-          <h4 class="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-4">Produto</h4>
-          <ul class="space-y-3">
-            <li v-for="link in links.product" :key="link.name">
-              <a :href="link.href" class="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                {{ link.name }}
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Company -->
-        <div>
-          <h4 class="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-4">Empresa</h4>
-          <ul class="space-y-3">
-            <li v-for="link in links.company" :key="link.name">
-              <a :href="link.href" class="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                {{ link.name }}
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Legal -->
-        <div>
-          <h4 class="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-4">Legal</h4>
-          <ul class="space-y-3">
-            <li v-for="link in links.legal" :key="link.name">
-              <a :href="link.href" class="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                {{ link.name }}
-              </a>
-            </li>
-          </ul>
+        <!-- Link columns -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-16">
+          <div class="space-y-6">
+            <h5 class="text-[11px] font-bold uppercase tracking-[0.3em] opacity-20">Produto</h5>
+            <div class="flex flex-col gap-4 text-[11px] font-bold uppercase text-white/40">
+              <a href="#features-section" class="hover:text-white transition-colors">Recursos</a>
+              <a href="#" class="hover:text-white transition-colors">Segurança</a>
+              <a href="#" class="hover:text-white transition-colors">Preços</a>
+            </div>
+          </div>
+          <div class="space-y-6">
+            <h5 class="text-[11px] font-bold uppercase tracking-[0.3em] opacity-20">Legal</h5>
+            <div class="flex flex-col gap-4 text-[11px] font-bold uppercase text-white/40">
+              <a href="#" class="hover:text-white transition-colors">Privacidade</a>
+              <a href="#" class="hover:text-white transition-colors">Termos</a>
+            </div>
+          </div>
+          <div class="space-y-6">
+            <h5 class="text-[11px] font-bold uppercase tracking-[0.3em] opacity-20">Social</h5>
+            <div class="flex flex-col gap-4 text-[11px] font-bold uppercase text-white/40">
+              <a href="#" class="hover:text-white transition-colors">Instagram</a>
+              <a href="#" class="hover:text-white transition-colors">Twitter</a>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Bottom bar -->
-      <div class="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p class="text-sm text-muted-foreground">
-          © {{ currentYear }} Du. Todos os direitos reservados.
+      <div class="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+        <p class="text-[10px] font-bold uppercase tracking-[0.5em] opacity-10">
+          © {{ currentYear }} Du Finance S.A. Controle Real.
         </p>
-        <p class="text-sm text-muted-foreground flex items-center gap-1">
-          Feito com <Heart class="w-4 h-4 text-danger inline" /> no Brasil 🇧🇷
-        </p>
+        <div class="flex items-center gap-2 opacity-10">
+          <div class="w-2 h-2 rounded-full bg-white" />
+          <span class="text-[9px] font-bold uppercase">Sistemas Auditados</span>
+        </div>
       </div>
     </div>
   </footer>
