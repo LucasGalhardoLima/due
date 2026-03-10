@@ -18,6 +18,7 @@ runAgent({
   promptFile: 'tech-debt.md',
   includePersonas: false,
   diffOnly: true,
+  agentLabel: 'Agent: Tech Debt',
 }).catch((err) => {
   console.error('❌ Tech Debt agent failed:', err)
   process.exit(1)

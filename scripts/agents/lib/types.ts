@@ -26,4 +26,6 @@ export interface AgentConfig {
   diffOnly?: boolean
   /** API endpoints to fetch as live product context (e.g. ['/api/dashboard/summary']) */
   apiEndpoints?: string[]
+  /** Label to identify which agent created the issue (e.g. 'Agent: PM') */
+  agentLabel: string
 }

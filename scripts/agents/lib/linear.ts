@@ -129,6 +129,32 @@ export async function updateIssueState(issueId: string, stateId: string): Promis
   )
 }
 
+export async function addLabelToIssue(issueId: string, labelName: string): Promise<void> {
+  const labelMap = await getLabelIds([labelName])
+  const labelId = labelMap[labelName]
+  if (!labelId) return
+
+  // Fetch current labels, append the new one
+  const data = await graphql<{
+    issue: { labels: { nodes: Array<{ id: string }> } }
+  }>(
+    `query($id: String!) {
+      issue(id: $id) { labels { nodes { id } } }
+    }`,
+    { id: issueId }
+  )
+
+  const currentLabelIds = data.issue.labels.nodes.map((l) => l.id)
+  if (currentLabelIds.includes(labelId)) return // already has the label
+
+  await graphql(
+    `mutation($id: String!, $labelIds: [String!]!) {
+      issueUpdate(id: $id, input: { labelIds: $labelIds }) { success }
+    }`,
+    { id: issueId, labelIds: [...currentLabelIds, labelId] }
+  )
+}
+
 export async function addIssueComment(issueId: string, body: string): Promise<void> {
   await graphql(
     `mutation($issueId: String!, $body: String!) {
