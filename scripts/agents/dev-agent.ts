@@ -5,6 +5,7 @@ import {
   getWorkflowStates,
   updateIssueState,
   addIssueComment,
+  addLabelToIssue,
 } from './lib/linear.js'
 import type { IssueNode } from './lib/linear.js'
 
@@ -61,10 +62,11 @@ async function main() {
     return
   }
 
-  // 3. Move to In Progress and comment
+  // 3. Move to In Progress, tag with Agent: Dev, and comment
   await updateIssueState(ticket.id, inProgressStateId)
+  await addLabelToIssue(ticket.id, 'Agent: Dev')
   await addIssueComment(ticket.id, `🤖 **Dev Agent** is picking up this ticket.\n\nCreating branch and starting implementation...`)
-  console.log('   → Moved to In Progress')
+  console.log('   → Moved to In Progress, tagged as Agent: Dev')
 
   // 4. Create feature branch (follows team convention: type/ticket-slug)
   const branchName = buildBranchName(ticket)

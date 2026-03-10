@@ -23,6 +23,7 @@ runAgent({
   ],
   promptFile: 'pm-discovery.md',
   includePersonas: true,
+  agentLabel: 'Agent: PM',
   apiEndpoints: [
     '/api/dashboard/current-invoice',
     '/api/dashboard/du-score',

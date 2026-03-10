@@ -23,6 +23,7 @@ runAgent({
   ],
   promptFile: 'brand-strategist.md',
   includePersonas: true,
+  agentLabel: 'Agent: Brand',
   apiEndpoints: [
     '/api/dashboard/current-invoice',
     '/api/dashboard/du-score',

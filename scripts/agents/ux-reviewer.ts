@@ -15,6 +15,7 @@ runAgent({
   ],
   promptFile: 'ux-reviewer.md',
   includePersonas: true,
+  agentLabel: 'Agent: UX',
 }).catch((err) => {
   console.error('❌ UX Reviewer agent failed:', err)
   process.exit(1)

@@ -25,6 +25,7 @@ runAgent({
   ],
   promptFile: 'product-designer.md',
   includePersonas: true,
+  agentLabel: 'Agent: Product Designer',
   apiEndpoints: [
     '/api/dashboard/current-invoice',
     '/api/dashboard/upcoming-bills',

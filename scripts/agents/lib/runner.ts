@@ -136,13 +136,19 @@ function printDryRun(result: AgentResult): void {
 }
 
 async function createInLinear(result: AgentResult, config: AgentConfig): Promise<void> {
-  const allLabels = [...new Set(result.issues.flatMap((i) => i.labels))]
+  // Collect all labels including the agent identity label
+  const allLabels = [...new Set([
+    ...result.issues.flatMap((i) => i.labels),
+    config.agentLabel,
+  ])]
   const labelMap = await getLabelIds(allLabels)
   const labelGroupMap = await getLabelGroupMap()
 
   for (const issue of result.issues) {
+    // Inject agent identity label into every issue
+    const labelsWithAgent = [...new Set([...issue.labels, config.agentLabel])]
     // Linear requires exclusive labels per group — filter to one per group
-    const filteredLabels = filterExclusiveLabels(issue.labels, labelGroupMap)
+    const filteredLabels = filterExclusiveLabels(labelsWithAgent, labelGroupMap)
     const filteredIssue = { ...issue, labels: filteredLabels }
 
     try {

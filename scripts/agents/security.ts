@@ -16,6 +16,7 @@ runAgent({
   ],
   promptFile: 'security.md',
   includePersonas: false,
+  agentLabel: 'Agent: Security',
 }).catch((err) => {
   console.error('❌ Security Auditor agent failed:', err)
   process.exit(1)
