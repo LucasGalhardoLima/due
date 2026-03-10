@@ -1,0 +1,50 @@
+name: "Agent: Dev (Implement Tickets)"
+
+on:
+  schedule:
+    # Runs twice daily on weekdays: 9am and 2pm BRT (12:00 and 17:00 UTC)
+    - cron: "0 12 * * 1-5"
+    - cron: "0 17 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      ticket:
+        description: "Specific ticket ID to implement (e.g. LUM-42). Leave empty for auto-pick."
+        required: false
+        type: string
+
+jobs:
+  implement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Configure git
+        run: |
+          git config user.name "Du Dev Agent"
+          git config user.email "dev-agent@du.app"
+
+      - name: Run Dev Agent
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.ticket }}" ]; then
+            ARGS="--ticket=${{ github.event.inputs.ticket }}"
+          fi
+          npx tsx scripts/agents/dev-agent.ts $ARGS
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

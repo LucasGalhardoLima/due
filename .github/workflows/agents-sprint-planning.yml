@@ -1,0 +1,27 @@
+name: "Agent: Sprint Planning (Weekly)"
+
+on:
+  schedule:
+    # Monday 8:30am BRT (11:30 UTC) — runs after PM agent (11:00 UTC)
+    - cron: "30 11 * * 1"
+  workflow_dispatch:
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run Sprint Planner
+        run: npx tsx scripts/agents/sprint-planner.ts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
