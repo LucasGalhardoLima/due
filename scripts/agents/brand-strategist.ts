@@ -8,13 +8,26 @@ runAgent({
   projectId: PROJECT_ID,
   teamId: TEAM_ID,
   filePatterns: [
+    // Landing page and web UI
     'app/pages/index.vue',
     'app/assets/**/*.css',
     'app/components/ui/**/*.vue',
     'public/**',
+    // iOS brand expression
+    'ios/Due/Due/Theme/**/*.swift',
+    'ios/Due/Due/Helpers/Color+Du.swift',
+    'ios/Due/Due/Views/Onboarding/**/*.swift',
+    'ios/Due/Due/Views/Dashboard/DashboardView.swift',
+    // Demo data (understand what users see in the product)
+    'prisma/seed-demo.ts',
   ],
   promptFile: 'brand-strategist.md',
   includePersonas: true,
+  apiEndpoints: [
+    '/api/dashboard/current-invoice',
+    '/api/dashboard/du-score',
+    '/api/cards',
+  ],
 }).catch((err) => {
   console.error('❌ Brand Strategist agent failed:', err)
   process.exit(1)

@@ -1,4 +1,4 @@
-name: "Agent: Brand Strategist (Bi-weekly)"
+name: "Agent: Brand & Growth Strategist (Bi-weekly)"
 
 on:
   schedule:
@@ -19,8 +19,10 @@ jobs:
 
       - run: npm ci
 
-      - name: Run Brand Strategist agent
+      - name: Run Brand & Growth Strategist agent
         run: npx tsx scripts/agents/brand-strategist.ts
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          AGENT_API_KEY: ${{ secrets.AGENT_API_KEY }}
+          DU_APP_URL: ${{ vars.DU_APP_URL }}

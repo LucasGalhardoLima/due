@@ -1,8 +1,9 @@
-name: "Agents: Weekly (PM, Security, UX)"
+name: "Agents: Weekly (PM, Product Designer, Security, UX)"
 
 on:
   schedule:
     - cron: "0 11 * * 1"
+    - cron: "0 11 * * 2"
     - cron: "0 11 * * 3"
     - cron: "0 11 * * 4"
   workflow_dispatch:
@@ -13,6 +14,7 @@ on:
         type: choice
         options:
           - pm
+          - product-designer
           - security
           - ux
           - all
@@ -36,6 +38,29 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          AGENT_API_KEY: ${{ secrets.AGENT_API_KEY }}
+          DU_APP_URL: ${{ vars.DU_APP_URL }}
+
+  product-designer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      github.event_name == 'workflow_dispatch' && (github.event.inputs.agent == 'product-designer' || github.event.inputs.agent == 'all')
+      || github.event_name == 'schedule' && github.event.schedule == '0 11 * * 2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run Product Designer agent
+        run: npx tsx scripts/agents/product-designer.ts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          AGENT_API_KEY: ${{ secrets.AGENT_API_KEY }}
+          DU_APP_URL: ${{ vars.DU_APP_URL }}
 
   security:
     runs-on: ubuntu-latest

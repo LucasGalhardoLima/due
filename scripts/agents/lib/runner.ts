@@ -2,6 +2,7 @@ import 'dotenv/config'
 import type { AgentConfig, AgentResult } from './types.js'
 import { buildContext, readPrompt, readPersonas } from './context.js'
 import { analyzeWithClaude } from './claude.js'
+import { fetchProductContext } from './api.js'
 import {
   getOpenIssues,
   getRejectedIssues,
@@ -47,14 +48,21 @@ export async function runAgent(config: AgentConfig): Promise<void> {
     }
   }
 
-  // 5. Build user message
-  const userMessage = buildUserMessage(codeContext, personas, openIssues, rejectedIssues)
+  // 5. Fetch live product data (if configured)
+  let productContext = ''
+  if (config.apiEndpoints?.length) {
+    console.log('🌐 Fetching live product data...')
+    productContext = await fetchProductContext(config.apiEndpoints)
+  }
 
-  // 6. Call Claude
+  // 6. Build user message
+  const userMessage = buildUserMessage(codeContext, personas, openIssues, rejectedIssues, productContext)
+
+  // 7. Call Claude
   console.log('🧠 Analyzing with Claude...')
   const result = await analyzeWithClaude(systemPrompt, userMessage)
 
-  // 7. Output results
+  // 8. Output results
   if (dryRun) {
     printDryRun(result)
   } else {
@@ -68,11 +76,16 @@ function buildUserMessage(
   codeContext: string,
   personas: string,
   openIssues: Array<{ title: string; description: string }>,
-  rejectedIssues: Array<{ title: string; description: string }>
+  rejectedIssues: Array<{ title: string; description: string }>,
+  productContext: string
 ): string {
   const parts: string[] = []
 
   parts.push('## Codebase\n\n' + codeContext)
+
+  if (productContext) {
+    parts.push(productContext)
+  }
 
   if (personas) {
     parts.push('## User Personas\n\n' + personas)

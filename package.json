@@ -17,6 +17,7 @@
     "lint:fix": "eslint . --fix",
     "agent:tech-debt": "tsx scripts/agents/tech-debt.ts",
     "agent:pm": "tsx scripts/agents/pm-discovery.ts",
+    "agent:product-designer": "tsx scripts/agents/product-designer.ts",
     "agent:security": "tsx scripts/agents/security.ts",
     "agent:ux": "tsx scripts/agents/ux-reviewer.ts",
     "agent:brand": "tsx scripts/agents/brand-strategist.ts"

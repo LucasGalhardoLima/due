@@ -24,4 +24,6 @@ export interface AgentConfig {
   promptFile: string
   includePersonas: boolean
   diffOnly?: boolean
+  /** API endpoints to fetch as live product context (e.g. ['/api/dashboard/summary']) */
+  apiEndpoints?: string[]
 }
