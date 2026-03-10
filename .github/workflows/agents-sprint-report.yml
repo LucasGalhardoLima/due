@@ -1,0 +1,27 @@
+name: "Agent: Sprint Report (Weekly)"
+
+on:
+  schedule:
+    # Every Friday at 5pm BRT (20:00 UTC)
+    - cron: "0 20 * * 5"
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Generate Sprint Report
+        run: npx tsx scripts/agents/sprint-reporter.ts
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -20,7 +20,10 @@
     "agent:product-designer": "tsx scripts/agents/product-designer.ts",
     "agent:security": "tsx scripts/agents/security.ts",
     "agent:ux": "tsx scripts/agents/ux-reviewer.ts",
-    "agent:brand": "tsx scripts/agents/brand-strategist.ts"
+    "agent:brand": "tsx scripts/agents/brand-strategist.ts",
+    "agent:dev": "tsx scripts/agents/dev-agent.ts",
+    "agent:sprint-plan": "tsx scripts/agents/sprint-planner.ts",
+    "agent:sprint-report": "tsx scripts/agents/sprint-reporter.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.0",

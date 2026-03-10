@@ -29,13 +29,21 @@ async function graphql<T>(query: string, variables?: Record<string, unknown>): P
   return json.data as T
 }
 
-interface IssueNode {
+export interface IssueNode {
   id: string
+  identifier: string
   title: string
   description: string
-  state: { name: string }
+  priority: number
+  state: { id: string; name: string; type: string }
   labels: { nodes: Array<{ name: string }> }
 }
+
+const ISSUE_FIELDS = `
+  id identifier title description priority
+  state { id name type }
+  labels { nodes { name } }
+`
 
 export async function getOpenIssues(projectId: string): Promise<IssueNode[]> {
   const data = await graphql<{
@@ -44,13 +52,7 @@ export async function getOpenIssues(projectId: string): Promise<IssueNode[]> {
     `query($projectId: String!) {
       project(id: $projectId) {
         issues(filter: { state: { type: { nin: ["completed", "canceled"] } } }, first: 250) {
-          nodes {
-            id
-            title
-            description
-            state { name }
-            labels { nodes { name } }
-          }
+          nodes { ${ISSUE_FIELDS} }
         }
       }
     }`,
@@ -66,13 +68,89 @@ export async function getRejectedIssues(projectId: string): Promise<IssueNode[]>
     `query($projectId: String!) {
       project(id: $projectId) {
         issues(filter: { state: { type: { eq: "canceled" } }, canceledAt: { gte: "-P30D" } }, first: 100) {
-          nodes {
-            id
-            title
-            description
-            state { name }
-            labels { nodes { name } }
-          }
+          nodes { ${ISSUE_FIELDS} }
+        }
+      }
+    }`,
+    { projectId }
+  )
+  return data.project.issues.nodes
+}
+
+// --- Ticket management (used by dev agent) ---
+
+export async function getReadyTickets(projectId: string): Promise<IssueNode[]> {
+  const data = await graphql<{
+    project: { issues: { nodes: IssueNode[] } }
+  }>(
+    `query($projectId: String!) {
+      project(id: $projectId) {
+        issues(
+          filter: { state: { name: { in: ["Todo", "Ready"] } } }
+          orderBy: updatedAt
+          first: 10
+        ) {
+          nodes { ${ISSUE_FIELDS} }
+        }
+      }
+    }`,
+    { projectId }
+  )
+  // Sort by priority (1=Urgent first, 4=Low last, 0=No priority last)
+  return data.project.issues.nodes.sort((a, b) => {
+    const pa = a.priority || 5
+    const pb = b.priority || 5
+    return pa - pb
+  })
+}
+
+export async function getWorkflowStates(teamId: string): Promise<Array<{ id: string; name: string; type: string }>> {
+  const data = await graphql<{
+    team: { states: { nodes: Array<{ id: string; name: string; type: string }> } }
+  }>(
+    `query($teamId: String!) {
+      team(id: $teamId) {
+        states { nodes { id name type } }
+      }
+    }`,
+    { teamId }
+  )
+  return data.team.states.nodes
+}
+
+export async function updateIssueState(issueId: string, stateId: string): Promise<void> {
+  await graphql(
+    `mutation($id: String!, $stateId: String!) {
+      issueUpdate(id: $id, input: { stateId: $stateId }) {
+        success
+      }
+    }`,
+    { id: issueId, stateId }
+  )
+}
+
+export async function addIssueComment(issueId: string, body: string): Promise<void> {
+  await graphql(
+    `mutation($issueId: String!, $body: String!) {
+      commentCreate(input: { issueId: $issueId, body: $body }) {
+        success
+      }
+    }`,
+    { issueId, body }
+  )
+}
+
+export async function getCompletedIssuesThisWeek(projectId: string): Promise<IssueNode[]> {
+  const data = await graphql<{
+    project: { issues: { nodes: IssueNode[] } }
+  }>(
+    `query($projectId: String!) {
+      project(id: $projectId) {
+        issues(
+          filter: { state: { type: { eq: "completed" } }, completedAt: { gte: "-P7D" } }
+          first: 50
+        ) {
+          nodes { ${ISSUE_FIELDS} }
         }
       }
     }`,
