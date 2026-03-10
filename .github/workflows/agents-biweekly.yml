@@ -1,0 +1,26 @@
+name: "Agent: Brand Strategist (Bi-weekly)"
+
+on:
+  schedule:
+    - cron: "0 11 1,15 * *"
+  workflow_dispatch:
+
+jobs:
+  brand-strategist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run Brand Strategist agent
+        run: npx tsx scripts/agents/brand-strategist.ts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}

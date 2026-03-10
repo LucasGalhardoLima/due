@@ -1,0 +1,76 @@
+name: "Agents: Weekly (PM, Security, UX)"
+
+on:
+  schedule:
+    - cron: "0 11 * * 1"
+    - cron: "0 11 * * 3"
+    - cron: "0 11 * * 4"
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: "Which agent to run"
+        required: true
+        type: choice
+        options:
+          - pm
+          - security
+          - ux
+          - all
+
+jobs:
+  pm-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      github.event_name == 'workflow_dispatch' && (github.event.inputs.agent == 'pm' || github.event.inputs.agent == 'all')
+      || github.event_name == 'schedule' && github.event.schedule == '0 11 * * 1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run PM / Discovery agent
+        run: npx tsx scripts/agents/pm-discovery.ts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      github.event_name == 'workflow_dispatch' && (github.event.inputs.agent == 'security' || github.event.inputs.agent == 'all')
+      || github.event_name == 'schedule' && github.event.schedule == '0 11 * * 3'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run Security Auditor agent
+        run: npx tsx scripts/agents/security.ts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+
+  ux-reviewer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      github.event_name == 'workflow_dispatch' && (github.event.inputs.agent == 'ux' || github.event.inputs.agent == 'all')
+      || github.event_name == 'schedule' && github.event.schedule == '0 11 * * 4'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run UX Reviewer agent
+        run: npx tsx scripts/agents/ux-reviewer.ts
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
