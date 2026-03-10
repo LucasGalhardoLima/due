@@ -14,7 +14,13 @@
     "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "agent:tech-debt": "tsx scripts/agents/tech-debt.ts",
+    "agent:pm": "tsx scripts/agents/pm-discovery.ts",
+    "agent:product-designer": "tsx scripts/agents/product-designer.ts",
+    "agent:security": "tsx scripts/agents/security.ts",
+    "agent:ux": "tsx scripts/agents/ux-reviewer.ts",
+    "agent:brand": "tsx scripts/agents/brand-strategist.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.0",
@@ -54,6 +60,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@nuxt/eslint": "^1.12.1",
     "@nuxt/test-utils": "^3.23.0",
     "@nuxtjs/color-mode": "^4.0.0",
