@@ -134,24 +134,39 @@ export async function addLabelToIssue(issueId: string, labelName: string): Promi
   const labelId = labelMap[labelName]
   if (!labelId) return
 
-  // Fetch current labels, append the new one
+  // Fetch current labels with names so we can check exclusivity
   const data = await graphql<{
-    issue: { labels: { nodes: Array<{ id: string }> } }
+    issue: { labels: { nodes: Array<{ id: string; name: string }> } }
   }>(
     `query($id: String!) {
-      issue(id: $id) { labels { nodes { id } } }
+      issue(id: $id) { labels { nodes { id name } } }
     }`,
     { id: issueId }
   )
 
-  const currentLabelIds = data.issue.labels.nodes.map((l) => l.id)
-  if (currentLabelIds.includes(labelId)) return // already has the label
+  const currentLabels = data.issue.labels.nodes
+  if (currentLabels.some((l) => l.id === labelId)) return // already has the label
+
+  // Check if the new label conflicts with any existing label in the same group
+  const groupMap = await getLabelGroupMap()
+  const newLabelGroup = groupMap[labelName]
+
+  let finalLabelIds: string[]
+  if (newLabelGroup) {
+    // Remove any existing labels from the same group, then add the new one
+    finalLabelIds = currentLabels
+      .filter((l) => groupMap[l.name] !== newLabelGroup)
+      .map((l) => l.id)
+    finalLabelIds.push(labelId)
+  } else {
+    finalLabelIds = [...currentLabels.map((l) => l.id), labelId]
+  }
 
   await graphql(
     `mutation($id: String!, $labelIds: [String!]!) {
       issueUpdate(id: $id, input: { labelIds: $labelIds }) { success }
     }`,
-    { id: issueId, labelIds: [...currentLabelIds, labelId] }
+    { id: issueId, labelIds: finalLabelIds }
   )
 }
 
