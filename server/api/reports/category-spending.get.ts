@@ -4,8 +4,8 @@ import { endOfMonth } from 'date-fns'
 import { moneyToCents } from '../../utils/money'
 
 const querySchema = z.object({
-  month: z.string(), // 1-12
-  year: z.string(),
+  month: z.string().optional(), // 1-12
+  year: z.string().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -17,8 +17,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid query params' })
   }
 
-  const month = parseInt(result.data.month)
-  const year = parseInt(result.data.year)
+  const now = new Date()
+  const month = result.data.month ? parseInt(result.data.month) : now.getMonth() + 1
+  const year = result.data.year ? parseInt(result.data.year) : now.getFullYear()
 
   // 1. Define Range for Current Month
   const startDate = new Date(year, month - 1, 1)

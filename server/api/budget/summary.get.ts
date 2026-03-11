@@ -5,8 +5,8 @@ import { moneyToNumber } from '../../utils/money'
 import { createNotification } from '../../utils/notifications'
 
 const querySchema = z.object({
-  month: z.string(),
-  year: z.string(),
+  month: z.string().optional(),
+  year: z.string().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -18,8 +18,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid query params' })
   }
 
-  const month = parseInt(result.data.month)
-  const year = parseInt(result.data.year)
+  const now = new Date()
+  const month = result.data.month ? parseInt(result.data.month) : now.getMonth() + 1
+  const year = result.data.year ? parseInt(result.data.year) : now.getFullYear()
 
   // 1. Fetch incomes (specific month + recurring from prior months)
   const incomes = await prisma.income.findMany({
