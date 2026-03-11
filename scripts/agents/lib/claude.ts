@@ -66,5 +66,10 @@ export async function analyzeWithClaude(
     throw new Error('Claude did not return structured output')
   }
 
-  return toolUse.input as AgentResult
+  const raw = toolUse.input as Record<string, unknown>
+  return {
+    issues: Array.isArray(raw.issues) ? raw.issues : [],
+    documents: Array.isArray(raw.documents) ? raw.documents : [],
+    summary: typeof raw.summary === 'string' ? raw.summary : '',
+  } as AgentResult
 }
