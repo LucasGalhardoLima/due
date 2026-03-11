@@ -141,8 +141,8 @@ async function createInLinear(result: AgentResult, config: AgentConfig): Promise
     ...result.issues.flatMap((i) => i.labels),
     config.agentLabel,
   ])]
-  const labelMap = await getLabelIds(allLabels)
-  const labelGroupMap = await getLabelGroupMap()
+  const labelMap = await getLabelIds(allLabels, config.teamId)
+  const labelGroupMap = await getLabelGroupMap(config.teamId)
 
   for (const issue of result.issues) {
     // Inject agent identity label into every issue

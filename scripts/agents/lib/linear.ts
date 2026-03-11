@@ -29,6 +29,64 @@ async function graphql<T>(query: string, variables?: Record<string, unknown>): P
   return json.data as T
 }
 
+// --- Team labels (team-scoped query, returns Agent labels etc.) ---
+
+interface LabelNode {
+  id: string
+  name: string
+  isGroup: boolean
+  parent: { id: string; name: string } | null
+}
+
+let _teamLabelsCache: { teamId: string; labels: LabelNode[] } | null = null
+
+async function getTeamLabels(teamId: string): Promise<LabelNode[]> {
+  if (_teamLabelsCache?.teamId === teamId) return _teamLabelsCache.labels
+
+  const data = await graphql<{
+    team: { labels: { nodes: LabelNode[] } }
+  }>(
+    `query($teamId: String!) {
+      team(id: $teamId) {
+        labels(first: 250) {
+          nodes { id name isGroup parent { id name } }
+        }
+      }
+    }`,
+    { teamId }
+  )
+
+  const labels = data.team.labels.nodes
+  _teamLabelsCache = { teamId, labels }
+  return labels
+}
+
+// --- Cycles ---
+
+export interface CycleNode {
+  id: string
+  number: number
+  name: string | null
+  startsAt: string
+  endsAt: string
+}
+
+export async function getActiveCycle(teamId: string): Promise<CycleNode | null> {
+  const data = await graphql<{
+    team: { activeCycle: CycleNode | null }
+  }>(
+    `query($teamId: String!) {
+      team(id: $teamId) {
+        activeCycle { id number name startsAt endsAt }
+      }
+    }`,
+    { teamId }
+  )
+  return data.team.activeCycle
+}
+
+// --- Issues ---
+
 export interface IssueNode {
   id: string
   identifier: string
@@ -129,8 +187,8 @@ export async function updateIssueState(issueId: string, stateId: string): Promis
   )
 }
 
-export async function addLabelToIssue(issueId: string, labelName: string): Promise<void> {
-  const labelMap = await getLabelIds([labelName])
+export async function addLabelToIssue(issueId: string, labelName: string, teamId: string): Promise<void> {
+  const labelMap = await getLabelIds([labelName], teamId)
   const labelId = labelMap[labelName]
   if (!labelId) return
 
@@ -147,20 +205,28 @@ export async function addLabelToIssue(issueId: string, labelName: string): Promi
   const currentLabels = data.issue.labels.nodes
   if (currentLabels.some((l) => l.id === labelId)) return // already has the label
 
-  // Check if the new label conflicts with any existing label in the same group
-  const groupMap = await getLabelGroupMap()
-  const newLabelGroup = groupMap[labelName]
+  // Deduplicate ALL labels by group to prevent exclusive group conflicts.
+  // This handles both new label conflicts AND pre-existing conflicts on the issue.
+  const groupMap = await getLabelGroupMap(teamId)
+  const allLabels = [...currentLabels, { id: labelId, name: labelName }]
 
-  let finalLabelIds: string[]
-  if (newLabelGroup) {
-    // Remove any existing labels from the same group, then add the new one
-    finalLabelIds = currentLabels
-      .filter((l) => groupMap[l.name] !== newLabelGroup)
-      .map((l) => l.id)
-    finalLabelIds.push(labelId)
-  } else {
-    finalLabelIds = [...currentLabels.map((l) => l.id), labelId]
+  // For grouped labels, keep the LAST one per group (so the new label wins over existing)
+  const groupWinners = new Map<string, { id: string; name: string }>()
+  const ungrouped: Array<{ id: string; name: string }> = []
+
+  for (const label of allLabels) {
+    const group = groupMap[label.name]
+    if (group) {
+      groupWinners.set(group, label)
+    } else {
+      ungrouped.push(label)
+    }
   }
+
+  const finalLabelIds = [
+    ...Array.from(groupWinners.values()).map((l) => l.id),
+    ...ungrouped.map((l) => l.id),
+  ]
 
   await graphql(
     `mutation($id: String!, $labelIds: [String!]!) {
@@ -200,20 +266,11 @@ export async function getCompletedIssuesThisWeek(projectId: string): Promise<Iss
   return data.project.issues.nodes
 }
 
-export async function getLabelIds(names: string[]): Promise<Record<string, string>> {
-  const data = await graphql<{
-    issueLabels: { nodes: Array<{ id: string; name: string; isGroup: boolean; parent: { id: string; name: string } | null }> }
-  }>(
-    `query {
-      issueLabels(first: 100) {
-        nodes { id name isGroup parent { id name } }
-      }
-    }`
-  )
+export async function getLabelIds(names: string[], teamId: string): Promise<Record<string, string>> {
+  const labels = await getTeamLabels(teamId)
 
   const map: Record<string, string> = {}
-  for (const label of data.issueLabels.nodes) {
-    // Skip group labels — Linear only allows child labels on issues
+  for (const label of labels) {
     if (label.isGroup) continue
     if (names.includes(label.name)) {
       map[label.name] = label.id
@@ -223,17 +280,22 @@ export async function getLabelIds(names: string[]): Promise<Record<string, strin
 }
 
 // Linear requires that labels within the same group are exclusive (one per group).
-// Filter labels to keep only one per group, preferring the most specific area label.
+// Filter labels to keep only one per group. Ungrouped labels all pass through.
 export function filterExclusiveLabels(
   labelNames: string[],
   labelGroupMap: Record<string, string>
 ): string[] {
   const groups: Record<string, string[]> = {}
+  const ungrouped: string[] = []
 
   for (const name of labelNames) {
-    const group = labelGroupMap[name] || 'none'
-    if (!groups[group]) groups[group] = []
-    groups[group].push(name)
+    const group = labelGroupMap[name]
+    if (group) {
+      if (!groups[group]) groups[group] = []
+      groups[group].push(name)
+    } else {
+      ungrouped.push(name)
+    }
   }
 
   // For each group, keep only the first label
@@ -241,26 +303,20 @@ export function filterExclusiveLabels(
   for (const labels of Object.values(groups)) {
     result.push(labels[0])
   }
+  // Ungrouped labels are not exclusive — keep all of them
+  result.push(...ungrouped)
   return result
 }
 
 let _labelGroupMap: Record<string, string> | null = null
 
-export async function getLabelGroupMap(): Promise<Record<string, string>> {
+export async function getLabelGroupMap(teamId: string): Promise<Record<string, string>> {
   if (_labelGroupMap) return _labelGroupMap
 
-  const data = await graphql<{
-    issueLabels: { nodes: Array<{ name: string; isGroup: boolean; parent: { name: string } | null }> }
-  }>(
-    `query {
-      issueLabels(first: 100) {
-        nodes { name isGroup parent { name } }
-      }
-    }`
-  )
+  const labels = await getTeamLabels(teamId)
 
   _labelGroupMap = {}
-  for (const label of data.issueLabels.nodes) {
+  for (const label of labels) {
     if (!label.isGroup && label.parent) {
       _labelGroupMap[label.name] = label.parent.name
     }

@@ -3,10 +3,13 @@ import { execSync } from 'node:child_process'
 import {
   getOpenIssues,
   getCompletedIssuesThisWeek,
+  getActiveCycle,
   createDocument,
 } from './lib/linear.js'
+import type { CycleNode } from './lib/linear.js'
 
 const PROJECT_ID = '1110277c-1489-4dfd-a8dd-adf894b6b6bf'
+const TEAM_ID = 'aa1ef0a5-b3f3-47d0-9429-89b0d58913ca'
 
 async function main() {
   const dryRun = process.argv.includes('--dry-run')
@@ -16,10 +19,11 @@ async function main() {
   // 1. Gather data
   console.log('🔍 Gathering sprint data...')
 
-  const [openIssues, completedIssues, prData] = await Promise.all([
+  const [openIssues, completedIssues, prData, cycle] = await Promise.all([
     getOpenIssues(PROJECT_ID),
     getCompletedIssuesThisWeek(PROJECT_ID),
     getGitHubPRs(),
+    getActiveCycle(TEAM_ID),
   ])
 
   // Categorize open issues by state
@@ -40,6 +44,7 @@ async function main() {
     completedIssues,
     byState,
     prs: prData,
+    cycle,
   })
 
   // 3. Output
@@ -47,8 +52,9 @@ async function main() {
     console.log('\n--- SPRINT REPORT ---\n')
     console.log(report)
   } else {
+    const cycleLabel = cycle ? (cycle.name || `Cycle ${cycle.number}`) : today
     const doc = await createDocument(
-      { title: `Sprint Report — ${today}`, content: report },
+      { title: `Sprint Report — ${cycleLabel}`, content: report },
       PROJECT_ID
     )
     console.log(`\n✅ Sprint report created: ${doc.id}`)
@@ -99,13 +105,22 @@ interface ReportData {
   completedIssues: Array<{ identifier: string; title: string; priority: number; labels: { nodes: Array<{ name: string }> } }>
   byState: Record<string, Array<{ identifier: string; title: string; priority: number }>>
   prs: PRInfo[]
+  cycle: CycleNode | null
 }
 
 function buildReport(data: ReportData): string {
   const lines: string[] = []
 
-  lines.push(`# Weekly Sprint Report`)
-  lines.push(`**Period:** ${data.dateRange}`)
+  if (data.cycle) {
+    const cycleName = data.cycle.name || `Cycle ${data.cycle.number}`
+    const cycleStart = data.cycle.startsAt.split('T')[0]
+    const cycleEnd = data.cycle.endsAt.split('T')[0]
+    lines.push(`# Sprint Report — ${cycleName}`)
+    lines.push(`**Cycle:** ${cycleStart} → ${cycleEnd} | **Period:** ${data.dateRange}`)
+  } else {
+    lines.push(`# Weekly Sprint Report`)
+    lines.push(`**Period:** ${data.dateRange}`)
+  }
   lines.push('')
 
   // Summary stats

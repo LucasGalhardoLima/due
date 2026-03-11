@@ -64,7 +64,7 @@ async function main() {
 
   // 3. Move to In Progress, tag with Agent: Dev, and comment
   await updateIssueState(ticket.id, inProgressStateId)
-  await addLabelToIssue(ticket.id, 'Agent: Dev')
+  await addLabelToIssue(ticket.id, 'Agent: Dev', TEAM_ID)
   await addIssueComment(ticket.id, `🤖 **Dev Agent** is picking up this ticket.\n\nCreating branch and starting implementation...`)
   console.log('   → Moved to In Progress, tagged as Agent: Dev')
 
