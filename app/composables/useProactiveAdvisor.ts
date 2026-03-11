@@ -42,8 +42,9 @@ function migrateAdvisorStorageKeys() {
   }
   for (const oldKey of keysToMigrate) {
     const newKey = STORAGE_PREFIX + oldKey.slice(OLD_PREFIX.length)
-    if (!localStorage.getItem(newKey)) {
-      localStorage.setItem(newKey, localStorage.getItem(oldKey)!)
+    const val = localStorage.getItem(oldKey)
+    if (val !== null && !localStorage.getItem(newKey)) {
+      localStorage.setItem(newKey, val)
     }
     localStorage.removeItem(oldKey)
   }
