@@ -108,11 +108,12 @@ async function main() {
     return
   }
 
-  // 6. Verify changes exist
-  const hasChanges = execSync('git diff --stat HEAD', { encoding: 'utf-8' }).trim()
+  // 6. Verify changes exist (check both uncommitted changes AND new commits vs main)
+  const uncommittedChanges = execSync('git diff --stat HEAD', { encoding: 'utf-8' }).trim()
   const hasNewFiles = execSync('git ls-files --others --exclude-standard', { encoding: 'utf-8' }).trim()
+  const newCommits = execSync('git log main..HEAD --oneline', { encoding: 'utf-8' }).trim()
 
-  if (!hasChanges && !hasNewFiles) {
+  if (!uncommittedChanges && !hasNewFiles && !newCommits) {
     console.log('⚠️  No changes produced.')
     await failTicket(ticket, stateMap, 'Analyzed the ticket but produced no code changes. This ticket may need a more detailed description with specific file paths and acceptance criteria.')
     execSync(`git checkout main`, { stdio: 'pipe' })
@@ -122,7 +123,10 @@ async function main() {
   // 7. Self-review: run a code review pass before creating PR
   console.log('\n🔍 Running self-review...\n')
 
-  const diffForReview = execSync('git diff HEAD', { encoding: 'utf-8' })
+  // Use uncommitted diff if present, otherwise diff committed changes vs main
+  const diffForReview = uncommittedChanges
+    ? execSync('git diff HEAD', { encoding: 'utf-8' })
+    : execSync('git diff main..HEAD', { encoding: 'utf-8' })
   const newFilesContent = hasNewFiles
     ? hasNewFiles.split('\n').map((f) => {
         try { return `--- ${f} ---\n${execSync(`cat "${f}"`, { encoding: 'utf-8' })}` }
