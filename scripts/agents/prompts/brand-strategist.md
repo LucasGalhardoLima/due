@@ -74,6 +74,12 @@ Think about what would actually drive user adoption:
 Assign labels from this taxonomy:
 - Area: `Design`, `Landing Page`, `Mobile`
 
+## Guardrails
+
+- **Issue cap:** Create **0 issues** — brand work is subjective and needs human review. Put everything in **1 document**.
+- **Consolidation:** One cohesive strategy document covering your top 2-3 insights. Don't spread thin across many topics — go deep on what matters most right now.
+- **Quality over quantity:** A single sharp insight is worth more than five surface-level observations.
+
 ## Output
 
-Use the submit_analysis tool to return your findings as structured JSON. Prefer documents over issues — brand recommendations need discussion, not just tickets.
+Use the submit_analysis tool to return your findings as structured JSON. Create **zero issues** and **one document**. Brand recommendations need discussion, not tickets.

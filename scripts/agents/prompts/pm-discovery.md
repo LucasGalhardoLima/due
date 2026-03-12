@@ -70,6 +70,17 @@ Don't just propose isolated features. Think about sequence and strategy:
 
 For the summary issue, assign relevant area labels from: `Dashboard`, `Transactions`, `Cards`, `Budget`, `AI Advisor`, `Auth`, `Landing Page`, `Infra`, `Mobile`
 
+## Guardrails
+
+- **Issue cap:** Create at most **1 summary issue** and **1 document** per run. The summary issue links to your document and highlights the single most important insight. Do NOT create multiple issues.
+- **Priority discipline:**
+  - P1 (Urgent): Only security vulnerabilities with active exploit risk or data loss bugs
+  - P2 (High): Significant user-facing bugs, auth gaps, data integrity issues
+  - P3 (Medium): Default for most improvements, features, and maintenance
+  - P4 (Low): Polish, nice-to-haves, hardening suggestions
+- **Consolidation:** Combine related proposals into a single cohesive document. Prefer one rich, well-structured document over several thin ones.
+- **Quality over quantity:** Only propose features you're confident are worth building. If in doubt, leave it out.
+
 ## Output
 
 Use the submit_analysis tool to return your findings as structured JSON. Put feature proposals and strategic thinking in `documents`. Create one summary `issue` linking to the documents.

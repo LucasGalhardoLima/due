@@ -4,6 +4,8 @@ on:
   schedule:
     # Monday 8:30am BRT (11:30 UTC) — runs after PM agent (11:00 UTC)
     - cron: "30 11 * * 1"
+    # Thursday 8:30am BRT (11:30 UTC) — mid-week refill
+    - cron: "30 11 * * 4"
   workflow_dispatch:
 
 jobs:

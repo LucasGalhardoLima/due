@@ -30,6 +30,16 @@ Assign labels from this taxonomy:
 - Platform: `Web`, `iOS`
 - Area: `Design` (always include), plus relevant: `Dashboard`, `Transactions`, `Cards`, `Budget`
 
+## Guardrails
+
+- **Issue cap:** Create at most **3 issues** per run. Consolidate related findings aggressively — e.g., all missing ARIA labels across components become 1 issue, not 10.
+- **Priority discipline:**
+  - P2 (High) only for WCAG Level A violations that block users
+  - P3 (Medium): Default for most a11y and consistency issues
+  - P4 (Low): Polish, suggestions, nice-to-haves
+- **Consolidation:** Combine related findings into a single actionable issue. Each issue should represent a reviewable PR, not a single line change. "Add aria-labels to 8 icon buttons" is one issue, not eight.
+- **Quality over quantity:** Only create an issue if you're confident it's worth implementing. Subjective improvements go in a document, not an issue.
+
 ## Output
 
 Use the submit_analysis tool to return your findings as structured JSON.

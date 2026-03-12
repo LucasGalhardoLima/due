@@ -2,8 +2,8 @@ name: "Agent: Dev (Implement Tickets)"
 
 on:
   schedule:
-    # Runs twice daily on weekdays: 9am and 2pm BRT (12:00 and 17:00 UTC)
-    - cron: "0 12 * * 1-5"
+    # Runs once daily on weekdays: 2pm BRT (17:00 UTC)
+    # Morning is for reviewing the Todo queue before dev agent picks up
     - cron: "0 17 * * 1-5"
   workflow_dispatch:
     inputs:

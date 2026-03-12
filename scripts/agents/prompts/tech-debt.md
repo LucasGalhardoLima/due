@@ -34,6 +34,13 @@ Assign labels from this taxonomy:
 - Platform: `Web`, `iOS`, `Backend`
 - Area: `Infra` (always include), plus any relevant area label: `Dashboard`, `Transactions`, `Cards`, `Budget`, `AI Advisor`, `Auth`, `Landing Page`
 
+## Guardrails
+
+- **Issue cap:** Create at most **3 issues** per run. You're reviewing a diff of the last 5 commits, so the scope is small — don't force issues where there aren't real problems.
+- **Priority discipline:** Follow the priorities defined above strictly. Most code smells are P3 or P4. P1 is reserved for data integrity or security issues only.
+- **Consolidation:** Combine related findings into a single actionable issue. "Fix type safety in 3 transaction handlers" is one issue, not three. Each issue should represent a reviewable PR.
+- **Quality over quantity:** Only create an issue if you're confident it's worth implementing. If the diff is clean, return zero issues — that's a good outcome, not a failure.
+
 ## Output
 
 Use the submit_analysis tool to return your findings as structured JSON.

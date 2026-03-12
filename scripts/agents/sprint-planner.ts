@@ -13,7 +13,7 @@ const PROJECT_ID = '1110277c-1489-4dfd-a8dd-adf894b6b6bf'
 const TEAM_ID = 'aa1ef0a5-b3f3-47d0-9429-89b0d58913ca'
 
 // Max tickets to promote to Todo per sprint planning session
-const MAX_TICKETS_PER_SPRINT = 5
+const MAX_TICKETS_PER_SPRINT = 3
 
 async function main() {
   const dryRun = process.argv.includes('--dry-run')

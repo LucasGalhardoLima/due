@@ -82,6 +82,17 @@ Assign labels from this taxonomy:
 - Platform: `Web`, `iOS`, `Mobile`
 - Area: `Design` (always include), plus relevant: `Dashboard`, `Transactions`, `Cards`, `Budget`
 
+## Guardrails
+
+- **Issue cap:** Create at most **3 issues** and **1 document** per run. Issues are for concrete problems (broken flows, dead-end screens, missing states). Strategic proposals go in the document.
+- **Priority discipline:**
+  - P1 (Urgent): Only security vulnerabilities with active exploit risk or data loss bugs
+  - P2 (High): Significant user-facing bugs, auth gaps, data integrity issues
+  - P3 (Medium): Default for most improvements, features, and maintenance
+  - P4 (Low): Polish, nice-to-haves, hardening suggestions
+- **Consolidation:** Combine related findings into a single actionable issue. Prefer 2 well-scoped tickets over 5 granular ones. Each issue should represent a reviewable PR, not a single line change.
+- **Quality over quantity:** Only create an issue if you're confident it's worth implementing. If in doubt, put it in the document instead.
+
 ## Output
 
 Use the submit_analysis tool to return your findings as structured JSON. Prefer documents over issues — design work needs discussion, not just tickets.
