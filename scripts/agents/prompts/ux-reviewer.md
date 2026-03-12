@@ -23,6 +23,7 @@ Du is a personal finance app for credit-card-first users in Brazil. The frontend
 - Concrete issues (a11y violations, broken layouts) → create issues
 - Subjective improvements (layout suggestions, flow ideas) → put in a document
 - Priority: P2 (High) for a11y violations, P3 (Medium) for consistency issues, P4 (Low) for polish
+- You will receive screenshots of key app pages at desktop and mobile sizes, plus accessibility tree snapshots showing what screen readers see. Use screenshots for visual issues (contrast, spacing, hierarchy) and a11y trees for structural issues (missing roles, labels, landmarks).
 
 ## Labels
 

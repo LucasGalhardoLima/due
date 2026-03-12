@@ -1,8 +1,9 @@
 import 'dotenv/config'
 import type { AgentConfig, AgentResult } from './types.js'
 import { buildContext, readPrompt, readPersonas } from './context.js'
-import { analyzeWithClaude } from './claude.js'
+import { analyzeWithClaude, type ImageInput } from './claude.js'
 import { fetchProductContext } from './api.js'
+import { captureScreenshots } from './screenshots.js'
 import {
   getOpenIssues,
   getRejectedIssues,
@@ -55,14 +56,36 @@ export async function runAgent(config: AgentConfig): Promise<void> {
     productContext = await fetchProductContext(config.apiEndpoints)
   }
 
-  // 6. Build user message
+  // 6. Capture screenshots (if configured)
+  let images: ImageInput[] = []
+  if (config.screenshotPages?.length) {
+    console.log('📸 Capturing screenshots...')
+    const captures = await captureScreenshots(config.screenshotPages, {
+      includeA11y: config.includeA11yTree,
+    })
+    images = captures.screenshots.map((s) => ({
+      label: s.label,
+      base64: s.base64,
+    }))
+    console.log(`   ${images.length} screenshots captured`)
+
+    // Append a11y trees to product context (text-based)
+    if (captures.a11yTrees.length > 0) {
+      const a11ySection = captures.a11yTrees
+        .map((t) => `### ${t.label} — Accessibility Tree\n\`\`\`json\n${t.tree.slice(0, 8000)}\n\`\`\``)
+        .join('\n\n')
+      productContext += '\n\n## Accessibility Trees\n\n' + a11ySection
+    }
+  }
+
+  // 7. Build user message
   const userMessage = buildUserMessage(codeContext, personas, openIssues, rejectedIssues, productContext)
 
-  // 7. Call Claude
+  // 8. Call Claude
   console.log('🧠 Analyzing with Claude...')
-  const result = await analyzeWithClaude(systemPrompt, userMessage)
+  const result = await analyzeWithClaude(systemPrompt, userMessage, images.length > 0 ? images : undefined)
 
-  // 8. Output results
+  // 9. Output results
   if (dryRun) {
     printDryRun(result)
   } else {

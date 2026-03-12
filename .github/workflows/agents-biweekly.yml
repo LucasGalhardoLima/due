@@ -8,7 +8,7 @@ on:
 jobs:
   brand-strategist:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -19,6 +19,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
       - name: Run Brand & Growth Strategist agent
         run: npx tsx scripts/agents/brand-strategist.ts
         env:
@@ -26,3 +29,5 @@ jobs:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           AGENT_API_KEY: ${{ secrets.AGENT_API_KEY }}
           DU_APP_URL: ${{ vars.DU_APP_URL }}
+          SCREENSHOT_EMAIL: ${{ secrets.SCREENSHOT_EMAIL }}
+          SCREENSHOT_PASSWORD: ${{ secrets.SCREENSHOT_PASSWORD }}

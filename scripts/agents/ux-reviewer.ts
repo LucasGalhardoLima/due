@@ -16,6 +16,13 @@ runAgent({
   promptFile: 'ux-reviewer.md',
   includePersonas: true,
   agentLabel: 'Agent: UX',
+  screenshotPages: [
+    { path: '/dashboard', label: 'Dashboard', waitFor: '[data-testid="dashboard"]' },
+    { path: '/parcelamentos', label: 'Installments' },
+    { path: '/orcamento', label: 'Budget' },
+    { path: '/cards', label: 'Cards' },
+  ],
+  includeA11yTree: true,
 }).catch((err) => {
   console.error('❌ UX Reviewer agent failed:', err)
   process.exit(1)

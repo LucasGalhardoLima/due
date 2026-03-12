@@ -22,7 +22,7 @@ on:
 jobs:
   pm-discovery:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     if: >-
       github.event_name == 'workflow_dispatch' && (github.event.inputs.agent == 'pm' || github.event.inputs.agent == 'all')
       || github.event_name == 'schedule' && github.event.schedule == '0 11 * * 1'
@@ -33,6 +33,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
       - name: Run PM / Discovery agent
         run: npx tsx scripts/agents/pm-discovery.ts
         env:
@@ -40,10 +42,12 @@ jobs:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           AGENT_API_KEY: ${{ secrets.AGENT_API_KEY }}
           DU_APP_URL: ${{ vars.DU_APP_URL }}
+          SCREENSHOT_EMAIL: ${{ secrets.SCREENSHOT_EMAIL }}
+          SCREENSHOT_PASSWORD: ${{ secrets.SCREENSHOT_PASSWORD }}
 
   product-designer:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     if: >-
       github.event_name == 'workflow_dispatch' && (github.event.inputs.agent == 'product-designer' || github.event.inputs.agent == 'all')
       || github.event_name == 'schedule' && github.event.schedule == '0 11 * * 2'
@@ -54,6 +58,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
       - name: Run Product Designer agent
         run: npx tsx scripts/agents/product-designer.ts
         env:
@@ -61,6 +67,8 @@ jobs:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           AGENT_API_KEY: ${{ secrets.AGENT_API_KEY }}
           DU_APP_URL: ${{ vars.DU_APP_URL }}
+          SCREENSHOT_EMAIL: ${{ secrets.SCREENSHOT_EMAIL }}
+          SCREENSHOT_PASSWORD: ${{ secrets.SCREENSHOT_PASSWORD }}
 
   security:
     runs-on: ubuntu-latest
@@ -83,7 +91,7 @@ jobs:
 
   ux-reviewer:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     if: >-
       github.event_name == 'workflow_dispatch' && (github.event.inputs.agent == 'ux' || github.event.inputs.agent == 'all')
       || github.event_name == 'schedule' && github.event.schedule == '0 11 * * 4'
@@ -94,8 +102,13 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
       - name: Run UX Reviewer agent
         run: npx tsx scripts/agents/ux-reviewer.ts
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          DU_APP_URL: ${{ vars.DU_APP_URL }}
+          SCREENSHOT_EMAIL: ${{ secrets.SCREENSHOT_EMAIL }}
+          SCREENSHOT_PASSWORD: ${{ secrets.SCREENSHOT_PASSWORD }}

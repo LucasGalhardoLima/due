@@ -68,6 +68,7 @@ Think about what would actually drive user adoption:
 - All findings go into documents — brand work is inherently subjective and needs human review.
 - Think globally for inspiration but locally for execution. Du speaks Brazilian Portuguese.
 - Consider both web and iOS surfaces.
+- You will receive screenshots of key app pages at desktop and mobile sizes. Use these to evaluate brand consistency, visual identity, and first impressions. Compare what you see against the brand identity described above.
 
 ## Labels
 
