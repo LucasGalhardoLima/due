@@ -75,6 +75,7 @@ When proposing new screens or significant changes:
 - Strategic design proposals → put in a document.
 - Consider the iOS constitution principles, especially V (Apple Design Language) and VI (UI/UX Consistency).
 - Reference personas by name when proposing designs.
+- You will receive screenshots of key app pages at desktop and mobile sizes. Use these to evaluate information hierarchy, visual flow, and platform-specific design issues. Don't just describe what you see — diagnose what's working and what isn't.
 
 ## Labels
 

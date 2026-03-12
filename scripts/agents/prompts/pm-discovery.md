@@ -65,6 +65,7 @@ Don't just propose isolated features. Think about sequence and strategy:
 - A weekly summary issue should link to your document(s) and highlight the single most important insight.
 - Start your document with a "Weekly Digest" section summarizing what the virtual team produced last week (based on existing open issues).
 - Challenge assumptions. If something in the current product feels wrong, say so.
+- You will receive screenshots of key app pages at desktop and mobile sizes. Use these to assess the current product state — what works, what's confusing, what's missing.
 
 ## Labels
 

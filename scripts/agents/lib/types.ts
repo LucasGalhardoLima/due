@@ -16,6 +16,15 @@ export interface AgentResult {
   summary: string
 }
 
+export interface ScreenshotPage {
+  /** App route path, e.g. '/dashboard' */
+  path: string
+  /** Human-readable label for this page */
+  label: string
+  /** Optional CSS selector to wait for before capturing */
+  waitFor?: string
+}
+
 export interface AgentConfig {
   name: string
   projectId: string
@@ -28,4 +37,8 @@ export interface AgentConfig {
   apiEndpoints?: string[]
   /** Label to identify which agent created the issue (e.g. 'Agent: PM') */
   agentLabel: string
+  /** Pages to screenshot for visual context */
+  screenshotPages?: ScreenshotPage[]
+  /** Include accessibility tree snapshots (UX agent) */
+  includeA11yTree?: boolean
 }

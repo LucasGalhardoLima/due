@@ -24,6 +24,11 @@ runAgent({
   promptFile: 'brand-strategist.md',
   includePersonas: true,
   agentLabel: 'Agent: Brand',
+  screenshotPages: [
+    { path: '/', label: 'Landing Page' },
+    { path: '/dashboard', label: 'Dashboard', waitFor: '[data-testid="dashboard"]' },
+    { path: '/sign-in', label: 'Sign In' },
+  ],
   apiEndpoints: [
     '/api/dashboard/current-invoice',
     '/api/dashboard/du-score',

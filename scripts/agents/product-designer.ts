@@ -26,6 +26,13 @@ runAgent({
   promptFile: 'product-designer.md',
   includePersonas: true,
   agentLabel: 'Agent: Product Designer',
+  screenshotPages: [
+    { path: '/dashboard', label: 'Dashboard', waitFor: '[data-testid="dashboard"]' },
+    { path: '/parcelamentos', label: 'Installments' },
+    { path: '/orcamento', label: 'Budget' },
+    { path: '/cards', label: 'Cards' },
+    { path: '/settings', label: 'Settings' },
+  ],
   apiEndpoints: [
     '/api/dashboard/current-invoice',
     '/api/dashboard/upcoming-bills',
