@@ -21,12 +21,14 @@ interface SubscriptionAnalysis {
   quick_wins: string[]
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  const { userId } = getUser(event)
   // Get all active subscriptions
   const subscriptions = await prisma.transaction.findMany({
     where: {
       isSubscription: true,
-      active: true
+      active: true,
+      userId
     },
     orderBy: {
       amount: 'desc'
