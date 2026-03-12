@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { execSync } from 'node:child_process'
+import { execSync, spawnSync } from 'node:child_process'
 import {
   getReadyTickets,
   getWorkflowStates,
@@ -174,10 +174,16 @@ async function main() {
   execSync(`git push -u origin ${branchName}`, { stdio: 'pipe' })
 
   const prBody = buildPRBody(ticket, reviewFeedback)
-  const prUrl = execSync(
-    `gh pr create --title "${escapeShell(`${ticket.identifier}: ${ticket.title}`)}" --body "$(cat <<'PRBODYEOF'\n${prBody}\nPRBODYEOF\n)" --base main`,
+  const prTitle = `${ticket.identifier}: ${ticket.title}`
+  const prResult = spawnSync(
+    'gh',
+    ['pr', 'create', '--title', prTitle, '--body', prBody, '--base', 'main'],
     { encoding: 'utf-8' }
-  ).trim()
+  )
+  if (prResult.status !== 0) {
+    throw new Error(prResult.stderr || 'gh pr create failed')
+  }
+  const prUrl = prResult.stdout.trim()
 
   console.log(`   → PR created: ${prUrl}`)
 
@@ -313,10 +319,6 @@ Linear: https://linear.app/lumos/issue/${ticket.identifier}
 }
 
 // --- Utilities ---
-
-function escapeShell(str: string): string {
-  return str.replace(/"/g, '\\"').replace(/\$/g, '\\$').replace(/`/g, '\\`')
-}
 
 async function failTicket(
   ticket: IssueNode,
