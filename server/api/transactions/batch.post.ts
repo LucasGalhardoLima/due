@@ -10,6 +10,7 @@ const batchCreateSchema = z.array(z.object({
   date: z.string(), // ISO String
   categoryId: z.string().optional(),
   cardId: z.string(),
+  installmentsCount: z.number().int().min(1).default(1),
 }))
 
 // ...
@@ -85,38 +86,35 @@ export default defineEventHandler(async (event) => {
       if (!card) continue
 
       const purchaseDate = new Date(t.date)
-      let dueDate = purchaseDate
+      const installmentsCount = t.installmentsCount
 
-      if (card) {
-          const plan = FinanceUtils.generateInstallments(
-              t.amount,
-              1,
-              purchaseDate,
-              card.closingDay,
-              card.dueDay
-          )
-          if (plan.length > 0 && plan[0]) {
-              dueDate = plan[0].dueDate
-          }
-      }
+      const plan = FinanceUtils.generateInstallments(
+          t.amount,
+          installmentsCount,
+          purchaseDate,
+          card.closingDay,
+          card.dueDay
+      )
 
       await prisma.transaction.create({
           data: {
               description: t.description,
               amount: moneyFromCents(moneyToCents(t.amount)),
               purchaseDate: purchaseDate,
-              installmentsCount: 1,
+              installmentsCount: installmentsCount,
               cardId: t.cardId,
               categoryId: t.categoryId || defaultCategoryId, // Fallback
               isSubscription: false,
               userId, // Inject User ID
               installments: {
-                  create: {
-                      number: 1,
-                      amount: moneyFromCents(moneyToCents(t.amount)),
-                      dueDate: dueDate
-                  }
-              }
+                  createMany: {
+                      data: plan.map(inst => ({
+                          number: inst.number,
+                          amount: moneyFromCents(moneyToCents(inst.amount)),
+                          dueDate: inst.dueDate,
+                      })),
+                  },
+              },
           }
       })
       count++
