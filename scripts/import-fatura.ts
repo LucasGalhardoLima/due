@@ -1,8 +1,6 @@
-import { readFileSync, readdirSync } from 'fs'
+import { readdirSync } from 'fs'
 import { join, extname } from 'path'
-
-// pdf-parse v2 uses named export PDFParse
-import { PDFParse } from 'pdf-parse'
+import { execSync } from 'child_process'
 
 import { detectBank } from '../server/utils/fatura/detect'
 import { cleanupDescriptions } from '../server/utils/fatura/ai-cleanup'
@@ -59,17 +57,13 @@ async function main() {
     console.log(`\n--- Processing: ${file} ---`)
 
     const pdfPath = join(PDF_DIR, file)
-    const buffer = readFileSync(pdfPath)
 
-    // Extract text from PDF
+    // Extract text using pdftotext -layout (preserves columnar layout critical for parsing)
+    // pdf-parse v2's getText() merges columns, losing category/city associations
     let text: string
     try {
-      const pdfParser = new PDFParse({
-        data: new Uint8Array(buffer),
-        password: PDF_PASSWORD || undefined,
-      })
-      const pdfData = await pdfParser.getText()
-      text = pdfData.text
+      const pwFlag = PDF_PASSWORD ? `-opw ${PDF_PASSWORD}` : ''
+      text = execSync(`pdftotext -layout ${pwFlag} "${pdfPath}" -`, { encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 })
     } catch (err) {
       console.log(`  Error reading PDF: ${err instanceof Error ? err.message : err}`)
       continue

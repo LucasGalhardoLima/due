@@ -12,7 +12,8 @@ export class ItauParser implements FaturaParser {
   parse(rawText: string): ParsedFatura {
     const billingPeriod = this.extractBillingPeriod(rawText)
     const cleanedText = this.removePreviewSections(rawText)
-    const lines = cleanedText.split('\n')
+    const expandedText = this.splitColumns(cleanedText)
+    const lines = expandedText.split('\n')
 
     const transactions: ParsedTransaction[] = []
     const skippedInstallments: SkippedInstallment[] = []
@@ -151,6 +152,30 @@ export class ItauParser implements FaturaParser {
     }
 
     return 'unknown'
+  }
+
+  /**
+   * Split two-column PDF layout into single-column lines.
+   * Itau faturas use a side-by-side layout where two transactions or two
+   * category lines appear on the same row separated by a gap.
+   */
+  private splitColumns(text: string): string {
+    return text.split('\n').flatMap(line => {
+      // Split when a gap of 3+ spaces is followed by a date (DD/MM) + letter (a real transaction)
+      // Requiring [A-Za-z] after the date prevents splitting at installment suffixes like "06/07   160,71"
+      const dateSplit = line.match(/^(.+\S)\s{3,}(\d{2}\/\d{2}\s+[A-Za-z*].+)$/)
+      if (dateSplit) return [dateSplit[1]!, dateSplit[2]!]
+
+      // Split when a gap of 6+ spaces separates two category patterns (WORD .CITY)
+      const catSplit = line.match(/^(.+\.[A-Za-zÀ-ú\s]*)\s{6,}([A-ZÀ-Ú][A-ZÀ-Ú\s&]+\..*)$/)
+      if (catSplit) return [catSplit[1]!, catSplit[2]!]
+
+      // Split when a gap of 6+ spaces precedes a section header
+      const hdrSplit = line.match(/^(.+\S)\s{6,}((?:LUCAS|DATA|Lançamentos|Total|Compras|Limites).+)$/)
+      if (hdrSplit) return [hdrSplit[1]!, hdrSplit[2]!]
+
+      return [line]
+    }).join('\n')
   }
 
   private removePreviewSections(text: string): string {
