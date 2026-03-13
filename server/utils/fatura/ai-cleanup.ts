@@ -63,12 +63,21 @@ export async function cleanupDescriptions(
   }
 
   try {
-    const { gateway } = await import('../ai')
+    // Try Anthropic first (ANTHROPIC_API_KEY), fall back to Vercel AI Gateway
+    let model
+    if (process.env.ANTHROPIC_API_KEY) {
+      const { createAnthropic } = await import('@ai-sdk/anthropic')
+      const anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+      model = anthropic('claude-haiku-4-5-20251001')
+    } else {
+      const { gateway } = await import('../ai')
+      model = gateway('gpt-4o-mini')
+    }
 
     const prompt = buildCleanupPrompt(transactions, categories)
 
     const { object } = await generateObject({
-      model: gateway('gpt-4o-mini'),
+      model,
       schema: cleanupSchema,
       prompt,
     })
