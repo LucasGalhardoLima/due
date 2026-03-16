@@ -81,11 +81,9 @@ export default defineEventHandler(async (event) => {
   let totalBudget = 0
 
   if (cardId) {
-    const card = await prisma.creditCard.findUnique({ where: { id: cardId } })
-    if (card) {
-      totalLimit = moneyToNumber(card.limit)
-      totalBudget = card.budget ? moneyToNumber(card.budget) : 0
-    }
+    const card = await verifyCardOwnership(cardId, userId)
+    totalLimit = moneyToNumber(card.limit)
+    totalBudget = card.budget ? moneyToNumber(card.budget) : 0
   } else {
     // If multiple cards, sum their limits
     const cards = await prisma.creditCard.findMany({ where: { userId } })
