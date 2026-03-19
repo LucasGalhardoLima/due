@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { CreditCard } from '@prisma/client'
+import { addMonths } from 'date-fns'
 
 import { FinanceUtils } from '../../utils/finance'
 import prisma from '../../utils/prisma'
@@ -11,6 +12,7 @@ const batchCreateSchema = z.array(z.object({
   categoryId: z.string().optional(),
   cardId: z.string(),
   installmentsCount: z.number().int().min(1).default(1),
+  faturaDueDate: z.string().optional(), // ISO String — anchors installment #1 to actual fatura date
 }))
 
 // ...
@@ -88,18 +90,43 @@ export default defineEventHandler(async (event) => {
       const purchaseDate = new Date(t.date)
       const installmentsCount = t.installmentsCount
 
-      const plan = FinanceUtils.generateInstallments(
-          t.amount,
-          installmentsCount,
-          purchaseDate,
-          card.closingDay,
-          card.dueDay
-      )
+      // For parcelamentos, amount from fatura is per-installment — compute total
+      const totalAmount = installmentsCount > 1
+        ? Math.round(t.amount * installmentsCount * 100) / 100
+        : t.amount
+
+      // When faturaDueDate is provided (PDF import), anchor installments to actual
+      // fatura dates instead of calculating from purchase date + card settings.
+      // This ensures DB installment months match the real Itaú billing cycle.
+      let plan: { number: number; amount: number; dueDate: Date }[]
+      if (t.faturaDueDate) {
+        const firstDueDate = new Date(t.faturaDueDate)
+        const totalCents = Math.round(totalAmount * 100)
+        const installmentCents = Math.floor(totalCents / installmentsCount)
+        const remainderCents = totalCents % installmentsCount
+        plan = []
+        for (let i = 0; i < installmentsCount; i++) {
+          const thisAmountCents = i === installmentsCount - 1 ? installmentCents + remainderCents : installmentCents
+          plan.push({
+            number: i + 1,
+            amount: thisAmountCents / 100,
+            dueDate: addMonths(firstDueDate, i),
+          })
+        }
+      } else {
+        plan = FinanceUtils.generateInstallments(
+            totalAmount,
+            installmentsCount,
+            purchaseDate,
+            card.closingDay,
+            card.dueDay
+        )
+      }
 
       await prisma.transaction.create({
           data: {
               description: t.description,
-              amount: moneyFromCents(moneyToCents(t.amount)),
+              amount: moneyFromCents(moneyToCents(totalAmount)),
               purchaseDate: purchaseDate,
               installmentsCount: installmentsCount,
               cardId: t.cardId,

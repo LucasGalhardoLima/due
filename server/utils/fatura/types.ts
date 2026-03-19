@@ -7,6 +7,7 @@ export interface FaturaParser {
 export interface ParsedFatura {
   bank: string
   billingPeriod: string // closing date month, e.g. '2026-01'
+  vencimentoDate?: string // actual due date from PDF, e.g. '2026-03-20'
   transactions: ParsedTransaction[]
   skippedInstallments: SkippedInstallment[]
   stats: ParseStats
@@ -15,8 +16,9 @@ export interface ParsedFatura {
 export interface ParsedTransaction {
   purchaseDate: string // ISO date YYYY-MM-DD
   rawDescription: string
-  amount: number // total purchase amount (per-installment * count)
+  amount: number // per-installment amount as shown in the fatura
   installmentsCount: number
+  installmentNumber: number // 1 for first/single, >1 for ongoing
   bankCategory: string
   city: string
 }

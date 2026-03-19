@@ -40,6 +40,7 @@ export class ItauParser implements FaturaParser {
   parsePdf(pdfPath: string, password: string): ParsedFatura {
     const rawText = this.extractFullText(pdfPath, password)
     const billingPeriod = this.extractBillingPeriod(rawText)
+    const vencimentoDate = this.extractVencimentoDate(rawText)
 
     const billingYear = parseInt(billingPeriod.split('-')[0]!)
     const billingMonth = parseInt(billingPeriod.split('-')[1]!) - 1
@@ -67,6 +68,7 @@ export class ItauParser implements FaturaParser {
     return {
       bank: 'itau',
       billingPeriod,
+      vencimentoDate,
       transactions,
       skippedInstallments,
       stats: {
@@ -120,7 +122,28 @@ export class ItauParser implements FaturaParser {
         continue
       }
 
-      if (!inSection) continue
+      if (!inSection) {
+        // Capture "Repasse de IOF em R$ XX,XX" — appears without date, outside sections
+        const iofMatch = trimmed.match(/Repasse de IOF em R\$\s+([\d.,]+)/)
+        if (iofMatch) {
+          const amt = this.parseAmount(iofMatch[1]!)
+          if (amt && amt > 0) {
+            const closingDay = 14
+            const purchaseDate = `${billingYear}-${(billingMonth + 1).toString().padStart(2, '0')}-${closingDay.toString().padStart(2, '0')}`
+            transactions.push({
+              purchaseDate,
+              rawDescription: 'Repasse de IOF',
+              amount: amt,
+              installmentsCount: 1,
+              installmentNumber: 1,
+              bankCategory: '',
+              city: '',
+            })
+            totalLines++
+          }
+        }
+        continue
+      }
       if (trimmed.includes('PAGAMENTO EFETUADO')) continue
 
       // Match: DD/MM  description  [2+ spaces]  [-] amount (Brazilian XX,XX format)
@@ -132,11 +155,12 @@ export class ItauParser implements FaturaParser {
       const [, dateStr, descPart, negSign, amountStr] = txMatch
       const rawAmount = this.parseAmount(amountStr!)
 
-      if (negSign || rawAmount === null || rawAmount <= 0) {
+      if (rawAmount === null || rawAmount === 0) {
         skippedAdjustments++
         continue
       }
 
+      const isNegative = !!negSign
       const purchaseDate = this.resolveDate(dateStr!, billingYear, billingMonth)
 
       // Extract installment suffix (e.g. "01/10") before stripping it
@@ -151,10 +175,9 @@ export class ItauParser implements FaturaParser {
         rawDescription = rawDescription.replace(/\s*\S?\d{2}\/\d{2}\s*$/, '').trim()
       }
 
-      // Skip ongoing installments — they're covered by the 01/XX transaction
+      // Track ongoing installments for stats but still include them
       if (installmentNumber > 1) {
         skippedOngoing++
-        continue
       }
 
       // Extract bank category and city from the next line
@@ -169,16 +192,15 @@ export class ItauParser implements FaturaParser {
         }
       }
 
-      // For first installments (01/XX), reconstruct total purchase amount
-      const totalAmount = installmentsTotal > 1
-        ? Math.round(rawAmount * installmentsTotal * 100) / 100
-        : rawAmount
+      // Use per-installment amount (not total) — let the caller decide how to handle
+      const amount = isNegative ? -rawAmount : rawAmount
 
       transactions.push({
         purchaseDate,
         rawDescription,
-        amount: totalAmount,
+        amount,
         installmentsCount: installmentsTotal,
+        installmentNumber,
         bankCategory,
         city,
       })
@@ -288,6 +310,7 @@ export class ItauParser implements FaturaParser {
         rawDescription,
         amount: totalAmount,
         installmentsCount: installmentsTotal,
+        installmentNumber: 1,
         bankCategory,
         city,
       })
@@ -328,6 +351,14 @@ export class ItauParser implements FaturaParser {
   }
 
   // --- Shared helpers ---
+
+  private extractVencimentoDate(text: string): string | undefined {
+    const match = text.match(/Vencimento:\s*(\d{2})\/(\d{2})\/(\d{4})/)
+    if (match) {
+      return `${match[3]}-${match[2]}-${match[1]}`
+    }
+    return undefined
+  }
 
   private extractBillingPeriod(text: string): string {
     const closingMatch = text.match(/Fechamento:\s*(\d{2})\/(\d{2})\/(\d{4})/)

@@ -2,7 +2,7 @@
 import Papa from 'papaparse'
 import { ref, computed } from 'vue'
 import { toast } from 'vue-sonner'
-import { UploadCloud, FileText, ArrowRight, Loader2, Smartphone, Share2, CreditCard } from 'lucide-vue-next'
+import { UploadCloud, FileText, ArrowRight, Loader2, Smartphone, Share2, CreditCard, Lock } from 'lucide-vue-next'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import ListSkeleton from '@/components/ui/ListSkeleton.vue'
@@ -11,7 +11,9 @@ import ListSkeleton from '@/components/ui/ListSkeleton.vue'
 interface ParsedRow {
   date: string
   description: string
+  rawDescription?: string
   amount: number
+  installmentsCount: number
   selected: boolean
   categoryId?: string
   status: 'valid' | 'invalid'
@@ -34,6 +36,10 @@ const isProcessing = ref(false)
 const parsedRows = ref<ParsedRow[]>([])
 const selectedCardId = ref<string>('')
 const importStats = ref({ total: 0, matched: 0 })
+const pdfPassword = ref('')
+const showPasswordInput = ref(false)
+const pendingPdfFile = ref<File | null>(null)
+const faturaInfo = ref<{ billingPeriod?: string; bank?: string; faturaDueDate?: string } | null>(null)
 
 // Fetch Data
 const { data: cards, status: cardsStatus } = useFetch<CardOption[]>('/api/cards')
@@ -41,13 +47,12 @@ const { data: categories, status: catStatus } = useFetch<CategoryOption[]>('/api
 
 const isLoading = computed(() => cardsStatus.value === 'pending' || catStatus.value === 'pending')
 
-// Quick Matching Logic (Client-side for now)
+// Quick Matching Logic (Client-side for CSV)
 function findCategoryMatch(description: string): string | undefined {
     if (!categories.value) return undefined
-    
-    // Normalize logic
+
     const desc = description.toLowerCase()
-    
+
     const commonMappings: Record<string, string[]> = {
         'Transporte': ['uber', '99', 'posto', 'sem parar', 'veloe', 'combustivel'],
         'Alimentação': ['ifood', 'rappi', 'subway', 'mc donalds', 'burger king', 'restaurante', 'padaria', 'mercado', 'atacad', 'carrefour', 'pao de acucar'],
@@ -56,41 +61,51 @@ function findCategoryMatch(description: string): string | undefined {
         'Saúde': ['farmacia', 'drogaria', 'medico', 'hospital', 'lab'],
         'Casa': ['leroy', 'madeira', 'eletropaulo', 'energia', 'agua', 'sabesp', 'internet', 'claro', 'vivo', 'tim']
     }
-    
+
     for (const cat of categories.value) {
-        // Direct match with category name
         if (desc.includes(cat.name.toLowerCase())) return cat.id
-        
-        // Check common mappings
         const keywords = commonMappings[cat.name]
         if (keywords) {
             if (keywords.some(k => desc.includes(k))) return cat.id
         }
     }
-    
+
     return undefined
 }
 
 // File Handling
+function isPdf(file: File): boolean {
+    return file.type === 'application/pdf' || file.name.endsWith('.pdf')
+}
+
 function handleFile(file: File) {
-    if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
-        toast.error('Por favor envie um arquivo CSV.')
-        return
-    }
-    
     if (!selectedCardId.value) {
         toast.error('Selecione um cartão primeiro.')
         return
     }
 
+    if (isPdf(file)) {
+        pendingPdfFile.value = file
+        showPasswordInput.value = true
+        return
+    }
+
+    if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+        toast.error('Formato não suportado. Envie um arquivo CSV ou PDF.')
+        return
+    }
+
+    handleCsvFile(file)
+}
+
+function handleCsvFile(file: File) {
     isProcessing.value = true
-    
+
     Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
         complete: (results) => {
-            console.log('Parsed:', results)
-            processResults(results.data)
+            processResults(results.data as RawRow[])
             isProcessing.value = false
             step.value = 2
         },
@@ -102,53 +117,104 @@ function handleFile(file: File) {
     })
 }
 
+async function handlePdfSubmit() {
+    if (!pendingPdfFile.value) return
+
+    isProcessing.value = true
+    showPasswordInput.value = false
+
+    try {
+        const formData = new FormData()
+        formData.append('pdf', pendingPdfFile.value)
+        formData.append('password', pdfPassword.value)
+
+        const result = await $fetch<{
+            billingPeriod: string
+            bank: string
+            faturaDueDate?: string
+            stats: { totalLines: number; newPurchases: number; skippedOngoing: number; skippedAdjustments: number }
+            transactions: Array<{
+                date: string
+                description: string
+                rawDescription: string
+                amount: number
+                installmentsCount: number
+                categoryId?: string
+                categoryName?: string
+            }>
+        }>('/api/import/parse-fatura', {
+            method: 'POST',
+            body: formData,
+        })
+
+        faturaInfo.value = { billingPeriod: result.billingPeriod, bank: result.bank, faturaDueDate: result.faturaDueDate }
+
+        const rows: ParsedRow[] = []
+        let matches = 0
+
+        for (const tx of result.transactions) {
+            if (tx.categoryId) matches++
+            rows.push({
+                date: tx.date,
+                description: tx.description,
+                rawDescription: tx.rawDescription,
+                amount: tx.amount,
+                installmentsCount: tx.installmentsCount || 1,
+                selected: true,
+                categoryId: tx.categoryId,
+                status: 'valid',
+            })
+        }
+
+        parsedRows.value = rows
+        importStats.value = { total: rows.length, matched: matches }
+        step.value = 2
+
+        const ongoingMsg = result.stats.skippedOngoing > 0 ? ` (${result.stats.skippedOngoing} parcelas recorrentes ignoradas)` : ''
+        toast.success(`${result.stats.newPurchases} novas transações na fatura de ${result.billingPeriod}${ongoingMsg}`)
+    } catch (error: any) {
+        const message = error?.data?.statusMessage || error?.message || 'Erro ao processar PDF'
+        toast.error(message)
+    } finally {
+        isProcessing.value = false
+        pendingPdfFile.value = null
+        pdfPassword.value = ''
+    }
+}
+
 type RawRow = Record<string, string | number | null | undefined>
 
 function processResults(data: RawRow[]) {
-    // Nubank CSV Format: date, category, title, amount
-    // Inter Format: Data Lançamento, Histórico, Valor
-    // We need to normalize.
-    
+    faturaInfo.value = null
     const rows: ParsedRow[] = []
     let matches = 0
-    
+
     data.forEach((row) => {
-        // Auto-detect columns
         const dateVal = row['date'] || row['Date'] || row['Data'] || row['Data Lançamento']
         const descVal = row['title'] || row['description'] || row['Description'] || row['Histórico'] || row['Estabelecimento']
         const amountVal = row['amount'] || row['Amount'] || row['Valor']
 
         if (dateVal && descVal && amountVal) {
-            
-            if (typeof amountVal === 'string') {
-              // Handle currency symbols
-            }
-            
             let numAmount = Number(amountVal)
-            // If NaN, maybe needs replace
             if (isNaN(numAmount) && typeof amountVal === 'string') {
-                 // Try replacing , with .
                  numAmount = Number(amountVal.replace(',', '.'))
             }
 
-            // Valid row?
             if (!isNaN(numAmount)) {
-                
-                // Parse date (yyyy-mm-dd or dd/mm/yyyy)
                 let isoDate = dateVal
-                if (dateVal.includes('/')) {
+                if (typeof dateVal === 'string' && dateVal.includes('/')) {
                      const [d, m, y] = dateVal.split('/')
-                     isoDate = `${y}-${m}-${d}` // simple ISO
+                     isoDate = `${y}-${m}-${d}`
                 }
-                
-                // Match Category
-                const matchedCatId = findCategoryMatch(descVal)
+
+                const matchedCatId = findCategoryMatch(String(descVal))
                 if (matchedCatId) matches++
 
                 rows.push({
-                    date: new Date(isoDate).toISOString(),
-                    description: descVal,
-                    amount: Math.abs(numAmount), // Import transactions are usually expenses (positive for us)
+                    date: new Date(String(isoDate)).toISOString(),
+                    description: String(descVal),
+                    amount: Math.abs(numAmount),
+                    installmentsCount: 1,
                     selected: true,
                     categoryId: matchedCatId,
                     status: 'valid'
@@ -156,7 +222,7 @@ function processResults(data: RawRow[]) {
             }
         }
     })
-    
+
     parsedRows.value = rows
     importStats.value = { total: rows.length, matched: matches }
 }
@@ -191,7 +257,7 @@ async function handleImport() {
         toast.error('Cartão não selecionado (erro interno).')
         return
     }
-    
+
     isProcessing.value = true
     try {
         const payload = selectedRows.map(r => ({
@@ -199,17 +265,20 @@ async function handleImport() {
             amount: r.amount,
             date: r.date,
             categoryId: r.categoryId,
-            cardId: selectedCardId.value
+            cardId: selectedCardId.value,
+            installmentsCount: r.installmentsCount,
+            ...(faturaInfo.value?.faturaDueDate ? { faturaDueDate: faturaInfo.value.faturaDueDate } : {}),
         }))
 
         const res = await $fetch<{ count: number }>('/api/transactions/batch', {
             method: 'POST',
             body: payload
         })
-        
+
         toast.success(`${res.count} transações importadas!`)
         step.value = 1
         parsedRows.value = []
+        faturaInfo.value = null
         navigateTo('/')
     } catch (error) {
         console.error(error)
@@ -222,25 +291,78 @@ async function handleImport() {
 
 <template>
   <div class="app-page animate-in fade-in slide-in-from-bottom-4 duration-500">
-    <PageHeader 
-      title="Importação Inteligente" 
-      subtitle="Arraste sua fatura (CSV) e nossa IA organiza tudo para você."
+    <PageHeader
+      title="Importação Inteligente"
+      subtitle="Arraste sua fatura (CSV ou PDF) e nossa IA organiza tudo para você."
       :icon="UploadCloud"
     />
 
     <ListSkeleton v-if="isLoading" :items="3" />
 
     <template v-else>
+      <!-- PDF Password Dialog -->
+      <Teleport to="body">
+        <div v-if="showPasswordInput" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div class="bg-card rounded-3xl p-8 shadow-elevation-5 border border-border/70 w-full max-w-md space-y-6 animate-in zoom-in-95 duration-300">
+            <div class="space-y-2">
+              <h3 class="text-h2 flex items-center gap-2">
+                <Lock class="w-5 h-5 text-primary" />
+                Senha do PDF
+              </h3>
+              <p class="text-body text-muted-foreground">
+                A fatura Itaú é protegida por senha. Geralmente são os primeiros 5 dígitos do CPF.
+              </p>
+            </div>
+
+            <input
+              v-model="pdfPassword"
+              type="password"
+              placeholder="Senha do PDF"
+              class="w-full h-11 px-4 rounded-xl border border-input bg-background text-body shadow-elevation-1 transition-all duration-200 focus:outline-none focus:border-primary/40 focus:shadow-elevation-2"
+              @keyup.enter="handlePdfSubmit"
+            >
+
+            <div class="flex justify-end gap-3">
+              <button
+                class="px-4 py-2 text-body font-medium text-muted-foreground hover:text-foreground transition-all duration-200"
+                @click="showPasswordInput = false; pendingPdfFile = null; pdfPassword = ''"
+              >
+                Cancelar
+              </button>
+              <button
+                class="px-6 py-2 bg-primary text-primary-foreground rounded-xl text-body font-bold shadow-elevation-2 hover:bg-primary/90 transition-all duration-200 disabled:opacity-50"
+                :disabled="!pdfPassword"
+                @click="handlePdfSubmit"
+              >
+                Processar Fatura
+              </button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
+
+      <!-- Processing overlay -->
+      <Teleport to="body">
+        <div v-if="isProcessing" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div class="bg-card rounded-3xl p-8 shadow-elevation-5 border border-border/70 text-center space-y-4 animate-in zoom-in-95 duration-300">
+            <Loader2 class="w-8 h-8 animate-spin text-primary mx-auto" />
+            <div class="space-y-1">
+              <p class="text-h3">Processando fatura...</p>
+              <p class="text-body text-muted-foreground">Nossa IA está limpando as descrições e categorizando.</p>
+            </div>
+          </div>
+        </div>
+      </Teleport>
+
       <!-- Step 1: Upload -->
       <div v-if="step === 1" class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <!-- Visual Tutorial (Nubank Focus) -->
+          <!-- Visual Tutorial -->
           <div class="bg-card rounded-[2rem] p-8 border border-border/70 shadow-elevation-3 transition-all duration-300 hover:shadow-elevation-4 hover:border-primary/25">
               <h3 class="text-micro text-muted-foreground mb-8 flex items-center gap-2">
                   <Smartphone class="w-3 h-3 text-primary" />
                   Como exportar do seu banco?
               </h3>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <!-- Step 1 -->
                   <div class="flex items-start gap-3 group">
                       <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary-accent font-bold text-xs shrink-0 group-hover:scale-110 transition-transform">1</div>
                       <div class="space-y-1">
@@ -248,35 +370,34 @@ async function handleImport() {
                               Abra a Fatura
                               <CreditCard class="w-3 h-3 text-muted-foreground" />
                           </p>
-                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">No app do Nubank, toque no cartão de crédito na tela inicial.</p>
+                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">No app do banco, encontre a fatura do cartão de crédito.</p>
                       </div>
                   </div>
-  
-                  <!-- Step 2 -->
+
                   <div class="flex items-start gap-3 group">
                       <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary-accent font-bold text-xs shrink-0 group-hover:scale-110 transition-transform">2</div>
                       <div class="space-y-1">
                           <p class="text-h4 flex items-center gap-2">
-                              Enviar por E-mail
+                              Exporte
                               <Share2 class="w-3 h-3 text-muted-foreground" />
                           </p>
-                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">Toque em "Mais" ou no ícone de compartilhar no topo da fatura.</p>
+                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">Baixe o PDF da fatura ou exporte como CSV pelo app.</p>
                       </div>
                   </div>
-  
-                  <!-- Step 3 -->
+
                   <div class="flex items-start gap-3 group">
                       <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary-accent font-bold text-xs shrink-0 group-hover:scale-110 transition-transform">3</div>
                       <div class="space-y-1">
                           <p class="text-h4 flex items-center gap-2">
-                              Formato CSV
+                              Arraste Aqui
                               <FileText class="w-3 h-3 text-muted-foreground" />
                           </p>
-                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">Selecione CSV, envie para seu computador e arraste o arquivo abaixo.</p>
+                          <p class="text-small text-muted-foreground leading-relaxed transition-colors duration-200 group-hover:text-foreground/80">Arraste o arquivo abaixo. PDF do Itaú e CSV de qualquer banco.</p>
                       </div>
                   </div>
               </div>
           </div>
+
           <!-- Card Selector -->
            <div class="max-w-md space-y-2">
               <label class="text-micro text-muted-foreground">Cartão de Destino</label>
@@ -291,7 +412,7 @@ async function handleImport() {
                 </SelectContent>
               </Select>
           </div>
-  
+
           <!-- Dropzone -->
           <div
               class="border-2 border-dashed rounded-[2rem] p-12 flex flex-col items-center justify-center text-center space-y-4 transition-all duration-300 relative bg-card/60"
@@ -306,35 +427,39 @@ async function handleImport() {
               <div class="bg-muted p-4 rounded-2xl">
                   <FileText class="w-8 h-8 text-muted-foreground" />
               </div>
-  
+
               <div class="space-y-1">
-                  <p class="text-h3">Arraste o arquivo CSV aqui</p>
-                  <p class="text-body text-muted-foreground">ou clique para selecionar</p>
+                  <p class="text-h3">Arraste o arquivo aqui</p>
+                  <p class="text-body text-muted-foreground">CSV ou PDF da fatura do cartão</p>
               </div>
-  
+
               <input
                   type="file"
-                  accept=".csv"
+                  accept=".csv,.pdf"
                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                   :disabled="!selectedCardId"
-                  aria-label="Selecionar arquivo CSV para importação"
+                  aria-label="Selecionar arquivo CSV ou PDF para importação"
                   @change="onFileSelect"
               >
-  
+
               <p v-if="!selectedCardId" class="text-small text-danger font-medium absolute -bottom-6">
                   * Selecione um cartão primeiro
               </p>
           </div>
-  
-          <!-- Instructions / Supported Banks -->
+
+          <!-- Supported Banks -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
                <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-2 hover:border-primary/25">
+                   <div class="text-h4">Itaú</div>
+                   <div class="text-small text-muted-foreground">PDF da fatura com IA.</div>
+               </div>
+               <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-2 hover:border-primary/25">
                    <div class="text-h4">Nubank</div>
-                   <div class="text-small text-muted-foreground">Suporte total ao CSV exportado pelo app.</div>
+                   <div class="text-small text-muted-foreground">CSV exportado pelo app.</div>
                </div>
                <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-2 hover:border-primary/25">
                    <div class="text-h4">Inter</div>
-                   <div class="text-small text-muted-foreground">CSV de extrato suportado.</div>
+                   <div class="text-small text-muted-foreground">CSV de extrato.</div>
                </div>
                 <div class="border border-border/70 rounded-3xl p-4 text-center space-y-2 shadow-elevation-1 bg-card/70 transition-all duration-200 hover:-translate-y-[2px] hover:shadow-elevation-2 hover:border-primary/25">
                    <div class="text-h4">Outros</div>
@@ -342,11 +467,16 @@ async function handleImport() {
                </div>
           </div>
       </div>
-  
+
       <!-- Step 2: Review -->
       <div v-else class="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
           <div class="flex items-center justify-between">
-              <h2 class="text-h2">Revisão de Lançamentos</h2>
+              <div>
+                <h2 class="text-h2">Revisão de Lançamentos</h2>
+                <p v-if="faturaInfo" class="text-small text-muted-foreground mt-1">
+                  Fatura {{ faturaInfo.bank?.toUpperCase() }} — Período {{ faturaInfo.billingPeriod }}
+                </p>
+              </div>
               <div class="flex items-center gap-4 text-small">
                   <div class="flex items-center gap-2">
                       <span class="w-2 h-2 rounded-full bg-success"/>
@@ -355,7 +485,7 @@ async function handleImport() {
                   <div class="text-muted-foreground">Total: {{ parsedRows.length }}</div>
               </div>
           </div>
-  
+
           <div class="rounded-[2rem] border border-border/70 bg-card shadow-elevation-3 transition-all duration-300 hover:shadow-elevation-4">
               <div class="relative w-full overflow-auto max-h-[500px]">
                   <table class="w-full caption-bottom text-sm">
@@ -376,8 +506,14 @@ async function handleImport() {
                                   <input v-model="row.selected" type="checkbox" :aria-label="`Selecionar transação: ${row.description}`" >
                               </td>
                               <td class="p-4 align-middle text-body">{{ new Date(row.date).toLocaleDateString() }}</td>
-                              <td class="p-4 align-middle text-body font-medium">{{ row.description }}</td>
-                              <td class="p-4 align-middle text-body">R$ {{ row.amount.toFixed(2) }}</td>
+                              <td class="p-4 align-middle">
+                                <span class="text-body font-medium">{{ row.description }}</span>
+                                <span v-if="row.rawDescription && row.rawDescription !== row.description" class="block text-small text-muted-foreground truncate max-w-[300px]">{{ row.rawDescription }}</span>
+                              </td>
+                              <td class="p-4 align-middle text-body">
+                                <span>R$ {{ row.amount.toFixed(2) }}</span>
+                                <span v-if="row.installmentsCount > 1" class="ml-1.5 text-xs text-primary font-semibold">{{ row.installmentsCount }}x</span>
+                              </td>
                               <td class="p-4 align-middle w-[250px]">
                                   <Select v-model="row.categoryId">
                                     <SelectTrigger class="h-11 rounded-xl border border-input bg-background shadow-elevation-1 transition-all duration-200 hover:border-primary/30 data-[state=open]:border-primary/40 data-[state=open]:shadow-elevation-2" :class="!row.categoryId && 'text-muted-foreground border-warning bg-warning-muted'">
@@ -395,9 +531,9 @@ async function handleImport() {
                   </table>
               </div>
           </div>
-  
+
           <div class="flex justify-end gap-3 pt-4">
-              <button class="px-4 py-2 text-body font-medium text-muted-foreground hover:text-foreground transition-all duration-200 hover:-translate-y-[1px]" @click="step = 1">
+              <button class="px-4 py-2 text-body font-medium text-muted-foreground hover:text-foreground transition-all duration-200 hover:-translate-y-[1px]" @click="step = 1; faturaInfo = null">
                   Cancelar
               </button>
               <button

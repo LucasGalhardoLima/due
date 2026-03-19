@@ -13,13 +13,14 @@
  * Usage:
  *   npx tsx scripts/reimport-fatura.ts <pdf-dir> <password> [--dry-run] [--skip-ai]
  */
+import 'dotenv/config'
 import { PrismaClient, Prisma } from '@prisma/client'
 import { execSync } from 'child_process'
 import { readdirSync } from 'fs'
 import { join, extname } from 'path'
 import { addMonths } from 'date-fns'
-import { cleanupDescriptions } from '../server/utils/fatura/ai-cleanup'
-import type { ParsedTransaction } from '../server/utils/fatura/types'
+import { generateObject } from 'ai'
+import { z } from 'zod'
 
 const prisma = new PrismaClient({
   datasourceUrl: process.env.DATABASE_URL
@@ -107,6 +108,12 @@ function extractBillingPeriod(text: string): string {
   const emissaoMatch = text.match(/Emissão:\s*(\d{2})\/(\d{2})\/(\d{4})/)
   if (emissaoMatch) return `${emissaoMatch[3]}-${emissaoMatch[2]}`
   return 'unknown'
+}
+
+function extractVencimentoDate(text: string): string | undefined {
+  const match = text.match(/Vencimento:\s*(\d{2})\/(\d{2})\/(\d{4})/)
+  if (match) return `${match[3]}-${match[2]}-${match[1]}`
+  return undefined
 }
 
 function billingPeriodToDueDate(bp: string): string {
@@ -302,7 +309,9 @@ function parseFatura(pdfPath: string, password: string): ParsedFaturaResult {
   const rawText = extractFullText(pdfPath, password)
   const billingPeriod = extractBillingPeriod(rawText)
   const pdfTotal = extractPdfTotal(rawText)
-  const dueDate = billingPeriodToDueDate(billingPeriod)
+  // Prefer actual vencimento from PDF over calculated date
+  const vencimento = extractVencimentoDate(rawText)
+  const dueDate = vencimento || billingPeriodToDueDate(billingPeriod)
 
   const billingYear = parseInt(billingPeriod.split('-')[0]!)
   const billingMonth = parseInt(billingPeriod.split('-')[1]!) - 1
@@ -372,120 +381,348 @@ async function main() {
     allFaturas.push(result)
   }
 
-  // Step 2: Group installments across faturas
-  console.log('\n--- Grouping Installments ---')
-
+  // Step 2: Annotate all lines with fatura context
   interface AnnotatedLine extends FaturaLine {
     faturaDueDate: string
     faturaBillingPeriod: string
+    lineIndex: number
   }
 
+  let lineIdx = 0
   const allAnnotated: AnnotatedLine[] = allFaturas.flatMap(f =>
-    f.lines.map(l => ({ ...l, faturaDueDate: f.dueDate, faturaBillingPeriod: f.billingPeriod }))
+    f.lines.map(l => ({ ...l, faturaDueDate: f.dueDate, faturaBillingPeriod: f.billingPeriod, lineIndex: lineIdx++ }))
   )
 
   const positiveAnnotated = allAnnotated.filter(l => !l.isNegative)
   const negativeAnnotated = allAnnotated.filter(l => l.isNegative)
+  const installmentLines = positiveAnnotated.filter(l => l.installmentsTotal > 1)
+  const singleLines = positiveAnnotated.filter(l => l.installmentsTotal === 1)
 
-  // Parents: 01/XX entries — each starts a multi-installment purchase
-  interface ParentGroup {
-    line: AnnotatedLine
-    children: Map<number, AnnotatedLine> // installmentNumber -> fatura line
+  console.log(`\n  Total lines: ${allAnnotated.length} (${positiveAnnotated.length}+ ${negativeAnnotated.length}-)`)
+  console.log(`  Installment lines: ${installmentLines.length} (across multiple faturas)`)
+  console.log(`  Single lines: ${singleLines.length}`)
+
+  // Step 3: AI Grouping + Cleanup
+  console.log('\n--- AI Grouping + Cleanup ---')
+
+  const categoryNames = categories.map(c => c.name).join(', ')
+
+  // Build the AI grouping schema
+  const groupingSchema = z.object({
+    groups: z.array(z.object({
+      groupId: z.number(),
+      cleanDescription: z.string(),
+      suggestedCategory: z.string(),
+      lineIndices: z.array(z.number()),
+    }))
+  })
+
+  interface AIGroup {
+    groupId: number
+    cleanDescription: string
+    suggestedCategory: string
+    lineIndices: number[]
   }
 
-  const parentGroups: ParentGroup[] = positiveAnnotated
-    .filter(l => l.installmentNumber === 1 && l.installmentsTotal > 1)
-    .map(l => {
-      const children = new Map<number, AnnotatedLine>()
-      children.set(1, l)
-      return { line: l, children }
-    })
+  let allGroups: AIGroup[] = []
 
-  // Match ongoing installments (NN>1) to their parent by description + total + amount + date alignment
-  const orphans: AnnotatedLine[] = []
-  for (const line of positiveAnnotated.filter(l => l.installmentNumber > 1)) {
-    const lineDue = new Date(line.faturaDueDate + 'T03:00:00Z')
+  if (SKIP_AI) {
+    console.log('  [SKIP_AI] Using deterministic fallback grouping...')
 
-    const parent = parentGroups.find(p => {
-      if (p.line.rawDescription.toLowerCase() !== line.rawDescription.toLowerCase()) return false
-      if (p.line.installmentsTotal !== line.installmentsTotal) return false
-      if (Math.abs(p.line.amount - line.amount) >= 0.02) return false
-      if (p.children.has(line.installmentNumber)) return false // slot already taken
-      // Date alignment: parent due + (N-1) months = this line's fatura due
-      const parentDue = new Date(p.line.faturaDueDate + 'T03:00:00Z')
-      const expectedDue = addMonths(parentDue, line.installmentNumber - 1)
-      return expectedDue.getUTCFullYear() === lineDue.getUTCFullYear() &&
-             expectedDue.getUTCMonth() === lineDue.getUTCMonth()
-    })
+    // Deterministic fallback: group installment lines by exact description + amount + total
+    const installmentGroups = new Map<string, number[]>()
+    for (const line of installmentLines) {
+      const key = `${line.rawDescription.toLowerCase()}|${line.amount.toFixed(2)}|${line.installmentsTotal}`
+      const group = installmentGroups.get(key) || []
+      group.push(line.lineIndex)
+      installmentGroups.set(key, group)
+    }
 
-    if (parent) {
-      parent.children.set(line.installmentNumber, line)
+    let gid = 1
+    for (const [, indices] of installmentGroups) {
+      const line = allAnnotated[indices[0]!]!
+      allGroups.push({
+        groupId: gid++,
+        cleanDescription: line.rawDescription,
+        suggestedCategory: 'Outro',
+        lineIndices: indices,
+      })
+    }
+
+    // Singles and negatives as individual groups
+    for (const line of [...singleLines, ...negativeAnnotated]) {
+      allGroups.push({
+        groupId: gid++,
+        cleanDescription: line.rawDescription,
+        suggestedCategory: 'Outro',
+        lineIndices: [line.lineIndex],
+      })
+    }
+  } else {
+    // AI grouping: send installment lines for grouping, singles/negatives for cleanup only
+    console.log(`  Grouping ${installmentLines.length} installment lines via AI...`)
+
+    try {
+      let model
+      if (process.env.ANTHROPIC_API_KEY) {
+        const { createAnthropic } = await import('@ai-sdk/anthropic')
+        const anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+        model = anthropic('claude-sonnet-4-20250514')
+      } else {
+        const { gateway } = await import('../server/utils/ai')
+        model = gateway('gpt-4o-mini')
+      }
+
+      // Batch installment lines by installmentsTotal for smaller AI calls
+      const byTotal = new Map<number, AnnotatedLine[]>()
+      for (const line of installmentLines) {
+        const group = byTotal.get(line.installmentsTotal) || []
+        group.push(line)
+        byTotal.set(line.installmentsTotal, group)
+      }
+
+      let batchNum = 0
+      const totalBatches = byTotal.size
+      for (const [instTotal, batchLines] of byTotal) {
+        batchNum++
+        const batchInput = batchLines.map(l =>
+          `[${l.lineIndex}] ${l.faturaDueDate} | "${l.rawDescription}" | R$${l.amount.toFixed(2)} | ${l.installmentNumber}/${l.installmentsTotal}`
+        ).join('\n')
+
+        const groupingPrompt = `You are a financial data analyst. You have credit card installment lines extracted from multiple Brazilian Itaú faturas (bills). All lines below are ${instTotal}-installment purchases.
+
+Each line represents one installment payment from a specific fatura month. Lines from the SAME purchase will:
+- Have similar descriptions (but may have formatting differences like "EC *LGELECTRONICS" vs "EC*LG ELECTRONICS" — these are the same)
+- Have the EXACT SAME amount (credit card installments are always the same amount per month — no rounding differences)
+- Appear in sequential monthly faturas
+
+CRITICAL RULE: Two lines with the same description and installment count but DIFFERENT amounts are DIFFERENT purchases. Never group them together.
+
+Group these installment lines by purchase. Each group = one parcelamento (installment plan).
+
+Also for each group:
+1. Clean the description into a human-readable name (e.g., "EC *LGELECTRONICS" → "LG Electronics", "RAIA182 -CT" → "Droga Raia")
+2. Suggest the best category from: ${categoryNames}. Always pick the closest match — use "Outro" if nothing else fits.
+
+INSTALLMENT LINES:
+${batchInput}
+
+Return groups where lineIndices contains the [index] numbers from above.`
+
+        const { object: groupResult } = await generateObject({
+          model,
+          schema: groupingSchema,
+          prompt: groupingPrompt,
+        })
+
+        allGroups.push(...groupResult.groups)
+        console.log(`    Batch ${batchNum}/${totalBatches} (${instTotal}x): ${groupResult.groups.length} groups from ${batchLines.length} lines`)
+      }
+
+      console.log(`  AI returned ${allGroups.length} installment groups total`)
+    } catch (err: any) {
+      console.error('  AI grouping failed:', err?.message || String(err))
+      console.log('  Falling back to deterministic grouping...')
+
+      const installmentGroups = new Map<string, number[]>()
+      for (const line of installmentLines) {
+        const key = `${line.rawDescription.toLowerCase()}|${line.amount.toFixed(2)}|${line.installmentsTotal}`
+        const group = installmentGroups.get(key) || []
+        group.push(line.lineIndex)
+        installmentGroups.set(key, group)
+      }
+      let gid = 1
+      for (const [, indices] of installmentGroups) {
+        const line = allAnnotated[indices[0]!]!
+        allGroups.push({
+          groupId: gid++,
+          cleanDescription: line.rawDescription,
+          suggestedCategory: 'Outro',
+          lineIndices: indices,
+        })
+      }
+    }
+
+    // Now clean singles + negatives descriptions (no grouping needed, just cleanup)
+    console.log(`  Cleaning ${singleLines.length + negativeAnnotated.length} single/negative descriptions...`)
+
+    let cleanupModel
+    if (process.env.ANTHROPIC_API_KEY) {
+      const { createAnthropic } = await import('@ai-sdk/anthropic')
+      const anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+      cleanupModel = anthropic('claude-haiku-4-5-20251001')
     } else {
-      orphans.push(line)
+      const { gateway } = await import('../server/utils/ai')
+      cleanupModel = gateway('gpt-4o-mini')
+    }
+
+    const CLEANUP_BATCH = 80
+    const allSingleNeg = [...singleLines, ...negativeAnnotated]
+    let nextGid = allGroups.length + 1
+    const totalCleanupBatches = Math.ceil(allSingleNeg.length / CLEANUP_BATCH)
+
+    for (let i = 0; i < allSingleNeg.length; i += CLEANUP_BATCH) {
+      const batch = allSingleNeg.slice(i, i + CLEANUP_BATCH)
+      const batchInput = batch.map(l =>
+        `[${l.lineIndex}] "${l.rawDescription}" | R$${l.amount.toFixed(2)}`
+      ).join('\n')
+
+      const cleanupSchema = z.object({
+        results: z.array(z.object({
+          index: z.number(),
+          cleanDescription: z.string(),
+          suggestedCategory: z.string(),
+        }))
+      })
+
+      try {
+        const { object: cleanResult } = await generateObject({
+          model: cleanupModel,
+          schema: cleanupSchema,
+          prompt: `You are a financial assistant. Clean these credit card transaction descriptions from Brazilian Itaú bank into human-readable names, and suggest a category for each.
+
+For each transaction:
+1. Transform cryptic descriptions into readable names (e.g., "RAIA182 -CT" → "Droga Raia", "MC DONALD S -CT" → "McDonald's")
+2. Suggest the best category from: ${categoryNames}. Always pick the closest match — use "Outro" if nothing else fits.
+
+TRANSACTIONS:
+${batchInput}
+
+Return results where "index" is the number in brackets [N] from each line above.`,
+        })
+
+        // Map AI results back to actual lines by matching index to lineIndex
+        const resultMap = new Map(cleanResult.results.map(r => [r.index, r]))
+        for (let j = 0; j < batch.length; j++) {
+          const line = batch[j]!
+          // Try matching by lineIndex, fall back to positional
+          const aiResult = resultMap.get(line.lineIndex) || cleanResult.results[j]
+          allGroups.push({
+            groupId: nextGid++,
+            cleanDescription: aiResult?.cleanDescription || line.rawDescription,
+            suggestedCategory: aiResult?.suggestedCategory || 'Outro',
+            lineIndices: [line.lineIndex],
+          })
+        }
+      } catch (err: any) {
+        console.error(`    Batch ${Math.floor(i / CLEANUP_BATCH) + 1} failed: ${err?.message || String(err)}`)
+        for (const line of batch) {
+          allGroups.push({
+            groupId: nextGid++,
+            cleanDescription: line.rawDescription,
+            suggestedCategory: 'Outro',
+            lineIndices: [line.lineIndex],
+          })
+        }
+      }
+
+      console.log(`    Cleanup batch ${Math.floor(i / CLEANUP_BATCH) + 1}/${totalCleanupBatches} done`)
     }
   }
 
-  const singles = positiveAnnotated.filter(l => l.installmentsTotal === 1)
-  const totalMatched = parentGroups.reduce((s, p) => s + p.children.size - 1, 0)
+  // Step 4: Validate AI output
+  console.log('\n--- Validating AI Groups ---')
 
-  console.log(`  Parents (01/XX): ${parentGroups.length}`)
-  console.log(`  Matched ongoing: ${totalMatched}`)
-  console.log(`  Unmatched orphans: ${orphans.length}`)
-  console.log(`  Singles: ${singles.length}`)
-  console.log(`  Negatives: ${negativeAnnotated.length}`)
+  const allAssignedIndices = allGroups.flatMap(g => g.lineIndices)
+  const expectedIndices = new Set(allAnnotated.map(l => l.lineIndex))
+  const assignedSet = new Set(allAssignedIndices)
 
-  // Step 3: AI Cleanup
-  // Clean parents + orphans + singles + negatives (matched children share parent description)
-  console.log('\n--- AI Cleanup ---')
-
-  const linesForCleanup: AnnotatedLine[] = [
-    ...parentGroups.map(p => p.line),
-    ...orphans,
-    ...singles,
-    ...negativeAnnotated,
-  ]
-
-  const forCleanup: ParsedTransaction[] = linesForCleanup.map(l => ({
-    purchaseDate: l.purchaseDate,
-    rawDescription: l.rawDescription,
-    amount: l.installmentsTotal > 1
-      ? Math.round(l.amount * l.installmentsTotal * 100) / 100
-      : Math.abs(l.amount),
-    installmentsCount: l.installmentsTotal,
-    bankCategory: '',
-    city: '',
-  }))
-
-  const categoryOptions = categories.map(c => ({ id: c.id, name: c.name }))
-
-  console.log(`  Cleaning ${forCleanup.length} descriptions...`)
-  const BATCH_SIZE = 80
-  const cleaned: Awaited<ReturnType<typeof cleanupDescriptions>> = []
-  for (let i = 0; i < forCleanup.length; i += BATCH_SIZE) {
-    const batch = forCleanup.slice(i, i + BATCH_SIZE)
-    const batchResult = await cleanupDescriptions(batch, categoryOptions, { skipAI: SKIP_AI })
-    cleaned.push(...batchResult)
-    if (!SKIP_AI) console.log(`    Batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(forCleanup.length / BATCH_SIZE)} done`)
+  // Fix: remove duplicates — keep only the first occurrence of each lineIndex
+  const seenIndices = new Set<number>()
+  let duplicatesRemoved = 0
+  for (const group of allGroups) {
+    const dedupedIndices = group.lineIndices.filter(idx => {
+      if (seenIndices.has(idx)) {
+        duplicatesRemoved++
+        return false
+      }
+      seenIndices.add(idx)
+      return true
+    })
+    group.lineIndices = dedupedIndices
   }
-  const unchangedCount = cleaned.filter((c, i) =>
-    c.cleanDescription === linesForCleanup[i]?.rawDescription
-  ).length
-  console.log(`  Cleaned: ${cleaned.length - unchangedCount}, unchanged: ${unchangedCount}`)
-  console.log('  Done.\n')
+  // Remove empty groups after dedup
+  const preDedup = allGroups.length
+  const emptyRemoved = allGroups.filter(g => g.lineIndices.length === 0).length
+  allGroups.splice(0, allGroups.length, ...allGroups.filter(g => g.lineIndices.length > 0))
+  if (duplicatesRemoved > 0) console.log(`  Fixed: ${duplicatesRemoved} duplicate line assignments removed (${emptyRemoved} empty groups dropped)`)
 
-  // Step 4: Category distribution
+  // Check: no missing lines
+  const missing = [...expectedIndices].filter(i => !assignedSet.has(i))
+  if (missing.length > 0) {
+    console.log(`  WARNING: ${missing.length} lines not assigned to any group — adding as singles`)
+    let gid = allGroups.length + 1
+    for (const idx of missing) {
+      const line = allAnnotated[idx]!
+      allGroups.push({
+        groupId: gid++,
+        cleanDescription: line.rawDescription,
+        suggestedCategory: 'Outro',
+        lineIndices: [idx],
+      })
+    }
+  }
+
+  // Check: within each multi-line group, amounts must be identical and installmentsTotals must match
+  const installmentGroups = allGroups.filter(g => g.lineIndices.length > 1)
+  let validGroups = 0
+  let invalidGroups = 0
+  for (const group of installmentGroups) {
+    const lines = group.lineIndices.map(i => allAnnotated[i]!)
+    const amounts = new Set(lines.map(l => l.amount.toFixed(2)))
+    const totals = new Set(lines.map(l => l.installmentsTotal))
+    if (amounts.size > 1 || totals.size > 1) {
+      console.log(`  WARNING: Group "${group.cleanDescription}" has mismatched amounts/totals — splitting`)
+      invalidGroups++
+      // Split into individual entries
+      const splitGroups = group.lineIndices.map(idx => ({
+        groupId: allGroups.length + 1,
+        cleanDescription: group.cleanDescription,
+        suggestedCategory: group.suggestedCategory,
+        lineIndices: [idx],
+      }))
+      // Remove the bad group and add split ones
+      const gIdx = allGroups.indexOf(group)
+      allGroups.splice(gIdx, 1, ...splitGroups)
+    } else {
+      validGroups++
+    }
+  }
+
+  const singleGroups = allGroups.filter(g => g.lineIndices.length === 1)
+  console.log(`  Valid installment groups: ${validGroups}`)
+  if (invalidGroups > 0) console.log(`  Invalid groups (split): ${invalidGroups}`)
+  console.log(`  Single-line groups: ${singleGroups.length}`)
+  console.log(`  Total groups: ${allGroups.length}`)
+
+  // Step 5: Categorize groups
   const catCounts: Record<string, number> = {}
-  for (const tx of cleaned) {
-    const cat = tx.suggestedCategory || 'Sem categoria'
-    catCounts[cat] = (catCounts[cat] || 0) + 1
+  for (const group of allGroups) {
+    const cat = group.suggestedCategory
+    catCounts[cat] = (catCounts[cat] || 0) + group.lineIndices.length
   }
-  console.log('--- Category Distribution ---')
+  console.log('\n--- Category Distribution ---')
   Object.entries(catCounts)
     .sort((a, b) => b[1] - a[1])
     .forEach(([cat, count]) => console.log(`  ${cat}: ${count}`))
 
-  const totalAll = parentGroups.length + totalMatched + orphans.length + singles.length + negativeAnnotated.length
-  console.log(`\n--- TOTAL: ${totalAll} lines (${parentGroups.length} parents, ${totalMatched} matched, ${orphans.length} orphans, ${singles.length} singles, ${negativeAnnotated.length} negatives) ---`)
+  // Synthetic parent report
+  const syntheticParents = installmentGroups.filter(g => {
+    const lines = g.lineIndices.map(i => allAnnotated[i]!)
+    return !lines.some(l => l.installmentNumber === 1)
+  })
+  if (syntheticParents.length > 0) {
+    console.log(`\n--- Synthetic Parents (no 01/XX in data) ---`)
+    for (const g of syntheticParents) {
+      const lines = g.lineIndices.map(i => allAnnotated[i]!).sort((a, b) => a.installmentNumber - b.installmentNumber)
+      const first = lines[0]!
+      const installmentNums = lines.map(l => `${l.installmentNumber}/${l.installmentsTotal}`).join(', ')
+      console.log(`  ${g.cleanDescription} ${first.installmentsTotal}x R$${first.amount.toFixed(2)} (had: ${installmentNums})`)
+    }
+  }
+
+  const totalAll = allAnnotated.length
+  console.log(`\n--- TOTAL: ${totalAll} lines → ${allGroups.length} groups (${installmentGroups.length} parcelamentos, ${singleGroups.length} singles) ---`)
 
   if (DRY_RUN) {
     console.log('\n[DRY RUN] Would delete existing Itaú card data and import all transactions')
@@ -493,7 +730,7 @@ async function main() {
     return
   }
 
-  // Step 5: Delete existing Itaú card data
+  // Step 6: Delete existing Itaú card data
   console.log('\n--- Deleting existing Itaú card data ---')
   const existingCount = await prisma.transaction.count({
     where: { userId: LUCAS_USER, cardId: ITAU_CARD },
@@ -508,17 +745,19 @@ async function main() {
   })
   console.log('  Done.')
 
-  // Step 6: Import transactions
+  // Step 7: Import transactions from groups
   console.log('\n--- Importing transactions ---')
   const outroCategory = categories.find(c => c.name === 'Outro')!
 
   // Find latest fatura due date — only generate future installments beyond this
-  const lastFaturaDue = allFaturas
-    .map(f => new Date(f.dueDate + 'T03:00:00Z'))
-    .reduce((a, b) => a > b ? a : b)
+  const faturaDueDates = allFaturas.map(f => new Date(f.dueDate + 'T03:00:00Z'))
+  const firstFaturaDue = faturaDueDates.reduce((a, b) => a < b ? a : b)
+  const lastFaturaDue = faturaDueDates.reduce((a, b) => a > b ? a : b)
 
   let imported = 0
-  let importedParents = 0
+  let importedParcelamentos = 0
+  let importedSingles = 0
+  let importedNegatives = 0
   let generatedFuture = 0
   let createCount = 0
 
@@ -530,142 +769,114 @@ async function main() {
     }
   }
 
-  // 6a: Import parent groups (multi-installment purchases)
-  let cleanedIdx = 0
-  for (const parent of parentGroups) {
-    const cleanedTx = cleaned[cleanedIdx]!
-    cleanedIdx++
+  for (const group of allGroups) {
+    const lines = group.lineIndices.map(i => allAnnotated[i]!).sort((a, b) => a.installmentNumber - b.installmentNumber)
+    const first = lines[0]!
+    const catId = categories.find(c => c.name.toLowerCase() === group.suggestedCategory.toLowerCase())?.id || outroCategory.id
 
-    const totalAmount = Math.round(parent.line.amount * parent.line.installmentsTotal * 100) / 100
-    const purchaseDateObj = new Date(parent.line.purchaseDate + 'T03:00:00Z')
-    const parentDueDate = new Date(parent.line.faturaDueDate + 'T03:00:00Z')
+    if (lines.length > 1 || first.installmentsTotal > 1) {
+      // Multi-installment group (parcelamento)
+      const installmentsTotal = first.installmentsTotal
+      const perInstallmentAmount = first.amount
+      const totalAmount = Math.round(perInstallmentAmount * installmentsTotal * 100) / 100
 
-    // Build installments: fatura data (children) + generated (future beyond last fatura)
-    const installmentData: { number: number; amount: Prisma.Decimal; dueDate: Date }[] = []
+      // Determine first installment due date
+      let firstDueDate: Date
+      const line01 = lines.find(l => l.installmentNumber === 1)
+      if (line01) {
+        // We have the parent — use its fatura due date
+        firstDueDate = new Date(line01.faturaDueDate + 'T03:00:00Z')
+      } else {
+        // Synthetic: back-calculate from earliest available installment
+        const earliest = lines[0]!
+        firstDueDate = addMonths(new Date(earliest.faturaDueDate + 'T03:00:00Z'), -(earliest.installmentNumber - 1))
+      }
 
-    // From fatura data
-    for (const [num, child] of parent.children) {
-      installmentData.push({
-        number: num,
-        amount: new Prisma.Decimal(child.amount.toFixed(2)),
-        dueDate: new Date(child.faturaDueDate + 'T03:00:00Z'),
-      })
-    }
+      // Determine purchase date
+      const purchaseDate = line01
+        ? new Date(line01.purchaseDate + 'T03:00:00Z')
+        : addMonths(firstDueDate, -1) // approximate: ~1 month before first installment
 
-    // Generated: missing installments that fall AFTER last fatura
-    for (let n = 1; n <= parent.line.installmentsTotal; n++) {
-      if (!parent.children.has(n)) {
-        const dueDate = addMonths(parentDueDate, n - 1)
-        if (dueDate > lastFaturaDue) {
-          installmentData.push({
-            number: n,
-            amount: new Prisma.Decimal(parent.line.amount.toFixed(2)),
-            dueDate,
-          })
-          generatedFuture++
+      // Build installment data: actual fatura lines + generated for missing months
+      const installmentData: { number: number; amount: Prisma.Decimal; dueDate: Date }[] = []
+      const coveredNumbers = new Set(lines.map(l => l.installmentNumber))
+
+      // From actual fatura data
+      for (const line of lines) {
+        installmentData.push({
+          number: line.installmentNumber,
+          amount: new Prisma.Decimal(line.amount.toFixed(2)),
+          dueDate: new Date(line.faturaDueDate + 'T03:00:00Z'),
+        })
+      }
+
+      // Generated: only installments OUTSIDE our fatura coverage window.
+      // For months where we have faturas, trust the PDF — if an installment
+      // doesn't appear, it genuinely isn't in that billing cycle.
+      for (let n = 1; n <= installmentsTotal; n++) {
+        if (!coveredNumbers.has(n)) {
+          const dueDate = addMonths(firstDueDate, n - 1)
+          // Only generate if before first fatura or after last fatura
+          const isBeforeCoverage = dueDate < firstFaturaDue
+          const isAfterCoverage = dueDate > lastFaturaDue
+          if (isBeforeCoverage || isAfterCoverage) {
+            installmentData.push({
+              number: n,
+              amount: new Prisma.Decimal(perInstallmentAmount.toFixed(2)),
+              dueDate,
+            })
+            generatedFuture++
+          }
         }
       }
+
+      installmentData.sort((a, b) => a.number - b.number)
+
+      await prisma.transaction.create({
+        data: {
+          userId: LUCAS_USER,
+          card: { connect: { id: ITAU_CARD } },
+          description: group.cleanDescription || first.rawDescription,
+          amount: new Prisma.Decimal(totalAmount.toFixed(2)),
+          purchaseDate,
+          installmentsCount: installmentsTotal,
+          category: { connect: { id: catId } },
+          installments: { createMany: { data: installmentData } },
+        },
+      })
+      importedParcelamentos++
+    } else {
+      // Single transaction (one-time purchase or negative)
+      const line = first
+      const isNeg = line.isNegative
+
+      await prisma.transaction.create({
+        data: {
+          userId: LUCAS_USER,
+          card: { connect: { id: ITAU_CARD } },
+          description: group.cleanDescription || line.rawDescription,
+          amount: new Prisma.Decimal(line.amount.toFixed(2)),
+          purchaseDate: new Date(line.purchaseDate + 'T03:00:00Z'),
+          installmentsCount: 1,
+          category: { connect: { id: isNeg ? outroCategory.id : catId } },
+          installments: {
+            create: { number: 1, amount: new Prisma.Decimal(line.amount.toFixed(2)), dueDate: new Date(line.faturaDueDate + 'T03:00:00Z') },
+          },
+        },
+      })
+      if (isNeg) importedNegatives++
+      else importedSingles++
     }
 
-    installmentData.sort((a, b) => a.number - b.number)
-
-    await prisma.transaction.create({
-      data: {
-        userId: LUCAS_USER,
-        card: { connect: { id: ITAU_CARD } },
-        description: cleanedTx.cleanDescription || parent.line.rawDescription,
-        amount: new Prisma.Decimal(totalAmount.toFixed(2)),
-        purchaseDate: purchaseDateObj,
-        installmentsCount: parent.line.installmentsTotal,
-        category: { connect: { id: cleanedTx.suggestedCategoryId || outroCategory.id } },
-        installments: { createMany: { data: installmentData } },
-      },
-    })
-    importedParents++
     imported++
     await reconnectIfNeeded()
   }
-  console.log(`  Parents: ${importedParents} (${generatedFuture} future installments generated)`)
 
-  // 6b: Import orphans (unmatched ongoing installments)
-  let importedOrphans = 0
-  for (const orphan of orphans) {
-    const cleanedTx = cleaned[cleanedIdx]!
-    cleanedIdx++
-
-    await prisma.transaction.create({
-      data: {
-        userId: LUCAS_USER,
-        card: { connect: { id: ITAU_CARD } },
-        description: cleanedTx.cleanDescription || orphan.rawDescription,
-        amount: new Prisma.Decimal(orphan.amount.toFixed(2)),
-        purchaseDate: new Date(orphan.purchaseDate + 'T03:00:00Z'),
-        installmentsCount: 1,
-        category: { connect: { id: cleanedTx.suggestedCategoryId || outroCategory.id } },
-        installments: {
-          create: { number: 1, amount: new Prisma.Decimal(orphan.amount.toFixed(2)), dueDate: new Date(orphan.faturaDueDate + 'T03:00:00Z') },
-        },
-      },
-    })
-    importedOrphans++
-    imported++
-    await reconnectIfNeeded()
-  }
-  console.log(`  Orphans: ${importedOrphans}`)
-
-  // 6c: Import singles
-  let importedSingles = 0
-  for (const single of singles) {
-    const cleanedTx = cleaned[cleanedIdx]!
-    cleanedIdx++
-
-    await prisma.transaction.create({
-      data: {
-        userId: LUCAS_USER,
-        card: { connect: { id: ITAU_CARD } },
-        description: cleanedTx.cleanDescription || single.rawDescription,
-        amount: new Prisma.Decimal(single.amount.toFixed(2)),
-        purchaseDate: new Date(single.purchaseDate + 'T03:00:00Z'),
-        installmentsCount: 1,
-        category: { connect: { id: cleanedTx.suggestedCategoryId || outroCategory.id } },
-        installments: {
-          create: { number: 1, amount: new Prisma.Decimal(single.amount.toFixed(2)), dueDate: new Date(single.faturaDueDate + 'T03:00:00Z') },
-        },
-      },
-    })
-    importedSingles++
-    imported++
-    await reconnectIfNeeded()
-  }
+  console.log(`  Parcelamentos: ${importedParcelamentos} (${generatedFuture} future installments generated)`)
   console.log(`  Singles: ${importedSingles}`)
-
-  // 6d: Import negatives
-  let importedNegatives = 0
-  for (const neg of negativeAnnotated) {
-    const cleanedTx = cleaned[cleanedIdx]!
-    cleanedIdx++
-
-    await prisma.transaction.create({
-      data: {
-        userId: LUCAS_USER,
-        card: { connect: { id: ITAU_CARD } },
-        description: cleanedTx.cleanDescription || neg.rawDescription,
-        amount: new Prisma.Decimal(neg.amount.toFixed(2)),
-        purchaseDate: new Date(neg.purchaseDate + 'T03:00:00Z'),
-        installmentsCount: 1,
-        category: { connect: { id: outroCategory.id } },
-        installments: {
-          create: { number: 1, amount: new Prisma.Decimal(neg.amount.toFixed(2)), dueDate: new Date(neg.faturaDueDate + 'T03:00:00Z') },
-        },
-      },
-    })
-    importedNegatives++
-    imported++
-    await reconnectIfNeeded()
-  }
   console.log(`  Negatives: ${importedNegatives}`)
 
-  // Step 7: Verify — per-fatura, DB installments due that month vs PDF total
+  // Step 8: Verify — per-fatura, DB installments due that month vs PDF total
   await prisma.$disconnect()
   await prisma.$connect()
   console.log('\n--- Verification ---')
@@ -691,20 +902,12 @@ async function main() {
     console.log(`  ${fatura.billingPeriod}: DB R$ ${dbTotal.toFixed(2)} vs PDF R$ ${fatura.pdfTotal.toFixed(2)} ${status}`)
   }
 
-  // Log uncleaned descriptions for manual review
-  const uncleaned = cleaned.filter((c, i) =>
-    c.cleanDescription === linesForCleanup[i]?.rawDescription
-  )
-  if (uncleaned.length > 0) {
-    console.log('\n--- Uncleaned descriptions (review manually) ---')
-    uncleaned.forEach(c => console.log(`  "${c.rawDescription}"`))
-  }
-
-  console.log(`\n=== Done! Imported ${imported} transactions (${importedParents} parents, ${importedOrphans} orphans, ${importedSingles} singles, ${importedNegatives} negatives, ${generatedFuture} future installments) ===`)
+  console.log(`\n=== Done! Imported ${imported} transactions (${importedParcelamentos} parcelamentos, ${importedSingles} singles, ${importedNegatives} negatives, ${generatedFuture} future installments) ===`)
   await prisma.$disconnect()
 }
 
-main().catch(err => {
-  console.error('Fatal error:', err)
+main().catch((err: any) => {
+  console.error('Fatal error:', err?.message || String(err))
+  if (err?.cause) console.error('Cause:', err.cause?.message || String(err.cause))
   process.exit(1)
 })
