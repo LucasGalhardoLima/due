@@ -85,7 +85,7 @@ const groups = [
     label: 'Ferramentas',
     items: [
       { name: 'Cartões', path: '/cards', icon: CreditCard },
-      { name: 'Importar CSV', path: '/import', icon: UploadCloud },
+      { name: 'Importar', path: '/import', icon: UploadCloud },
       { name: 'Auditoria', path: '/audit', icon: ShieldCheck },
       { name: 'Configurações', path: '/settings', icon: Settings },
     ]

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { addMonths, subMonths, getMonth, getYear, differenceInDays, parseISO } from 'date-fns'
+import { addMonths, subMonths, getMonth, getYear } from 'date-fns'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
-import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
@@ -102,23 +101,35 @@ const { data: summary, refresh: refreshSummary, status: summaryStatus } = useFet
     watch: [queryParams]
 })
 
-const demoCookie = useCookie('demo_mode', { maxAge: 60 * 60 * 24 * 30, path: '/' })
-const isDemoMode = computed(() => String(demoCookie.value) === 'true')
+// Fetch previous month's summary for trend comparison
+const prevSummaryParams = computed(() => {
+  const m = getMonth(currentDate.value) + 1
+  const y = getYear(currentDate.value)
+  return {
+    month: m === 1 ? 12 : m - 1,
+    year: m === 1 ? y - 1 : y,
+    cardId: selectedCardId.value || undefined,
+    v: dataVersion.value,
+  }
+})
 
-const daysToDue = computed(() => {
-    let dueDateStr = summary.value?.dueDate
-    
-    // Fallback for Demo Mode if dueDate is missing (e.g. in Global View)
-    if (!dueDateStr && isDemoMode.value) {
-        const fallbackDate = new Date()
-        fallbackDate.setDate(fallbackDate.getDate() + 5)
-        dueDateStr = fallbackDate.toISOString()
-    }
+const { data: prevSummary } = useFetch<SummaryResponse>('/api/invoices/summary', {
+  key: computed(() => {
+    const p = prevSummaryParams.value
+    return `dashboard-summary-prev-${p.year}-${p.month}-${p.cardId ?? 'all'}-v${dataVersion.value}`
+  }),
+  query: prevSummaryParams,
+  watch: [prevSummaryParams],
+})
 
-    if (!dueDateStr) return null
-    const today = new Date()
-    const due = parseISO(dueDateStr)
-    return differenceInDays(due, today)
+// Fetch ending-soon parcelamentos
+interface EndingSoonResponse {
+  totalFreeing: number
+  count: number
+}
+
+const { data: endingSoon } = useFetch<EndingSoonResponse>('/api/dashboard/ending-soon', {
+  key: computed(() => `dashboard-ending-soon-v${dataVersion.value}`),
 })
 
 // Fetch cards to check if user has any
@@ -208,15 +219,6 @@ onMounted(() => {
   }
 })
 
-// Watch for pre-fechamento trigger (when <=5 days to closing)
-watch(daysToDue, (days) => {
-  if (days !== null && days <= 5 && days > 0) {
-    if (advisor.shouldShowForTrigger('pre_fechamento')) {
-      advisor.trigger('pre_fechamento', { cardId: selectedCardId.value || undefined })
-    }
-  }
-}, { immediate: true })
-
 const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 
 function formatCurrency(val: number) {
@@ -285,27 +287,6 @@ const topCategory = computed(() => {
 })
 
 // Methods
-const handlePayInvoice = async () => {
-    if (!summary.value || !selectedCardId.value) return
-    try {
-        await $fetch('/api/invoices/pay', {
-            method: 'POST',
-            body: {
-                cardId: selectedCardId.value,
-                month: summary.value.month,
-                year: summary.value.year
-            }
-        })
-        toast.success('Fatura paga com sucesso!')
-        refreshSummary()
-    } catch {
-        toast.error('Erro ao pagar fatura.')
-    } finally {
-        showPayConfirm.value = false
-    }
-}
-
-const showPayConfirm = ref(false)
 </script>
 
 <template>
@@ -457,10 +438,9 @@ const showPayConfirm = ref(false)
           :limit="summary.limit"
           :budget="summary.budget"
           :usage-percentage="usagePercentage"
-          :days-to-due="daysToDue"
-          :status="summary.status"
           :top-category="topCategory || undefined"
-          @pay="showPayConfirm = true"
+          :ending-soon="endingSoon || undefined"
+          :previous-total="prevSummary?.total ?? null"
         />
       </div>
 
@@ -525,22 +505,19 @@ const showPayConfirm = ref(false)
         </div>
 
         <!-- Right: Sidebar stack -->
-        <div class="space-y-5">
-          <!-- AI Insights -->
-          <div class="hidden lg:block">
+        <div class="space-y-5 hidden lg:block">
+          <!-- AI CTAs (compact row) -->
+          <div class="space-y-2">
             <AIInsights :month="summary.month" :year="summary.year" />
-          </div>
-
-          <!-- Purchase Simulator -->
-          <div v-if="selectedCardId && cards && cards.length > 0" class="hidden lg:block">
             <PurchaseSimulator
+              v-if="selectedCardId && cards && cards.length > 0"
               :card-id="selectedCardId"
               :card-name="cards.find(c => c.id === selectedCardId)?.name || ''"
             />
           </div>
 
           <!-- Future Projection -->
-          <div v-if="futureProjection" class="glass-surface overflow-hidden p-0 hidden lg:block">
+          <div v-if="futureProjection" class="glass-surface overflow-hidden p-0">
             <div class="p-4 border-b border-border bg-muted !rounded-none !border-x-0 !border-t-0">
               <h3 class="text-micro text-muted-foreground">Projeção Futura</h3>
             </div>
@@ -594,15 +571,6 @@ const showPayConfirm = ref(false)
       v-model:open="isAIDrawerOpen" 
       :selected-card-id="selectedCardId"
       :card-name="cards?.find(c => c.id === selectedCardId)?.name"
-    />
-
-    <!-- Confirm Dialog -->
-    <ConfirmDialog
-      v-model:open="showPayConfirm"
-      title="Pagar Fatura?"
-      description="Isso marcará a fatura deste mês como paga. O limite será liberado no próximo ciclo (simulação)."
-      confirm-text="Confirmar Pagamento"
-      @confirm="handlePayInvoice"
     />
 
     <!-- Proactive Advisor Toast (teleports to body) -->

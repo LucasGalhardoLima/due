@@ -56,22 +56,22 @@
     --ai-accent: 0 0% 36%;
     --ai-accent-foreground: 0 0% 98%;
 
-    /* Status Colors — Mono: pure grayscale */
-    --success: 0 0% 36%;
+    /* Status Colors — Tinted mono: enough hue to scan, not enough to clash */
+    --success: 152 18% 38%;
     --success-foreground: 0 0% 98%;
-    --success-muted: 0 0% 94%;
+    --success-muted: 152 12% 94%;
 
-    --warning: 0 0% 42%;
+    --warning: 38 22% 44%;
     --warning-foreground: 0 0% 98%;
-    --warning-muted: 0 0% 94%;
+    --warning-muted: 38 14% 94%;
 
-    --info: 0 0% 48%;
+    --info: 210 16% 48%;
     --info-foreground: 0 0% 98%;
-    --info-muted: 0 0% 94%;
+    --info-muted: 210 10% 94%;
 
-    --danger: 0 0% 30%;
+    --danger: 355 20% 42%;
     --danger-foreground: 0 0% 98%;
-    --danger-muted: 0 0% 94%;
+    --danger-muted: 355 12% 94%;
 
     --glass-bg: 0 0% 100% / 0.78;
     --glass-border: 0 0% 50% / 0.16;
@@ -121,22 +121,22 @@
     --ai-accent: 0 0% 64%;
     --ai-accent-foreground: 0 0% 98%;
 
-    /* Status Colors — Mono dark: inverted grayscale */
-    --success: 0 0% 64%;
-    --success-foreground: 0 0% 6%;
-    --success-muted: 0 0% 16%;
+    /* Status Colors — Tinted mono dark */
+    --success: 152 16% 56%;
+    --success-foreground: 0 0% 98%;
+    --success-muted: 152 10% 16%;
 
-    --warning: 0 0% 58%;
-    --warning-foreground: 0 0% 6%;
-    --warning-muted: 0 0% 16%;
+    --warning: 38 20% 54%;
+    --warning-foreground: 0 0% 98%;
+    --warning-muted: 38 12% 16%;
 
-    --info: 0 0% 52%;
-    --info-foreground: 0 0% 6%;
-    --info-muted: 0 0% 16%;
+    --info: 210 14% 56%;
+    --info-foreground: 0 0% 98%;
+    --info-muted: 210 10% 16%;
 
-    --danger: 0 0% 70%;
-    --danger-foreground: 0 0% 6%;
-    --danger-muted: 0 0% 16%;
+    --danger: 355 18% 54%;
+    --danger-foreground: 0 0% 98%;
+    --danger-muted: 355 10% 16%;
 
     --glass-bg: 0 0% 8% / 0.88;
     --glass-border: 0 0% 60% / 0.12;
