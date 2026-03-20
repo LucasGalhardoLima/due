@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { Sparkles, ArrowRight } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Sparkles, ChevronRight } from 'lucide-vue-next'
 
 defineProps<{
   cardId: string
@@ -10,36 +8,17 @@ defineProps<{
 </script>
 
 <template>
-  <div class="contents">
-    <!-- Trigger Card -->
-    <Card
-      class="relative overflow-hidden group transition-all duration-500 border-ai-accent/30 bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.16),hsl(var(--muted)/0.08))] dark:bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.26),hsl(var(--muted)/0.20))] cursor-pointer hover:border-ai-accent/45 active:scale-[0.98]"
-      @click="navigateTo('/parcelamentos')"
-    >
-      <!-- Content -->
-      <div class="p-5 md:p-6 relative z-10 flex flex-col gap-4 text-left">
-          <div class="space-y-3">
-            <div class="flex flex-wrap items-center gap-2.5">
-              <div class="h-9 w-9 rounded-xl bg-ai-accent/20 flex items-center justify-center text-ai-accent shadow-elevation-1 ring-1 ring-ai-accent/30">
-                <Sparkles class="w-4.5 h-4.5" />
-              </div>
-              <h3 class="text-h3 font-black tracking-tight">Simular & Otimizar</h3>
-              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black tracking-wider bg-ai-accent text-ai-accent-foreground">
-                NOVO
-              </span>
-            </div>
-            <p class="text-small text-muted-foreground leading-relaxed">
-              Use nossa IA para avaliar compras e gerenciar seus parcelamentos inteligentes.
-            </p>
-          </div>
-          <Button
-            size="default"
-            class="w-full font-bold h-10 rounded-lg bg-ai-accent text-ai-accent-foreground hover:bg-ai-accent/90 transition-all pointer-events-none shadow-elevation-3"
-          >
-            Acessar Parcelamentos
-            <ArrowRight class="w-4 h-4 ml-2" />
-          </Button>
-      </div>
-    </Card>
-  </div>
+  <button
+    class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl border border-ai-accent/30 bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.10),hsl(var(--muted)/0.06))] dark:bg-[linear-gradient(145deg,hsl(var(--ai-accent)/0.18),hsl(var(--muted)/0.14))] hover:border-ai-accent/45 transition-all duration-200 active:scale-[0.98] cursor-pointer text-left group"
+    @click="navigateTo('/parcelamentos')"
+  >
+    <div class="h-8 w-8 rounded-xl bg-ai-accent/20 flex items-center justify-center text-ai-accent ring-1 ring-ai-accent/30 shrink-0">
+      <Sparkles class="w-4 h-4" />
+    </div>
+    <span class="flex-1 text-sm font-bold tracking-tight">Simular & Otimizar</span>
+    <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-black tracking-wider bg-ai-accent text-ai-accent-foreground">
+      NOVO
+    </span>
+    <ChevronRight class="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+  </button>
 </template>

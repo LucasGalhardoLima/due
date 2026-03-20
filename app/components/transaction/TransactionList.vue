@@ -163,7 +163,7 @@ function getIcon(categoryName: string) {
                   <ArrowUpDown class="h-3 w-3" />
                 </div>
               </TableHead>
-              <TableHead>Categ.</TableHead>
+              <TableHead class="min-w-[140px]">Categoria</TableHead>
               <TableHead class="cursor-pointer hover:text-foreground" @click="toggleSort('description')">
                 <div class="flex items-center gap-1">
                   Descrição
@@ -192,8 +192,11 @@ function getIcon(categoryName: string) {
                 {{ formatDate(tx.purchaseDate, 'short') }}
               </TableCell>
               <TableCell class="py-1">
-                <div class="flex items-center justify-center h-7 w-7 rounded-full bg-secondary text-primary" :title="tx.category">
-                  <component :is="getIcon(tx.category)" class="h-3.5 w-3.5" />
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center justify-center h-7 w-7 rounded-full bg-secondary text-primary shrink-0">
+                    <component :is="getIcon(tx.category)" class="h-3.5 w-3.5" />
+                  </div>
+                  <span class="text-xs text-muted-foreground truncate max-w-[100px]">{{ tx.category }}</span>
                 </div>
               </TableCell>
               <TableCell class="py-1">
