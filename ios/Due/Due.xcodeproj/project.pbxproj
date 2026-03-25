@@ -59,6 +59,8 @@
 		F2E1D0C9B8A7F6E5D4C3B2A1 /* TransactionDrilldownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* TransactionDrilldownView.swift */; };
 		A3F2E1D0C9B8A7F6E5D4C3B2 /* TransactionDrilldownViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6A7B8C9D0E1F2A3 /* TransactionDrilldownViewModel.swift */; };
 		B4A3F2E1D0C9B8A7F6E5D4C3 /* EditTransactionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6A7B8C9D0E1F2A3B4 /* EditTransactionSheet.swift */; };
+		D4E5F6A7B8C9D0E1F2A3B4C5 /* OnboardingSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6A7B8C9D0E1F2A3B4C5D6 /* OnboardingSetupView.swift */; };
+		E6F7A8B9C0D1E2F3A4B5C6D7 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A8B9C0D1E2F3A4B5C6D7E8 /* Onboarding.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -115,6 +117,8 @@
 		A1B2C3D4E5F6A7B8C9D0E1F2 /* TransactionDrilldownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDrilldownView.swift; sourceTree = "<group>"; };
 		B2C3D4E5F6A7B8C9D0E1F2A3 /* TransactionDrilldownViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDrilldownViewModel.swift; sourceTree = "<group>"; };
 		C3D4E5F6A7B8C9D0E1F2A3B4 /* EditTransactionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTransactionSheet.swift; sourceTree = "<group>"; };
+		E5F6A7B8C9D0E1F2A3B4C5D6 /* OnboardingSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSetupView.swift; sourceTree = "<group>"; };
+		F7A8B9C0D1E2F3A4B5C6D7E8 /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +160,7 @@
 			isa = PBXGroup;
 			children = (
 				5598958A2EBEFBC6082155FB /* OnboardingPageView.swift */,
+				E5F6A7B8C9D0E1F2A3B4C5D6 /* OnboardingSetupView.swift */,
 				026EFEAE0186C44338B0C56F /* OnboardingView.swift */,
 			);
 			path = Onboarding;
@@ -310,6 +315,7 @@
 				5FA2969A4F747C07FE80667D /* DuScore.swift */,
 				E657150ADFE263F7211C1322 /* InstallmentTimeline.swift */,
 				C041235E5EB0EED7A781DCC5 /* Invoice.swift */,
+				F7A8B9C0D1E2F3A4B5C6D7E8 /* Onboarding.swift */,
 				2D420E46AA0F5D0682010725 /* Transaction.swift */,
 				FB100A790E810D19BC5B6BF6 /* UpcomingBill.swift */,
 			);
@@ -415,6 +421,8 @@
 				41AD00785314934CCEB3D9AC /* InstallmentsViewModel.swift in Sources */,
 				288D41702FA7D3DB9ABE0E1F /* Invoice.swift in Sources */,
 				9D4775A9F42C220C9146C1F3 /* OnboardingPageView.swift in Sources */,
+				D4E5F6A7B8C9D0E1F2A3B4C5 /* OnboardingSetupView.swift in Sources */,
+				E6F7A8B9C0D1E2F3A4B5C6D7 /* Onboarding.swift in Sources */,
 				EDD288E76F5EFE8CBE95269B /* OnboardingView.swift in Sources */,
 				6C8554CCCBF1CB2C227A551B /* QuickAddSheet.swift in Sources */,
 				C84C0A53114B839FCDBF371B /* RootView.swift in Sources */,

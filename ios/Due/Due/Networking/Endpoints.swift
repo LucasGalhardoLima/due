@@ -101,6 +101,30 @@ extension Endpoint {
     }
 }
 
+// MARK: - Onboarding
+
+extension Endpoint {
+    static func onboardingStatus() -> Endpoint {
+        Endpoint(path: "/api/user/onboarding")
+    }
+
+    static func updateOnboardingStep() -> Endpoint {
+        Endpoint(path: "/api/user/onboarding", method: .put)
+    }
+
+    static func seedCategories() -> Endpoint {
+        Endpoint(path: "/api/onboarding/seed-categories", method: .post)
+    }
+
+    static func createCard() -> Endpoint {
+        Endpoint(path: "/api/cards", method: .post)
+    }
+
+    static func createIncome() -> Endpoint {
+        Endpoint(path: "/api/income", method: .post)
+    }
+}
+
 // MARK: - AI
 
 extension Endpoint {
