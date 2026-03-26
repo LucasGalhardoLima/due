@@ -19,25 +19,38 @@ struct TopSpendingWidget: View {
 
                 VStack(spacing: 8) {
                     ForEach(Array(topCategories.enumerated()), id: \.element.id) { index, category in
-                        HStack(spacing: 12) {
-                            Text("\(index + 1)")
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(rankColor(index))
-                                .frame(width: 20)
+                        NavigationLink {
+                            TransactionDrilldownView(filter: .category(
+                                id: category.categoryId,
+                                name: category.categoryName,
+                                emoji: category.categoryEmoji
+                            ))
+                        } label: {
+                            HStack(spacing: 12) {
+                                Text("\(index + 1)")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(rankColor(index))
+                                    .frame(width: 20)
 
-                            Text(category.categoryEmoji ?? "📦")
-                                .font(.callout)
+                                Text(category.categoryEmoji ?? "📦")
+                                    .font(.callout)
 
-                            Text(category.categoryName)
-                                .font(.subheadline.weight(.medium))
-                                .lineLimit(1)
+                                Text(category.categoryName)
+                                    .font(.subheadline.weight(.medium))
+                                    .lineLimit(1)
 
-                            Spacer()
+                                Spacer()
 
-                            Text(CurrencyFormatter.format(category.actualSpending))
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(rankColor(index))
+                                Text(CurrencyFormatter.format(category.actualSpending))
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(rankColor(index))
+
+                                Image(systemName: "chevron.right")
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(.tertiary)
+                            }
                         }
+                        .buttonStyle(.plain)
                         .padding(.vertical, 6)
                         .padding(.horizontal, 12)
                     }
