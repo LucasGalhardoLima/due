@@ -2,7 +2,6 @@ import SwiftUI
 
 struct RootView: View {
     @State private var selectedTab = 0
-    @State private var showQuickAdd = false
     @AppStorage("appColorScheme") private var appColorScheme = "system"
 
     private var resolvedColorScheme: ColorScheme? {
@@ -19,9 +18,6 @@ struct RootView: View {
             .preferredColorScheme(resolvedColorScheme)
             .onChange(of: selectedTab) {
                 HapticManager.selection()
-            }
-            .sheet(isPresented: $showQuickAdd) {
-                QuickAddSheet()
             }
     }
 
@@ -42,12 +38,9 @@ struct RootView: View {
             DashboardView()
                 .opacity(selectedTab == 0 ? 1 : 0)
                 .allowsHitTesting(selectedTab == 0)
-            TransactionsView()
+            ChatView()
                 .opacity(selectedTab == 1 ? 1 : 0)
                 .allowsHitTesting(selectedTab == 1)
-            InstallmentsView()
-                .opacity(selectedTab == 2 ? 1 : 0)
-                .allowsHitTesting(selectedTab == 2)
         }
         .safeAreaInset(edge: .bottom) {
             customBottomBar
@@ -58,18 +51,19 @@ struct RootView: View {
     private var customBottomBar: some View {
         GlassEffectContainer {
             HStack(spacing: 12) {
-                // Tab pill
+                // Tab pills
                 HStack(spacing: 0) {
                     tabBarButton("Início", icon: "house.fill", tag: 0)
-                    tabBarButton("Fatura", icon: "creditcard.fill", tag: 1)
-                    tabBarButton("Parcelas", icon: "calendar.badge.clock", tag: 2)
+                    tabBarButton("Chat", icon: "bubble.left.and.text.bubble.right.fill", tag: 1)
                 }
                 .glassEffect(.regular, in: .capsule)
 
-                // FAB — same Y level, trailing
+                // FAB — opens Chat with quick-add context
                 Button {
                     HapticManager.impact(.medium)
-                    showQuickAdd = true
+                    withAnimation(DuTheme.snappySpring) {
+                        selectedTab = 1
+                    }
                 } label: {
                     Image(systemName: "plus")
                         .font(.title2.weight(.semibold))
@@ -114,16 +108,10 @@ struct RootView: View {
                         Label("Início", systemImage: "house.fill")
                     }
 
-                TransactionsView()
+                ChatView()
                     .tag(1)
                     .tabItem {
-                        Label("Fatura", systemImage: "creditcard.fill")
-                    }
-
-                InstallmentsView()
-                    .tag(2)
-                    .tabItem {
-                        Label("Parcelas", systemImage: "calendar.badge.clock")
+                        Label("Chat", systemImage: "bubble.left.and.text.bubble.right.fill")
                     }
             }
 
@@ -136,7 +124,9 @@ struct RootView: View {
     private var fabButton: some View {
         Button {
             HapticManager.impact(.medium)
-            showQuickAdd = true
+            withAnimation(DuTheme.snappySpring) {
+                selectedTab = 1
+            }
         } label: {
             Image(systemName: "plus")
                 .font(.title2.weight(.semibold))

@@ -3,6 +3,7 @@ import Clerk
 
 struct AuthGateView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @AppStorage("hasCompletedDataSetup") private var hasCompletedDataSetup = false
     @Environment(\.colorScheme) private var colorScheme
     @State private var showSignIn = false
     @State private var welcomeAppeared = false
@@ -10,7 +11,15 @@ struct AuthGateView: View {
     var body: some View {
         Group {
             if Clerk.shared.user != nil {
-                RootView()
+                if hasCompletedDataSetup {
+                    RootView()
+                } else {
+                    OnboardingSetupView {
+                        withAnimation(DuTheme.defaultSpring) {
+                            hasCompletedDataSetup = true
+                        }
+                    }
+                }
             } else if !hasCompletedOnboarding {
                 OnboardingView {
                     withAnimation(DuTheme.defaultSpring) {
@@ -22,6 +31,7 @@ struct AuthGateView: View {
             }
         }
         .animation(DuTheme.gentleSpring, value: hasCompletedOnboarding)
+        .animation(DuTheme.gentleSpring, value: hasCompletedDataSetup)
     }
 
     private var welcomeView: some View {
