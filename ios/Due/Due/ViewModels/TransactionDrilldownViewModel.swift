@@ -24,6 +24,7 @@ final class TransactionDrilldownViewModel {
     var categories: [Category] = []
     var isLoading = false
     var error: String?
+    var errorKind: ErrorKind?
 
     // Edit
     var editingTransaction: InvoiceTransaction?
@@ -76,6 +77,7 @@ final class TransactionDrilldownViewModel {
             transactions = response.transactions
         } catch {
             self.error = error.localizedDescription
+            self.errorKind = (error as? APIError)?.kind ?? .loadFailure
         }
     }
 

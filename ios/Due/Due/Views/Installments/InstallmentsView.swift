@@ -9,8 +9,14 @@ struct InstallmentsView: View {
                 VStack(spacing: 20) {
                     if viewModel.isLoading && viewModel.timeline == nil {
                         InstallmentsSkeleton()
-                    } else if let error = viewModel.error, viewModel.timeline == nil {
-                        ErrorView(message: error) {
+                    } else if viewModel.error != nil, viewModel.timeline == nil {
+                        let kind = viewModel.errorKind ?? .loadFailure
+                        ErrorView(
+                            icon: kind.icon,
+                            title: kind.title,
+                            message: kind.message,
+                            ctaTitle: kind.ctaTitle
+                        ) {
                             Task { await viewModel.load() }
                         }
                     } else if viewModel.timeline != nil {
@@ -18,9 +24,10 @@ struct InstallmentsView: View {
                         timelineSection
                     } else {
                         EmptyStateView(
-                            icon: "calendar.badge.clock",
-                            title: "Sem parcelas",
-                            subtitle: "Você não tem parcelas ativas"
+                            icon: "calendar.badge.checkmark",
+                            title: "Sem parcelas ativas",
+                            subtitle: "Quando você tiver compras parceladas, elas aparecem aqui com o valor e as datas de cada prestação.",
+                            iconColor: Color.duVioletAdaptive.opacity(0.5)
                         )
                     }
                 }
