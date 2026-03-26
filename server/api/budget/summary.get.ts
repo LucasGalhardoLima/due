@@ -22,20 +22,14 @@ export default defineEventHandler(async (event) => {
   const month = result.data.month ? parseInt(result.data.month) : now.getMonth() + 1
   const year = result.data.year ? parseInt(result.data.year) : now.getFullYear()
 
-  // 1. Fetch incomes (specific month + recurring from prior months)
+  // 1. Fetch incomes for this specific month only.
+  // Using an OR to also fetch recurring rows from prior months causes double-counting
+  // (every historical row gets summed). isRecurring is treated as a flag, not a multiplier.
   const incomes = await prisma.income.findMany({
     where: {
       userId,
-      OR: [
-        { month, year },
-        {
-          isRecurring: true,
-          OR: [
-            { year: { lt: year } },
-            { year, month: { lte: month } },
-          ],
-        },
-      ],
+      month,
+      year,
     },
     orderBy: { createdAt: 'desc' },
   })
