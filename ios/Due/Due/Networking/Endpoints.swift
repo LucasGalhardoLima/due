@@ -131,6 +131,10 @@ extension Endpoint {
     static func parseExpense() -> Endpoint {
         Endpoint(path: "/api/ai/parse-expense", method: .post)
     }
+
+    static func aiInsights() -> Endpoint {
+        Endpoint(path: "/api/ai/insights")
+    }
 }
 
 // MARK: - Installments
