@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardView: View {
     @State private var viewModel = DashboardViewModel()
     @State private var showSettings = false
+    @State private var showNotifications = false
 
     var body: some View {
         NavigationStack {
@@ -27,6 +28,13 @@ struct DashboardView: View {
             .duGradientBackground()
             .navigationTitle("Início")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showNotifications = true
+                    } label: {
+                        Image(systemName: "bell")
+                    }
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         showSettings = true
@@ -41,6 +49,9 @@ struct DashboardView: View {
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showNotifications) {
+                NotificationsSheet()
             }
         }
         .task {
