@@ -42,6 +42,8 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<AuditRequest>(event)
   const { items: bankItems, cardId, month, year } = body
 
+  await verifyCardOwnership(cardId, appUser.userId)
+
   // Define date range for the invoice
   // Assuming strict calendar month for now, but should ideally use card closing day
   // For MVP, we'll look at transactions in the target month +/- 5 days buffer to catch edge cases
