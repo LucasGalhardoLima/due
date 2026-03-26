@@ -11,8 +11,14 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     if viewModel.isLoading && viewModel.budgetSummary == nil {
                         DashboardSkeleton()
-                    } else if let error = viewModel.error, viewModel.budgetSummary == nil {
-                        ErrorView(message: error) {
+                    } else if viewModel.error != nil, viewModel.budgetSummary == nil {
+                        let kind = viewModel.errorKind ?? .loadFailure
+                        ErrorView(
+                            icon: kind.icon,
+                            title: kind.title,
+                            message: kind.message,
+                            ctaTitle: kind.ctaTitle
+                        ) {
                             Task { await viewModel.load() }
                         }
                     } else {

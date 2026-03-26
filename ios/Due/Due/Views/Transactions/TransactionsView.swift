@@ -9,8 +9,14 @@ struct TransactionsView: View {
                 VStack(spacing: 0) {
                     if viewModel.isLoading && viewModel.invoice == nil {
                         TransactionsSkeleton()
-                    } else if let error = viewModel.error, viewModel.invoice == nil {
-                        ErrorView(message: error) {
+                    } else if viewModel.error != nil, viewModel.invoice == nil {
+                        let kind = viewModel.errorKind ?? .loadFailure
+                        ErrorView(
+                            icon: kind.icon,
+                            title: kind.title,
+                            message: kind.message,
+                            ctaTitle: kind.ctaTitle
+                        ) {
                             Task { await viewModel.load() }
                         }
                     } else {
@@ -110,10 +116,11 @@ struct TransactionsView: View {
 
         if groups.isEmpty {
             EmptyStateView(
-                icon: "tray",
-                title: "Nenhuma transação",
-                subtitle: "Nenhuma transação nesta fatura",
-                ctaTitle: "Adicionar transação"
+                icon: "banknote",
+                title: "Nenhum gasto ainda",
+                subtitle: "Registre sua primeira despesa e comece a acompanhar pra onde seu dinheiro vai.",
+                iconColor: Color.duMintAdaptive.opacity(0.7),
+                ctaTitle: "Adicionar despesa"
             ) {
                 viewModel.showAddSheet = true
             }

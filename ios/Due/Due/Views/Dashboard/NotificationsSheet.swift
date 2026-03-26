@@ -5,21 +5,15 @@ struct NotificationsSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
+            VStack {
                 Spacer()
 
-                Image(systemName: "bell")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.secondary)
-
-                VStack(spacing: 8) {
-                    Text("Nenhuma notificação")
-                        .font(.title3.weight(.semibold))
-                    Text("Dicas, resumos semanais e alertas aparecerão aqui")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                }
+                EmptyStateView(
+                    icon: "checkmark.seal",
+                    title: "Tudo tranquilo por aqui",
+                    subtitle: "Nenhuma conta próxima. Aproveite a paz! ✌️",
+                    iconColor: Color.statusSuccess.opacity(0.7)
+                )
 
                 Spacer()
             }

@@ -11,15 +11,22 @@ struct TransactionDrilldownView: View {
         Group {
             if viewModel.isLoading && viewModel.transactions.isEmpty {
                 TransactionsSkeleton()
-            } else if let error = viewModel.error, viewModel.transactions.isEmpty {
-                ErrorView(message: error) {
+            } else if viewModel.error != nil, viewModel.transactions.isEmpty {
+                let kind = viewModel.errorKind ?? .loadFailure
+                ErrorView(
+                    icon: kind.icon,
+                    title: kind.title,
+                    message: kind.message,
+                    ctaTitle: kind.ctaTitle
+                ) {
                     Task { await viewModel.load() }
                 }
             } else if viewModel.transactions.isEmpty {
                 EmptyStateView(
-                    icon: "tray",
-                    title: "Nenhuma transação",
-                    subtitle: "Nenhuma transação encontrada nesta categoria"
+                    icon: "line.3.horizontal.decrease.circle",
+                    title: "Nada por aqui",
+                    subtitle: "Essa categoria não tem gastos nesta fatura.",
+                    iconColor: Color.duVioletAdaptive.opacity(0.5)
                 )
             } else {
                 List {

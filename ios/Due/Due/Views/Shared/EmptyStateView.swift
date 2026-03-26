@@ -4,6 +4,7 @@ struct EmptyStateView: View {
     let icon: String
     let title: String
     let subtitle: String
+    var iconColor: Color = Color.duVioletAdaptive.opacity(0.5)
     var ctaTitle: String? = nil
     var onCTA: (() -> Void)? = nil
 
@@ -13,7 +14,7 @@ struct EmptyStateView: View {
         VStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.system(size: 44))
-                .foregroundStyle(Color.duVioletAdaptive.opacity(0.5))
+                .foregroundStyle(iconColor)
                 .symbolEffect(.bounce, value: appeared)
 
             VStack(spacing: 6) {

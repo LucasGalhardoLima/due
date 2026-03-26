@@ -10,6 +10,7 @@ final class DashboardViewModel {
     var aiInsight: String?
     var isLoading = false
     var error: String?
+    var errorKind: ErrorKind?
 
     private let api = APIClient.shared
 
@@ -19,6 +20,7 @@ final class DashboardViewModel {
     func load() async {
         isLoading = true
         error = nil
+        errorKind = nil
 
         do {
             async let summaryTask: BudgetSummary = api.request(
@@ -55,6 +57,7 @@ final class DashboardViewModel {
             }
         } catch {
             self.error = error.localizedDescription
+            self.errorKind = (error as? APIError)?.kind ?? .loadFailure
         }
 
         isLoading = false
