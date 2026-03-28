@@ -137,6 +137,14 @@ extension Endpoint {
     }
 }
 
+// MARK: - Chat
+
+extension Endpoint {
+    static func chatStream() -> Endpoint {
+        Endpoint(path: "/api/chat", method: .post)
+    }
+}
+
 // MARK: - Installments
 
 extension Endpoint {
