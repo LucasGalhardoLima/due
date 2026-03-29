@@ -4,6 +4,7 @@ enum HTTPMethod: String {
     case get = "GET"
     case post = "POST"
     case put = "PUT"
+    case patch = "PATCH"
     case delete = "DELETE"
 }
 
@@ -142,6 +143,26 @@ extension Endpoint {
 extension Endpoint {
     static func chatStream() -> Endpoint {
         Endpoint(path: "/api/chat", method: .post)
+    }
+}
+
+// MARK: - Notifications
+
+extension Endpoint {
+    static func notifications() -> Endpoint {
+        Endpoint(path: "/api/notifications")
+    }
+
+    static func markNotificationRead(id: String) -> Endpoint {
+        Endpoint(path: "/api/notifications/\(id)", method: .patch)
+    }
+
+    static func markAllNotificationsRead() -> Endpoint {
+        Endpoint(path: "/api/notifications/read-all", method: .post)
+    }
+
+    static func unreadNotificationCount() -> Endpoint {
+        Endpoint(path: "/api/notifications/unread-count")
     }
 }
 

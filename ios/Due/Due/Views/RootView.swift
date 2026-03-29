@@ -35,7 +35,7 @@ struct RootView: View {
     @available(iOS 26, *)
     private var ios26TabView: some View {
         ZStack {
-            DashboardView()
+            DashboardView(onNavigateToChat: navigateToChat)
                 .opacity(selectedTab == 0 ? 1 : 0)
                 .allowsHitTesting(selectedTab == 0)
             ChatView()
@@ -102,7 +102,7 @@ struct RootView: View {
     private var legacyTabView: some View {
         ZStack(alignment: .bottomTrailing) {
             TabView(selection: $selectedTab) {
-                DashboardView()
+                DashboardView(onNavigateToChat: navigateToChat)
                     .tag(0)
                     .tabItem {
                         Label("Início", systemImage: "house.fill")
@@ -118,6 +118,12 @@ struct RootView: View {
             fabButton
                 .padding(.trailing, 20)
                 .padding(.bottom, 70)
+        }
+    }
+
+    private func navigateToChat() {
+        withAnimation(DuTheme.snappySpring) {
+            selectedTab = 1
         }
     }
 

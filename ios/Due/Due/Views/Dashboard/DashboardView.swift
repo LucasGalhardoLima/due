@@ -4,6 +4,7 @@ struct DashboardView: View {
     @State private var viewModel = DashboardViewModel()
     @State private var showSettings = false
     @State private var showNotifications = false
+    var onNavigateToChat: (() -> Void)?
 
     var body: some View {
         NavigationStack {
@@ -41,6 +42,17 @@ struct DashboardView: View {
                         showNotifications = true
                     } label: {
                         Image(systemName: "bell")
+                            .overlay(alignment: .topTrailing) {
+                                if viewModel.unreadNotificationCount > 0 {
+                                    Text("\(viewModel.unreadNotificationCount)")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundStyle(.white)
+                                        .padding(.horizontal, 4)
+                                        .padding(.vertical, 1)
+                                        .background(Color.statusDanger, in: Capsule())
+                                        .offset(x: 8, y: -6)
+                                }
+                            }
                     }
                 }
                 ToolbarItem(placement: .primaryAction) {
@@ -59,7 +71,12 @@ struct DashboardView: View {
                 SettingsView()
             }
             .sheet(isPresented: $showNotifications) {
-                NotificationsSheet()
+                NotificationsSheet(onNavigateToChat: onNavigateToChat)
+            }
+            .onChange(of: showNotifications) { _, isShowing in
+                if !isShowing {
+                    Task { await viewModel.loadUnreadCount() }
+                }
             }
         }
         .task {

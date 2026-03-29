@@ -8,6 +8,7 @@ final class DashboardViewModel {
     var cardInvoices: [String: InvoiceSummary] = [:]
     var installmentsHealth: InstallmentHealthResponse?
     var aiInsight: String?
+    var unreadNotificationCount: Int = 0
     var isLoading = false
     var error: String?
     var errorKind: ErrorKind?
@@ -60,7 +61,18 @@ final class DashboardViewModel {
             self.errorKind = (error as? APIError)?.kind ?? .loadFailure
         }
 
+        // Load unread notification count (non-blocking)
+        if let response: UnreadCountResponse = try? await api.request(.unreadNotificationCount()) {
+            unreadNotificationCount = response.unreadCount
+        }
+
         isLoading = false
+    }
+
+    func loadUnreadCount() async {
+        if let response: UnreadCountResponse = try? await api.request(.unreadNotificationCount()) {
+            unreadNotificationCount = response.unreadCount
+        }
     }
 
     // MARK: - Computed Text Properties
