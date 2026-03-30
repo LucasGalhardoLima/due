@@ -5,21 +5,14 @@ struct Message: Identifiable, Equatable {
     let role: Role
     var content: String
     let timestamp: Date
-    var cards: [CardData]?
+    var cards: [ChatCard]
 
     enum Role: String, Codable {
         case user
         case assistant
     }
 
-    struct CardData: Codable, Equatable, Identifiable {
-        let id: String
-        let type: String
-        let title: String
-        let value: String?
-    }
-
-    init(id: UUID = UUID(), role: Role, content: String, timestamp: Date = Date(), cards: [CardData]? = nil) {
+    init(id: UUID = UUID(), role: Role, content: String, timestamp: Date = Date(), cards: [ChatCard] = []) {
         self.id = id
         self.role = role
         self.content = content

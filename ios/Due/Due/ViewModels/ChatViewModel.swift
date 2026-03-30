@@ -1,6 +1,89 @@
 import Foundation
 import Clerk
 
+// MARK: - Card Stream Parser
+
+protocol CardStreamParser {
+    func parse(line: String) -> [ChatCard]?
+}
+
+/// Parses Vercel AI SDK data stream lines for card JSON.
+/// Handles `2:` (data) and `8:` (tool call results) prefixes.
+struct SSECardStreamParser: CardStreamParser {
+    func parse(line: String) -> [ChatCard]? {
+        // Vercel AI SDK: 2: = data, 8: = tool call result
+        let payload: String
+        if line.hasPrefix("2:") {
+            payload = String(line.dropFirst(2))
+        } else if line.hasPrefix("8:") {
+            payload = String(line.dropFirst(2))
+        } else {
+            return nil
+        }
+
+        guard let data = payload.data(using: .utf8) else { return nil }
+
+        // Try decoding as array of cards first, then single card
+        if let cards = try? JSONDecoder().decode([ChatCard].self, from: data) {
+            return cards
+        }
+        if let card = try? JSONDecoder().decode(ChatCard.self, from: data) {
+            return [card]
+        }
+        return nil
+    }
+}
+
+/// Mock parser that injects sample cards for development.
+struct MockCardStreamParser: CardStreamParser {
+    func parse(line: String) -> [ChatCard]? { nil }
+
+    static var sampleCards: [ChatCard] {
+        [
+            .budget(BudgetCard(
+                categoryName: "Alimentação",
+                limit: 1200,
+                actual: 890.50,
+                severity: .warning,
+                summary: "Você gastou 74% do orçamento de alimentação."
+            )),
+            .installmentTimeline(InstallmentTimelineCard(
+                entries: [
+                    TimelineEntry(month: "Abr", year: 2026, amount: 450),
+                    TimelineEntry(month: "Mai", year: 2026, amount: 450),
+                    TimelineEntry(month: "Jun", year: 2026, amount: 200),
+                ],
+                totalCommitted: 1100
+            )),
+            .transactionList(TransactionListCard(
+                transactions: [
+                    CompactTransaction(description: "iFood", amount: 45.90, date: "28 Mar", category: "Alimentação"),
+                    CompactTransaction(description: "Uber", amount: 23.50, date: "27 Mar", category: "Transporte"),
+                    CompactTransaction(description: "Netflix", amount: 55.90, date: "25 Mar", category: "Streaming"),
+                ]
+            )),
+            .summary(SummaryCard(
+                title: "Resumo do mês",
+                pairs: [
+                    KeyValuePair(label: "Receita", value: "R$ 8.500,00"),
+                    KeyValuePair(label: "Gastos", value: "R$ 5.230,00"),
+                    KeyValuePair(label: "Economia", value: "R$ 3.270,00"),
+                    KeyValuePair(label: "Parcelas ativas", value: "4"),
+                ]
+            )),
+            .action(ActionCard(
+                title: "O que deseja fazer?",
+                actions: [
+                    CardAction(label: "Criar orçamento", actionType: .createBudget),
+                    CardAction(label: "Ver detalhes", actionType: .viewDetail),
+                ]
+            )),
+        ]
+    }
+}
+
+// MARK: - ChatViewModel
+
 @MainActor
 @Observable
 final class ChatViewModel {
@@ -10,6 +93,7 @@ final class ChatViewModel {
     var errorKind: ErrorKind?
 
     private let api = APIClient.shared
+    private let cardParser: CardStreamParser = SSECardStreamParser()
 
     var hasMessages: Bool { !messages.isEmpty }
 
@@ -33,7 +117,7 @@ final class ChatViewModel {
         } catch {
             // Remove empty assistant message on failure
             if let idx = messages.lastIndex(where: { $0.id == assistantMessage.id }),
-               messages[idx].content.isEmpty {
+               messages[idx].content.isEmpty && messages[idx].cards.isEmpty {
                 messages.remove(at: idx)
             }
             self.error = error.localizedDescription
@@ -41,6 +125,19 @@ final class ChatViewModel {
         }
 
         isStreaming = false
+    }
+
+    // MARK: - Action Handling
+
+    func handleCardAction(_ action: CardAction) async {
+        switch action.actionType {
+        case .createBudget:
+            await send("Criar orçamento para \(action.payload ?? "categoria")")
+        case .viewDetail:
+            await send("Mostrar detalhes de \(action.payload ?? "item")")
+        case .confirm:
+            await send("Confirmar \(action.payload ?? "ação")")
+        }
     }
 
     // MARK: - SSE Streaming
@@ -74,15 +171,22 @@ final class ChatViewModel {
         }
 
         for try await line in bytes.lines {
-            // Vercel AI SDK data stream format: "0:\"text chunk\"\n"
-            guard line.hasPrefix("0:") else { continue }
+            // Text chunks: "0:\"text chunk\"\n"
+            if line.hasPrefix("0:") {
+                let payload = String(line.dropFirst(2))
+                if let data = payload.data(using: .utf8),
+                   let text = try? JSONDecoder().decode(String.self, from: data) {
+                    if let idx = messages.firstIndex(where: { $0.id == messageId }) {
+                        messages[idx].content += text
+                    }
+                }
+                continue
+            }
 
-            let payload = String(line.dropFirst(2))
-            // Payload is a JSON-encoded string like "\"hello \""
-            if let data = payload.data(using: .utf8),
-               let text = try? JSONDecoder().decode(String.self, from: data) {
+            // Card data: "2:" (data) or "8:" (tool results)
+            if let cards = cardParser.parse(line: line) {
                 if let idx = messages.firstIndex(where: { $0.id == messageId }) {
-                    messages[idx].content += text
+                    messages[idx].cards.append(contentsOf: cards)
                 }
             }
         }

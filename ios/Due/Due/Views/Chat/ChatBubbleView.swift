@@ -3,6 +3,7 @@ import SwiftUI
 struct ChatBubbleView: View {
     let message: Message
     let isStreaming: Bool
+    var onCardAction: ((CardAction) -> Void)?
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -21,6 +22,14 @@ struct ChatBubbleView: View {
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(bubbleBackground, in: bubbleShape)
+
+                // Inline cards for assistant messages
+                if !isUser && !message.cards.isEmpty {
+                    ChatCardContainerView(cards: message.cards) { action in
+                        onCardAction?(action)
+                    }
+                    .padding(.top, 4)
+                }
 
                 Text(message.timestamp, style: .time)
                     .font(.caption2)

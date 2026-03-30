@@ -54,7 +54,10 @@ struct ChatView: View {
                         ForEach(Array(viewModel.messages.enumerated()), id: \.element.id) { index, message in
                             ChatBubbleView(
                                 message: message,
-                                isStreaming: viewModel.isStreaming && index == viewModel.messages.count - 1
+                                isStreaming: viewModel.isStreaming && index == viewModel.messages.count - 1,
+                                onCardAction: { action in
+                                    Task { await viewModel.handleCardAction(action) }
+                                }
                             )
                             .id(message.id)
                             .staggeredAppearance(index: index)
