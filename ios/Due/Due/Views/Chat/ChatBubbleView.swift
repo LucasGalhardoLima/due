@@ -4,6 +4,7 @@ struct ChatBubbleView: View {
     let message: Message
     let isStreaming: Bool
     var onCardAction: ((CardAction) -> Void)?
+    var onCardTap: ((ChatCard) -> Void)?
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -25,9 +26,11 @@ struct ChatBubbleView: View {
 
                 // Inline cards for assistant messages
                 if !isUser && !message.cards.isEmpty {
-                    ChatCardContainerView(cards: message.cards) { action in
-                        onCardAction?(action)
-                    }
+                    ChatCardContainerView(
+                        cards: message.cards,
+                        onAction: { action in onCardAction?(action) },
+                        onCardTap: { card in onCardTap?(card) }
+                    )
                     .padding(.top, 4)
                 }
 

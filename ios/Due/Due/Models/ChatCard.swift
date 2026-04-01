@@ -19,6 +19,11 @@ enum ChatCard: Codable, Identifiable, Equatable {
         }
     }
 
+    var isActionCard: Bool {
+        if case .action = self { return true }
+        return false
+    }
+
     // MARK: - Codable
 
     private enum CodingKeys: String, CodingKey {

@@ -3,6 +3,7 @@ import SwiftUI
 struct ChatCardContainerView: View {
     let cards: [ChatCard]
     let onAction: (CardAction) -> Void
+    var onCardTap: ((ChatCard) -> Void)?
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -11,6 +12,12 @@ struct ChatCardContainerView: View {
             ForEach(Array(cards.enumerated()), id: \.element.id) { index, card in
                 cardView(for: card)
                     .background(glassBackground, in: RoundedRectangle(cornerRadius: DuTheme.radiusMedium))
+                    .contentShape(RoundedRectangle(cornerRadius: DuTheme.radiusMedium))
+                    .onTapGesture {
+                        if !card.isActionCard {
+                            onCardTap?(card)
+                        }
+                    }
                     .transition(.asymmetric(
                         insertion: .opacity.combined(with: .move(edge: .bottom)).combined(with: .scale(scale: 0.95)),
                         removal: .opacity

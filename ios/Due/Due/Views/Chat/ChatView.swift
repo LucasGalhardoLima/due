@@ -57,6 +57,9 @@ struct ChatView: View {
                                 isStreaming: viewModel.isStreaming && index == viewModel.messages.count - 1,
                                 onCardAction: { action in
                                     Task { await viewModel.handleCardAction(action) }
+                                },
+                                onCardTap: { card in
+                                    Task { await viewModel.handleCardTap(card) }
                                 }
                             )
                             .id(message.id)
