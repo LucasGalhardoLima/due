@@ -16,6 +16,10 @@
  *   - Income: salary (recurring every month) + sporadic freelance
  *   - CategoryBudget: 5 categories budgeted, one with rollover
  *   - 2 SavingsGoals: Viagem Europa (partial), Reserva de Emergência (partial)
+ *   - 6 Invoices per card (18 total) spanning past 6 months
+ *   - 8 CategorizationRules for auto-categorizing common merchants
+ *   - 12 Notifications: budget warnings, bill reminders, goal milestones, tips
+ *   - UsageCounters: AI feature usage across recent months
  *
  * Interesting signals baked in for agent analysis:
  *   - Alimentação trending up (+15% month-over-month for 4 months)
@@ -74,6 +78,16 @@ function installmentDueDate(
 // ---------------------------------------------------------------------------
 
 async function cleanup() {
+  // Look up the User record to clean related models that use User.id (UUID)
+  const user = await prisma.user.findUnique({ where: { clerkId: DEMO_USER_ID } })
+
+  if (user) {
+    console.log('  Deleting Notifications...')
+    await prisma.notification.deleteMany({ where: { userId: user.id } })
+    console.log('  Deleting UsageCounters...')
+    await prisma.usageCounter.deleteMany({ where: { userId: user.id } })
+  }
+
   console.log('  Deleting TransactionTags...')
   await prisma.transactionTag.deleteMany({
     where: { transaction: { userId: DEMO_USER_ID } }
@@ -84,8 +98,12 @@ async function cleanup() {
   })
   console.log('  Deleting Transactions...')
   await prisma.transaction.deleteMany({ where: { userId: DEMO_USER_ID } })
+  console.log('  Deleting Invoices...')
+  await prisma.invoice.deleteMany({ where: { userId: DEMO_USER_ID } })
   console.log('  Deleting CategoryBudgets...')
   await prisma.categoryBudget.deleteMany({ where: { userId: DEMO_USER_ID } })
+  console.log('  Deleting CategorizationRules...')
+  await prisma.categorizationRule.deleteMany({ where: { userId: DEMO_USER_ID } })
   console.log('  Deleting Categories...')
   await prisma.category.deleteMany({ where: { userId: DEMO_USER_ID } })
   console.log('  Deleting CreditCards...')
@@ -111,7 +129,7 @@ async function main() {
   // 1. User
   // -------------------------------------------------------------------------
   console.log('1. Upserting User...')
-  await prisma.user.upsert({
+  const user = await prisma.user.upsert({
     where: { clerkId: DEMO_USER_ID },
     update: {
       tier: 'pro',
@@ -708,23 +726,176 @@ async function main() {
   })
 
   // -------------------------------------------------------------------------
+  // 9. Invoices (6 months of history per card)
+  // -------------------------------------------------------------------------
+  console.log('9. Creating Invoices...')
+  const invoiceCards = [
+    { card: nubank, cardId: nubank.id },
+    { card: itau, cardId: itau.id },
+    { card: c6, cardId: c6.id }
+  ]
+  for (const { cardId } of invoiceCards) {
+    for (let offset = -6; offset <= 0; offset++) {
+      const d = month(offset, 1)
+      const m = d.getMonth() + 1
+      const y = d.getFullYear()
+      // Past months are PAID, current month is OPEN
+      const status = offset < 0 ? 'PAID' : 'OPEN'
+      await prisma.invoice.create({
+        data: { month: m, year: y, status, cardId, userId: DEMO_USER_ID }
+      })
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // 10. CategorizationRules
+  // -------------------------------------------------------------------------
+  console.log('10. Creating CategorizationRules...')
+  const rules = [
+    { pattern: 'ifood',              isRegex: false, categoryId: cat['Alimentação'] },
+    { pattern: 'rappi',              isRegex: false, categoryId: cat['Alimentação'] },
+    { pattern: 'uber',               isRegex: false, categoryId: cat['Transporte'] },
+    { pattern: '99|99pop',           isRegex: true,  categoryId: cat['Transporte'] },
+    { pattern: 'netflix|disney|spotify|amazon prime', isRegex: true, categoryId: cat['Assinaturas'] },
+    { pattern: 'smart\\s?fit|academia', isRegex: true, categoryId: cat['Assinaturas'] },
+    { pattern: 'drogasil|drogaria|farmacia|pacheco', isRegex: true, categoryId: cat['Saúde'] },
+    { pattern: 'condominio|condomínio|enel|luz', isRegex: true, categoryId: cat['Moradia'] },
+  ]
+  for (const r of rules) {
+    await prisma.categorizationRule.create({
+      data: { pattern: r.pattern, isRegex: r.isRegex, categoryId: r.categoryId, userId: DEMO_USER_ID }
+    })
+  }
+
+  // -------------------------------------------------------------------------
+  // 11. Notifications
+  // -------------------------------------------------------------------------
+  console.log('11. Creating Notifications...')
+  const notifications = [
+    // Budget warnings
+    { type: 'budget_warning', title: 'Alimentação acima do orçamento',
+      message: 'Você gastou R$840 de R$900 em Alimentação este mês. Fique de olho!',
+      actionUrl: '/orcamento', read: false, daysAgo: 0 },
+    { type: 'budget_warning', title: 'Assinaturas ultrapassou o limite',
+      message: 'Suas assinaturas totalizam R$417/mês, R$37 acima do orçamento de R$380.',
+      actionUrl: '/orcamento', read: true, daysAgo: 2 },
+
+    // Bill reminders
+    { type: 'bill_reminder', title: 'Fatura Nubank vence em 3 dias',
+      message: 'Sua fatura do Nubank Ultravioleta de R$4.832,50 vence dia 2. Não esqueça!',
+      actionUrl: '/faturas', read: false, daysAgo: 0 },
+    { type: 'bill_reminder', title: 'Fatura Itaú paga',
+      message: 'Fatura do Itaú Personnalité de R$3.215,80 foi confirmada como paga.',
+      actionUrl: '/faturas', read: true, daysAgo: 5 },
+
+    // Goal milestones
+    { type: 'goal_milestone', title: 'Viagem Europa 2026 — 42% concluído!',
+      message: 'Sua meta de R$20.000 já tem R$8.500 guardados. Continue assim!',
+      actionUrl: '/metas', read: true, daysAgo: 3 },
+    { type: 'goal_milestone', title: 'Reserva de Emergência — marco de 10k!',
+      message: 'Sua reserva de emergência passou de R$10.000. Parabéns pelo compromisso!',
+      actionUrl: '/metas', read: true, daysAgo: 15 },
+
+    // Invoice closing
+    { type: 'invoice_closing', title: 'Fatura Nubank fecha em 5 dias',
+      message: 'A fatura do Nubank fecha dia 25. Valor atual: R$3.420,00.',
+      actionUrl: '/faturas', read: false, daysAgo: 1 },
+    { type: 'invoice_closing', title: 'Fatura C6 fechou',
+      message: 'A fatura do C6 Bank Mastercard fechou em R$1.870,30. Vencimento dia 25.',
+      actionUrl: '/faturas', read: true, daysAgo: 8 },
+
+    // Streaks
+    { type: 'streak', title: '7 dias registrando gastos!',
+      message: 'Você está no seu melhor momento — 7 dias seguidos acompanhando suas finanças.',
+      actionUrl: '/', read: true, daysAgo: 1 },
+    { type: 'streak', title: '30 dias de uso do Du!',
+      message: 'Parabéns! Você completou 1 mês usando o Du. Sua saúde financeira agradece.',
+      actionUrl: '/', read: true, daysAgo: 10 },
+
+    // Du tips
+    { type: 'du_tip', title: 'Dica: parcelas convergindo em julho',
+      message: 'Em julho, suas parcelas do MacBook + Viagem Europa vão somar R$2.599/mês. Planeje-se!',
+      actionUrl: '/parcelas', read: false, daysAgo: 0 },
+    { type: 'du_tip', title: 'Dica: Saúde com saldo acumulado',
+      message: 'Seu orçamento de Saúde tem rollover ativado — você acumulou R$620 dos últimos meses.',
+      actionUrl: '/orcamento', read: true, daysAgo: 4 },
+  ]
+
+  for (const n of notifications) {
+    const createdAt = new Date(now.getTime() - n.daysAgo * 24 * 60 * 60 * 1000)
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: n.type,
+        title: n.title,
+        message: n.message,
+        actionUrl: n.actionUrl,
+        read: n.read,
+        readAt: n.read ? createdAt : null,
+        createdAt
+      }
+    })
+  }
+
+  // -------------------------------------------------------------------------
+  // 12. UsageCounters (AI feature usage)
+  // -------------------------------------------------------------------------
+  console.log('12. Creating UsageCounters...')
+  const usageData = [
+    // ai_insights — heavy user, increasing over time
+    { feature: 'ai_insights', monthOffset: -3, count: 4 },
+    { feature: 'ai_insights', monthOffset: -2, count: 8 },
+    { feature: 'ai_insights', monthOffset: -1, count: 12 },
+    { feature: 'ai_insights', monthOffset: 0,  count: 6 },
+    // csv_imports — occasional
+    { feature: 'csv_imports', monthOffset: -2, count: 1 },
+    { feature: 'csv_imports', monthOffset: 0,  count: 1 },
+    // simulations — tried once last month
+    { feature: 'simulations', monthOffset: -1, count: 3 },
+    { feature: 'simulations', monthOffset: 0,  count: 1 },
+    // audits — new feature, just started
+    { feature: 'audits', monthOffset: 0, count: 2 },
+  ]
+
+  for (const u of usageData) {
+    const d = month(u.monthOffset, 1)
+    const periodKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    await prisma.usageCounter.create({
+      data: {
+        userId: user.id,
+        feature: u.feature,
+        count: u.count,
+        periodKey
+      }
+    })
+  }
+
+  // -------------------------------------------------------------------------
   // Done
   // -------------------------------------------------------------------------
-  const [txCount, installCount, incomeCount] = await Promise.all([
+  const [txCount, installCount, incomeCount, invoiceCount, ruleCount, notifCount, usageCount] = await Promise.all([
     prisma.transaction.count({ where: { userId: DEMO_USER_ID } }),
     prisma.installment.count({ where: { transaction: { userId: DEMO_USER_ID } } }),
     prisma.income.count({ where: { userId: DEMO_USER_ID } }),
+    prisma.invoice.count({ where: { userId: DEMO_USER_ID } }),
+    prisma.categorizationRule.count({ where: { userId: DEMO_USER_ID } }),
+    prisma.notification.count({ where: { userId: user.id } }),
+    prisma.usageCounter.count({ where: { userId: user.id } }),
   ])
 
   console.log('\n=== Demo Seed Complete ===')
-  console.log(`  Transactions : ${txCount}`)
-  console.log(`  Installments : ${installCount}`)
-  console.log(`  Incomes      : ${incomeCount}`)
-  console.log(`  Cards        : 3 (Nubank, Itaú Personnalité, C6 Bank)`)
-  console.log(`  Categories   : ${categoryDefs.length}`)
-  console.log(`  Tags         : 3 (essencial, impulsiva, work)`)
-  console.log(`  Budgets      : ${budgets.length}`)
-  console.log(`  SavingsGoals : 2`)
+  console.log(`  Transactions    : ${txCount}`)
+  console.log(`  Installments    : ${installCount}`)
+  console.log(`  Incomes         : ${incomeCount}`)
+  console.log(`  Cards           : 3 (Nubank, Itaú Personnalité, C6 Bank)`)
+  console.log(`  Categories      : ${categoryDefs.length}`)
+  console.log(`  Tags            : 3 (essencial, impulsiva, work)`)
+  console.log(`  Budgets         : ${budgets.length}`)
+  console.log(`  SavingsGoals    : 2`)
+  console.log(`  Invoices        : ${invoiceCount}`)
+  console.log(`  CatRules        : ${ruleCount}`)
+  console.log(`  Notifications   : ${notifCount}`)
+  console.log(`  UsageCounters   : ${usageCount}`)
 }
 
 main()
