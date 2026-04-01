@@ -47,6 +47,13 @@ struct ChatInputBar: View {
                         }
                     }
                 }
+                .onChange(of: shouldFocus) { _, newValue in
+                    if newValue {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            isFocused = true
+                        }
+                    }
+                }
 
             Button {
                 HapticManager.impact(.light)

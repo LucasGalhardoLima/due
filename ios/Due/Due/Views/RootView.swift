@@ -39,17 +39,9 @@ struct RootView: View {
             DashboardView()
                 .opacity(selectedTab == 0 ? 1 : 0)
                 .allowsHitTesting(selectedTab == 0)
-            ChatView(startInQuickAddMode: shouldStartQuickAdd)
+            ChatView(startInQuickAddMode: $shouldStartQuickAdd)
                 .opacity(selectedTab == 1 ? 1 : 0)
                 .allowsHitTesting(selectedTab == 1)
-                .onChange(of: selectedTab) { oldValue, newValue in
-                    if newValue == 1 && shouldStartQuickAdd {
-                        // Reset after ChatView appears with quick-add mode
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            shouldStartQuickAdd = false
-                        }
-                    }
-                }
         }
         .safeAreaInset(edge: .bottom) {
             customBottomBar
@@ -118,19 +110,11 @@ struct RootView: View {
                         Label("Início", systemImage: "house.fill")
                     }
 
-                ChatView(startInQuickAddMode: shouldStartQuickAdd)
+                ChatView(startInQuickAddMode: $shouldStartQuickAdd)
                     .tag(1)
                     .tabItem {
                         Label("Chat", systemImage: "bubble.left.and.text.bubble.right.fill")
                     }
-            }
-            .onChange(of: selectedTab) { oldValue, newValue in
-                if newValue == 1 && shouldStartQuickAdd {
-                    // Reset after ChatView appears with quick-add mode
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        shouldStartQuickAdd = false
-                    }
-                }
             }
 
             fabButton

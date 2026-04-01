@@ -6,10 +6,10 @@ struct ChatView: View {
     @State private var isEditingExpense = false
     @FocusState private var isInputFocused: Bool
 
-    let startInQuickAddMode: Bool
+    @Binding var startInQuickAddMode: Bool
 
-    init(startInQuickAddMode: Bool = false) {
-        self.startInQuickAddMode = startInQuickAddMode
+    init(startInQuickAddMode: Binding<Bool> = .constant(false)) {
+        self._startInQuickAddMode = startInQuickAddMode
     }
 
     var body: some View {
@@ -37,6 +37,13 @@ struct ChatView: View {
             .onAppear {
                 if startInQuickAddMode && viewModel.prefillMode == .normal {
                     viewModel.enterQuickAddMode()
+                    startInQuickAddMode = false
+                }
+            }
+            .onChange(of: startInQuickAddMode) { _, newValue in
+                if newValue {
+                    viewModel.enterQuickAddMode()
+                    startInQuickAddMode = false
                 }
             }
             .toolbar {
