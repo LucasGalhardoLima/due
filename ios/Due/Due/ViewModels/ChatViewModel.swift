@@ -189,17 +189,17 @@ final class ChatViewModel {
         isStreaming = true
         error = nil
 
-        do {
-            let request = CreateTransactionRequest(
-                description: expense.description,
-                amount: Double(truncating: expense.amount as NSDecimalNumber),
-                purchaseDate: expense.date,
-                installmentsCount: 1,
-                cardId: expense.cardId ?? "",
-                categoryId: expense.categoryId,
-                isSubscription: false
-            )
+        let request = CreateTransactionRequest(
+            description: expense.description,
+            amount: Double(truncating: expense.amount as NSDecimalNumber),
+            purchaseDate: expense.date,
+            installmentsCount: 1,
+            cardId: expense.cardId ?? "",
+            categoryId: expense.categoryId,
+            isSubscription: false
+        )
 
+        do {
             let response: TransactionResponse = try await api.request(Endpoint.createTransaction(), body: request)
 
             // Store transaction ID for undo
@@ -210,8 +210,18 @@ final class ChatViewModel {
             messages.append(successMessage)
 
         } catch {
-            self.error = error.localizedDescription
-            self.errorKind = (error as? APIError)?.kind ?? .loadFailure
+            let apiError = error as? APIError
+            if apiError?.kind == .offline {
+                // Queue for later sync
+                OfflineTransactionQueue.shared.enqueue(request)
+                pendingExpense = nil
+
+                let queuedMessage = Message(role: .assistant, content: "Você está offline. O gasto \(expense.description) \(expense.displayAmount) será salvo quando a conexão voltar.")
+                messages.append(queuedMessage)
+            } else {
+                self.error = error.localizedDescription
+                self.errorKind = apiError?.kind ?? .loadFailure
+            }
         }
 
         isStreaming = false
@@ -336,7 +346,7 @@ private struct ChatRequest: Encodable {
 
 // MARK: - Parsed Expense
 
-struct ParsedExpense {
+struct ParsedExpense: Equatable {
     let description: String
     let amount: Decimal
     let date: String

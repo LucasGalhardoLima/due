@@ -100,6 +100,12 @@ struct ChatView: View {
                         .padding(.top, 80)
                 }
 
+                if OfflineTransactionQueue.shared.pendingCount > 0 {
+                    offlineQueueBanner
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 4)
+                }
+
                 if let errorKind = viewModel.errorKind {
                     errorBanner(errorKind)
                         .padding(.horizontal, 16)
@@ -157,6 +163,24 @@ struct ChatView: View {
             inputText = suggestion
             sendMessage()
         }
+    }
+
+    // MARK: - Offline Queue Banner
+
+    private var offlineQueueBanner: some View {
+        let count = OfflineTransactionQueue.shared.pendingCount
+        return HStack(spacing: 8) {
+            Image(systemName: "arrow.triangle.2.circlepath.circle")
+                .foregroundStyle(Color.statusWarning)
+            Text(count == 1
+                 ? "1 gasto pendente será sincronizado quando a conexão voltar."
+                 : "\(count) gastos pendentes serão sincronizados quando a conexão voltar.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding(12)
+        .duGlass(in: RoundedRectangle(cornerRadius: DuTheme.radiusMedium))
     }
 
     // MARK: - Error Banner
