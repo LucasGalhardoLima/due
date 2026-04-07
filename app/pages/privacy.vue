@@ -10,6 +10,11 @@ function toggleTheme() {
 definePageMeta({
   layout: false
 })
+
+useSeoMeta({
+  title: 'Política de Privacidade | Du',
+  description: 'Saiba como o Du protege seus dados financeiros. Política de privacidade, coleta de dados, uso de IA e seus direitos.',
+})
 </script>
 
 <template>
@@ -49,7 +54,7 @@ definePageMeta({
               <h2 class="text-2xl font-bold">Armazenamento Isolado</h2>
             </div>
             <p class="text-muted-foreground leading-relaxed">
-              O Due utiliza o <span class="text-foreground font-semibold">Supabase</span> como provedor de banco de dados. Cada usuário tem seus dados isolados através de políticas de <span class="italic">Row Level Security (RLS)</span>. Isso significa que, a nível de banco de dados, é impossível que um usuário acesse dados de outro.
+              Seus dados são isolados por autenticação via <span class="text-foreground font-semibold">Clerk</span>. Cada requisição ao servidor valida sua identidade, e o acesso ao banco é filtrado por usuário através do <span class="text-foreground font-semibold">Prisma ORM</span> — nenhum usuário pode acessar dados de outro.
             </p>
           </section>
 
@@ -71,7 +76,7 @@ definePageMeta({
             <p class="text-muted-foreground leading-relaxed">
               Quando você utiliza o Advisor AI, enviamos apenas os dados necessários das suas transações para o modelo <span class="text-foreground font-semibold">GPT-4o da OpenAI</span>. 
               <br><br>
-              <span class="font-bold underline">Importante:</span> A OpenAI não utiliza dados enviados via API para treinar seus modelos. Além disso, o Due não envia dados que possam te identificar pessoalmente (como nome completo ou CPF) para a IA.
+              <span class="font-bold underline">Importante:</span> A OpenAI não utiliza dados enviados via API para treinar seus modelos. Além disso, o Du não envia dados que possam te identificar pessoalmente (como nome completo ou CPF) para a IA.
             </p>
           </section>
 
@@ -85,22 +90,25 @@ definePageMeta({
             </ul>
 
             <h3>Cookies e Rastreamento</h3>
-            <p>O Due utiliza cookies apenas para manter sua sessão ativa. Não utilizamos trackers de terceiros para fins de marketing ou publicidade. Nossa análise de uso (via Vercel Analytics) é anônima e focada apenas em performance técnica.</p>
+            <p>O Du utiliza cookies apenas para manter sua sessão ativa. Não utilizamos trackers de terceiros para fins de marketing ou publicidade. Nossa análise de uso (via Vercel Analytics) é anônima e focada apenas em performance técnica.</p>
 
             <h3>Seus Direitos</h3>
-            <p>Você pode excluir sua conta e todos os seus dados a qualquer momento diretamente nas configurações do perfil (em breve) ou solicitando via suporte. A exclusão é imediata e definitiva.</p>
+            <p>Você pode excluir sua conta e todos os seus dados a qualquer momento diretamente nas configurações do perfil ou solicitando via e-mail em <span class="text-foreground font-semibold">suporte@du.app</span>. A exclusão é imediata e definitiva.</p>
+
+            <h3>Controlador de Dados (LGPD)</h3>
+            <p>O controlador dos seus dados pessoais é a <span class="text-foreground font-semibold">Du</span> (Lumos Tecnologia). Para exercer seus direitos previstos na Lei Geral de Proteção de Dados (LGPD), incluindo acesso, correção, portabilidade ou eliminação dos seus dados, entre em contato pelo e-mail <span class="text-foreground font-semibold">privacidade@du.app</span>.</p>
           </section>
         </div>
 
         <div class="pt-8 border-t border-border/40 text-center text-sm text-muted-foreground">
-          Última atualização: 16 de Janeiro de 2026
+          Última atualização: 7 de Abril de 2026
         </div>
       </div>
     </main>
 
     <footer class="py-12 border-t border-border/40">
       <div class="container mx-auto px-6 text-center text-sm opacity-60">
-        &copy; 2026 Due Finance. Privacidade em primeiro lugar.
+        &copy; 2026 Du. Privacidade em primeiro lugar.
       </div>
     </footer>
   </div>
