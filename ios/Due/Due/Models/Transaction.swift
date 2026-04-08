@@ -1,6 +1,6 @@
 import Foundation
 
-struct CreateTransactionRequest: Encodable {
+struct CreateTransactionRequest: Codable {
     let description: String
     let amount: Double
     let purchaseDate: String

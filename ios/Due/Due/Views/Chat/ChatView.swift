@@ -3,7 +3,14 @@ import SwiftUI
 struct ChatView: View {
     @State private var viewModel = ChatViewModel()
     @State private var inputText = ""
+    @State private var isEditingExpense = false
     @FocusState private var isInputFocused: Bool
+
+    @Binding var startInQuickAddMode: Bool
+
+    init(startInQuickAddMode: Binding<Bool> = .constant(false)) {
+        self._startInQuickAddMode = startInQuickAddMode
+    }
 
     var body: some View {
         NavigationStack {
@@ -18,6 +25,8 @@ struct ChatView: View {
                 ChatInputBar(
                     text: $inputText,
                     isStreaming: viewModel.isStreaming,
+                    placeholder: quickAddPlaceholder,
+                    shouldFocus: viewModel.prefillMode == .quickAddExpense,
                     onSend: sendMessage
                 )
             }
@@ -25,6 +34,18 @@ struct ChatView: View {
             .duGradientBackground()
             .navigationTitle("Chat")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                if startInQuickAddMode && viewModel.prefillMode == .normal {
+                    viewModel.enterQuickAddMode()
+                    startInQuickAddMode = false
+                }
+            }
+            .onChange(of: startInQuickAddMode) { _, newValue in
+                if newValue {
+                    viewModel.enterQuickAddMode()
+                    startInQuickAddMode = false
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     if viewModel.hasMessages {
@@ -65,12 +86,34 @@ struct ChatView: View {
                             .id(message.id)
                             .staggeredAppearance(index: index)
                         }
+
+                        // Show expense confirmation bubble if there's a pending expense
+                        if let expense = viewModel.pendingExpense, !isEditingExpense {
+                            ExpenseConfirmationBubble(
+                                expense: expense,
+                                onConfirm: {
+                                    await viewModel.saveExpense()
+                                },
+                                onEdit: {
+                                    handleEditExpense()
+                                },
+                                onUndo: expense.transactionId != nil ? {
+                                    await viewModel.undoExpense()
+                                } : nil
+                            )
+                        }
                     }
                     .padding(.vertical, 16)
                 } else {
                     emptyState
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .padding(.top, 80)
+                }
+
+                if OfflineTransactionQueue.shared.pendingCount > 0 {
+                    offlineQueueBanner
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 4)
                 }
 
                 if let errorKind = viewModel.errorKind {
@@ -84,6 +127,9 @@ struct ChatView: View {
                 scrollToBottom(proxy: proxy)
             }
             .onChange(of: viewModel.messages.last?.content) {
+                scrollToBottom(proxy: proxy)
+            }
+            .onChange(of: viewModel.pendingExpense) {
                 scrollToBottom(proxy: proxy)
             }
         }
@@ -129,6 +175,24 @@ struct ChatView: View {
         }
     }
 
+    // MARK: - Offline Queue Banner
+
+    private var offlineQueueBanner: some View {
+        let count = OfflineTransactionQueue.shared.pendingCount
+        return HStack(spacing: 8) {
+            Image(systemName: "arrow.triangle.2.circlepath.circle")
+                .foregroundStyle(Color.statusWarning)
+            Text(count == 1
+                 ? "1 gasto pendente será sincronizado quando a conexão voltar."
+                 : "\(count) gastos pendentes serão sincronizados quando a conexão voltar.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding(12)
+        .duGlass(in: RoundedRectangle(cornerRadius: DuTheme.radiusMedium))
+    }
+
     // MARK: - Error Banner
 
     private func errorBanner(_ kind: ErrorKind) -> some View {
@@ -167,5 +231,51 @@ struct ChatView: View {
         withAnimation(DuTheme.defaultSpring) {
             proxy.scrollTo(lastId, anchor: .bottom)
         }
+    }
+
+    private func handleEditExpense() {
+        guard let expense = viewModel.pendingExpense else { return }
+
+        // Pre-fill input with expense details for editing
+        inputText = "\(expense.description) R$\(Double(truncating: expense.amount as NSDecimalNumber)) \(formatDateForInput(expense.date))"
+        isEditingExpense = true
+
+        // Clear pending expense and re-enter quick-add mode
+        viewModel.clearPendingExpense()
+        viewModel.enterQuickAddMode()
+
+        // Focus input
+        isInputFocused = true
+    }
+
+    private func formatDateForInput(_ dateString: String) -> String {
+        let inputFormatter = ISO8601DateFormatter()
+        inputFormatter.formatOptions = [.withFullDate]
+
+        guard let date = inputFormatter.date(from: dateString) else {
+            return ""
+        }
+
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let expenseDate = calendar.startOfDay(for: date)
+
+        let daysDifference = calendar.dateComponents([.day], from: expenseDate, to: today).day ?? 0
+
+        if daysDifference == 0 {
+            return "hoje"
+        } else if daysDifference == 1 {
+            return "ontem"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd/MM"
+            return formatter.string(from: date)
+        }
+    }
+
+    // MARK: - Computed Properties
+
+    private var quickAddPlaceholder: String {
+        viewModel.prefillMode == .quickAddExpense ? "Adiciona gasto: Uber R$25 ontem" : "Pergunte algo..."
     }
 }

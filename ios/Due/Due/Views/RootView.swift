@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RootView: View {
     @State private var selectedTab = 0
+    @State private var shouldStartQuickAdd = false
     @AppStorage("appColorScheme") private var appColorScheme = "system"
 
     private var resolvedColorScheme: ColorScheme? {
@@ -38,7 +39,7 @@ struct RootView: View {
             DashboardView()
                 .opacity(selectedTab == 0 ? 1 : 0)
                 .allowsHitTesting(selectedTab == 0)
-            ChatView()
+            ChatView(startInQuickAddMode: $shouldStartQuickAdd)
                 .opacity(selectedTab == 1 ? 1 : 0)
                 .allowsHitTesting(selectedTab == 1)
         }
@@ -61,6 +62,7 @@ struct RootView: View {
                 // FAB — opens Chat with quick-add context
                 Button {
                     HapticManager.impact(.medium)
+                    shouldStartQuickAdd = true
                     withAnimation(DuTheme.snappySpring) {
                         selectedTab = 1
                     }
@@ -108,7 +110,7 @@ struct RootView: View {
                         Label("Início", systemImage: "house.fill")
                     }
 
-                ChatView()
+                ChatView(startInQuickAddMode: $shouldStartQuickAdd)
                     .tag(1)
                     .tabItem {
                         Label("Chat", systemImage: "bubble.left.and.text.bubble.right.fill")
@@ -124,6 +126,7 @@ struct RootView: View {
     private var fabButton: some View {
         Button {
             HapticManager.impact(.medium)
+            shouldStartQuickAdd = true
             withAnimation(DuTheme.snappySpring) {
                 selectedTab = 1
             }

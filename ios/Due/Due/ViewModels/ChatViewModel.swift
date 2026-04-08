@@ -84,6 +84,11 @@ struct MockCardStreamParser: CardStreamParser {
 
 // MARK: - ChatViewModel
 
+enum PrefillMode {
+    case normal
+    case quickAddExpense
+}
+
 @MainActor
 @Observable
 final class ChatViewModel {
@@ -91,6 +96,8 @@ final class ChatViewModel {
     var isStreaming = false
     var error: String?
     var errorKind: ErrorKind?
+    var prefillMode: PrefillMode = .normal
+    var pendingExpense: ParsedExpense?
 
     private let api = APIClient.shared
     private let cardParser: CardStreamParser = SSECardStreamParser()
@@ -102,6 +109,12 @@ final class ChatViewModel {
     func send(_ text: String) async {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
+
+        // Handle quick-add expense mode
+        if prefillMode == .quickAddExpense {
+            await parseAndConfirmExpense(trimmed)
+            return
+        }
 
         let userMessage = Message(role: .user, content: trimmed)
         messages.append(userMessage)
@@ -125,6 +138,125 @@ final class ChatViewModel {
         }
 
         isStreaming = false
+    }
+
+    // MARK: - Parse Expense
+
+    func parseAndConfirmExpense(_ text: String) async {
+        isStreaming = true
+        error = nil
+        errorKind = nil
+
+        do {
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withFullDate]
+            let currentDate = dateFormatter.string(from: Date())
+
+            let request = AIParseRequest(text: text, currentDate: currentDate)
+            let response: AIParseResponse = try await api.request(Endpoint.parseExpense(), body: request)
+
+            guard let description = response.description,
+                  let amount = response.amount,
+                  let date = response.date else {
+                throw APIError.decodingError(NSError(domain: "ParseExpense", code: 0, userInfo: [NSLocalizedDescriptionKey: "Não consegui entender o gasto. Tente algo como: Uber R$25 ontem"]))
+            }
+
+            let decimal = Decimal(amount)
+            pendingExpense = ParsedExpense(
+                description: description,
+                amount: decimal,
+                date: date,
+                categoryId: response.categoryId,
+                cardId: response.cardId,
+                transactionId: nil
+            )
+
+            // Exit quick-add mode after parsing
+            prefillMode = .normal
+        } catch {
+            self.error = error.localizedDescription
+            self.errorKind = (error as? APIError)?.kind ?? .loadFailure
+        }
+
+        isStreaming = false
+    }
+
+    // MARK: - Transaction Actions
+
+    func saveExpense() async {
+        guard let expense = pendingExpense else { return }
+
+        isStreaming = true
+        error = nil
+
+        let request = CreateTransactionRequest(
+            description: expense.description,
+            amount: Double(truncating: expense.amount as NSDecimalNumber),
+            purchaseDate: expense.date,
+            installmentsCount: 1,
+            cardId: expense.cardId ?? "",
+            categoryId: expense.categoryId,
+            isSubscription: false
+        )
+
+        do {
+            let response: TransactionResponse = try await api.request(Endpoint.createTransaction(), body: request)
+
+            // Store transaction ID for undo
+            pendingExpense?.transactionId = response.id
+
+            // Add success message
+            let successMessage = Message(role: .assistant, content: "Pronto! \(expense.description) \(expense.displayAmount) adicionado.")
+            messages.append(successMessage)
+
+        } catch {
+            let apiError = error as? APIError
+            if apiError?.kind == .offline {
+                // Queue for later sync
+                OfflineTransactionQueue.shared.enqueue(request)
+                pendingExpense = nil
+
+                let queuedMessage = Message(role: .assistant, content: "Você está offline. O gasto \(expense.description) \(expense.displayAmount) será salvo quando a conexão voltar.")
+                messages.append(queuedMessage)
+            } else {
+                self.error = error.localizedDescription
+                self.errorKind = apiError?.kind ?? .loadFailure
+            }
+        }
+
+        isStreaming = false
+    }
+
+    func undoExpense() async {
+        guard let transactionId = pendingExpense?.transactionId else { return }
+
+        isStreaming = true
+        error = nil
+
+        do {
+            struct EmptyResponse: Decodable {}
+            let _: EmptyResponse = try await api.request(Endpoint.deleteTransaction(id: transactionId))
+
+            // Remove success message
+            if let lastMessage = messages.last, lastMessage.role == .assistant, lastMessage.content.contains("Pronto!") {
+                messages.removeLast()
+            }
+
+            pendingExpense = nil
+        } catch {
+            self.error = error.localizedDescription
+            self.errorKind = (error as? APIError)?.kind ?? .loadFailure
+        }
+
+        isStreaming = false
+    }
+
+    func clearPendingExpense() {
+        pendingExpense = nil
+    }
+
+    func enterQuickAddMode() {
+        prefillMode = .quickAddExpense
     }
 
     // MARK: - Card Tap (Drill-in)
@@ -226,5 +358,24 @@ private struct ChatRequest: Encodable {
     struct RequestMessage: Encodable {
         let role: String
         let content: String
+    }
+}
+
+// MARK: - Parsed Expense
+
+struct ParsedExpense: Equatable {
+    let description: String
+    let amount: Decimal
+    let date: String
+    let categoryId: String?
+    let cardId: String?
+    var transactionId: String?
+
+    var displayAmount: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = "BRL"
+        formatter.locale = Locale(identifier: "pt_BR")
+        return formatter.string(from: amount as NSDecimalNumber) ?? "R$ 0,00"
     }
 }
