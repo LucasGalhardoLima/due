@@ -16,6 +16,11 @@ enum CurrencyFormatter: Sendable {
         brlFormatter.string(from: NSNumber(value: value)) ?? "R$ 0,00"
     }
 
+    /// Full BRL format from Decimal (used by card views for monetary precision)
+    static func format(_ value: Decimal) -> String {
+        brlFormatter.string(from: value as NSDecimalNumber) ?? "R$ 0,00"
+    }
+
     /// Compact BRL format: "R$ 1,2 mil", "R$ 1,5 mi"
     /// Falls back to full format for values under 1000.
     static func formatCompact(_ value: Double) -> String {
