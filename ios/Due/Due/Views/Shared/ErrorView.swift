@@ -48,6 +48,7 @@ struct ErrorView: View {
     private var iconColor: Color {
         switch icon {
         case "wifi.slash": .secondary
+        case "clock.badge.exclamationmark": Color.statusWarning.opacity(0.8)
         case "exclamationmark.icloud": Color.statusWarning.opacity(0.8)
         case "lock.shield": Color.duVioletAdaptive.opacity(0.6)
         default: .secondary

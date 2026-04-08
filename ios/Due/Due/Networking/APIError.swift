@@ -28,9 +28,13 @@ enum APIError: LocalizedError {
             return .authExpired
         case .networkError(let error):
             let nsError = error as NSError
-            if nsError.domain == NSURLErrorDomain,
-               [NSURLErrorNotConnectedToInternet, NSURLErrorNetworkConnectionLost, NSURLErrorDataNotAllowed].contains(nsError.code) {
-                return .offline
+            if nsError.domain == NSURLErrorDomain {
+                if [NSURLErrorNotConnectedToInternet, NSURLErrorNetworkConnectionLost, NSURLErrorDataNotAllowed].contains(nsError.code) {
+                    return .offline
+                }
+                if nsError.code == NSURLErrorTimedOut {
+                    return .timeout
+                }
             }
             return .loadFailure
         case .httpError(let code, _):
@@ -45,6 +49,7 @@ enum APIError: LocalizedError {
 
 enum ErrorKind {
     case offline
+    case timeout
     case serverError
     case authExpired
     case loadFailure
@@ -52,6 +57,7 @@ enum ErrorKind {
     var icon: String {
         switch self {
         case .offline: "wifi.slash"
+        case .timeout: "clock.badge.exclamationmark"
         case .serverError: "exclamationmark.icloud"
         case .authExpired: "lock.shield"
         case .loadFailure: "arrow.trianglehead.2.counterclockwise.circle"
@@ -61,6 +67,7 @@ enum ErrorKind {
     var title: String {
         switch self {
         case .offline: "Sem conexão"
+        case .timeout: "Demorou demais"
         case .serverError: "Algo deu errado"
         case .authExpired: "Sessão expirada"
         case .loadFailure: "Não foi possível carregar"
@@ -70,6 +77,7 @@ enum ErrorKind {
     var message: String {
         switch self {
         case .offline: "Parece que você está offline. Verifique sua internet e tente de novo."
+        case .timeout: "A conexão demorou mais de 30 segundos. Verifique sua internet e tente de novo."
         case .serverError: "Nossos servidores estão com dificuldade. Tente de novo em alguns segundos."
         case .authExpired: "Por segurança, sua sessão foi encerrada. Entre novamente pra continuar."
         case .loadFailure: "Tivemos um problema ao buscar seus dados. Tente de novo."
