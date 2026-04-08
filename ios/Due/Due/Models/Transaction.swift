@@ -10,16 +10,16 @@ struct CreateTransactionRequest: Codable {
     let isSubscription: Bool
 }
 
-typealias UpdateTransactionRequest = CreateTransactionRequest
-
-struct TransactionResponse: Decodable {
-    let id: String
+struct UpdateTransactionRequest: Encodable {
     let description: String
     let amount: Double
     let purchaseDate: String
     let installmentsCount: Int
     let cardId: String
-    let categoryId: String
+    let categoryId: String?
     let isSubscription: Bool
-    let active: Bool
+}
+
+struct TransactionResponse: Decodable {
+    let id: String
 }
