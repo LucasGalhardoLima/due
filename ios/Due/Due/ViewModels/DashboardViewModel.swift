@@ -119,7 +119,7 @@ final class DashboardViewModel {
     static func daysUntilClosing(closingDay: Int) -> Int {
         let cal = Calendar.current
         let today = cal.component(.day, from: Date())
-        let daysInMonth = cal.range(of: .day, in: .month, for: Date())!.count
+        let daysInMonth = cal.range(of: .day, in: .month, for: Date())?.count ?? 30
 
         if closingDay > today {
             return closingDay - today
