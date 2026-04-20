@@ -1,19 +1,20 @@
 import { defineEventHandler, readBody } from 'h3'
+import { z } from 'zod'
 import prisma from '../../utils/prisma'
 import { endOfMonth, parseISO, differenceInDays } from 'date-fns'
 
-interface AuditItem {
-  date: string
-  description: string
-  amount: number
-}
+const auditItemSchema = z.object({
+  date: z.string(),
+  description: z.string(),
+  amount: z.number(),
+})
 
-interface AuditRequest {
-  items: AuditItem[]
-  cardId: string
-  month: number
-  year: number
-}
+const bodySchema = z.object({
+  items: z.array(auditItemSchema),
+  cardId: z.string().uuid(),
+  month: z.number().int().min(1).max(12),
+  year: z.number().int().min(2000),
+})
 
 interface AuditAlertItem {
   date: string
@@ -39,8 +40,12 @@ export default defineEventHandler(async (event) => {
   const appUser = await getOrCreateUser(event)
   enforceTierAccess(await checkAndIncrementUsage(appUser.dbUserId, appUser.tier, 'audits'))
 
-  const body = await readBody<AuditRequest>(event)
-  const { items: bankItems, cardId, month, year } = body
+  const rawBody = await readBody(event)
+  const result = bodySchema.safeParse(rawBody)
+  if (!result.success) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid body' })
+  }
+  const { items: bankItems, cardId, month, year } = result.data
 
   await verifyCardOwnership(cardId, appUser.userId)
 
@@ -54,6 +59,7 @@ export default defineEventHandler(async (event) => {
   const dbTransactions = await prisma.transaction.findMany({
     where: {
       cardId,
+      userId: appUser.userId,
       purchaseDate: {
         gte: new Date(year, month - 1, -5), // buffer
         lte: new Date(year, month, 5)
