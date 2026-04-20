@@ -49,14 +49,15 @@ export default defineEventHandler(async (event) => {
       dueDate: { gte: startDate, lte: endDate }
     },
     include: {
-      transaction: { select: { card: { select: { limit: true, closingDay: true, dueDay: true } } } }
+      transaction: { select: { card: { select: { limit: true, closingDay: true, dueDay: true, dueNextMonth: true } } } }
     }
   })
 
   // Get Card Details for limit and closing day (if cardId provided, else find first or avg)
   let cardLimit = 0
-  let closingDay = 10 
+  let closingDay = 10
   let dueDay = 15
+  let dueNextMonth = true
 
   if (cardId) {
     const card = await prisma.creditCard.findUnique({ where: { id: cardId } })
@@ -64,6 +65,7 @@ export default defineEventHandler(async (event) => {
       cardLimit = moneyToNumber(card.limit)
       closingDay = card.closingDay
       dueDay = card.dueDay
+      dueNextMonth = card.dueNextMonth
     }
   } else if (currentInstallments.length > 0) {
     // Fallback to first found card info
@@ -71,6 +73,7 @@ export default defineEventHandler(async (event) => {
     cardLimit = moneyToNumber(first.limit)
     closingDay = first.closingDay
     dueDay = first.dueDay
+    dueNextMonth = first.dueNextMonth
   } else {
     // Fallback if no data at all
     const card = await prisma.creditCard.findFirst({ where: { userId } })
@@ -78,6 +81,7 @@ export default defineEventHandler(async (event) => {
       cardLimit = moneyToNumber(card.limit)
       closingDay = card.closingDay
       dueDay = card.dueDay
+      dueNextMonth = card.dueNextMonth
     }
   }
 
@@ -124,8 +128,7 @@ export default defineEventHandler(async (event) => {
     amount,
     installments,
     now,
-    closingDay,
-    dueDay
+    { closingDay, dueDay, dueNextMonth },
   )
 
   // 4. Build "After" Timeline (Clone before logic)
