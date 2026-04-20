@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import type Stripe from 'stripe'
 
 /** Extract current_period_end from the first subscription item (Stripe v20+) */
@@ -24,12 +25,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid signature' })
   }
 
-  // Idempotency: skip already-processed events (Stripe may retry)
-  const existing = await prisma.processedStripeEvent.findUnique({
-    where: { id: stripeEvent.id },
-  })
-  if (existing) {
-    return { received: true, skipped: true }
+  // Idempotency: mark event as processing before any business logic to prevent
+  // TOCTOU race when Stripe retries while a prior invocation is still executing.
+  // The @id unique constraint ensures a concurrent duplicate insert throws P2002.
+  try {
+    await prisma.processedStripeEvent.create({ data: { id: stripeEvent.id } })
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      return { received: true, skipped: true }
+    }
+    throw err
   }
 
   switch (stripeEvent.type) {
@@ -104,11 +109,6 @@ export default defineEventHandler(async (event) => {
       break
     }
   }
-
-  // Mark event as processed
-  await prisma.processedStripeEvent.create({
-    data: { id: stripeEvent.id },
-  })
 
   return { received: true }
 })
