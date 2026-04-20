@@ -53,8 +53,7 @@ export default defineEventHandler(async (event) => {
     totalAmount,
     remainingInstallments,
     purchaseDate,
-    card.closingDay,
-    card.dueDay
+    { closingDay: card.closingDay, dueDay: card.dueDay, dueNextMonth: card.dueNextMonth },
   )
 
   // Resolve Category

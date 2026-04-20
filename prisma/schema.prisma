@@ -17,6 +17,7 @@ model CreditCard {
   budget      Decimal? @db.Decimal(14, 2) // Meta de gastos (opcional)
   closingDay  Int      // Dia que fecha a fatura (ex: 25)
   dueDay      Int      // Dia que vence (ex: 01)
+  dueNextMonth Boolean @default(true) // true = vencimento cai no mês seguinte ao fechamento (Itaú/Nubank/Bradesco); false = mesmo mês (raro)
   isDefault   Boolean  @default(false) // Marca o cartão padrão
   createdAt   DateTime @default(now())
   

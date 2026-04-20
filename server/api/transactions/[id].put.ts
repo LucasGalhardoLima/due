@@ -78,8 +78,7 @@ export default defineEventHandler(async (event) => {
         amount,
         installmentsCount,
         pDate,
-        card.closingDay,
-        card.dueDay
+        { closingDay: card.closingDay, dueDay: card.dueDay, dueNextMonth: card.dueNextMonth },
      )
 
      // Transaction Update with overwrite (Delete installments, create new)

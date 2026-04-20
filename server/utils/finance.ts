@@ -6,86 +6,78 @@ interface InstallmentPlan {
   dueDate: Date
 }
 
-export const FinanceUtils = {
-  /**
-   * Calculates the due date of the first installment based on Purchase Date and Card Settings.
+interface CycleSettings {
+  closingDay: number
+  dueDay: number
+  /** When true (default), the due date falls in the calendar month AFTER the closing month
+   * — standard for modern Brazilian issuers (Itaú, Nubank, Bradesco, Inter, C6, Santander).
+   * When false, both fall in the same month (rare, e.g. cards with close 2 / due 15).
    */
-  calculateFirstDueDate(purchaseDate: Date, closingDay: number, dueDay: number): Date {
+  dueNextMonth?: boolean
+}
+
+export const FinanceUtils = {
+  calculateFirstDueDate(purchaseDate: Date, cycle: CycleSettings): Date {
+    const { closingDay, dueDay, dueNextMonth = true } = cycle
     const pDate = startOfDay(purchaseDate)
     const dayOfMonth = getDate(pDate)
 
-    // Base date for the invoice is the PURCHASE date initially
+    // Invoice cycle: purchases on or before closingDay belong to the cycle that
+    // closes THIS month; purchases strictly after closingDay belong to the next.
     let invoiceMonth = getMonth(pDate)
     let invoiceYear = getYear(pDate)
 
-    // Safra Logic:
-    // If we bought AFTER the closing day, it belongs to the NEXT month's invoice cycle
-    // Example: Close 10. Buy 15. Belongs to cycle ending next month.
-    // Example: Close 10. Buy 5. Belongs to cycle ending this month.
     if (dayOfMonth > closingDay) {
-      // Moves to next billing cycle
       const nextMonth = addMonths(pDate, 1)
       invoiceMonth = getMonth(nextMonth)
       invoiceYear = getYear(nextMonth)
     }
 
-    // Now determine the actual Due Date given the Invoice Month/Year
-    // Standard Card Logic: If Due Day < Closing Day, it usually pays in the SUBSEQUENT month relative to the closing date
-    // Example: Close 25/Jan. Due 05/Feb.
-    // If we are in "Jan Invoice" (Close 25/Jan), Due Date is 05 (Next month)
-    // Example: Close 10/Jan. Due 17/Jan.
-    // If we are in "Jan Invoice" (Close 10/Jan), Due Date is 17 (Same month)
-
+    // Due-date month relative to the closing month.
     let dueMonth = invoiceMonth
     let dueYear = invoiceYear
 
-    if (dueDay < closingDay) {
-      // It flips to next month
+    if (dueNextMonth) {
+      // Always lands in the month following the close.
+      const nextForDue = addMonths(new Date(invoiceYear, invoiceMonth, 1), 1)
+      dueMonth = getMonth(nextForDue)
+      dueYear = getYear(nextForDue)
+    } else if (dueDay < closingDay) {
+      // Same-month cycle but the day number is earlier than the close —
+      // impossible in the same calendar month, so bump to the next.
       const nextForDue = addMonths(new Date(invoiceYear, invoiceMonth, 1), 1)
       dueMonth = getMonth(nextForDue)
       dueYear = getYear(nextForDue)
     }
 
-    // Construct the date
     return new Date(dueYear, dueMonth, dueDay)
   },
 
-  /**
-   * Generates all installment records.
-   */
   generateInstallments(
     totalAmount: number,
     installmentsCount: number,
     purchaseDate: Date,
-    closingDay: number,
-    dueDay: number
+    cycle: CycleSettings,
   ): InstallmentPlan[] {
-    // Fix rounding issues on last installment if needed, but for MVP simpler is fine.
-    // Better approach: Calculate remainder and add to first or last.
-    // Let's do simple division for now, risking 0.01 cents diff.
-    
-    // Actually, let's fix the penny issue:
     const totalCents = Math.round(totalAmount * 100)
     const installmentCents = Math.floor(totalCents / installmentsCount)
     const remainderCents = totalCents % installmentsCount
 
-    const firstDueDate = this.calculateFirstDueDate(purchaseDate, closingDay, dueDay)
-    
+    const firstDueDate = this.calculateFirstDueDate(purchaseDate, cycle)
     const plans: InstallmentPlan[] = []
 
     for (let i = 0; i < installmentsCount; i++) {
-        // Last installment absorbs remainder pennies so the total is exact
-        const thisAmountCents = i === installmentsCount - 1 ? installmentCents + remainderCents : installmentCents
-        
-        const dueDate = addMonths(firstDueDate, i)
-        
-        plans.push({
-            number: i + 1,
-            amount: thisAmountCents / 100,
-            dueDate
-        })
+      const thisAmountCents = i === installmentsCount - 1
+        ? installmentCents + remainderCents
+        : installmentCents
+      const dueDate = addMonths(firstDueDate, i)
+      plans.push({
+        number: i + 1,
+        amount: thisAmountCents / 100,
+        dueDate,
+      })
     }
 
     return plans
-  }
+  },
 }

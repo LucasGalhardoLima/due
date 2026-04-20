@@ -92,8 +92,7 @@ export default defineEventHandler(async (event) => {
               t.amount,
               1,
               purchaseDate,
-              card.closingDay,
-              card.dueDay
+              { closingDay: card.closingDay, dueDay: card.dueDay, dueNextMonth: card.dueNextMonth },
           )
           if (plan.length > 0 && plan[0]) {
               dueDate = plan[0].dueDate

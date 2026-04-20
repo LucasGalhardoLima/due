@@ -44,8 +44,7 @@ export default defineEventHandler(async (event) => {
     amount,
     installmentsCount,
     pDate,
-    card.closingDay,
-    card.dueDay
+    { closingDay: card.closingDay, dueDay: card.dueDay, dueNextMonth: card.dueNextMonth },
   )
 
   // Determine Category (use provided or find/create 'Outros')
