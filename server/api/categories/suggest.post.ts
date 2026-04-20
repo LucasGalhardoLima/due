@@ -3,6 +3,7 @@ import { generateObject } from 'ai'
 import prisma from '../../utils/prisma'
 import { gateway } from '../../utils/ai'
 import { enforceRateLimit } from '../../utils/ai-rate-limit'
+import { sanitizePromptInput } from '../../utils/ai-guard'
 
 const bodySchema = z.object({
   description: z.string().min(1),
@@ -21,7 +22,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid body' })
   }
 
-  const { description, amount, cardId } = parsed.data
+  const { description: rawDescription, amount, cardId } = parsed.data
+  const description = sanitizePromptInput(rawDescription)
 
   const [categories, similar] = await Promise.all([
     prisma.category.findMany({

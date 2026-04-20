@@ -3,19 +3,27 @@ import { z } from 'zod'
 import { gateway } from '../../utils/ai'
 import prisma from '../../utils/prisma'
 import { enforceRateLimit } from '../../utils/ai-rate-limit'
+import { sanitizePromptInput } from '../../utils/ai-guard'
+
+const bodySchema = z.object({
+  text: z.string().min(1).max(500),
+  currentDate: z.string().regex(/^\d{4}-\d{2}-\d{2}(T[\d:.Z+-]*)?$/).optional()
+})
 
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
   enforceRateLimit(`ai:parse-expense:${userId}`, 30, 10 * 60 * 1000)
-  const body = await readBody(event)
-  const { text, currentDate } = body
 
-  if (!text) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Texto é obrigatório'
-    })
+  const rawBody = await readBody(event)
+  const parsed = bodySchema.safeParse(rawBody)
+  if (!parsed.success) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid body' })
   }
+
+  const text = sanitizePromptInput(parsed.data.text)
+  const currentDate = parsed.data.currentDate
+    ? sanitizePromptInput(parsed.data.currentDate)
+    : new Date().toISOString()
 
   // Fetch context
   const [cards, categories] = await Promise.all([
@@ -29,6 +37,9 @@ export default defineEventHandler(async (event) => {
     })
   ])
 
+  const validCardIds = new Set(cards.map(c => c.id))
+  const validCategoryIds = new Set(categories.map(c => c.id))
+
   // Context strings
   const cardsContext = cards.map(c => `- ${c.name} (ID: ${c.id})`).join('\n')
   const categoriesContext = categories.map(c => `- ${c.name} (ID: ${c.id})`).join('\n')
@@ -36,7 +47,7 @@ export default defineEventHandler(async (event) => {
   const prompt = `
     Você é um assistente financeiro inteligente. Sua tarefa é analisar um texto em linguagem natural sobre uma despesa e extrair os dados estruturados.
 
-    DATA ATUAL: ${currentDate || new Date().toISOString()}
+    DATA ATUAL: ${currentDate}
 
     TEXTO DO USUÁRIO: "${text}"
 
@@ -74,6 +85,10 @@ export default defineEventHandler(async (event) => {
     // Sanitize: AI sometimes returns "null" string instead of actual null
     if (object.cardId === 'null') object.cardId = null
     if (object.categoryId === 'null') object.categoryId = null
+
+    // Re-verify AI-returned IDs belong to this user — never trust LLM output as authoritative
+    if (object.cardId && !validCardIds.has(object.cardId)) object.cardId = null
+    if (object.categoryId && !validCategoryIds.has(object.categoryId)) object.categoryId = null
 
     return object
   } catch (error) {
