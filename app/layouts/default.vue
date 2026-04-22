@@ -2,7 +2,13 @@
 import Sidebar from '@/components/layout/Sidebar.vue'
 import BottomNav from '@/components/layout/BottomNav.vue'
 import InstallPrompt from '@/components/pwa/InstallPrompt.vue'
-import GlobalQuickAddFab from '@/components/layout/GlobalQuickAddFab.vue'
+import ChatFab from '@/components/chat/ChatFab.vue'
+import ChatPanel from '@/components/chat/ChatPanel.vue'
+import ChatBottomSheet from '@/components/chat/ChatBottomSheet.vue'
+import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
+import { useChatDrawer } from '@/composables/useChatDrawer'
+
+const chatDrawer = useChatDrawer()
 </script>
 
 <template>
@@ -17,7 +23,19 @@ import GlobalQuickAddFab from '@/components/layout/GlobalQuickAddFab.vue'
     </div>
 
     <BottomNav />
-    <GlobalQuickAddFab />
+
+    <!-- Du Chat FAB + Panel -->
+    <ChatFab />
+    <ChatPanel />
+    <ChatBottomSheet />
+
+    <!-- Chat-driven expense drawer (separate from dashboard's drawer) -->
+    <TransactionDrawer
+      :open="chatDrawer.isOpen.value"
+      :prefilled="chatDrawer.prefilled.value"
+      @update:open="(v) => v ? null : chatDrawer.close()"
+      @saved="chatDrawer.close()"
+    />
 
     <!-- PWA Install Prompt -->
     <InstallPrompt />
