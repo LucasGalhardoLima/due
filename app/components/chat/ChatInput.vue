@@ -24,10 +24,19 @@ const props = defineProps<{
   tabContext?: string
 }>()
 
+function autoResize(event: Event) {
+  const el = event.target as HTMLTextAreaElement
+  el.style.height = 'auto'
+  el.style.height = `${el.scrollHeight}px`
+}
+
 function submit() {
   const msg = localInput.value.trim()
   if (!msg || chat.isStreaming.value) return
   localInput.value = ''
+  if (inputEl.value) {
+    inputEl.value.style.height = 'auto'
+  }
   chat.send(msg, props.tabContext)
 }
 
@@ -46,11 +55,12 @@ function handleKeydown(event: KeyboardEvent) {
         ref="inputEl"
         v-model="localInput"
         rows="1"
+        aria-label="Mensagem para Du"
         placeholder="Pergunte algo ao Du…"
         class="flex-1 resize-none bg-transparent text-sm leading-relaxed outline-none placeholder:text-muted-foreground/60 max-h-32 overflow-y-auto"
         :disabled="chat.isStreaming.value"
         @keydown="handleKeydown"
-        @input="($event.target as HTMLTextAreaElement).style.height = 'auto'; ($event.target as HTMLTextAreaElement).style.height = ($event.target as HTMLTextAreaElement).scrollHeight + 'px'"
+        @input="autoResize"
       />
       <button
         type="button"

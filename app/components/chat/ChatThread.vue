@@ -18,7 +18,7 @@ const threadEl = ref<HTMLElement | null>(null)
 const isEmpty = computed(() => chat.thread.value.length === 0)
 
 watch(
-  () => chat.thread.value.length,
+  [() => chat.thread.value.length, () => chat.isStreaming.value],
   async () => {
     await nextTick()
     if (threadEl.value) {
