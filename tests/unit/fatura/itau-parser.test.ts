@@ -120,4 +120,49 @@ describe('ItauParser', () => {
       expect(result.stats.skippedAdjustments).toBeGreaterThan(0)
     })
   })
+
+  describe('ItauParser — edge cases', () => {
+    it('should handle international transactions section (skip it)', () => {
+      const text = `
+      Cartão 5536.XXXX.XXXX.6552
+      Previsão prox. Fechamento: 13/02/2026
+
+      LUCAS G LIMA (final 6552)
+      DATA ESTABELECIMENTO                                   VALOR EM R$
+      13/12   RAIA182 -CT                 77,65
+              SAÚDE .MATO
+
+      Lançamentos internacionais
+      LUCAS G LIMA (final 6552)
+      DATA ESTABELECIMENTO                             US$         R$
+      26/12 TUYA (HK) LIMITED                        39,22
+               KOWLOON           36,90 BRL   6,67
+      Total transações inter. em R$                 39,22
+    `
+      const parser = new ItauParser()
+      const result = parser.parse(text)
+
+      // Should only have the domestic transaction, not the international one
+      expect(result.transactions.length).toBe(1)
+      expect(result.transactions[0]!.rawDescription).toContain('RAIA182')
+    })
+
+    it('should handle transactions with empty city', () => {
+      const text = `
+      Cartão 5536.XXXX.XXXX.6552
+      Previsão prox. Fechamento: 13/02/2026
+
+      LUCAS G LIMA (final 6552)
+      DATA ESTABELECIMENTO                                   VALOR EM R$
+      19/12   RAIA3368 -CT 01/03         137,48
+              SAÚDE .
+    `
+      const parser = new ItauParser()
+      const result = parser.parse(text)
+
+      expect(result.transactions.length).toBe(1)
+      expect(result.transactions[0]!.city).toBe('')
+      expect(result.transactions[0]!.bankCategory).toBe('SAÚDE')
+    })
+  })
 })
