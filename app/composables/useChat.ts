@@ -11,15 +11,6 @@ interface ChatState {
   pendingExpense: ParsedExpenseResult | null
 }
 
-const state = useState<ChatState>('du-chat', () => ({
-  isOpen: false,
-  thread: [],
-  isStreaming: false,
-  pendingInput: '',
-  isLongRunning: false,
-  pendingExpense: null,
-}))
-
 function nanoid(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36)
 }
@@ -38,6 +29,15 @@ function parseAIDataStream(line: string): { text?: string; data?: ChatStreamMeta
 }
 
 export function useChat() {
+  const state = useState<ChatState>('du-chat', () => ({
+    isOpen: false,
+    thread: [],
+    isStreaming: false,
+    pendingInput: '',
+    isLongRunning: false,
+    pendingExpense: null,
+  }))
+
   const isOpen = computed(() => state.value.isOpen)
   const thread = computed(() => state.value.thread)
   const isStreaming = computed(() => state.value.isStreaming)
@@ -103,7 +103,6 @@ export function useChat() {
 
       if (!response.ok || !response.body) {
         assistantMsg.content = 'Desculpe, ocorreu um erro. Tente novamente.'
-        assistantMsg.isTyping = false
         state.value.thread = [...state.value.thread]
         return
       }

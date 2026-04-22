@@ -1,4 +1,5 @@
 import { useState } from '#app'
+import { computed } from 'vue'
 import type { ParsedExpenseResult } from '~/types/chat'
 
 interface ChatDrawerState {
@@ -6,12 +7,11 @@ interface ChatDrawerState {
   prefilled: ParsedExpenseResult | null
 }
 
-const state = useState<ChatDrawerState>('chat-drawer', () => ({
-  open: false,
-  prefilled: null,
-}))
-
 export function useChatDrawer() {
+  const state = useState<ChatDrawerState>('chat-drawer', () => ({
+    open: false,
+    prefilled: null,
+  }))
   function openWithParsed(parsed: ParsedExpenseResult) {
     state.value.prefilled = parsed
     state.value.open = true
