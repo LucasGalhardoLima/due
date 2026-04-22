@@ -95,6 +95,9 @@ REGRAS:
     onFinish: () => {
       data.close()
     },
+    onError: () => {
+      data.close()
+    },
   })
 
   return result.toDataStreamResponse({ data })
