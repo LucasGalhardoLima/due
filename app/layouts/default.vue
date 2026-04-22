@@ -33,7 +33,7 @@ const chatDrawer = useChatDrawer()
     <TransactionDrawer
       :open="chatDrawer.isOpen.value"
       :prefilled="chatDrawer.prefilled.value"
-      @update:open="(v) => v ? null : chatDrawer.close()"
+      @update:open="(v) => { if (!v) chatDrawer.close() }"
       @saved="chatDrawer.close()"
     />
 
