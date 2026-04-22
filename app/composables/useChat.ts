@@ -170,6 +170,9 @@ export function useChat() {
       if (state.value.isLongRunning) {
         state.value.thread = state.value.thread.filter(m => !m.notificationPrompt)
         state.value.isLongRunning = false
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          new Notification('Du', { body: 'Sua análise está pronta! Abra o Du para ver o resultado.' })
+        }
       }
       state.value.thread = [...state.value.thread]
     }
