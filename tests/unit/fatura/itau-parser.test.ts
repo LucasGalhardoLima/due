@@ -68,7 +68,7 @@ describe('ItauParser', () => {
       expect(raia!.amount).toBe(77.65)
       expect(raia!.installmentsCount).toBe(1)
       expect(raia!.bankCategory).toBe('SAÚDE')
-      expect(raia!.purchaseDate).toContain('12-13')
+      expect(raia!.purchaseDate).toBe('2025-12-13')
     })
 
     it('should parse first-installment transactions (01/YY)', () => {
@@ -96,7 +96,7 @@ describe('ItauParser', () => {
       // -0.02 lines should not appear in transactions
       const adjustments = result.transactions.filter(t => t.amount < 0)
       expect(adjustments).toHaveLength(0)
-      expect(result.stats.skippedAdjustments).toBeGreaterThan(0)
+      expect(result.stats.skippedAdjustments).toBe(2)
     })
 
     it('should skip "Compras parceladas - proximas faturas" section', () => {
@@ -115,9 +115,9 @@ describe('ItauParser', () => {
 
     it('should report correct stats', () => {
       const result = parser.parse(SAMPLE_ITAU_TEXT)
-      expect(result.stats.newPurchases).toBe(result.transactions.length)
-      expect(result.stats.skippedOngoing).toBeGreaterThan(0)
-      expect(result.stats.skippedAdjustments).toBeGreaterThan(0)
+      expect(result.stats.newPurchases).toBe(6)
+      expect(result.stats.skippedOngoing).toBe(3)
+      expect(result.stats.skippedAdjustments).toBe(2)
     })
   })
 
