@@ -2,7 +2,15 @@
 import Sidebar from '@/components/layout/Sidebar.vue'
 import BottomNav from '@/components/layout/BottomNav.vue'
 import InstallPrompt from '@/components/pwa/InstallPrompt.vue'
-import GlobalQuickAddFab from '@/components/layout/GlobalQuickAddFab.vue'
+import ChatFab from '@/components/chat/ChatFab.vue'
+import ChatPanel from '@/components/chat/ChatPanel.vue'
+import ChatBottomSheet from '@/components/chat/ChatBottomSheet.vue'
+import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
+import { useChatDrawer } from '@/composables/useChatDrawer'
+import { useMediaQuery } from '@vueuse/core'
+
+const chatDrawer = useChatDrawer()
+const isDesktop = useMediaQuery('(min-width: 1024px)')
 </script>
 
 <template>
@@ -17,7 +25,19 @@ import GlobalQuickAddFab from '@/components/layout/GlobalQuickAddFab.vue'
     </div>
 
     <BottomNav />
-    <GlobalQuickAddFab />
+
+    <!-- Du Chat FAB + Panel (only one panel mounted at a time to avoid dual portals) -->
+    <ChatFab />
+    <ChatPanel v-if="isDesktop" />
+    <ChatBottomSheet v-else />
+
+    <!-- Chat-driven expense drawer (separate from dashboard's drawer) -->
+    <TransactionDrawer
+      :open="chatDrawer.isOpen.value"
+      :prefilled="chatDrawer.prefilled.value"
+      @update:open="(v) => { if (!v) chatDrawer.close() }"
+      @saved="chatDrawer.close()"
+    />
 
     <!-- PWA Install Prompt -->
     <InstallPrompt />
