@@ -17,6 +17,7 @@ import { sheetVariants } from "."
 interface SheetContentProps extends DialogContentProps {
   class?: HTMLAttributes["class"]
   side?: SheetVariants["side"]
+  hideClose?: boolean
 }
 
 defineOptions({
@@ -44,6 +45,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
       <slot />
 
       <DialogClose
+        v-if="!hideClose"
         class="absolute right-4 top-4 rounded-xl opacity-70 ring-offset-background transition-[opacity,transform,background-color] duration-200 ease-out hover:opacity-100 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-secondary"
       >
         <X class="w-4 h-4" />
