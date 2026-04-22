@@ -22,7 +22,7 @@ const displayName = computed(() => props.userName ?? 'você')
     <div class="flex flex-col gap-1">
       <p class="text-sm text-muted-foreground">{{ greeting }}.</p>
       <p class="text-base font-medium leading-snug">
-        Oi, {{ displayName }}! O que posso fazer por você?
+        👋 Oi, {{ displayName }}! O que posso fazer por você?
       </p>
     </div>
 
