@@ -45,6 +45,14 @@ const advisor = useProactiveAdvisor()
 const props = defineProps<{
   open: boolean
   transactionId?: string | null
+  prefilled?: {
+    description: string
+    amount: number
+    date: string
+    installments: number
+    cardId: string | null
+    categoryId: string | null
+  } | null
 }>()
 
 const emit = defineEmits(['update:open', 'saved'])
@@ -214,6 +222,18 @@ watch(() => props.open, async (isOpen) => {
         })
     }
 })
+
+watch(() => props.prefilled, (val) => {
+  if (!val) return
+  isAiMode.value = false
+  description.value = val.description
+  amount.value = val.amount
+  purchaseDate.value = val.date
+  installments.value = [val.installments]
+  paymentType.value = val.installments > 1 ? 'installment' : 'cash'
+  if (val.cardId) selectedCardId.value = val.cardId
+  if (val.categoryId) selectedCategoryId.value = val.categoryId
+}, { immediate: true })
 
 // Computed
 const isOpen = computed({
