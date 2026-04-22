@@ -13,6 +13,10 @@ export class ItauParser implements FaturaParser {
 
   parse(rawText: string): ParsedFatura {
     const billingPeriod = this.extractBillingPeriod(rawText)
+    if (billingPeriod === 'unknown') {
+      throw new Error('Could not extract billing period from fatura — missing Fechamento/Emissão header')
+    }
+
     const cleanedText = this.removePreviewSections(rawText)
     const lines = cleanedText.split('\n')
 
