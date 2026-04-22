@@ -1,3 +1,9 @@
+# Superpowers brainstorm sessions
+.superpowers/
+
+# Git worktrees
+.worktrees/
+
 # Nuxt dev/build outputs
 .output
 .data
@@ -22,6 +28,9 @@ logs
 .env
 .env.*
 !.env.example
+
+# MCP config (contains API keys)
+.mcp.json
 
 # Database
 prisma/*.db
