@@ -4,6 +4,7 @@ import { useChat } from '@/composables/useChat'
 const chat = useChat()
 const requested = ref(false)
 const granted = ref(false)
+const denied = ref(false)
 
 async function requestNotification() {
   if (!('Notification' in window)) {
@@ -12,6 +13,7 @@ async function requestNotification() {
   }
   const permission = await Notification.requestPermission()
   granted.value = permission === 'granted'
+  denied.value = permission === 'denied'
   requested.value = true
 }
 
@@ -43,12 +45,14 @@ function waitHere() {
     <!-- Actions -->
     <div v-if="!requested" class="flex flex-col gap-2">
       <button
+        type="button"
         class="w-full rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         @click="requestNotification"
       >
         🔔 Me avise quando terminar
       </button>
       <button
+        type="button"
         class="w-full rounded-lg bg-muted px-4 py-2 text-sm text-muted-foreground hover:bg-muted/80 active:scale-[0.98] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         @click="waitHere"
       >
@@ -60,7 +64,7 @@ function waitHere() {
     </div>
 
     <p v-else class="text-xs text-center text-muted-foreground">
-      {{ granted ? '✓ Você será notificado quando terminar' : 'Aguardando resultado…' }}
+      {{ granted ? '✓ Você será notificado quando terminar' : denied ? 'Notificações bloqueadas. O resultado aparecerá aqui.' : 'Aguardando resultado…' }}
     </p>
   </div>
 </template>

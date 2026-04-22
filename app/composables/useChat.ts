@@ -167,6 +167,10 @@ export function useChat() {
     } finally {
       assistantMsg.isTyping = false
       state.value.isStreaming = false
+      if (state.value.isLongRunning) {
+        state.value.thread = state.value.thread.filter(m => !m.notificationPrompt)
+        state.value.isLongRunning = false
+      }
       state.value.thread = [...state.value.thread]
     }
   }

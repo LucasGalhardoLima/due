@@ -15,9 +15,13 @@ const drawer = useChatDrawer()
 const chat = useChat()
 
 function handleAction(action: string, payload?: Record<string, unknown>) {
-  if (action === 'open-drawer' && chat.pendingExpense.value) {
-    drawer.openWithParsed(chat.pendingExpense.value)
-    chat.clearPendingExpense()
+  if (action === 'open-drawer') {
+    if (chat.pendingExpense.value) {
+      drawer.openWithParsed(chat.pendingExpense.value)
+      chat.clearPendingExpense()
+    } else {
+      drawer.openEmpty()
+    }
   } else if (action === 'dismiss') {
     chat.clearPendingExpense()
   }
@@ -56,7 +60,7 @@ function handleAction(action: string, payload?: Record<string, unknown>) {
           <div v-if="item.barPercent !== undefined" class="h-1.5 rounded-full bg-muted overflow-hidden">
             <div
               class="h-full rounded-full bg-primary transition-all duration-500"
-              :style="{ width: `${Math.min(item.barPercent, 100)}%` }"
+              :style="{ width: `${Math.max(0, Math.min(item.barPercent, 100))}%` }"
             />
           </div>
         </div>
@@ -74,6 +78,7 @@ function handleAction(action: string, payload?: Record<string, unknown>) {
       <button
         v-for="action in card.actions"
         :key="action.label"
+        type="button"
         class="rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         :class="action.action === 'open-drawer'
           ? 'bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.97]'

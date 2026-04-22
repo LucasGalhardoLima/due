@@ -34,7 +34,7 @@ const emit = defineEmits<{
 
     <div class="flex-1 min-w-0 flex flex-col gap-2">
       <!-- Typing indicator -->
-      <div v-if="message.isTyping" class="flex items-center gap-1 py-1">
+      <div v-if="message.isTyping" role="status" aria-label="Du está digitando" class="flex items-center gap-1 py-1">
         <span v-for="i in 3" :key="i" class="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce" :style="{ animationDelay: `${(i - 1) * 150}ms` }" />
       </div>
 
@@ -49,6 +49,7 @@ const emit = defineEmits<{
         <button
           v-for="chip in message.followUpChips"
           :key="chip"
+          type="button"
           class="rounded-full border border-border bg-muted/50 px-3 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground hover:border-primary/30 active:scale-[0.97] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
           @click="emit('selectChip', chip)"
         >
