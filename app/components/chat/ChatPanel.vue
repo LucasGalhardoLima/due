@@ -5,6 +5,7 @@ import ChatThread from './ChatThread.vue'
 import ChatInput from './ChatInput.vue'
 import { useChat } from '@/composables/useChat'
 import { useChatContext } from '@/composables/useChatContext'
+import { DialogClose } from 'reka-ui'
 import { X } from 'lucide-vue-next'
 
 const chat = useChat()
@@ -21,6 +22,7 @@ function handleSelectSuggestion(message: string) {
     <Sheet :open="chat.isOpen.value" @update:open="(v) => v ? chat.open() : chat.close()">
       <SheetContent
         side="right"
+        hide-close
         class="hidden lg:flex w-[420px] flex-col p-0 gap-0 border-l border-border bg-background"
       >
         <!-- Header -->
@@ -30,14 +32,16 @@ function handleSelectSuggestion(message: string) {
             <p class="text-sm font-extrabold leading-tight tracking-tight">Du</p>
             <p class="text-[11px] text-muted-foreground leading-none mt-0.5">Seu coach financeiro</p>
           </div>
-          <button
-            type="button"
-            class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-            aria-label="Fechar Du Chat"
-            @click="chat.close()"
-          >
-            <X class="h-4 w-4" />
-          </button>
+          <DialogClose as-child>
+            <button
+              type="button"
+              class="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+              aria-label="Fechar Du Chat"
+              @click="chat.close()"
+            >
+              <X class="h-4 w-4" />
+            </button>
+          </DialogClose>
         </div>
 
         <!-- Thread -->
