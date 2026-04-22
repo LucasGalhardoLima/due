@@ -7,8 +7,10 @@ import ChatPanel from '@/components/chat/ChatPanel.vue'
 import ChatBottomSheet from '@/components/chat/ChatBottomSheet.vue'
 import TransactionDrawer from '@/components/transaction/TransactionDrawer.vue'
 import { useChatDrawer } from '@/composables/useChatDrawer'
+import { useMediaQuery } from '@vueuse/core'
 
 const chatDrawer = useChatDrawer()
+const isDesktop = useMediaQuery('(min-width: 1024px)')
 </script>
 
 <template>
@@ -24,10 +26,10 @@ const chatDrawer = useChatDrawer()
 
     <BottomNav />
 
-    <!-- Du Chat FAB + Panel -->
+    <!-- Du Chat FAB + Panel (only one panel mounted at a time to avoid dual portals) -->
     <ChatFab />
-    <ChatPanel />
-    <ChatBottomSheet />
+    <ChatPanel v-if="isDesktop" />
+    <ChatBottomSheet v-else />
 
     <!-- Chat-driven expense drawer (separate from dashboard's drawer) -->
     <TransactionDrawer

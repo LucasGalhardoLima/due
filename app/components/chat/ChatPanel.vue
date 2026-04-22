@@ -23,7 +23,7 @@ function handleSelectSuggestion(message: string) {
       <SheetContent
         side="right"
         hide-close
-        class="hidden lg:flex w-[420px] flex-col p-0 gap-0 border-l border-border bg-background"
+        class="flex w-[420px] flex-col p-0 gap-0 border-l border-border bg-background"
       >
         <!-- Header -->
         <div class="flex items-center gap-2.5 border-b border-border px-5 py-4 shrink-0">

@@ -40,8 +40,9 @@ const GREETINGS: Record<string, string> = {
 }
 
 export function useChatContext() {
+  const route = useRoute()
+
   const contextKey = computed(() => {
-    const route = useRoute()
     if (route.path === '/parcelamentos') return 'parcelamentos'
     const tab = String(route.query?.tab ?? '')
     if (tab === 'cartao' || tab === '') return 'cartao' // dashboard default = cartao

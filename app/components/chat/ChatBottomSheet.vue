@@ -24,7 +24,7 @@ function handleSelectSuggestion(message: string) {
   <!-- Mobile only: < lg -->
   <ClientOnly>
     <Drawer :open="chat.isOpen.value" @update:open="(v) => v ? chat.open() : chat.close()">
-      <DrawerContent class="lg:hidden flex flex-col h-[92dvh] p-0 gap-0">
+      <DrawerContent class="flex flex-col h-[92dvh] p-0 gap-0">
         <!-- Header -->
         <DrawerHeader class="flex items-center gap-2.5 border-b border-border px-5 py-4 shrink-0">
           <span class="text-xl leading-none select-none" aria-hidden="true">✦</span>

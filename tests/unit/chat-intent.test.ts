@@ -33,5 +33,9 @@ describe('detectChatIntent', () => {
     it('does not flag questions', () => {
       expect(detectChatIntent('por que minha fatura está alta?').isExpenseAdd).toBe(false)
     })
+    it('does not flag expense verbs without an amount', () => {
+      expect(detectChatIntent('gastei tempo nisso semana passada').isExpenseAdd).toBe(false)
+      expect(detectChatIntent('comi muito mal essa semana').isExpenseAdd).toBe(false)
+    })
   })
 })
