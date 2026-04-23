@@ -58,5 +58,11 @@ describe('detectChatIntent', () => {
     it('does not flag analysis requests', () => {
       expect(detectChatIntent('por que minha fatura está alta?').isFilterIntent).toBe(false)
     })
+    it('does not flag "apenas" in expense context', () => {
+      expect(detectChatIntent('comi apenas uma maçã').isFilterIntent).toBe(false)
+    })
+    it('does not flag "só" in expense context', () => {
+      expect(detectChatIntent('só gastei R$50 hoje').isFilterIntent).toBe(false)
+    })
   })
 })
