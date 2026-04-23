@@ -50,7 +50,24 @@ export interface ContextualSuggestion {
   message: string
 }
 
+export interface FilterParams {
+  merchant?: string
+  category?: string
+  minAmount?: number
+  maxAmount?: number
+  dateFrom?: string   // ISO date "YYYY-MM-DD"
+  dateTo?: string     // ISO date "YYYY-MM-DD"
+  month?: string      // "YYYY-MM" — expanded to dateFrom/dateTo by the composable
+  installmentOnly?: boolean
+}
+
+export interface ChatFilterEvent {
+  type: 'filter:apply' | 'filter:clear'
+  filters: FilterParams
+}
+
 export interface ChatStreamMetadata {
   longRunning?: boolean
   parsedExpense?: ParsedExpenseResult
+  filterEvent?: ChatFilterEvent
 }
