@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Activity } from 'lucide-vue-next'
+import AiHintBadge from '@/components/chat/AiHintBadge.vue'
 
 interface DataPoint {
   date: string
@@ -89,7 +90,11 @@ const paceStatus = computed(() => {
 </script>
 
 <template>
-  <div class="glass-surface p-5">
+  <div class="relative glass-surface p-5">
+    <AiHintBadge
+      question="Meu ritmo de gastos esse mês está bom?"
+      class="absolute top-3 right-3 z-10"
+    />
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center gap-2">
         <div class="p-1.5 rounded-xl" :class="{

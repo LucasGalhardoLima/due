@@ -2,6 +2,7 @@
 import { CalendarClock, RotateCw, CreditCard } from 'lucide-vue-next'
 import { parseISO, differenceInDays, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import AiHintBadge from '@/components/chat/AiHintBadge.vue'
 
 interface Bill {
   id: string
@@ -43,7 +44,11 @@ function dueColorClass(dateStr: string) {
 </script>
 
 <template>
-  <div class="glass-surface p-5">
+  <div class="relative glass-surface p-5">
+    <AiHintBadge
+      question="Consigo pagar todas as contas que vencem essa semana sem comprometer o orçamento?"
+      class="absolute top-3 right-3 z-10"
+    />
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
         <div class="p-1.5 rounded-xl bg-brand-accent/10 dark:bg-brand-accent/10">

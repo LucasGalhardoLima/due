@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-vue-next'
 import DuAvatar from '@/components/ui/DuAvatar.vue'
+import AiHintBadge from '@/components/chat/AiHintBadge.vue'
 
 interface ScoreComponent {
   name: string
@@ -76,7 +77,11 @@ function barColor(component: ScoreComponent) {
 </script>
 
 <template>
-  <div class="glass-surface overflow-hidden p-0">
+  <div class="relative glass-surface overflow-hidden p-0">
+    <AiHintBadge
+      question="Como posso melhorar meu DuScore?"
+      class="absolute top-3 right-3 z-10"
+    />
     <div class="p-4 border-b border-border bg-muted !rounded-none !border-x-0 !border-t-0 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <DuAvatar size="xs" variant="primary" />
