@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button'
 import { X, MessageCircle, AlertTriangle, PartyPopper, Bot } from 'lucide-vue-next'
 import DuAvatar from '@/components/ui/DuAvatar.vue'
 import { useProactiveAdvisor } from '@/composables/useProactiveAdvisor'
+import { useChat } from '@/composables/useChat'
 
 const advisor = useProactiveAdvisor()
+const chat = useChat()
 
 // Controls the Transition visibility (separate from advisor.hasMessage so animation completes)
 const showToast = ref(false)
@@ -96,6 +98,13 @@ function handleAction() {
   handleDismiss()
 }
 
+function askDu() {
+  const msg = advisor.currentMessage.value?.message
+  if (!msg) return
+  handleDismiss()
+  chat.openWithAssistantMessage(msg)
+}
+
 function onAfterLeave() {
   advisor.dismiss()
 }
@@ -146,9 +155,10 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <!-- Action button (if provided) -->
-            <div v-if="advisor.currentMessage.value?.action" class="mt-3 pl-11">
+            <!-- Action + Du CTA buttons -->
+            <div class="mt-3 pl-11 flex flex-wrap gap-2">
               <Button
+                v-if="advisor.currentMessage.value?.action"
                 variant="secondary"
                 size="sm"
                 class="h-auto min-h-7 py-1 px-3 text-xs whitespace-normal text-left justify-start"
@@ -156,6 +166,13 @@ onUnmounted(() => {
               >
                 {{ advisor.currentMessage.value.action.text }}
               </Button>
+              <button
+                type="button"
+                class="inline-flex items-center gap-1 rounded-full bg-[hsl(168_64%_70%_/_0.15)] hover:bg-[hsl(168_64%_70%_/_0.25)] border border-[hsl(168_64%_70%_/_0.3)] px-3 py-1 text-xs font-medium text-[hsl(168_64%_45%)] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(168_64%_70%_/_0.5)]"
+                @click="askDu"
+              >
+                ✦ Perguntar ao Du →
+              </button>
             </div>
           </div>
         </div>
