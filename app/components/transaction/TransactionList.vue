@@ -41,7 +41,7 @@ const props = defineProps<{
   transactions: Record<string, TransactionItem[]>
 }>()
 
-defineEmits(['edit', 'delete'])
+defineEmits(['edit'])
 
 // Sorting state
 const sortKey = ref<'purchaseDate' | 'description' | 'amount' | 'cardName'>('purchaseDate')
@@ -81,7 +81,7 @@ function openContextMenu(e: MouseEvent | Touch, tx: TransactionWithDate) {
     x: clientX,
     y: clientY,
     transaction: {
-      id: tx.id,
+      id: tx.transactionId,
       description: tx.description,
       amount: tx.amount,
       purchaseDate: tx.purchaseDate,
@@ -331,7 +331,6 @@ function getIcon(categoryName: string) {
         :transaction="contextMenu.transaction"
         @close="contextMenu = null"
         @edit="$emit('edit', $event)"
-        @delete="$emit('delete', $event)"
       />
   </div>
 </template>

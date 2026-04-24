@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Pencil, Trash2 } from 'lucide-vue-next'
+import { Pencil } from 'lucide-vue-next'
 import { useChat } from '@/composables/useChat'
 
 const props = defineProps<{
@@ -20,7 +20,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
   edit: [id: string]
-  delete: [id: string]
 }>()
 
 const chat = useChat()
@@ -41,11 +40,6 @@ function askDu() {
 
 function handleEdit() {
   emit('edit', props.transaction.id)
-  emit('close')
-}
-
-function handleDelete() {
-  emit('delete', props.transaction.id)
   emit('close')
 }
 
@@ -107,15 +101,6 @@ onMounted(() => {
       >
         <Pencil class="w-3.5 h-3.5 text-muted-foreground" />
         Editar
-      </button>
-      <button
-        type="button"
-        role="menuitem"
-        class="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-destructive hover:bg-muted transition-colors"
-        @click="handleDelete"
-      >
-        <Trash2 class="w-3.5 h-3.5" />
-        Excluir
       </button>
     </div>
   </Teleport>
