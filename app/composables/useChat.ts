@@ -1,6 +1,7 @@
 import { useState, useRoute } from '#app'
 import { computed } from 'vue'
 import type { ChatMessage, ChatStreamMetadata, ParsedExpenseResult } from '~/types/chat'
+import { useTransactionFilter } from './useTransactionFilter'
 
 interface ChatState {
   isOpen: boolean
@@ -52,6 +53,13 @@ export function useChat() {
     if (options?.preloadedMessage) {
       state.value.pendingInput = options.preloadedMessage
     }
+  }
+
+  function openWithAssistantMessage(content: string) {
+    state.value.isOpen = true
+    state.value.pendingInput = ''
+    const assistantMsg: ChatMessage = { id: nanoid(), role: 'assistant', content }
+    state.value.thread = [...state.value.thread, assistantMsg]
   }
 
   function close() {
@@ -159,6 +167,10 @@ export function useChat() {
               ],
             }
           }
+
+          if (parsed.data?.filterEvent) {
+            useTransactionFilter().applyFilter(parsed.data.filterEvent)
+          }
         }
         state.value.thread = [...state.value.thread]
       }
@@ -186,6 +198,7 @@ export function useChat() {
     isLongRunning,
     pendingExpense,
     open,
+    openWithAssistantMessage,
     close,
     send,
     clearThread,

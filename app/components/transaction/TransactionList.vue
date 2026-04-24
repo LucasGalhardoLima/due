@@ -9,6 +9,7 @@ import {
   ArrowUpDown,
   Pencil,
   Receipt,
+  X,
 } from 'lucide-vue-next'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import {
@@ -20,6 +21,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import TransactionContextMenu from '@/components/transaction/TransactionContextMenu.vue'
+import { useTransactionFilter } from '@/composables/useTransactionFilter'
 
 interface TransactionItem {
   id: string
@@ -38,7 +41,7 @@ const props = defineProps<{
   transactions: Record<string, TransactionItem[]>
 }>()
 
-defineEmits(['edit', 'delete'])
+defineEmits(['edit'])
 
 // Sorting state
 const sortKey = ref<'purchaseDate' | 'description' | 'amount' | 'cardName'>('purchaseDate')
@@ -58,6 +61,63 @@ interface TransactionWithDate extends TransactionItem {
   purchaseDate: string
 }
 
+const filter = useTransactionFilter()
+
+const contextMenu = ref<{
+  x: number; y: number
+  transaction: {
+    id: string; description: string; amount: number
+    purchaseDate: string; category: string
+    installmentNumber: number; totalInstallments: number
+  }
+} | null>(null)
+
+let longPressTimer: ReturnType<typeof setTimeout> | null = null
+
+function openContextMenu(e: MouseEvent | Touch, tx: TransactionWithDate) {
+  const clientX = e.clientX
+  const clientY = e.clientY
+  contextMenu.value = {
+    x: clientX,
+    y: clientY,
+    transaction: {
+      id: tx.transactionId,
+      description: tx.description,
+      amount: tx.amount,
+      purchaseDate: tx.purchaseDate,
+      category: tx.category,
+      installmentNumber: tx.installmentNumber,
+      totalInstallments: tx.totalInstallments,
+    },
+  }
+}
+
+function onRowContextMenu(e: MouseEvent, tx: TransactionWithDate) {
+  e.preventDefault()
+  openContextMenu(e, tx)
+}
+
+function onRowTouchStart(e: TouchEvent, tx: TransactionWithDate) {
+  const touch = e.touches[0]!
+  longPressTimer = setTimeout(() => {
+    openContextMenu(touch, tx)
+  }, 500)
+}
+
+function onRowTouchEnd() {
+  if (longPressTimer !== null) {
+    clearTimeout(longPressTimer)
+    longPressTimer = null
+  }
+}
+
+function onRowTouchMove() {
+  if (longPressTimer !== null) {
+    clearTimeout(longPressTimer)
+    longPressTimer = null
+  }
+}
+
 const allTransactions = computed<TransactionWithDate[]>(() => {
   const flattened: TransactionWithDate[] = []
   Object.entries(props.transactions).forEach(([date, items]) => {
@@ -66,7 +126,16 @@ const allTransactions = computed<TransactionWithDate[]>(() => {
     })
   })
 
-  return flattened.sort((a, b) => {
+  const filtered = filter.activeFilter.value
+    ? flattened.filter(tx => filter.matchesFilter({
+        description: tx.description,
+        amount: tx.amount,
+        purchaseDate: tx.purchaseDate,
+        category: tx.category,
+      }))
+    : flattened
+
+  return filtered.sort((a, b) => {
     const modifier = sortOrder.value === 'asc' ? 1 : -1
     if (sortKey.value === 'amount') {
       return (a.amount - b.amount) * modifier
@@ -107,6 +176,22 @@ function getIcon(categoryName: string) {
 
 <template>
   <div class="transaction-list-container">
+      <!-- Du filter chip -->
+      <div v-if="filter.activeFilter.value" class="mb-3 flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-[hsl(168_64%_70%_/_0.15)] border border-[hsl(168_64%_70%_/_0.3)] px-3 py-1 text-xs font-medium text-[hsl(168_64%_45%)]">
+          <span aria-hidden="true">✦</span>
+          Filtro aplicado pelo Du
+        </span>
+        <button
+          type="button"
+          class="flex items-center justify-center w-5 h-5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground transition-colors"
+          aria-label="Remover filtro do Du"
+          @click="filter.clearFilter()"
+        >
+          <X class="w-3 h-3" />
+        </button>
+      </div>
+
     <div v-if="!transactions || Object.keys(transactions).length === 0">
       <EmptyState
         :icon="Receipt"
@@ -126,11 +211,15 @@ function getIcon(categoryName: string) {
             </h4>
             
             <div class="rounded-xl border border-border bg-card text-card-foreground shadow-elevation-1 divide-y divide-border">
-                <div 
-                  v-for="tx in items" 
-                  :key="tx.id" 
+                <div
+                  v-for="tx in items"
+                  :key="tx.id"
                   class="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/50 transition-colors active:bg-muted/80 touch-manipulation min-h-[72px]"
                   @click="$emit('edit', tx)"
+                  @contextmenu="onRowContextMenu($event, { ...tx, purchaseDate: String(date) })"
+                  @touchstart.passive="onRowTouchStart($event, { ...tx, purchaseDate: String(date) })"
+                  @touchend="onRowTouchEnd"
+                  @touchmove.passive="onRowTouchMove"
                 >
                      <div class="flex items-center gap-4">
                         <div class="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-primary shrink-0">
@@ -187,7 +276,15 @@ function getIcon(categoryName: string) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="tx in allTransactions" :key="tx.id" class="group h-12 border-border hover:bg-muted/50 transition-colors">
+            <TableRow
+              v-for="tx in allTransactions"
+              :key="tx.id"
+              class="group h-12 border-border hover:bg-muted/50 transition-colors"
+              @contextmenu="onRowContextMenu($event, tx)"
+              @touchstart.passive="onRowTouchStart($event, tx)"
+              @touchend="onRowTouchEnd"
+              @touchmove.passive="onRowTouchMove"
+            >
               <TableCell class="font-medium py-1">
                 {{ formatDate(tx.purchaseDate, 'short') }}
               </TableCell>
@@ -226,5 +323,14 @@ function getIcon(categoryName: string) {
         </Table>
       </div>
     </template>
+
+      <TransactionContextMenu
+        v-if="contextMenu"
+        :x="contextMenu.x"
+        :y="contextMenu.y"
+        :transaction="contextMenu.transaction"
+        @close="contextMenu = null"
+        @edit="$emit('edit', $event)"
+      />
   </div>
 </template>

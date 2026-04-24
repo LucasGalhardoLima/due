@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Wallet, TrendingDown, TrendingUp } from 'lucide-vue-next'
+import AiHintBadge from '@/components/chat/AiHintBadge.vue'
 
 const props = defineProps<{
   totalIncome: number
@@ -36,6 +37,10 @@ const trendIcon = computed(() => props.remaining >= 0 ? TrendingUp : TrendingDow
     class="relative overflow-hidden rounded-3xl p-6 border transition-all hover:scale-[1.005] group"
     :class="gradientClass"
   >
+    <AiHintBadge
+      question="Como posso aproveitar melhor o dinheiro disponível para gastar?"
+      class="absolute top-3 right-3 z-10"
+    />
     <div>
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">

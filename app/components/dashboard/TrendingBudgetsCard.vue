@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AlertTriangle, TrendingUp, Wallet } from 'lucide-vue-next'
 import EmptyState from '@/components/ui/EmptyState.vue'
+import AiHintBadge from '@/components/chat/AiHintBadge.vue'
 
 interface CategoryBudgetStatus {
   categoryId: string
@@ -46,7 +47,11 @@ function textColor(status: string) {
 </script>
 
 <template>
-  <div class="glass-surface p-5">
+  <div class="relative glass-surface p-5">
+    <AiHintBadge
+      question="Quais categorias estão mais comprometidas no meu orçamento?"
+      class="absolute top-3 right-3 z-10"
+    />
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-2">
         <div class="p-1.5 rounded-xl" :class="hasAlerts ? 'bg-warning/[0.08]' : 'bg-primary/[0.08]'">

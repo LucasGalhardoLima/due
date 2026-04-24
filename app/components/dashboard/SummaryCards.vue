@@ -2,6 +2,7 @@
 import type { Component } from 'vue'
 import { computed } from 'vue'
 import { CreditCard, TrendingUp, TrendingDown, Minus, Unlock, ShoppingBag, Utensils, Car, Home } from 'lucide-vue-next'
+import AiHintBadge from '@/components/chat/AiHintBadge.vue'
 
 const props = defineProps<{
   total: number
@@ -148,6 +149,11 @@ const shouldPulse = computed(() => colorState.value === 'danger')
     <div
       class="relative overflow-hidden rounded-3xl p-6 border border-border bg-card shadow-sm transition-all hover:scale-[1.01] group min-h-[176px]"
     >
+      <AiHintBadge
+        v-if="topCategory"
+        :question="`Por que gastei tanto em ${topCategory.name}?`"
+        class="absolute top-2 right-2 z-10"
+      />
       <div class="space-y-4">
         <div class="flex items-center justify-between">
           <div class="p-2 rounded-2xl bg-muted">

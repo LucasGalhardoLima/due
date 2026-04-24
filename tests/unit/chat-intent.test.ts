@@ -38,4 +38,31 @@ describe('detectChatIntent', () => {
       expect(detectChatIntent('comi muito mal essa semana').isExpenseAdd).toBe(false)
     })
   })
+
+  describe('isFilterIntent', () => {
+    it('detects "mostra gastos com Uber Eats"', () => {
+      expect(detectChatIntent('mostra gastos com Uber Eats').isFilterIntent).toBe(true)
+    })
+    it('detects "transações acima de R$200"', () => {
+      expect(detectChatIntent('transações acima de R$200 esse mês').isFilterIntent).toBe(true)
+    })
+    it('detects "gastos em março"', () => {
+      expect(detectChatIntent('gastos em março').isFilterIntent).toBe(true)
+    })
+    it('detects "filtra por alimentação"', () => {
+      expect(detectChatIntent('filtra por alimentação').isFilterIntent).toBe(true)
+    })
+    it('does not flag expense additions', () => {
+      expect(detectChatIntent('gastei R$50 no Spoleto').isFilterIntent).toBe(false)
+    })
+    it('does not flag analysis requests', () => {
+      expect(detectChatIntent('por que minha fatura está alta?').isFilterIntent).toBe(false)
+    })
+    it('does not flag "apenas" in expense context', () => {
+      expect(detectChatIntent('comi apenas uma maçã').isFilterIntent).toBe(false)
+    })
+    it('does not flag "só" in expense context', () => {
+      expect(detectChatIntent('só gastei R$50 hoje').isFilterIntent).toBe(false)
+    })
+  })
 })
