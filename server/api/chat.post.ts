@@ -1,10 +1,34 @@
-import { streamText, StreamData } from 'ai'
+import { streamText, StreamData, generateObject } from 'ai'
 import { gateway } from '../utils/ai'
 import prisma from '../utils/prisma'
 import { enforceRateLimit } from '../utils/ai-rate-limit'
 import { detectChatIntent } from '../utils/chat-intent'
 import { parseExpenseInline } from '../utils/parse-expense-inline'
 import { z } from 'zod'
+
+const filterSchema = z.object({
+  merchant: z.string().optional().describe('Nome do estabelecimento/loja, em minúsculas'),
+  category: z.string().optional().describe('Nome da categoria de gastos'),
+  minAmount: z.number().optional().describe('Valor mínimo em reais'),
+  maxAmount: z.number().optional().describe('Valor máximo em reais'),
+  month: z.string().optional().describe('Mês no formato YYYY-MM, ex: 2025-03'),
+  installmentOnly: z.boolean().optional().describe('Somente transações parceladas'),
+})
+
+async function extractFilterParams(message: string): Promise<z.infer<typeof filterSchema> | null> {
+  try {
+    const today = new Date()
+    const { object } = await generateObject({
+      model: gateway('gpt-4o-mini'),
+      schema: filterSchema,
+      prompt: `Hoje é ${today.toISOString().slice(0, 10)}. Extraia os parâmetros de filtro da seguinte mensagem do usuário em português brasileiro. Retorne apenas os campos relevantes presentes na mensagem.\n\nMensagem: "${message}"`,
+    })
+    const hasAnyParam = Object.values(object).some(v => v !== undefined)
+    return hasAnyParam ? object : null
+  } catch {
+    return null
+  }
+}
 
 const messageSchema = z.object({
   messages: z.array(z.object({
@@ -29,6 +53,10 @@ export default defineEventHandler(async (event) => {
 
   const lastMessage = messages.at(-1)?.content ?? ''
   const intent = detectChatIntent(lastMessage)
+
+  const filterParams = intent.isFilterIntent
+    ? await extractFilterParams(lastMessage)
+    : null
 
   // Fetch user financial context
   const now = new Date()
@@ -84,6 +112,10 @@ REGRAS:
     if (parsed) {
       data.append({ parsedExpense: parsed })
     }
+  }
+
+  if (filterParams) {
+    data.append({ filterEvent: { type: 'filter:apply' as const, filters: filterParams } })
   }
 
   const result = streamText({
