@@ -1,5 +1,4 @@
 import prisma from '../../utils/prisma'
-import { SYSADMIN_CLERK_ID } from '#shared/tier-config'
 
 export default defineEventHandler(async (event) => {
   const { userId } = getUser(event)
@@ -8,7 +7,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
-  if (!SYSADMIN_CLERK_ID || userId !== SYSADMIN_CLERK_ID) {
+  const sysadminClerkId = process.env.SYSADMIN_CLERK_ID
+  if (!sysadminClerkId || userId !== sysadminClerkId) {
     throw createError({ statusCode: 403, statusMessage: 'Forbidden — sysadmin only' })
   }
 

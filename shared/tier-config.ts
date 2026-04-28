@@ -1,11 +1,5 @@
 export const TIERS = ['free', 'plus', 'pro'] as const
 export type Tier = (typeof TIERS)[number]
-export const SYSADMIN_CLERK_ID = process.env.SYSADMIN_CLERK_ID || ''
-
-// Fail loudly in production if SYSADMIN_CLERK_ID is not configured
-if (process.env.NODE_ENV === 'production' && !SYSADMIN_CLERK_ID) {
-  console.warn('[tier-config] SYSADMIN_CLERK_ID is not set — admin endpoints will be inaccessible')
-}
 
 export interface TierLimits {
   // Count-based limits (null = unlimited)

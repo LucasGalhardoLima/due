@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import { SYSADMIN_CLERK_ID, type Tier } from '#shared/tier-config'
+import type { Tier } from '#shared/tier-config'
 
 interface AppUser {
   userId: string // Clerk ID (used on all existing models)
@@ -11,8 +11,9 @@ interface AppUser {
 export async function getOrCreateUser(event: H3Event): Promise<AppUser> {
   const { userId } = getUser(event)
 
+  const sysadminClerkId = process.env.SYSADMIN_CLERK_ID
   // Sysadmin bypass — always Pro
-  if (SYSADMIN_CLERK_ID && userId === SYSADMIN_CLERK_ID) {
+  if (sysadminClerkId && userId === sysadminClerkId) {
     const user = await prisma.user.upsert({
       where: { clerkId: userId },
       create: { clerkId: userId, tier: 'pro' },
