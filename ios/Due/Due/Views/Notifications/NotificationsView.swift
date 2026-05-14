@@ -2,8 +2,9 @@ import SwiftUI
 
 struct NotificationsView: View {
     @Environment(AppTheme.self) private var theme
-    let groups: [NotificationGroup] = MockData.notifications
+    let groups: [NotificationGroup]
     var onBack: () -> Void
+    var onMarkAllRead: () -> Void = {}
 
     private let pad: CGFloat = 24
 
@@ -70,7 +71,7 @@ struct NotificationsView: View {
                     .foregroundStyle(Color.duFgMuted)
             }
             Spacer()
-            Button {} label: {
+            Button(action: onMarkAllRead) {
                 Text("Marcar tudo lido")
                     .font(DuFont.mono(12, weight: .medium))
                     .foregroundStyle(theme.palette.primary)

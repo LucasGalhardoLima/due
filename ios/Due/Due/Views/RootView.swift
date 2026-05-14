@@ -43,16 +43,10 @@ struct RootView: View {
                 ),
                 onLogoTap: { /* future: open profile */ },
                 onBell: {
-                    // unreadCount comes from SwiftData Insights, so we mark
-                    // them read here. NotificationsView itself still renders
-                    // MockData fixtures (those have their own `unread` flags)
-                    // and will switch to the same store when its migration
-                    // slice lands — until then the bell-dot and the
-                    // Notifications list can disagree on what's "unread".
-                    for ins in insights where !ins.read {
-                        ins.read = true
-                    }
-                    try? modelContext.save()
+                    // Bell-tap clears the dot AND jumps to the list. The
+                    // list reads from the same store, so the two surfaces
+                    // stay in sync.
+                    markAllInsightsRead()
                     path.append(.notifications)
                 },
                 onSettings: { path.append(.settings) },
@@ -93,7 +87,11 @@ struct RootView: View {
                 onChat: { _ in navigate(to: .chat) }
             )
         case .notifications:
-            NotificationsView(onBack: { path.removeLast() })
+            NotificationsView(
+                groups: NotificationsViewModel.project(insights: insights),
+                onBack: { path.removeLast() },
+                onMarkAllRead: markAllInsightsRead
+            )
         case .settings:
             SettingsView(onBack: { path.removeLast() })
         case .home, .onboarding:
@@ -106,5 +104,16 @@ struct RootView: View {
     private func navigate(to dest: AppDestination) {
         if path.last == dest { return }
         path.append(dest)
+    }
+
+    /// Flips `read` to true on every unread insight + saves. The same
+    /// flow the bell-tap does on Home; both surfaces should leave the
+    /// store in the same state so the bell-dot and the Notifications
+    /// list agree on what's "new".
+    private func markAllInsightsRead() {
+        for ins in insights where !ins.read {
+            ins.read = true
+        }
+        try? modelContext.save()
     }
 }
