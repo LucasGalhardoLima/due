@@ -131,7 +131,7 @@ private struct ExpenseCard: View {
                         .kerning(-0.2)
                 }
                 Spacer()
-                Text("R$ " + amountString)
+                Text(CurrencyFormatter.format(proposal.amount))
                     .font(DuFont.mono(22, weight: .bold))
                     .kerning(-0.5)
                     .foregroundStyle(Color.duFg)
@@ -185,11 +185,6 @@ private struct ExpenseCard: View {
         .background(Color.duSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color.duBorder, lineWidth: 1))
         .frame(maxWidth: 320)
-    }
-
-    private var amountString: String {
-        String(format: "%.2f", proposal.amount)
-            .replacingOccurrences(of: ".", with: ",")
     }
 }
 

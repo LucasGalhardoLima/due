@@ -17,7 +17,7 @@ struct RuleBasedBackend: ChatBackend {
 
                 let lower = message.lowercased()
 
-                if let proposal = parseExpense(from: message) {
+                if let proposal = ExpenseQuickParser.parse(message) {
                     continuation.yield(.structured(.expense(proposal)))
                     continuation.yield(.done(stats(from: start, tokens: 0, parseSuccess: true)))
                     continuation.finish()
@@ -80,38 +80,6 @@ struct RuleBasedBackend: ChatBackend {
             .finalText("Anotado. Quer que eu olhe algo específico?"),
             .suggestions(["Como tô esse mês?", "Cartão", "Análise de 6 meses"])
         ]
-    }
-
-    private func parseExpense(from message: String) -> ExpenseProposal? {
-        let pattern = #"(?i)(?:^|\s)(ifood|uber|99|padaria|mercado|drogasil|spotify|netflix|posto)\s+(\d+(?:[.,]\d{1,2})?)"#
-        guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
-        let ns = message as NSString
-        guard let m = regex.firstMatch(in: message, range: NSRange(location: 0, length: ns.length)),
-              m.numberOfRanges == 3 else { return nil }
-        let merchantRaw = ns.substring(with: m.range(at: 1))
-        let amountRaw = ns.substring(with: m.range(at: 2)).replacingOccurrences(of: ",", with: ".")
-        guard let amount = Double(amountRaw) else { return nil }
-        let merchant = merchantRaw.prefix(1).uppercased() + merchantRaw.dropFirst().lowercased()
-
-        let categoryMap: [String: String] = [
-            "ifood": "Delivery", "uber": "Mobilidade", "99": "Mobilidade",
-            "padaria": "Mercado", "mercado": "Mercado",
-            "drogasil": "Saúde", "spotify": "Assinaturas", "netflix": "Assinaturas",
-            "posto": "Combustível"
-        ]
-        let cat = categoryMap[merchantRaw.lowercased()] ?? "Outros"
-        let now = Date()
-        let timeFormatter = DateFormatter()
-        timeFormatter.locale = Locale(identifier: "pt_BR")
-        timeFormatter.dateFormat = "HH:mm"
-
-        return ExpenseProposal(
-            merchant: merchant,
-            amount: amount,
-            category: cat,
-            date: "Hoje",
-            time: timeFormatter.string(from: now)
-        )
     }
 
     private func stats(from start: DispatchTime, tokens: Int, parseSuccess: Bool) -> BackendStats {

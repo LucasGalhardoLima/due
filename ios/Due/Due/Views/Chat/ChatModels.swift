@@ -17,12 +17,16 @@ struct ChatMessage: Identifiable {
     }
 }
 
+// Constitution Principle 3: currency is Decimal end-to-end. The chat
+// surface (rules / Llama JSON / FoundationModels) was using Double; this
+// is now the source of truth and every emit/consume site is responsible
+// for staying in Decimal.
 struct ExpenseProposal {
     let merchant: String
-    let amount: Double
+    let amount: Decimal
     let category: String
-    let date: String
-    let time: String
+    let date: String      // "Hoje" / "Ontem" / "dd/MM"  — see proposedDate()
+    let time: String      // "HH:mm"
 }
 
 struct ChatInsight {

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ChatView: View {
     @Environment(AppTheme.self) private var theme
+    @Environment(\.modelContext) private var modelContext
     @Bindable var viewModel: ChatViewModel
     var onBack: () -> Void
 
@@ -16,7 +17,10 @@ struct ChatView: View {
             composer
         }
         .background(Color.duBg.ignoresSafeArea())
-        .onAppear { inputFocused = true }
+        .onAppear {
+            inputFocused = true
+            viewModel.modelContext = modelContext
+        }
     }
 
     // MARK: Header

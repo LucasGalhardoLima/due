@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftData
 
 @MainActor
 @Observable
@@ -16,6 +17,11 @@ final class ChatViewModel {
 
     /// Set by RootView; lets the chat trigger navigation (insight cards / overview punt).
     var onNavigate: (AppDestination) -> Void = { _ in }
+
+    /// Injected by ChatView from `@Environment(\.modelContext)`. Confirmed
+    /// expense proposals are written here as real Transaction rows. Nil only
+    /// in tests that bypass the SwiftData container on purpose.
+    var modelContext: ModelContext?
 
     /// User's backend preference. `.auto` lets ChatBackendResolver pick the
     /// best tier for the device at runtime. DEBUG-only Settings can override.
@@ -39,12 +45,38 @@ final class ChatViewModel {
         guard !raw.isEmpty else { return }
         thread.append(ChatMessage(who: .me, content: .text(raw)))
         draft = ""
+
+        // Deterministic fast path: a recognized "merchant amount" goes
+        // straight to an expense card with no model warmup or typing dot.
+        // The backend only gets free-form text it can actually help with.
+        if let proposal = ExpenseQuickParser.parse(raw) {
+            thread.append(ChatMessage(who: .du, content: .expense(proposal)))
+            return
+        }
+
         respond(to: raw)
     }
 
     func confirmExpense(messageID: UUID) {
-        guard let idx = thread.firstIndex(where: { $0.id == messageID }) else { return }
+        guard let idx = thread.firstIndex(where: { $0.id == messageID }),
+              case .expense(let proposal) = thread[idx].content else { return }
         thread[idx].confirmed = true
+
+        // Negative amount = expense (Transaction.swift sign convention).
+        // We coerce here so a bug in any backend that emits positive can't
+        // accidentally write an income row.
+        if let ctx = modelContext {
+            let expenseAmount = -abs(proposal.amount)
+            let txn = Transaction(
+                merchant: proposal.merchant,
+                amount: expenseAmount,
+                category: proposal.category,
+                timestamp: proposal.proposedDate()
+            )
+            ctx.insert(txn)
+            try? ctx.save()
+        }
+
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(300))
             thread.append(ChatMessage(who: .du, content: .text("Anotado. Categorizei e tá no teu mês.")))

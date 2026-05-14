@@ -45,7 +45,19 @@ enum ChatPromptKit {
                   let category = json["category"] as? String else {
                 return ParseResult(event: nil, expectedFreeform: false)
             }
-            let amount = (json["amount"] as? Double) ?? Double((json["amount"] as? Int) ?? 0)
+            // Models can produce either a number ("amount":47.5) or a
+            // string ("amount":"47,50"). NSDecimalNumber-via-NSNumber
+            // preserves precision for the numeric path; the string path
+            // accepts the BR-style comma decimal.
+            let amount: Decimal
+            if let n = json["amount"] as? NSNumber {
+                amount = n.decimalValue
+            } else if let s = json["amount"] as? String,
+                      let d = Decimal(string: s.replacingOccurrences(of: ",", with: ".")) {
+                amount = d
+            } else {
+                amount = 0
+            }
             let timeFormatter = DateFormatter()
             timeFormatter.locale = Locale(identifier: "pt_BR")
             timeFormatter.dateFormat = "HH:mm"
