@@ -13,9 +13,14 @@ settings:
     CURRENT_PROJECT_VERSION: 1
 
 packages:
-  Clerk:
-    url: https://github.com/clerk/clerk-ios
-    from: "0.40.0"
+  # Consumed via local clone because the upstream package contains
+  # symlinks into a git submodule (`exclude/llama.cpp`) that SPM does
+  # not recurse when fetching from a remote URL — leaving the C target's
+  # source files dangling. Run `scripts/setup-vendor.sh` once to clone
+  # `Vendor/LocalLLMClient` with submodules. Tracked at upstream issue
+  # tattn/LocalLLMClient#94.
+  LocalLLMClient:
+    path: ../Vendor/LocalLLMClient
 
 targets:
   Du:
@@ -23,6 +28,16 @@ targets:
     platform: iOS
     sources:
       - path: Due
+        excludes:
+          - "Resources/Models/**"
+      # Bundle GGUF weights as resources. Each `.gguf` is referenced as a
+      # data resource so `Bundle.main.url(forResource:withExtension:"gguf")`
+      # resolves at runtime. Use `optional: true` so the project still
+      # generates before the user runs `scripts/fetch-model.sh`.
+      - path: Due/Resources/Models
+        type: folder
+        optional: true
+        buildPhase: resources
     info:
       path: Due/Info.plist
       properties:
@@ -40,10 +55,49 @@ targets:
         CFBundleIconName: AppIcon
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+        UIAppFonts:
+          - Geist-Regular.ttf
+          - Geist-Medium.ttf
+          - Geist-SemiBold.ttf
+          - Geist-Bold.ttf
+          - GeistMono-Regular.ttf
+          - GeistMono-Medium.ttf
+          - GeistMono-SemiBold.ttf
+          - GeistMono-Bold.ttf
     settings:
       base:
         SWIFT_STRICT_CONCURRENCY: complete
         PRODUCT_BUNDLE_IDENTIFIER: com.du.app
+        # Skip the bundled GGUFs from code-signing integrity checks
+        # (huge files; llama.cpp validates the model headers at load).
+        OTHER_CODE_SIGN_FLAGS: "--deep"
+        # Automatic signing for real-device install.
+        CODE_SIGN_STYLE: Automatic
+        # Xcode 26's explicit-modules dep scanner doesn't pass --isysroot
+        # to subscan invocations of mixed C/C++ targets, breaking libc++
+        # header lookup for LocalLLMClientLlamaC (`<memory>` not found).
+        # Force the legacy module builder until the package or Xcode ships
+        # a fix.
+        SWIFT_ENABLE_EXPLICIT_MODULES: NO
+        _EXPERIMENTAL_SWIFT_EXPLICIT_MODULES: NO
+        CLANG_ENABLE_EXPLICIT_MODULES: NO
+        _EXPERIMENTAL_CLANG_EXPLICIT_MODULES: NO
+        # LocalLLMClientLlamaC.h trips a #error unless the consumer compiles
+        # in C++ interop mode. We import it transitively through
+        # `LocalLLMClientLlama`, so the flag has to be on Du itself.
+        SWIFT_OBJC_INTEROP_MODE: objcxx
+        OTHER_SWIFT_FLAGS: "-cxx-interoperability-mode=default"
+        # Larger heap budget for loading 1B-class models on real devices.
+        # Enabled via entitlement below; this just signals intent.
+        # DEVELOPMENT_TEAM: ""
+    entitlements:
+      path: Due/Du.entitlements
+      properties:
+        # Lets us hold the model + KV cache without iOS jetsamming the
+        # process under memory pressure. Recommended by LocalLLMClient.
+        com.apple.developer.kernel.increased-memory-limit: true
     dependencies:
-      - package: Clerk
-        product: Clerk
+      - package: LocalLLMClient
+        product: LocalLLMClient
+      - package: LocalLLMClient
+        product: LocalLLMClientLlama

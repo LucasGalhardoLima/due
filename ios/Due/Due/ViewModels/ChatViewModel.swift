@@ -1,381 +1,229 @@
 import Foundation
-import Clerk
-
-// MARK: - Card Stream Parser
-
-protocol CardStreamParser {
-    func parse(line: String) -> [ChatCard]?
-}
-
-/// Parses Vercel AI SDK data stream lines for card JSON.
-/// Handles `2:` (data) and `8:` (tool call results) prefixes.
-struct SSECardStreamParser: CardStreamParser {
-    func parse(line: String) -> [ChatCard]? {
-        // Vercel AI SDK: 2: = data, 8: = tool call result
-        let payload: String
-        if line.hasPrefix("2:") {
-            payload = String(line.dropFirst(2))
-        } else if line.hasPrefix("8:") {
-            payload = String(line.dropFirst(2))
-        } else {
-            return nil
-        }
-
-        guard let data = payload.data(using: .utf8) else { return nil }
-
-        // Try decoding as array of cards first, then single card
-        if let cards = try? JSONDecoder().decode([ChatCard].self, from: data) {
-            return cards
-        }
-        if let card = try? JSONDecoder().decode(ChatCard.self, from: data) {
-            return [card]
-        }
-        return nil
-    }
-}
-
-/// Mock parser that injects sample cards for development.
-struct MockCardStreamParser: CardStreamParser {
-    func parse(line: String) -> [ChatCard]? { nil }
-
-    static var sampleCards: [ChatCard] {
-        [
-            .budget(BudgetCard(
-                categoryName: "Alimentação",
-                limit: 1200,
-                actual: 890.50,
-                severity: .warning,
-                summary: "Você gastou 74% do orçamento de alimentação."
-            )),
-            .installmentTimeline(InstallmentTimelineCard(
-                entries: [
-                    TimelineEntry(month: "Abr", year: 2026, amount: 450),
-                    TimelineEntry(month: "Mai", year: 2026, amount: 450),
-                    TimelineEntry(month: "Jun", year: 2026, amount: 200),
-                ],
-                totalCommitted: 1100
-            )),
-            .transactionList(TransactionListCard(
-                transactions: [
-                    CompactTransaction(description: "iFood", amount: 45.90, date: "28 Mar", category: "Alimentação"),
-                    CompactTransaction(description: "Uber", amount: 23.50, date: "27 Mar", category: "Transporte"),
-                    CompactTransaction(description: "Netflix", amount: 55.90, date: "25 Mar", category: "Streaming"),
-                ]
-            )),
-            .summary(SummaryCard(
-                title: "Resumo do mês",
-                pairs: [
-                    KeyValuePair(label: "Receita", value: "R$ 8.500,00"),
-                    KeyValuePair(label: "Gastos", value: "R$ 5.230,00"),
-                    KeyValuePair(label: "Economia", value: "R$ 3.270,00"),
-                    KeyValuePair(label: "Parcelas ativas", value: "4"),
-                ]
-            )),
-            .action(ActionCard(
-                title: "O que deseja fazer?",
-                actions: [
-                    CardAction(label: "Criar orçamento", actionType: .createBudget),
-                    CardAction(label: "Ver detalhes", actionType: .viewDetail),
-                ]
-            )),
-        ]
-    }
-}
-
-// MARK: - ChatViewModel
-
-enum PrefillMode {
-    case normal
-    case quickAddExpense
-}
+import Observation
 
 @MainActor
 @Observable
 final class ChatViewModel {
-    var messages: [Message] = []
-    var isStreaming = false
-    var error: String?
-    var errorKind: ErrorKind?
-    var prefillMode: PrefillMode = .normal
-    var pendingExpense: ParsedExpense?
+    var thread: [ChatMessage] = [
+        ChatMessage(who: .du, content: .text("Oi! Em que posso ajudar hoje?")),
+        ChatMessage(who: .du, content: .suggestions([
+            "Adicionar gasto",
+            "Como tô esse mês?",
+            "Análise de 6 meses"
+        ]))
+    ]
+    var draft: String = ""
 
-    private let api = APIClient.shared
-    private let cardParser: CardStreamParser = SSECardStreamParser()
+    /// Set by RootView; lets the chat trigger navigation (insight cards / overview punt).
+    var onNavigate: (AppDestination) -> Void = { _ in }
 
-    var hasMessages: Bool { !messages.isEmpty }
-
-    // MARK: - Send Message
-
-    func send(_ text: String) async {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-
-        // Handle quick-add expense mode
-        if prefillMode == .quickAddExpense {
-            await parseAndConfirmExpense(trimmed)
-            return
-        }
-
-        let userMessage = Message(role: .user, content: trimmed)
-        messages.append(userMessage)
-
-        let assistantMessage = Message(role: .assistant, content: "")
-        messages.append(assistantMessage)
-        isStreaming = true
-        error = nil
-        errorKind = nil
-
-        do {
-            try await streamResponse(for: trimmed, into: assistantMessage.id)
-        } catch {
-            // Fallback: inject mock cards so the UI is functional without backend
-            if let idx = messages.lastIndex(where: { $0.id == assistantMessage.id }) {
-                if messages[idx].content.isEmpty {
-                    messages[idx].content = "Não consegui conectar ao servidor agora, mas aqui está um resumo com dados de exemplo:"
-                }
-                messages[idx].cards = MockCardStreamParser.sampleCards
-            }
-        }
-
-        isStreaming = false
+    /// Active backend. Defaults to rule-based for fastest first-launch — flip via Settings.
+    var backendKind: ChatBackendKind = .ruleBased {
+        didSet { rebuildBackend() }
     }
 
-    // MARK: - Parse Expense
+    private var backend: any ChatBackend = RuleBasedBackend()
+    private let fallback: any ChatBackend = RuleBasedBackend()
+    private var inflightTask: Task<Void, Never>?
 
-    func parseAndConfirmExpense(_ text: String) async {
-        isStreaming = true
-        error = nil
-        errorKind = nil
-
-        do {
-            let dateFormatter = ISO8601DateFormatter()
-            dateFormatter.formatOptions = [.withFullDate]
-            let currentDate = dateFormatter.string(from: Date())
-
-            let request = AIParseRequest(text: text, currentDate: currentDate)
-            let response: AIParseResponse = try await api.request(Endpoint.parseExpense(), body: request)
-
-            guard let description = response.description,
-                  let amount = response.amount,
-                  let date = response.date else {
-                throw APIError.decodingError(NSError(domain: "ParseExpense", code: 0, userInfo: [NSLocalizedDescriptionKey: "Não consegui entender o gasto. Tente algo como: Uber R$25 ontem"]))
-            }
-
-            let decimal = Decimal(amount)
-            pendingExpense = ParsedExpense(
-                description: description,
-                amount: decimal,
-                date: date,
-                categoryId: response.categoryId,
-                cardId: response.cardId,
-                transactionId: nil
-            )
-
-            // Exit quick-add mode after parsing
-            prefillMode = .normal
-        } catch {
-            self.error = error.localizedDescription
-            self.errorKind = (error as? APIError)?.kind ?? .loadFailure
-        }
-
-        isStreaming = false
+    init(initialBackend: ChatBackendKind = .ruleBased) {
+        self.backendKind = initialBackend
+        rebuildBackend()
     }
 
-    // MARK: - Transaction Actions
+    // MARK: - User actions
 
-    func saveExpense() async {
-        guard let expense = pendingExpense else { return }
+    func send(_ overrideText: String? = nil) {
+        let raw = (overrideText ?? draft).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !raw.isEmpty else { return }
+        thread.append(ChatMessage(who: .me, content: .text(raw)))
+        draft = ""
+        respond(to: raw)
+    }
 
-        isStreaming = true
-        error = nil
+    func confirmExpense(messageID: UUID) {
+        guard let idx = thread.firstIndex(where: { $0.id == messageID }) else { return }
+        thread[idx].confirmed = true
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(300))
+            thread.append(ChatMessage(who: .du, content: .text("Anotado. Categorizei e tá no teu mês.")))
+        }
+    }
 
-        let request = CreateTransactionRequest(
-            description: expense.description,
-            amount: Double(truncating: expense.amount as NSDecimalNumber),
-            purchaseDate: expense.date,
-            installmentsCount: 1,
-            cardId: expense.cardId ?? "",
-            categoryId: expense.categoryId,
-            isSubscription: false
-        )
+    func editExpense(messageID _: UUID) {
+        thread.append(ChatMessage(who: .du, content: .text("Beleza, em qual categoria?")))
+        thread.append(ChatMessage(who: .du, content: .suggestions(["Delivery", "Mercado", "Saúde", "Outros"])))
+    }
 
-        do {
-            let response: TransactionResponse = try await api.request(Endpoint.createTransaction(), body: request)
+    func suggestionTapped(_ suggestion: String) { send(suggestion) }
+    func insightActionTapped(_ destination: AppDestination?) {
+        if let destination { onNavigate(destination) }
+    }
 
-            // Store transaction ID for undo
-            pendingExpense?.transactionId = response.id
+    // MARK: - Backend driver
 
-            // Add success message
-            let successMessage = Message(role: .assistant, content: "Pronto! \(expense.description) \(expense.displayAmount) adicionado.")
-            messages.append(successMessage)
-
-        } catch {
-            let apiError = error as? APIError
-            if apiError?.kind == .offline {
-                // Queue for later sync
-                OfflineTransactionQueue.shared.enqueue(request)
-                pendingExpense = nil
-
-                let queuedMessage = Message(role: .assistant, content: "Você está offline. O gasto \(expense.description) \(expense.displayAmount) será salvo quando a conexão voltar.")
-                messages.append(queuedMessage)
+    private func rebuildBackend() {
+        switch backendKind {
+        case .ruleBased:
+            backend = RuleBasedBackend()
+        default:
+            if let config = LocalModelCatalog.config(for: backendKind) {
+                backend = LocalLlamaCppBackend(kind: backendKind, config: config)
             } else {
-                self.error = error.localizedDescription
-                self.errorKind = apiError?.kind ?? .loadFailure
+                backend = RuleBasedBackend()
             }
         }
-
-        isStreaming = false
+        // Best-effort warm-up. If `prepare()` throws (model missing, OOM, etc.)
+        // we surface it once as a chat bubble so the user knows replies will
+        // come from the rules fallback for this turn onward.
+        let captured = backend
+        Task { @MainActor in
+            do {
+                try await captured.prepare()
+            } catch {
+                self.thread.append(ChatMessage(
+                    who: .du,
+                    content: .text("Modelo local indisponível (\(error.localizedDescription)). Vou usar regras enquanto isso.")
+                ))
+            }
+        }
     }
 
-    func undoExpense() async {
-        guard let transactionId = pendingExpense?.transactionId else { return }
+    private func respond(to message: String) {
+        inflightTask?.cancel()
 
-        isStreaming = true
-        error = nil
+        // Show typing while we wait for the first token.
+        let typingMessage = ChatMessage(who: .du, content: .typing)
+        thread.append(typingMessage)
 
-        do {
-            struct EmptyResponse: Decodable {}
-            let _: EmptyResponse = try await api.request(Endpoint.deleteTransaction(id: transactionId))
+        let primary = backend
+        let fallback = self.fallback
+        let history = thread
 
-            // Remove success message
-            if let lastMessage = messages.last, lastMessage.role == .assistant, lastMessage.content.contains("Pronto!") {
-                messages.removeLast()
+        inflightTask = Task { @MainActor in
+            // Guarantee the typing dot is gone on every exit path — silent
+            // finish, throw, or cancel. Without this the UI gets stuck
+            // showing "Du is typing" forever.
+            defer { removeTyping() }
+
+            var streamingMessage: ChatMessage?
+            var assembled = ""
+            var lastStructured: StructuredOutput?
+            var emittedSomething = false
+            var finalStats: BackendStats?
+
+            do {
+                for try await event in primary.reply(to: message, history: history) {
+                    if Task.isCancelled { return }
+                    Self.handle(event,
+                                thread: &thread,
+                                streamingMessage: &streamingMessage,
+                                assembled: &assembled,
+                                lastStructured: &lastStructured,
+                                emittedSomething: &emittedSomething,
+                                finalStats: &finalStats,
+                                removeTyping: { self.removeTyping() })
+                }
+            } catch {
+                emittedSomething = false  // force fallback below
             }
 
-            pendingExpense = nil
-        } catch {
-            self.error = error.localizedDescription
-            self.errorKind = (error as? APIError)?.kind ?? .loadFailure
-        }
-
-        isStreaming = false
-    }
-
-    func clearPendingExpense() {
-        pendingExpense = nil
-    }
-
-    func enterQuickAddMode() {
-        prefillMode = .quickAddExpense
-    }
-
-    // MARK: - Card Tap (Drill-in)
-
-    func handleCardTap(_ card: ChatCard) async {
-        switch card {
-        case .budget(let data):
-            await send("Mostre detalhes do orçamento de \(data.categoryName)")
-        case .installmentTimeline:
-            await send("Mostre todas as minhas parcelas futuras")
-        case .transactionList:
-            await send("Mostre mais detalhes das transações recentes")
-        case .summary:
-            await send("Explique mais sobre o resumo financeiro")
-        case .action:
-            break // Handled by onAction callback
-        }
-    }
-
-    // MARK: - Action Handling
-
-    func handleCardAction(_ action: CardAction) async {
-        switch action.actionType {
-        case .createBudget:
-            await send("Criar orçamento para \(action.payload ?? "categoria")")
-        case .viewDetail:
-            await send("Mostrar detalhes de \(action.payload ?? "item")")
-        case .confirm:
-            await send("Confirmar \(action.payload ?? "ação")")
-        }
-    }
-
-    // MARK: - SSE Streaming
-
-    private func streamResponse(for prompt: String, into messageId: UUID) async throws {
-        guard let token = try await Clerk.shared.session?.getToken()?.jwt else {
-            throw APIError.noSession
-        }
-
-        let endpoint = Endpoint.chatStream()
-        guard let url = endpoint.url else {
-            throw APIError.invalidURL
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let body = ChatRequest(
-            messages: messages.dropLast().map { ChatRequest.RequestMessage(role: $0.role.rawValue, content: $0.content) }
-        )
-        request.httpBody = try JSONEncoder().encode(body)
-
-        let (bytes, response) = try await URLSession.shared.bytes(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-            throw APIError.httpError(statusCode: statusCode, message: "Chat request failed")
-        }
-
-        for try await line in bytes.lines {
-            // Text chunks: "0:\"text chunk\"\n"
-            if line.hasPrefix("0:") {
-                let payload = String(line.dropFirst(2))
-                if let data = payload.data(using: .utf8),
-                   let text = try? JSONDecoder().decode(String.self, from: data) {
-                    if let idx = messages.firstIndex(where: { $0.id == messageId }) {
-                        messages[idx].content += text
+            // If the model produced nothing visible (silent finish, error, or
+            // empty text), fall back to rules so the user always gets a reply.
+            if !emittedSomething {
+                do {
+                    for try await event in fallback.reply(to: message, history: history) {
+                        if Task.isCancelled { return }
+                        Self.handle(event,
+                                    thread: &thread,
+                                    streamingMessage: &streamingMessage,
+                                    assembled: &assembled,
+                                    lastStructured: &lastStructured,
+                                    emittedSomething: &emittedSomething,
+                                    finalStats: &finalStats,
+                                    removeTyping: { self.removeTyping() })
                     }
+                } catch {
+                    thread.append(ChatMessage(who: .du, content: .text("Errei aqui — \(error.localizedDescription)")))
                 }
-                continue
             }
 
-            // Card data: "2:" (data) or "8:" (tool results)
-            if let cards = cardParser.parse(line: line) {
-                if let idx = messages.firstIndex(where: { $0.id == messageId }) {
-                    messages[idx].cards.append(contentsOf: cards)
-                }
+            if let stats = finalStats {
+                ChatBenchmarkLogger.log(.init(
+                    backend: primary.kind,
+                    prompt: message,
+                    rawResponse: assembled,
+                    structured: lastStructured,
+                    stats: stats
+                ))
             }
         }
     }
 
-    // MARK: - Clear
+    /// Static so it can take inout params without capturing self in the loop.
+    private static func handle(
+        _ event: ChatStreamEvent,
+        thread: inout [ChatMessage],
+        streamingMessage: inout ChatMessage?,
+        assembled: inout String,
+        lastStructured: inout StructuredOutput?,
+        emittedSomething: inout Bool,
+        finalStats: inout BackendStats?,
+        removeTyping: () -> Void
+    ) {
+        switch event {
+        case .textChunk(let delta):
+            removeTyping()
+            if streamingMessage == nil {
+                let m = ChatMessage(who: .du, content: .text(""))
+                streamingMessage = m
+                thread.append(m)
+            }
+            assembled += delta
+            if let id = streamingMessage?.id,
+               let i = thread.firstIndex(where: { $0.id == id }) {
+                thread[i].content = .text(assembled)
+            }
+            emittedSomething = true
 
-    func clearChat() {
-        messages.removeAll()
-        error = nil
-        errorKind = nil
+        case .finalText(let text):
+            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.isEmpty { return }   // skip empty finals (model bailed)
+            removeTyping()
+            if let id = streamingMessage?.id,
+               let i = thread.firstIndex(where: { $0.id == id }) {
+                thread[i].content = .text(trimmed)
+            } else {
+                thread.append(ChatMessage(who: .du, content: .text(trimmed)))
+            }
+            streamingMessage = nil
+            assembled = trimmed
+            emittedSomething = true
+
+        case .structured(let s):
+            removeTyping()
+            switch s {
+            case .expense(let e):
+                thread.append(ChatMessage(who: .du, content: .expense(e)))
+            case .insight(let i):
+                thread.append(ChatMessage(who: .du, content: .insight(i)))
+            }
+            lastStructured = s
+            emittedSomething = true
+
+        case .suggestions(let chips):
+            removeTyping()
+            thread.append(ChatMessage(who: .du, content: .suggestions(chips)))
+            emittedSomething = true
+
+        case .done(let stats):
+            finalStats = stats
+        }
     }
-}
 
-// MARK: - Request Types
-
-private struct ChatRequest: Encodable {
-    let messages: [RequestMessage]
-
-    struct RequestMessage: Encodable {
-        let role: String
-        let content: String
-    }
-}
-
-// MARK: - Parsed Expense
-
-struct ParsedExpense: Equatable {
-    let description: String
-    let amount: Decimal
-    let date: String
-    let categoryId: String?
-    let cardId: String?
-    var transactionId: String?
-
-    var displayAmount: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = "BRL"
-        formatter.locale = Locale(identifier: "pt_BR")
-        return formatter.string(from: amount as NSDecimalNumber) ?? "R$ 0,00"
+    private func removeTyping() {
+        thread.removeAll {
+            if case .typing = $0.content { return true } else { return false }
+        }
     }
 }

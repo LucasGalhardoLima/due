@@ -1,105 +1,292 @@
 import SwiftUI
-import Clerk
 
 struct OnboardingView: View {
-    let onComplete: () -> Void
+    @Environment(AppTheme.self) private var theme
+    var onDone: () -> Void
 
-    @Environment(\.colorScheme) private var colorScheme
-    @State private var currentPage = 0
-    @State private var controlsAppeared = false
-    @State private var showSignIn = false
+    @State private var step = 0
+    @State private var name = ""
+    @State private var importChoice: ImportChoice?
 
-    private let pages: [(emoji: String, title: String, subtitle: String)] = [
-        ("👋", "Oi, eu sou o Du!", "Seu assistente financeiro pessoal. Tô aqui pra te ajudar a dominar sua vida financeira."),
-        ("📊", "Me conta tudo", "Importa seu extrato ou adiciona na mão. Eu organizo seus gastos, cartões e parcelas em segundos."),
-        ("💳", "Eu organizo tudo pra você", "Faturas, parcelas, assinaturas, orçamento por categoria. Tudo num lugar só."),
-        ("🎯", "E te digo o que fazer", "Analiso seus padrões e te dou dicas sob medida. Sem julgamento, só solução.")
-    ]
+    enum ImportChoice: String, Identifiable {
+        case sheet, card, scratch
+        var id: String { rawValue }
+        var icon: String {
+            switch self {
+            case .sheet: return "tablecells"
+            case .card: return "creditcard"
+            case .scratch: return "pencil"
+            }
+        }
+        var title: String {
+            switch self {
+            case .sheet: return "Importar planilha"
+            case .card: return "Subir fatura do cartão"
+            case .scratch: return "Começar do zero"
+            }
+        }
+        var subtitle: String {
+            switch self {
+            case .sheet: return "Google Sheets, Notion, CSV"
+            case .card: return "PDF ou foto · processo no seu device"
+            case .scratch: return "Você me conta o que rola"
+            }
+        }
+    }
+
+    private let pad: CGFloat = 24
 
     var body: some View {
-        ZStack {
-            DuTheme.onboardingGradient(for: colorScheme)
-                .ignoresSafeArea()
+        VStack(alignment: .leading, spacing: 0) {
+            header.padding(.bottom, 40)
+
+            Group {
+                switch step {
+                case 0: stepGreeting
+                case 1: stepImport
+                default: stepFirstInteraction
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .transition(.opacity.combined(with: .move(edge: .bottom)))
+        }
+        .padding(.horizontal, pad)
+        .padding(.top, pad)
+        .padding(.bottom, pad + 16)
+        .background(Color.duBg.ignoresSafeArea())
+        .animation(.spring(response: 0.45, dampingFraction: 0.85), value: step)
+    }
+
+    // MARK: Header (logo + dot indicator)
+
+    private var header: some View {
+        HStack {
+            DuLogo(size: 26, palette: theme.palette)
+            Spacer()
+            HStack(spacing: 6) {
+                ForEach(0..<3) { i in
+                    Capsule()
+                        .fill(i <= step ? theme.palette.primary : Color.duFgFaint)
+                        .frame(width: i == step ? 18 : 6, height: 6)
+                }
+            }
+        }
+    }
+
+    // MARK: Step 0 — greeting
+
+    private var stepGreeting: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Oi 👋")
+                .font(DuFont.mono(13, weight: .medium))
+                .tracking(2.0)
+                .textCase(.uppercase)
+                .foregroundStyle(Color.duFgMuted)
+
+            (Text("Eu sou o Du.\n")
+                + Text("Seu coach financeiro.").foregroundColor(Color.duFgMuted))
+                .font(DuFont.mono(36, weight: .bold))
+                .kerning(-0.7)
+                .lineSpacing(4)
+                .foregroundStyle(Color.duFg)
+                .padding(.top, 16)
+
+            Text("Sem dashboards, sem planilha. Você fala, eu organizo. Pra começar, como te chamo?")
+                .font(DuFont.mono(16))
+                .lineSpacing(4)
+                .foregroundStyle(Color.duFgMuted)
+                .padding(.top, 24)
+                .frame(maxWidth: 320, alignment: .leading)
+
+            Spacer(minLength: 24)
+
+            VStack(spacing: 12) {
+                TextField("seu nome", text: $name)
+                    .font(DuFont.display(22, weight: .medium))
+                    .foregroundStyle(Color.duFg)
+                    .padding(.bottom, 12)
+                    .overlay(alignment: .bottom) {
+                        Rectangle().fill(Color.duBorder).frame(height: 1.5)
+                    }
+
+                Button {
+                    if name.trimmingCharacters(in: .whitespaces).isEmpty { return }
+                    HapticManager.impact(.light)
+                    step = 1
+                } label: {
+                    primaryButtonLabel("Continuar", enabled: !name.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+                .buttonStyle(.pressable)
+            }
+        }
+    }
+
+    // MARK: Step 1 — import
+
+    private var stepImport: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Prazer, \(name.trimmingCharacters(in: .whitespaces))")
+                .font(DuFont.mono(13, weight: .medium))
+                .tracking(2.0)
+                .textCase(.uppercase)
+                .foregroundStyle(Color.duFgMuted)
+
+            Text("Por onde começamos?")
+                .font(DuFont.mono(30, weight: .bold))
+                .kerning(-0.6)
+                .foregroundStyle(Color.duFg)
+                .padding(.top, 16)
+
+            Text("Posso puxar o que você já tem, ou começamos do zero.")
+                .font(DuFont.mono(14))
+                .lineSpacing(2)
+                .foregroundStyle(Color.duFgMuted)
+                .padding(.top, 12)
 
             VStack(spacing: 0) {
-                // Skip button
-                HStack {
-                    Spacer()
-                    Button("Pular") {
-                        HapticManager.selection()
-                        showSignIn = true
-                    }
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 8)
+                ForEach([ImportChoice.sheet, .card, .scratch]) { opt in
+                    importRow(opt)
                 }
+            }
+            .padding(.top, 32)
 
-                // Pages
-                TabView(selection: $currentPage) {
-                    ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
-                        OnboardingPageView(
-                            emoji: page.emoji,
-                            title: page.title,
-                            subtitle: page.subtitle,
-                            isIntroPage: index == 0
-                        )
-                        .tag(index)
-                    }
+            Spacer(minLength: 24)
+
+            Button {
+                guard importChoice != nil else { return }
+                HapticManager.impact(.light)
+                step = 2
+            } label: {
+                primaryButtonLabel("Continuar", enabled: importChoice != nil)
+            }
+            .buttonStyle(.pressable)
+            .padding(.top, 24)
+        }
+    }
+
+    private func importRow(_ opt: ImportChoice) -> some View {
+        let active = importChoice == opt
+        return Button {
+            importChoice = opt
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: opt.icon)
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundStyle(active ? .white : Color.duFgMuted)
+                    .frame(width: 36, height: 36)
+                    .background(active ? AnyShapeStyle(theme.palette.primary) : AnyShapeStyle(Color.duSurface),
+                                in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(opt.title)
+                        .font(DuFont.display(15, weight: .semibold))
+                        .kerning(-0.1)
+                        .foregroundStyle(Color.duFg)
+                    Text(opt.subtitle)
+                        .font(DuFont.mono(12))
+                        .foregroundStyle(Color.duFgMuted)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-
-                // Custom indicators + CTA
-                VStack(spacing: 28) {
-                    // Capsule indicators
-                    HStack(spacing: 8) {
-                        ForEach(0..<pages.count, id: \.self) { index in
-                            Capsule()
-                                .fill(index == currentPage ? Color.duTabAccent : Color.gray.opacity(0.3))
-                                .frame(width: index == currentPage ? 24 : 8, height: 8)
-                                .scaleEffect(index == currentPage ? 1.0 : 0.85)
-                                .animation(DuTheme.snappySpring, value: currentPage)
-                        }
-                    }
-
-                    // CTA Button
-                    Button {
-                        HapticManager.impact(.medium)
-                        if currentPage < pages.count - 1 {
-                            withAnimation(DuTheme.defaultSpring) {
-                                currentPage += 1
-                            }
-                        } else {
-                            showSignIn = true
-                        }
-                    } label: {
-                        Text(currentPage == pages.count - 1 ? "Começar" : "Próximo")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Color.duTabAccent, in: Capsule())
-                            .contentTransition(.interpolate)
-                    }
-                    .pressableStyle()
-                    .padding(.horizontal, 32)
+                Spacer()
+                if active {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 22, height: 22)
+                        .background(theme.palette.primary, in: Circle())
                 }
-                .opacity(controlsAppeared ? 1 : 0)
-                .scaleEffect(controlsAppeared ? 1.0 : 0.92)
-                .animation(DuTheme.gentleSpring.delay(0.7), value: controlsAppeared)
-                .padding(.bottom, 48)
+            }
+            .padding(.vertical, 16)
+            .overlay(alignment: .bottom) {
+                Rectangle().fill(Color.duBorder).frame(height: 1)
             }
         }
-        .onAppear {
-            controlsAppeared = true
-        }
-        .sheet(isPresented: $showSignIn) {
-            AuthView()
-        }
-        .onChange(of: Clerk.shared.user != nil) { _, isSignedIn in
-            if isSignedIn {
-                onComplete()
+        .buttonStyle(.pressable)
+    }
+
+    // MARK: Step 2 — first interaction
+
+    private var stepFirstInteraction: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Quase lá")
+                .font(DuFont.mono(13, weight: .medium))
+                .tracking(2.0)
+                .textCase(.uppercase)
+                .foregroundStyle(Color.duFgMuted)
+
+            Text(stepTitle)
+                .font(DuFont.mono(30, weight: .bold))
+                .kerning(-0.6)
+                .lineSpacing(2)
+                .foregroundStyle(Color.duFg)
+                .padding(.top, 16)
+
+            Text(stepBody)
+                .font(DuFont.mono(14))
+                .lineSpacing(4)
+                .foregroundStyle(Color.duFgMuted)
+                .padding(.top, 14)
+
+            Spacer(minLength: 16)
+
+            HStack(spacing: 12) {
+                DuSparkle(size: 14, color: theme.palette.primary)
+                Text(successQuote)
+                    .font(DuFont.mono(13))
+                    .foregroundStyle(Color.duFgMuted)
+                    .lineSpacing(2)
             }
+            .padding(.horizontal, 16).padding(.vertical, 14)
+            .background(Color.duSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.duBorder, lineWidth: 1))
+            .padding(.bottom, 12)
+
+            Button {
+                HapticManager.impact(.medium)
+                onDone()
+            } label: {
+                primaryButtonLabel("Entrar", enabled: true)
+            }
+            .buttonStyle(.pressable)
         }
+    }
+
+    private var stepTitle: String {
+        switch importChoice {
+        case .sheet: return "Mande sua planilha."
+        case .card: return "Manda a fatura."
+        case .scratch, .none: return "Me conta um gasto. Qualquer um."
+        }
+    }
+    private var stepBody: String {
+        switch importChoice {
+        case .sheet: return "Eu leio o formato sozinho. Sem template, sem ajuste."
+        case .card: return "PDF ou print. Nada sai do seu celular sem você ver."
+        case .scratch, .none: return "Pode digitar, falar, ou tirar foto do recibo. Eu entendo."
+        }
+    }
+    private var successQuote: String {
+        switch importChoice {
+        case .sheet: return "“40 lançamentos importados. Categorizei tudo.”"
+        case .card: return "“Fatura lida. 38 lançamentos categorizados.”"
+        case .scratch, .none: return "“Tudo pronto. Manda ver.”"
+        }
+    }
+
+    // MARK: Common button label
+
+    private func primaryButtonLabel(_ title: String, enabled: Bool) -> some View {
+        HStack {
+            Text(title)
+                .font(DuFont.display(15, weight: .semibold))
+                .foregroundStyle(enabled ? .white : Color.duFgFaint)
+            Spacer()
+            Image(systemName: "arrow.right")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(enabled ? .white : Color.duFgFaint)
+        }
+        .padding(.horizontal, 20).padding(.vertical, 16)
+        .background(enabled ? AnyShapeStyle(theme.palette.primary) : AnyShapeStyle(Color.duSurface),
+                    in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .opacity(enabled ? 1.0 : 0.5)
     }
 }
