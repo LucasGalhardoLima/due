@@ -101,6 +101,13 @@ targets:
         product: LocalLLMClient
       - package: LocalLLMClient
         product: LocalLLMClientLlama
+      # FoundationModels tier (iOS 26 + Apple Intelligence). The
+      # `LocalLLMClientFoundationModels` library guards everything with
+      # `#if canImport(FoundationModels)` so linking it on older
+      # toolchains is harmless. Runtime availability is checked via
+      # SystemLanguageModel.availability before we route to this tier.
+      - package: LocalLLMClient
+        product: LocalLLMClientFoundationModels
 
   DuTests:
     type: bundle.unit-test

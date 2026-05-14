@@ -215,25 +215,30 @@ final class ChatViewModel {
 
     // MARK: - Backend instantiation
 
-    // `.auto` defers to ChatBackendResolver — added in the next slice when
-    // the Apple FoundationModels backend lands. For now, `.auto` falls
-    // through to the llama path when a GGUF is bundled, else rule-based.
+    // `.auto` defers to ChatBackendResolver. The explicit cases are
+    // dev overrides: if the user (well, dev) forces a tier that isn't
+    // actually available on this device, we drop to rules silently
+    // rather than crashing or shipping an empty reply.
     private static func instantiate(kind: ChatBackendKind) -> any ChatBackend {
         switch kind {
+        case .auto:
+            return ChatBackendResolver.resolve()
         case .ruleBased:
             return RuleBasedBackend()
         case .appleFoundationModels:
-            // Concrete backend type lands with the resolver commit; until
-            // then, force-selecting this in DEBUG drops to rules so the
-            // user still gets a reply.
+            #if canImport(FoundationModels)
+            if #available(iOS 26.0, *),
+               ChatBackendResolver.isFoundationModelsAvailable() {
+                return AppleFoundationModelsBackend()
+            }
+            #endif
             return RuleBasedBackend()
-        case .llamaQwen06b, .auto:
-            if let config = LocalModelCatalog.config(for: .llamaQwen06b),
-               Bundle.main.url(
-                   forResource: (config.ggufFileName as NSString).deletingPathExtension,
-                   withExtension: "gguf"
-               ) != nil {
-                return LocalLlamaCppBackend(kind: .llamaQwen06b, config: config)
+        case .llamaQwen06b:
+            if ChatBackendResolver.hasBundledLlamaModel() {
+                return LocalLlamaCppBackend(
+                    kind: .llamaQwen06b,
+                    config: LocalModelCatalog.qwen06b
+                )
             }
             return RuleBasedBackend()
         }
