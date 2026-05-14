@@ -56,7 +56,7 @@ struct HomeView: View {
             Button(action: onLogoTap) {
                 HStack(spacing: 10) {
                     DuLogo(size: 26, palette: theme.palette)
-                    Text("Mar · dia \(data.dia)/\(data.totalDias)")
+                    Text("\(data.monthLabel) · dia \(data.dia)/\(data.totalDias)")
                         .font(DuFont.mono(11, weight: .medium))
                         .tracking(2.0)
                         .textCase(.uppercase)

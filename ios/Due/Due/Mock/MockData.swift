@@ -14,6 +14,7 @@ import Foundation
 enum MockData {
     static let home = HomeData(
         disponivel: 4983,
+        monthLabel: "MAR",
         dia: 24,
         totalDias: 31,
         cardCloses: 10,
@@ -139,6 +140,7 @@ enum MockData {
 
 struct HomeData {
     let disponivel: Int
+    let monthLabel: String   // PT-BR short month, e.g. "MAI"
     let dia: Int
     let totalDias: Int
     let cardCloses: Int

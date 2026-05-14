@@ -14,6 +14,9 @@ enum HomeViewModel {
         let cal = Calendar.current
         let totalDias = cal.range(of: .day, in: .month, for: now)?.count ?? 30
         let dia = cal.component(.day, from: now)
+        let monthLabel = monthLabelFmt.string(from: now)
+            .replacingOccurrences(of: ".", with: "")
+            .uppercased()
 
         // disponível: sum of this-month transactions. Income is positive,
         // expense is negative, so summing both gives net cash this month.
@@ -58,6 +61,7 @@ enum HomeViewModel {
 
         return HomeData(
             disponivel: disponivel,
+            monthLabel: monthLabel,
             dia: dia,
             totalDias: totalDias,
             cardCloses: cardSnap.closesIn,
@@ -126,6 +130,13 @@ enum HomeViewModel {
     }
 
     // MARK: - Date strings
+
+    private static let monthLabelFmt: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "pt_BR")
+        f.dateFormat = "MMM"
+        return f
+    }()
 
     private static let timeFmt: DateFormatter = {
         let f = DateFormatter()
