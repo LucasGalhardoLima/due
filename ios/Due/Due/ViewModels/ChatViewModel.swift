@@ -17,8 +17,9 @@ final class ChatViewModel {
     /// Set by RootView; lets the chat trigger navigation (insight cards / overview punt).
     var onNavigate: (AppDestination) -> Void = { _ in }
 
-    /// Active backend. Defaults to rule-based for fastest first-launch — flip via Settings.
-    var backendKind: ChatBackendKind = .ruleBased {
+    /// User's backend preference. `.auto` lets ChatBackendResolver pick the
+    /// best tier for the device at runtime. DEBUG-only Settings can override.
+    var backendKind: ChatBackendKind = .auto {
         didSet { rebuildBackend() }
     }
 
@@ -26,7 +27,7 @@ final class ChatViewModel {
     private let fallback: any ChatBackend = RuleBasedBackend()
     private var inflightTask: Task<Void, Never>?
 
-    init(initialBackend: ChatBackendKind = .ruleBased) {
+    init(initialBackend: ChatBackendKind = .auto) {
         self.backendKind = initialBackend
         rebuildBackend()
     }
@@ -63,16 +64,7 @@ final class ChatViewModel {
     // MARK: - Backend driver
 
     private func rebuildBackend() {
-        switch backendKind {
-        case .ruleBased:
-            backend = RuleBasedBackend()
-        default:
-            if let config = LocalModelCatalog.config(for: backendKind) {
-                backend = LocalLlamaCppBackend(kind: backendKind, config: config)
-            } else {
-                backend = RuleBasedBackend()
-            }
-        }
+        backend = Self.instantiate(kind: backendKind)
         // Best-effort warm-up. If `prepare()` throws (model missing, OOM, etc.)
         // we surface it once as a chat bubble so the user knows replies will
         // come from the rules fallback for this turn onward.
@@ -218,6 +210,32 @@ final class ChatViewModel {
 
         case .done(let stats):
             finalStats = stats
+        }
+    }
+
+    // MARK: - Backend instantiation
+
+    // `.auto` defers to ChatBackendResolver — added in the next slice when
+    // the Apple FoundationModels backend lands. For now, `.auto` falls
+    // through to the llama path when a GGUF is bundled, else rule-based.
+    private static func instantiate(kind: ChatBackendKind) -> any ChatBackend {
+        switch kind {
+        case .ruleBased:
+            return RuleBasedBackend()
+        case .appleFoundationModels:
+            // Concrete backend type lands with the resolver commit; until
+            // then, force-selecting this in DEBUG drops to rules so the
+            // user still gets a reply.
+            return RuleBasedBackend()
+        case .llamaQwen06b, .auto:
+            if let config = LocalModelCatalog.config(for: .llamaQwen06b),
+               Bundle.main.url(
+                   forResource: (config.ggufFileName as NSString).deletingPathExtension,
+                   withExtension: "gguf"
+               ) != nil {
+                return LocalLlamaCppBackend(kind: .llamaQwen06b, config: config)
+            }
+            return RuleBasedBackend()
         }
     }
 

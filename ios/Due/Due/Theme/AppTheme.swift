@@ -55,8 +55,10 @@ final class AppTheme {
     }
 
     /// Read the persisted backend without instantiating the full theme.
-    /// Used by RootView so the chat view-model can spin up with the user's last pick.
+    /// Used by RootView so the chat view-model can spin up with the user's
+    /// last pick. Defaults to `.auto` for new installs — the resolver picks
+    /// the best tier; users (well, only devs in DEBUG) can override.
     static func persistedBackend() -> ChatBackendKind {
-        UserDefaults.standard.string(forKey: backendKey).flatMap(ChatBackendKind.init(rawValue:)) ?? .ruleBased
+        UserDefaults.standard.string(forKey: backendKey).flatMap(ChatBackendKind.init(rawValue:)) ?? .auto
     }
 }

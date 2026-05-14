@@ -1,50 +1,59 @@
 import Foundation
 
-// One enum per chat option visible in Settings. The user picks one;
-// the view-model spins up the right backend. Adding a model = add a
-// case here + a `ModelConfig` entry in `LocalModelCatalog`.
+// User-facing chat backend choice. `.auto` defers to ChatBackendResolver,
+// which picks the best tier available on the current device (Apple
+// FoundationModels when iOS 26 + Apple Intelligence is available, else
+// the bundled Qwen GGUF via llama.cpp, else the rule-based baseline).
+// The other three cases are dev/QA overrides; in RELEASE the Settings
+// picker is hidden entirely so end users always get `.auto`.
 enum ChatBackendKind: String, CaseIterable, Identifiable, Codable {
+    case auto
     case ruleBased
-    case qwen3_06b
-    case qwen35_08b
-    case gemma3_1b
-    case llama32_1b
+    case appleFoundationModels
+    case llamaQwen06b
 
     var id: String { rawValue }
 
     /// The runtime family. Used by the benchmark logger and to decide
-    /// which backend implementation to instantiate.
+    /// which backend implementation to instantiate. `.auto` is resolved
+    /// before this is read; backends themselves never report `.auto`.
     var family: BackendFamily {
         switch self {
-        case .ruleBased: return .rules
-        default:         return .llamaCpp
+        case .auto:                  return .auto
+        case .ruleBased:             return .rules
+        case .appleFoundationModels: return .appleFoundationModels
+        case .llamaQwen06b:          return .llamaCpp
         }
     }
 
     var label: String {
         switch self {
-        case .ruleBased: return "Regras"
-        case .qwen3_06b: return "Qwen 3 0.6B"
-        case .qwen35_08b: return "Qwen 3.5 0.8B"
-        case .gemma3_1b: return "Gemma 3 1B"
-        case .llama32_1b: return "Llama 3.2 1B"
+        case .auto:                  return "Automático"
+        case .ruleBased:             return "Regras"
+        case .appleFoundationModels: return "Apple Intelligence"
+        case .llamaQwen06b:          return "Qwen 3 0.6B"
         }
     }
 
     var subtitle: String {
         switch self {
-        case .ruleBased: return "Padrões hard-coded — rápido, previsível, sem IA"
-        case .qwen3_06b: return "On-device · Q4_K_M · ~400 MB · pt-BR forte"
-        case .qwen35_08b: return "On-device · Q4_K_M · ~500 MB · mais capaz"
-        case .gemma3_1b: return "On-device · Q4_K_M · ~700 MB · multilíngue"
-        case .llama32_1b: return "On-device · Q4_K_M · ~700 MB · base Meta"
+        case .auto:
+            return "Du escolhe o melhor backend pra esse iPhone"
+        case .ruleBased:
+            return "Padrões hard-coded — rápido, previsível, sem IA"
+        case .appleFoundationModels:
+            return "On-device · iOS 26+ · iPhone 15 Pro / 16+ / Apple Silicon"
+        case .llamaQwen06b:
+            return "On-device · Q4_K_M · ~440 MB · pt-BR forte · qualquer iPhone iOS 17+"
         }
     }
 }
 
 enum BackendFamily: String, Codable {
+    case auto
     case rules
     case llamaCpp
+    case appleFoundationModels
 }
 
 // Streamed reply: one token / chunk at a time, plus structured payloads
