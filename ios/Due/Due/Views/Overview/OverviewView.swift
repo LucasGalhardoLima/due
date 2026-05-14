@@ -2,7 +2,7 @@ import SwiftUI
 
 struct OverviewView: View {
     @Environment(AppTheme.self) private var theme
-    let data: OverviewData = MockData.overview
+    let data: OverviewData
     var onBack: () -> Void
     var onChat: (String?) -> Void
 
@@ -60,7 +60,7 @@ struct OverviewView: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     DuSparkle(size: 9, color: theme.palette.primary)
-                    Text("Análise · out → mar")
+                    Text("Análise · \(rangeLabel)")
                         .font(DuFont.mono(10, weight: .medium))
                         .tracking(2.4)
                         .textCase(.uppercase)
@@ -316,5 +316,12 @@ struct OverviewView: View {
 
     private func thousands(_ value: Int) -> String {
         String(format: "%.1f", Double(value)/1000).replacingOccurrences(of: ".", with: ",") + "k"
+    }
+
+    private var rangeLabel: String {
+        guard let first = data.months.first, let last = data.months.last else {
+            return ""
+        }
+        return "\(first) → \(last)"
     }
 }

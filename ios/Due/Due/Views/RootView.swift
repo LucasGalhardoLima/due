@@ -88,6 +88,7 @@ struct RootView: View {
             )
         case .overview:
             OverviewView(
+                data: OverviewViewModel.project(transactions: transactions),
                 onBack: { path.removeLast() },
                 onChat: { _ in navigate(to: .chat) }
             )
