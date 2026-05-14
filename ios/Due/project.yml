@@ -30,12 +30,13 @@ targets:
       - path: Due
         excludes:
           - "Resources/Models/**"
-      # Bundle GGUF weights as resources. Each `.gguf` is referenced as a
-      # data resource so `Bundle.main.url(forResource:withExtension:"gguf")`
-      # resolves at runtime. Use `optional: true` so the project still
-      # generates before the user runs `scripts/fetch-model.sh`.
+      # Bundle GGUF weights as resources. Each `.gguf` lands at the .app
+      # bundle root (type: group, not folder) so
+      # `Bundle.main.url(forResource:withExtension:"gguf")` resolves
+      # without needing a subdirectory hint. `optional: true` keeps the
+      # project generating before `scripts/fetch-model.sh` has been run.
       - path: Due/Resources/Models
-        type: folder
+        type: group
         optional: true
         buildPhase: resources
     info:

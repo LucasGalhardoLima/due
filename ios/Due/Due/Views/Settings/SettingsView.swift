@@ -39,13 +39,17 @@ struct SettingsView: View {
                 }
                 .padding(.bottom, 32)
 
+                #if DEBUG
+                // Backend tier is auto-resolved in RELEASE; this picker is
+                // a dev override so we can force-test each tier and watch
+                // the resolver fallbacks behave when an unavailable choice
+                // is forced.
                 section(title: "Backend do chat (dev)") {
                     ForEach(ChatBackendKind.allCases) { b in
                         backendRow(b)
                     }
                 }
 
-                #if DEBUG
                 Spacer().frame(height: 32)
                 section(title: "Dados (dev)") {
                     devActionRow(
