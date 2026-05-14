@@ -40,8 +40,14 @@ struct ChatBackendResolverTests {
         ].contains(backend.kind))
     }
 
+    // Sanity: the resolver's bundle check resolves the GGUF that the
+    // Du target now ships. The test target embeds the host bundle, so
+    // `Bundle.main` here is the .app — same path the real resolver
+    // looks at. If this flips to false, the model resource is no longer
+    // being copied into the .app and the Llama tier will be silently
+    // dead at runtime.
     @Test
-    func bundledLlamaCheckIsFalseInTestBundle() {
-        #expect(ChatBackendResolver.hasBundledLlamaModel() == false)
+    func bundledLlamaCheckResolvesShippedGguf() {
+        #expect(ChatBackendResolver.hasBundledLlamaModel() == true)
     }
 }
