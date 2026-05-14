@@ -257,9 +257,10 @@ struct OnboardingView: View {
     // it writes a welcome Insight so the first Home isn't completely empty
     // and demonstrates the SwiftData write round-trip. The sheet/card paths
     // will gain their own import handlers (CSV parser, VNRecognizeTextRequest
-    // over fatura PDFs) and will write the parsed entities themselves.
+    // over fatura PDFs) and will write the parsed entities themselves —
+    // they don't go through here.
     private func writeInitialState() {
-        guard importChoice == .scratch || importChoice == nil else { return }
+        guard importChoice == .scratch else { return }
         modelContext.insert(Insight(
             text: "Tudo pronto. Me conta seu primeiro gasto e eu organizo.",
             actionLabel: "Falar com Du",

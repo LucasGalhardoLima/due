@@ -43,6 +43,12 @@ struct RootView: View {
                 ),
                 onLogoTap: { /* future: open profile */ },
                 onBell: {
+                    // unreadCount comes from SwiftData Insights, so we mark
+                    // them read here. NotificationsView itself still renders
+                    // MockData fixtures (those have their own `unread` flags)
+                    // and will switch to the same store when its migration
+                    // slice lands — until then the bell-dot and the
+                    // Notifications list can disagree on what's "unread".
                     for ins in insights where !ins.read {
                         ins.read = true
                     }

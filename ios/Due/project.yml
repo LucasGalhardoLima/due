@@ -101,3 +101,27 @@ targets:
         product: LocalLLMClient
       - package: LocalLLMClient
         product: LocalLLMClientLlama
+
+  DuTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        SWIFT_STRICT_CONCURRENCY: complete
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.du.app.tests
+        # @testable import Du transitively pulls LocalLLMClientLlamaC's
+        # C++ headers — must inherit the same explicit-modules + cxx
+        # interop workarounds the Du target uses or `<memory>` fails to
+        # resolve. See project.yml header for the upstream issue.
+        SWIFT_ENABLE_EXPLICIT_MODULES: NO
+        _EXPERIMENTAL_SWIFT_EXPLICIT_MODULES: NO
+        CLANG_ENABLE_EXPLICIT_MODULES: NO
+        _EXPERIMENTAL_CLANG_EXPLICIT_MODULES: NO
+        SWIFT_OBJC_INTEROP_MODE: objcxx
+        OTHER_SWIFT_FLAGS: "-cxx-interoperability-mode=default"
+    dependencies:
+      - target: Du

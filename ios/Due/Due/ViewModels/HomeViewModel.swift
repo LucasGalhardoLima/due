@@ -126,7 +126,11 @@ enum HomeViewModel {
         let target = thisMonthClose > now
             ? thisMonthClose
             : (cal.date(byAdding: .month, value: 1, to: thisMonthClose) ?? thisMonthClose)
-        return max(0, cal.dateComponents([.day], from: now, to: target).day ?? 0)
+        // Count calendar days, not elapsed hours. The UX label is
+        // "fecha em N dias" — if now is May 14 afternoon and close is
+        // May 20 midnight, the user thinks 6 days, not 5.
+        let nowStart = cal.startOfDay(for: now)
+        return max(0, cal.dateComponents([.day], from: nowStart, to: target).day ?? 0)
     }
 
     // MARK: - Date strings
