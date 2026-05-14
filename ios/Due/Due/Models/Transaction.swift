@@ -4,6 +4,10 @@ import SwiftData
 // Positive amount = income (e.g., salário); negative = expense.
 // Same sign convention MockData used; expressed in Decimal to honor
 // Constitution Principle 3 (no Double for currency).
+//
+// Note: this type shadows SwiftUI.Transaction (the animation-context
+// struct used in withAnimation). Inside this module the local
+// definition wins; in files that need both, qualify with `SwiftUI.`.
 @Model
 final class Transaction {
     var id: UUID

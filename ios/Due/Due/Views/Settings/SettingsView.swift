@@ -1,7 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct SettingsView: View {
     @Environment(AppTheme.self) private var theme
+    @Environment(\.modelContext) private var modelContext
     var onBack: () -> Void
 
     private let pad: CGFloat = 24
@@ -42,6 +44,24 @@ struct SettingsView: View {
                         backendRow(b)
                     }
                 }
+
+                #if DEBUG
+                Spacer().frame(height: 32)
+                section(title: "Dados (dev)") {
+                    devActionRow(
+                        label: "Popular com dados de exemplo",
+                        sub: "Cartão · 5 transações · 2 insights"
+                    ) {
+                        try? MockSeeder.seed(context: modelContext)
+                    }
+                    devActionRow(
+                        label: "Apagar tudo",
+                        sub: "Limpa o store local"
+                    ) {
+                        try? MockSeeder.wipe(context: modelContext)
+                    }
+                }
+                #endif
             }
             .padding(.horizontal, pad)
             .padding(.top, 12)
@@ -49,6 +69,18 @@ struct SettingsView: View {
         }
         .background(Color.duBg.ignoresSafeArea())
     }
+
+    #if DEBUG
+    private func devActionRow(label: String, sub: String, action: @escaping () -> Void) -> some View {
+        Button {
+            HapticManager.impact(.light)
+            action()
+        } label: {
+            row(label: label, sub: sub, active: false, swatch: nil)
+        }
+        .buttonStyle(.pressable)
+    }
+    #endif
 
     // MARK: Header
 

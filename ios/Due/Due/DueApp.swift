@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct DueApp: App {
@@ -22,5 +23,11 @@ struct DueApp: App {
             .preferredColorScheme(theme.mode.preferredColorScheme)
             .animation(.spring(response: 0.5, dampingFraction: 0.85), value: hasCompletedOnboarding)
         }
+        .modelContainer(for: [
+            Card.self,
+            Transaction.self,
+            Installment.self,
+            Insight.self
+        ])
     }
 }
