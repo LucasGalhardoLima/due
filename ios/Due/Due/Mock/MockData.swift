@@ -187,7 +187,13 @@ struct CartaoData {
     let categorias: [CartaoCategory]
     let recent: [CartaoTxn]
 
-    var pct: Int { Int((Double(fatura) / Double(limite) * 100).rounded()) }
+    // Guard against division-by-zero when there are no cards yet —
+    // CartaoViewModel returns `limite: 0` in that case and computing
+    // pct without the guard yields NaN → fatal Int conversion.
+    var pct: Int {
+        guard limite > 0 else { return 0 }
+        return Int((Double(fatura) / Double(limite) * 100).rounded())
+    }
     var livre: Int { limite - fatura }
 }
 

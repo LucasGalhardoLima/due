@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CartaoView: View {
     @Environment(AppTheme.self) private var theme
-    let data: CartaoData = MockData.cartao
+    let data: CartaoData
     var onBack: () -> Void
     var onChat: () -> Void
 

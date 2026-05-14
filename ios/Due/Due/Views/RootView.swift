@@ -79,6 +79,10 @@ struct RootView: View {
             ChatView(viewModel: chatVM, onBack: { path.removeLast() })
         case .cartao:
             CartaoView(
+                data: CartaoViewModel.project(
+                    cards: cards,
+                    transactions: transactions
+                ),
                 onBack: { path.removeLast() },
                 onChat: { navigate(to: .chat) }
             )
