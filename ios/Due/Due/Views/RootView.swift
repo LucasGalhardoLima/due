@@ -1,12 +1,17 @@
 import SwiftUI
+import SwiftData
 
 // State machine for the redesigned app: Home is the root, everything else is
 // pushed via NavigationStack. No tabs. Du-access is the FAB on Home only.
 struct RootView: View {
     @Environment(AppTheme.self) private var theme
+    @Environment(\.modelContext) private var modelContext
     @State private var path: [AppDestination] = RootView.initialPath()
-    @State private var unreadCount = MockData.initialUnreadCount
     @State private var chatVM = ChatViewModel(initialBackend: AppTheme.persistedBackend())
+
+    @Query private var cards: [Card]
+    @Query private var transactions: [Transaction]
+    @Query(sort: \Insight.createdAt, order: .reverse) private var insights: [Insight]
 
     /// Debug helper. Pass `-startScreen chat|cartao|overview|notifications|settings`
     /// (or set `du.startScreen` UserDefault) to skip Home and land on a screen for screenshots.
@@ -23,14 +28,25 @@ struct RootView: View {
         return []
     }
 
+    private var unreadCount: Int {
+        insights.filter { !$0.read }.count
+    }
+
     var body: some View {
         NavigationStack(path: $path) {
             HomeView(
                 unreadCount: unreadCount,
-                data: MockData.home,
+                data: HomeViewModel.project(
+                    transactions: transactions,
+                    cards: cards,
+                    insights: insights
+                ),
                 onLogoTap: { /* future: open profile */ },
                 onBell: {
-                    unreadCount = 0
+                    for ins in insights where !ins.read {
+                        ins.read = true
+                    }
+                    try? modelContext.save()
                     path.append(.notifications)
                 },
                 onSettings: { path.append(.settings) },
