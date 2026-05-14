@@ -1,59 +1,20 @@
 import Foundation
 
 // ─────────────────────────────────────────────────────────────
-// All hard-coded values from the prototype live here so they're
-// trivial to replace once real data lands. Each screen's view
-// reads from `MockData.{home,cartao,overview,notifications,...}`
-// — never hard-codes the values inline.
+// Residual mock data. Home, Cartão, and Notifications are now
+// projected from SwiftData via their respective *ViewModel.project
+// functions, so the per-screen statics that used to live here have
+// been deleted.
 //
-// To wire real data: swap `MockData.foo` for the live source and
-// delete the static here. The view contract (the structs below)
-// is what survives.
+// What remains: `MockData.overview` is read by OverviewViewModel
+// for the editorial sections (`habits`, `economyPotential6mo`) that
+// require real pattern-detection AI we haven't built yet. When that
+// pipeline lands, this file disappears — only the view-contract
+// structs below stay (they're tied to the view layouts, not to
+// mock content).
 // ─────────────────────────────────────────────────────────────
 
 enum MockData {
-    static let home = HomeData(
-        disponivel: 4983,
-        monthLabel: "MAR",
-        dia: 24,
-        totalDias: 31,
-        cardCloses: 10,
-        cardFatura: 21403,
-        cardLimitePct: 85,
-        insights: [
-            HomeInsight(time: "agora", text: "Delivery passou do teto em R$ 1.180.", actionLabel: "Ver"),
-            HomeInsight(time: "ontem", text: "3 parcelas terminam em abril. Liberam R$ 2.340 na próxima fatura.", actionLabel: nil)
-        ],
-        recentes: [
-            RecentItem(name: "iFood",              amount: -47.90,    sub: "hoje · 19:24"),
-            RecentItem(name: "Supermercado Extra", amount: -312.45,   sub: "ontem"),
-            RecentItem(name: "Salário",            amount: 35_000,    sub: "22 mar"),
-            RecentItem(name: "Spotify",            amount: -34.90,    sub: "20 mar")
-        ]
-    )
-
-    static let cartao = CartaoData(
-        fatura: 21_403,
-        limite: 25_000,
-        fechaEm: 5,
-        categorias: [
-            CartaoCategory(name: "Delivery",    valor: 5_840, share: 27, over: true),
-            CartaoCategory(name: "Mercado",     valor: 3_892, share: 18, over: true),
-            CartaoCategory(name: "Mobilidade",  valor: 2_410, share: 11, over: false),
-            CartaoCategory(name: "Assinaturas", valor: 1_670, share: 8,  over: false),
-            CartaoCategory(name: "Saúde",       valor: 1_480, share: 7,  over: false),
-            CartaoCategory(name: "Outros",      valor: 6_111, share: 29, over: false)
-        ],
-        recent: [
-            CartaoTxn(merchant: "iFood",         amount: 47.90,  category: "Delivery",    when: "hoje · 21:14"),
-            CartaoTxn(merchant: "Uber",          amount: 23.50,  category: "Mobilidade",  when: "hoje · 14:20"),
-            CartaoTxn(merchant: "Pão de Açúcar", amount: 312.45, category: "Mercado",     when: "ontem · 19:32"),
-            CartaoTxn(merchant: "Drogasil",      amount: 89.10,  category: "Saúde",       when: "ontem · 11:08"),
-            CartaoTxn(merchant: "Spotify",       amount: 34.90,  category: "Assinaturas", when: "ter · 03:00"),
-            CartaoTxn(merchant: "iFood",         amount: 62.30,  category: "Delivery",    when: "seg · 20:45")
-        ]
-    )
-
     static let overview = OverviewData(
         months: ["out", "nov", "dez", "jan", "fev", "mar"],
         totals: [24_100, 25_800, 27_200, 26_900, 28_400, 30_017],
@@ -100,40 +61,6 @@ enum MockData {
         ]
     )
 
-    static let notifications: [NotificationGroup] = [
-        NotificationGroup(label: "Hoje", items: [
-            NotificationItem(unread: true,  kind: .auto,
-                title: "Categorizei 3 lançamentos do cartão",
-                body: "iFood, Uber, e Drogasil entraram em Delivery, Mobilidade e Saúde.",
-                time: "agora", action: "Revisar", urgent: false),
-            NotificationItem(unread: true,  kind: .alert,
-                title: "Cartão a 85% do limite",
-                body: "Faltam 5 dias pra fechar. Você ainda tem R$ 3.097 livres.",
-                time: "14:22", action: "Ver cartão", urgent: true),
-            NotificationItem(unread: true,  kind: .insight,
-                title: "Padrão detectado: delivery cresceu 32%",
-                body: "Comparado aos últimos 3 meses. Quer que eu monte um plano?",
-                time: "09:10", action: "Falar com Du", urgent: false)
-        ]),
-        NotificationGroup(label: "Ontem", items: [
-            NotificationItem(unread: false, kind: .auto,
-                title: "Salário registrado",
-                body: "R$ 35.000 entrou via PIX. Tudo certo.",
-                time: "08:02", action: nil, urgent: false),
-            NotificationItem(unread: false, kind: .reminder,
-                title: "Lembrete: aluguel vence em 3 dias",
-                body: "R$ 4.200 pra Imobiliária Sul.",
-                time: "07:45", action: "Marcar como pago", urgent: false)
-        ]),
-        NotificationGroup(label: "Esta semana", items: [
-            NotificationItem(unread: false, kind: .insight,
-                title: "Você bateu a meta de mercado",
-                body: "Ficou 8% abaixo do teto. 🔥",
-                time: "seg, 07:30", action: nil, urgent: false)
-        ])
-    ]
-
-    static let initialUnreadCount = 3
 }
 
 // MARK: - Home

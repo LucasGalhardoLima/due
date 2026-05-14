@@ -84,8 +84,9 @@ enum HomeViewModel {
     // and treats "fatura" as expenses on that card over the last 30 days.
     // Good enough for the Home headline. The full Itaú-style cycle math
     // (close on day X → due on day X+~10, transactions bucket into the
-    // open invoice based on closing date) lives in the webapp today; will
-    // port when CartãoView migrates off MockData.
+    // open invoice based on closing date) lives in CartaoViewModel — Home
+    // can promote to that whenever the perf cost is acceptable; today the
+    // numbers agree closely enough for the 1-line headline.
     private static func cardSnapshot(
         now: Date,
         cards: [Card],
