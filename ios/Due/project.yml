@@ -54,6 +54,16 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         CFBundleDisplayName: "Du"
         CFBundleIconName: AppIcon
+        # Drive version + build from project.yml's MARKETING_VERSION /
+        # CURRENT_PROJECT_VERSION so we have one source of truth and
+        # don't drift between project.yml and Info.plist.
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        # Apple's export-compliance question. App uses only HTTPS-free,
+        # standard Apple framework crypto (PDFKit password unlock and
+        # nothing else) — all exempt. Declaring `false` here skips the
+        # "Missing Compliance" status on every TestFlight upload.
+        ITSAppUsesNonExemptEncryption: false
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
         UIAppFonts:
@@ -109,6 +119,13 @@ targets:
       # SystemLanguageModel.availability before we route to this tier.
       - package: LocalLLMClient
         product: LocalLLMClientFoundationModels
+    # Explicit shared scheme so it survives xcodegen regens and is
+    # readable by CI / Fastlane / scripted archive flows that look at
+    # xcshareddata/xcschemes/ instead of accepting an auto-scheme.
+    scheme:
+      testTargets:
+        - DuTests
+      gatherCoverageData: false
 
   DuTests:
     type: bundle.unit-test
