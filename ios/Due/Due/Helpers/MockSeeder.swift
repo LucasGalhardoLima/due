@@ -1,10 +1,9 @@
-#if DEBUG
 import Foundation
 import SwiftData
 
-// DEBUG-only helper that lets devs populate the local SwiftData store
-// with a representative dataset so the screens look like the prototype
-// while we migrate them off MockData. Not compiled into RELEASE.
+// `wipe(context:)` is always compiled — it's the destructive action surfaced
+// in Settings ("Apagar todos os dados"). `seed(context:)` is DEBUG-only and
+// powers the dev "Popular com dados de exemplo" picker in Settings.
 @MainActor
 enum MockSeeder {
     static func wipe(context: ModelContext) throws {
@@ -16,6 +15,7 @@ enum MockSeeder {
         try context.save()
     }
 
+    #if DEBUG
     static func seed(context: ModelContext) throws {
         try wipe(context: context)
 
@@ -72,5 +72,5 @@ enum MockSeeder {
 
         try context.save()
     }
+    #endif
 }
-#endif

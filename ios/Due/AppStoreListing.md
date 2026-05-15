@@ -4,9 +4,9 @@
 
 | Field | Value |
 |-------|-------|
-| App Name | Du — Finanças com IA |
-| Subtitle | Controle de gastos e faturas |
-| Bundle ID | *(set in Xcode project)* |
+| App Name | Du — Finanças no seu dispositivo |
+| Subtitle | Faturas e parcelas, sem login |
+| Bundle ID | com.du.app |
 | Category (Primary) | Finance |
 | Category (Secondary) | Productivity |
 | Age Rating | 4+ |
@@ -17,86 +17,70 @@
 ## 2. App Description — Portuguese (Primary)
 
 **Promotional Text** (170 chars, editable without review):
-> Agora com insights de IA! A Du analisa seus gastos e te ajuda a manter as finanças saudáveis, de forma simples e inteligente.
+> Suas finanças, no seu dispositivo. Importe sua fatura, organize parcelas e converse com a Du — sem login, sem servidor, sem anúncio.
 
 **Description:**
 
-Du é sua assistente financeira pessoal com inteligência artificial — feita sob medida para o dia a dia do brasileiro.
+Du é uma assistente financeira pessoal que roda **100% no seu iPhone**. Sem conta, sem login, sem servidor. Suas faturas e gastos ficam só no seu aparelho.
 
-Acompanhe suas faturas de cartão de crédito, controle parcelamentos, organize seus gastos por categoria e receba insights personalizados para tomar decisões financeiras melhores.
+Feita pra quem usa cartão de crédito no Brasil: importa a fatura em PDF, separa os parcelamentos, e te ajuda a entender pra onde foi o dinheiro.
 
-TUDO NUM SÓ LUGAR
-• Importe e visualize suas faturas de todos os seus cartões
-• Veja os gastos agrupados por data, com detalhes de cada transação
-• Acompanhe o limite de crédito utilizado em cada cartão
+TUDO LOCAL, TUDO SEU
+• Importe sua fatura PDF do Itaú direto no app — o arquivo é lido no seu próprio iPhone
+• Lançamentos categorizados automaticamente pelo que o banco já indicou
+• Parcelamentos viram um cronograma mês a mês, com a parcela do mês claramente marcada
 
-PARCELAMENTOS SOB CONTROLE
-• Saiba exatamente quanto você compromete por mês com parcelas
-• Visualize a linha do tempo dos seus parcelamentos
-• Score de saúde financeira dos parcelamentos (0 a 100)
-• Alertas quando o comprometimento estiver alto
+CONVERSA COM A DU
+• Du é uma coach financeira que conversa em pt-BR direto no chat
+• Em iPhones com Apple Intelligence (iOS 26+), usa o modelo da Apple no dispositivo
+• Em outros iPhones, usa um modelo pequeno empacotado no app — sempre offline
+• "iFood 47" vira um lançamento automaticamente; pergunta sobre seus gastos é respondida sem internet
 
-IA QUE ENTENDE SUAS FINANÇAS
-• Insights inteligentes sobre padrões de gasto
-• Categorias que estão acima do orçamento em destaque
-• Converse com a Du — pergunte sobre gastos, orçamento e parcelas
-• Sugestões personalizadas para economizar
+SEM CONTA, SEM RASTREAMENTO
+• Não precisa criar conta, não precisa fazer login
+• Nenhum dado é enviado pra servidor nenhum
+• Sem anúncios, sem analytics, sem SDKs de terceiros
 
-BONITO E FÁCIL DE USAR
-• Design moderno com efeito glass morphism
-• Modo claro e escuro
-• Navegação rápida e intuitiva
-• Dados atualizados com pull-to-refresh
+APARÊNCIA
+• Modo claro e escuro, com paleta personalizável
+• Design moderno em mono-spaced + glass
 
-SEGURANÇA E PRIVACIDADE
-• Autenticação segura
-• Seus dados financeiros ficam protegidos
-• Sem anúncios, sem venda de dados
-
-Baixe a Du e tenha suas finanças sob controle — com a inteligência que você merece.
+Du não substitui aconselhamento financeiro profissional. É uma ferramenta de organização, não um robô-conselheiro.
 
 ---
 
 ## 3. App Description — English (US)
 
 **Promotional Text:**
-> Now with AI insights! Du analyzes your spending and helps you keep your finances healthy, simply and smartly.
+> Your finances, on your device. Import your statement, manage installments, and chat with Du — no login, no server, no ads.
 
 **Description:**
 
-Du is your personal AI-powered financial assistant — designed for the everyday financial life of Brazilians.
+Du is a personal finance assistant that runs **100% on your iPhone**. No account, no login, no server. Your statements and spending stay on your device only.
 
-Track your credit card bills, manage installment plans, organize expenses by category, and get personalized insights to make better financial decisions.
+Built for Brazilian credit card users: import your PDF statement, separate installment plans, and understand where your money went.
 
-EVERYTHING IN ONE PLACE
-• Import and view bills from all your credit cards
-• See spending grouped by date with full transaction details
-• Track credit limit usage across all cards
+EVERYTHING LOCAL
+• Import your Itaú PDF statement straight in the app — the file is read on your iPhone
+• Charges auto-categorized using the bank's existing labels
+• Installment plans become a month-by-month timeline, with the current month clearly marked
 
-INSTALLMENTS UNDER CONTROL
-• Know exactly how much you commit per month in installments
-• View your installment payment timeline
-• Financial health score for installments (0 to 100)
-• Alerts when spending commitment is high
+CHAT WITH DU
+• Du is a financial coach you can chat with in pt-BR
+• On iPhones with Apple Intelligence (iOS 26+), uses Apple's on-device model
+• On other iPhones, uses a small bundled model — always offline
+• "iFood 47" becomes a logged expense automatically; questions about your spending are answered without internet
 
-AI THAT UNDERSTANDS YOUR FINANCES
-• Smart insights on your spending patterns
-• Over-budget categories highlighted at a glance
-• Chat with Du — ask about spending, budgets, and installments
-• Personalized saving suggestions
+NO ACCOUNT, NO TRACKING
+• No account creation, no login required
+• No data sent to any server
+• No ads, no analytics, no third-party SDKs
 
-BEAUTIFUL AND EASY TO USE
-• Modern glass morphism design
-• Light and dark mode
-• Fast, intuitive navigation
-• Data updated with pull-to-refresh
+APPEARANCE
+• Light and dark mode, with a customizable palette
+• Modern mono + glass design
 
-SECURITY AND PRIVACY
-• Secure authentication
-• Your financial data stays protected
-• No ads, no data selling
-
-Download Du and take control of your finances — with the intelligence you deserve.
+Du is not a substitute for professional financial advice. It's an organization tool, not a robo-advisor.
 
 ---
 
@@ -104,12 +88,12 @@ Download Du and take control of your finances — with the intelligence you dese
 
 **Portuguese (Brazil):**
 ```
-finanças,fatura,cartão,parcela,gastos,orçamento,IA,controle,dinheiro,conta,crédito,economia,despesa
+finanças,fatura,cartão,parcela,gastos,orçamento,IA,offline,local,privacidade,crédito,Itaú
 ```
 
 **English (US):**
 ```
-finance,budget,expenses,credit card,installments,spending,AI,bills,tracker,money,personal finance
+finance,budget,expenses,credit card,installments,spending,offline,private,local,bills,money
 ```
 
 ---
@@ -117,10 +101,10 @@ finance,budget,expenses,credit card,installments,spending,AI,bills,tracker,money
 ## 5. What's New (Version 1.0)
 
 **Portuguese:**
-> Primeira versão da Du! Acompanhe suas faturas, controle seus parcelamentos e receba insights de IA para suas finanças.
+> Primeira versão da Du. Importa fatura PDF do Itaú, organiza parcelamentos e tem um chat com IA — tudo no seu iPhone, sem login.
 
 **English:**
-> First version of Du! Track your bills, manage installments, and get AI insights for your finances.
+> First version of Du. Imports Itaú PDF statements, organizes installment plans, and includes an AI chat — all on your iPhone, no login.
 
 ---
 
@@ -128,33 +112,37 @@ finance,budget,expenses,credit card,installments,spending,AI,bills,tracker,money
 
 ### Data Types Collected
 
-| Data Type | Category | Linked to Identity | Used for Tracking |
-|-----------|----------|-------------------|-------------------|
-| Email Address | Contact Info | Yes | No |
-| Name | Contact Info | Yes | No |
-| User ID | Identifiers | Yes | No |
-| Credit Card Info (names, limits, closing dates) | Financial Info | Yes | No |
-| Transaction History | Financial Info | Yes | No |
-| Purchase History (installments) | Financial Info | Yes | No |
+**None.** Du does not collect, transmit, or share any data. All information stays on the user's device.
+
+| Category | Status |
+|----------|--------|
+| Contact Info | Not Collected |
+| Health & Fitness | Not Collected |
+| Financial Info | Not Collected (stored locally on device only) |
+| Location | Not Collected |
+| Sensitive Info | Not Collected |
+| Contacts | Not Collected |
+| User Content | Not Collected |
+| Browsing History | Not Collected |
+| Search History | Not Collected |
+| Identifiers | Not Collected |
+| Purchases | Not Collected (stored locally on device only) |
+| Usage Data | Not Collected |
+| Diagnostics | Not Collected |
+| Other Data | Not Collected |
 
 ### Data Usage Purposes
+None. The app makes no network calls. All financial data entered by the user is persisted to local SwiftData storage on the device and never leaves it.
 
-| Purpose | Data Types |
-|---------|-----------|
-| App Functionality | Email, Name, User ID, Credit Card Info, Transaction History, Purchase History |
-| Analytics | None (no third-party analytics) |
-| Advertising | None (no ads) |
-| Third-Party Advertising | None |
-| Developer's Advertising | None |
+### Tracking
+No tracking. `NSPrivacyTracking = false` in the bundled privacy manifest.
 
-### Data Not Collected
-- Location
-- Health & Fitness
-- Browsing History
-- Search History
-- Contacts
-- Photos/Videos
-- Diagnostics (no crash reporting SDK currently)
+### Third-Party SDKs
+- `LocalLLMClient` (open-source, on-device LLM runner — no network)
+- `LocalLLMClientLlama` (llama.cpp binding — no network)
+- `LocalLLMClientFoundationModels` (Apple FoundationModels wrapper — no network)
+
+No analytics, attribution, advertising, or crash-reporting SDKs.
 
 ---
 
@@ -165,6 +153,8 @@ finance,budget,expenses,credit card,installments,spending,AI,bills,tracker,money
 | Support URL | https://due-rosy.vercel.app/support |
 | Privacy Policy URL | https://due-rosy.vercel.app/privacy |
 | Marketing URL | *(optional — e.g., https://du.app)* |
+
+> **Action item before submission:** verify both URLs are live, reflect the local-first reality (no PII collection), and mention LGPD/§13.709 compliance for the Brazilian market.
 
 ---
 
@@ -180,32 +170,67 @@ finance,budget,expenses,credit card,installments,spending,AI,bills,tracker,money
 
 *Minimum: 6.7" and 6.1" screenshots required.*
 
-### Screenshot Set (5–10 screenshots, recommended order)
+### Screenshot Set (5–7 screenshots, recommended order)
 
 | # | Screen | Caption (PT-BR) | Caption (EN) |
 |---|--------|-----------------|--------------|
-| 1 | Dashboard (main view) | Suas finanças num só lugar | Your finances in one place |
-| 2 | Dashboard (AI insights) | Insights inteligentes com IA | Smart AI-powered insights |
-| 3 | Transactions (invoice view) | Faturas detalhadas por cartão | Detailed bills by card |
-| 4 | Installments (timeline) | Parcelamentos sob controle | Installments under control |
-| 5 | Installments (health score) | Score de saúde financeira | Financial health score |
-| 6 | Chat (AI assistant) | Converse com a Du | Chat with Du |
-| 7 | Onboarding (welcome) | Comece em segundos | Get started in seconds |
-| 8 | Settings (dark mode) | Modo claro e escuro | Light and dark mode |
+| 1 | Onboarding (greeting) | Sem login, sem nuvem | No login, no cloud |
+| 2 | Onboarding (import choice) | Importa sua fatura ou começa do zero | Import your statement or start fresh |
+| 3 | Home (with data) | Suas finanças num só lugar | Your finances in one place |
+| 4 | Cartão (installments timeline) | Parcelamentos mês a mês | Installments month by month |
+| 5 | Chat | Du responde no seu dispositivo | Du replies on your device |
+| 6 | Settings (dark mode + palette) | Sua aparência, seu controle | Your look, your call |
 
 ### Screenshot Design Guidelines
-- Background: Use app's gradient background (mint → deep purple)
-- Frame: Use device mockup frame (iPhone 16 Pro)
-- Caption: Bold text above device, Sora font, white on gradient
-- Layout: Device centered, caption top 20% of image
-- Style: Consistent with glass morphism aesthetic of the app
+- Background: app gradient background (mint → deep purple)
+- Frame: device mockup frame (iPhone 16 Pro)
+- Caption: bold sans-serif top 18% of image
+- Layout: device centered, mono caption above
 
 ---
 
 ## 9. App Review Notes
 
-**Demo Account:**
-*(Provide credentials for App Review team)*
+**Demo Account:** Not applicable. Du has no account creation, no login, no server. All flows are reachable on a fresh install.
+
+**Sample Itaú fatura PDF for testing:**
+Upload a sanitized Itaú PDF (no real card number, no real transactions) to App Store Connect's "App Review > Attachments" field. Password for the sample: `00000`.
 
 **Notes for reviewer:**
-> Du is a personal finance management app focused on the Brazilian market. It allows users to track credit card bills (faturas), manage installment plans (parcelamentos), and receive AI-powered financial insights. The app requires authentication via Clerk. A demo account will be provided for review purposes.
+
+```
+Du is a 100% on-device personal finance app for the Brazilian market.
+
+ACCOUNTS
+Du does not have any account creation, login, or remote server. All
+data stays on the user's device in SwiftData. No demo account is needed.
+
+FIRST RUN
+1. Tap "Continuar" through the name screen (any name works).
+2. Choose one of three options:
+   a) "Subir fatura do cartão" — recommended. We've attached a
+      sanitized Itaú fatura PDF (no real card number, no real
+      transactions; password: "00000"). Pick this file, enter the
+      password, fill in the card setup (any limit, e.g. 5000; closing
+      day 13; due day 20), confirm.
+   b) "Importar planilha" — intentionally shows an "Em breve" state
+      in this release. CSV import will land in a future version.
+   c) "Começar do zero" — proceed to Home with an empty Du.
+
+AI / CHAT
+"Du" is a financial coach chatbot powered by:
+- Apple FoundationModels (iOS 26 + Apple Intelligence devices), OR
+- A bundled Qwen 3 0.6B model running locally via llama.cpp, OR
+- A deterministic rule-based fallback.
+No prompts are sent to any server. There is no network call in the app.
+
+A "Du não substitui aconselhamento financeiro profissional"
+disclaimer is shown on every chat session.
+
+PERMISSIONS
+The app requests no permissions. Document picker access for the PDF
+import is handled by the system file provider.
+
+CONTACT
+Issues during review: lima.galhardo@gmail.com
+```

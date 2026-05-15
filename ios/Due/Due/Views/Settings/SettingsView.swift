@@ -8,6 +8,14 @@ struct SettingsView: View {
 
     private let pad: CGFloat = 24
 
+    @State private var showWipeAlert = false
+
+    private var versionString: String {
+        let v = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+        let b = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
+        return "\(v) (\(b))"
+    }
+
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
@@ -36,6 +44,28 @@ struct SettingsView: View {
                     ForEach(DuPalette.allCases) { p in
                         paletteRow(p)
                     }
+                }
+                .padding(.bottom, 32)
+
+                section(title: "Privacidade & Suporte") {
+                    Link(destination: URL(string: "https://due-rosy.vercel.app/privacy")!) {
+                        row(label: "Política de privacidade", sub: "Abre no Safari", active: false, swatch: nil)
+                    }
+                    Link(destination: URL(string: "https://due-rosy.vercel.app/support")!) {
+                        row(label: "Suporte", sub: "Abre no Safari", active: false, swatch: nil)
+                    }
+                    row(label: "Versão", sub: versionString, active: false, swatch: nil)
+                }
+                .padding(.bottom, 32)
+
+                section(title: "Dados") {
+                    Button {
+                        HapticManager.impact(.medium)
+                        showWipeAlert = true
+                    } label: {
+                        row(label: "Apagar todos os dados", sub: "Cartões, lançamentos, parcelas", active: false, swatch: nil)
+                    }
+                    .buttonStyle(.pressable)
                 }
                 .padding(.bottom, 32)
 
@@ -72,6 +102,15 @@ struct SettingsView: View {
             .padding(.bottom, 40)
         }
         .background(Color.duBg.ignoresSafeArea())
+        .alert("Apagar todos os dados?", isPresented: $showWipeAlert) {
+            Button("Cancelar", role: .cancel) { }
+            Button("Apagar tudo", role: .destructive) {
+                try? MockSeeder.wipe(context: modelContext)
+                HapticManager.notification(.warning)
+            }
+        } message: {
+            Text("Cartões, lançamentos e parcelas serão removidos. Não tem como desfazer.")
+        }
     }
 
     #if DEBUG

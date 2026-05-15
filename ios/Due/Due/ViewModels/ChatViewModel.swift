@@ -172,6 +172,10 @@ final class ChatViewModel {
                 }
             }
 
+            #if DEBUG
+            // Benchmark logging persists prompts + raw responses to
+            // Documents/du-chat-benchmark.jsonl. Useful for tuning the
+            // local models but personal data — keep RELEASE silent.
             if let stats = finalStats {
                 ChatBenchmarkLogger.log(.init(
                     backend: primary.kind,
@@ -181,6 +185,7 @@ final class ChatViewModel {
                     stats: stats
                 ))
             }
+            #endif
         }
     }
 

@@ -15,12 +15,24 @@ struct ChatView: View {
             thread
             Divider().background(Color.duBorder)
             composer
+            disclaimer
         }
         .background(Color.duBg.ignoresSafeArea())
         .onAppear {
             inputFocused = true
             viewModel.modelContext = modelContext
         }
+    }
+
+    // MARK: Disclaimer
+
+    private var disclaimer: some View {
+        Text("Du não substitui aconselhamento financeiro profissional.")
+            .font(DuFont.mono(10))
+            .foregroundStyle(Color.duFgFaint)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
     }
 
     // MARK: Header

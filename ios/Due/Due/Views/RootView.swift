@@ -15,7 +15,9 @@ struct RootView: View {
 
     /// Debug helper. Pass `-startScreen chat|cartao|overview|notifications|settings`
     /// (or set `du.startScreen` UserDefault) to skip Home and land on a screen for screenshots.
+    /// RELEASE always returns `[]` so a stray UserDefault can't reroute a shipped build.
     private static func initialPath() -> [AppDestination] {
+        #if DEBUG
         let args = CommandLine.arguments
         if let i = args.firstIndex(of: "-startScreen"), i + 1 < args.count,
            let dest = AppDestination(rawValue: args[i + 1]) {
@@ -25,6 +27,7 @@ struct RootView: View {
            let dest = AppDestination(rawValue: raw) {
             return [dest]
         }
+        #endif
         return []
     }
 

@@ -1,6 +1,9 @@
+#if DEBUG
 import Foundation
 
 // JSONL log of every chat exchange across backends. One line per turn.
+// Compiled only into DEBUG — RELEASE builds dead-strip the whole enum
+// and the call site in ChatViewModel is also #if DEBUG-wrapped.
 // File: <Documents>/du-chat-benchmark.jsonl
 //
 // Pull from device with:
@@ -58,6 +61,11 @@ enum ChatBenchmarkLogger {
             }
         } else {
             try? data.write(to: url, options: [.atomic])
+            // Stragglers from DEBUG builds must never reach iCloud Backup.
+            var mutableURL = url
+            var values = URLResourceValues()
+            values.isExcludedFromBackup = true
+            try? mutableURL.setResourceValues(values)
         }
     }
 
@@ -102,3 +110,4 @@ enum ChatBenchmarkLogger {
         }
     }
 }
+#endif
