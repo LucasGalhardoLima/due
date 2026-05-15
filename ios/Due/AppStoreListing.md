@@ -6,7 +6,7 @@
 |-------|-------|
 | App Name | Du — Finanças no seu dispositivo |
 | Subtitle | Faturas e parcelas, sem login |
-| Bundle ID | com.du.app |
+| Bundle ID | app.du.finance |
 | Category (Primary) | Finance |
 | Category (Secondary) | Productivity |
 | Age Rating | 4+ |

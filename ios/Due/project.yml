@@ -78,7 +78,7 @@ targets:
     settings:
       base:
         SWIFT_STRICT_CONCURRENCY: complete
-        PRODUCT_BUNDLE_IDENTIFIER: com.du.app
+        PRODUCT_BUNDLE_IDENTIFIER: app.du.finance
         # Skip the bundled GGUFs from code-signing integrity checks
         # (huge files; llama.cpp validates the model headers at load).
         OTHER_CODE_SIGN_FLAGS: "--deep"
@@ -137,7 +137,7 @@ targets:
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
         GENERATE_INFOPLIST_FILE: YES
-        PRODUCT_BUNDLE_IDENTIFIER: com.du.app.tests
+        PRODUCT_BUNDLE_IDENTIFIER: app.du.finance.tests
         # @testable import Du transitively pulls LocalLLMClientLlamaC's
         # C++ headers — must inherit the same explicit-modules + cxx
         # interop workarounds the Du target uses or `<memory>` fails to
