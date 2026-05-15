@@ -46,7 +46,7 @@ struct OnboardingView: View {
                 switch step {
                 case 0: stepGreeting
                 case 1: stepImport
-                default: stepFirstInteraction
+                default: stepTwo
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -205,7 +205,29 @@ struct OnboardingView: View {
         .buttonStyle(.pressable)
     }
 
-    // MARK: Step 2 — first interaction
+    // MARK: Step 2 — routes by import choice
+
+    @ViewBuilder
+    private var stepTwo: some View {
+        switch importChoice {
+        case .card:
+            OnboardingFaturaImportView(
+                onDone: onDone,
+                onBack: { step = 1 }
+            )
+        case .sheet:
+            OnboardingComingSoonView(
+                title: "Importar planilha",
+                bodyText: "Tô finalizando essa parte. Por enquanto, começa do zero ou manda a fatura do cartão."
+            ) {
+                step = 1
+            }
+        case .scratch, .none:
+            stepFirstInteraction
+        }
+    }
+
+    // MARK: Step 2 — first interaction (scratch path only)
 
     private var stepFirstInteraction: some View {
         VStack(alignment: .leading, spacing: 0) {
