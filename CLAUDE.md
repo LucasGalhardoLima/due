@@ -7,7 +7,7 @@ Auto-generated from all feature plans. Last updated: 2026-02-20
 - N/A — no data model changes (002-dashboard-tabs)
 
 - **Web**: TypeScript 5.9, Vue 3.5, Nuxt 4.2 + Prisma 6.2, Zod, date-fns, Vercel AI SDK, shadcn-vue (reka-ui), Lucide icons (001-orcamento-mensal)
-- **iOS**: Swift 6.0, SwiftUI, iOS 17.0+, XcodeGen, Clerk iOS SDK >= 0.40.0, MVVM with @Observable (Due iOS app)
+- **iOS**: Swift 6.0, SwiftUI, iOS 26.0+ (Apple Intelligence / FoundationModels floor), XcodeGen, MVVM with @Observable (Due iOS app)
 
 ## Project Structure
 

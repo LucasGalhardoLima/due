@@ -2,7 +2,10 @@ name: Du
 options:
   bundleIdPrefix: com.du
   deploymentTarget:
-    iOS: "17.0"
+    # iOS 26.0 is the floor: it's the first OS exposing the FoundationModels
+    # framework, which the AI chat tier (AppleFoundationModelsBackend) requires.
+    # A lower floor added nothing — the AI tier can't activate below 26.
+    iOS: "26.0"
   xcodeVersion: "16.0"
   generateEmptyDirectories: true
 
