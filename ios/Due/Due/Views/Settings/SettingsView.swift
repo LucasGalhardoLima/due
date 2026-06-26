@@ -1,108 +1,233 @@
 import SwiftUI
-import Clerk
+import SwiftData
 
 struct SettingsView: View {
-    @AppStorage("appColorScheme") private var appColorScheme = "system"
-    @Environment(\.dismiss) private var dismiss
+    @Environment(AppTheme.self) private var theme
+    @Environment(\.modelContext) private var modelContext
+    var onBack: () -> Void
 
-    private var user: User? { Clerk.shared.user }
+    private let pad: CGFloat = 24
 
-    private var displayName: String {
-        [user?.firstName, user?.lastName]
-            .compactMap { $0 }
-            .joined(separator: " ")
-            .trimmingCharacters(in: .whitespaces)
-            .isEmpty
-            ? "Usuário"
-            : [user?.firstName, user?.lastName].compactMap { $0 }.joined(separator: " ")
+    @State private var showWipeAlert = false
+
+    private var versionString: String {
+        let v = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+        let b = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
+        return "\(v) (\(b))"
     }
 
     var body: some View {
-        NavigationStack {
-            Form {
-                appearanceSection
-                accountSection
-                aboutSection
-            }
-            .navigationTitle("Configurações")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Fechar") { dismiss() }
-                }
-            }
-        }
-    }
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 0) {
+                header.padding(.bottom, 28)
 
-    // MARK: - Aparência
+                Text("Aparência")
+                    .font(DuFont.mono(32, weight: .bold))
+                    .kerning(-1.0)
+                    .foregroundStyle(Color.duFg)
+                    .padding(.bottom, 8)
 
-    private var appearanceSection: some View {
-        Section("Aparência") {
-            Picker("Tema", selection: $appColorScheme) {
-                Text("Sistema").tag("system")
-                Text("Claro").tag("light")
-                Text("Escuro").tag("dark")
-            }
-            .pickerStyle(.segmented)
-        }
-    }
+                Text("Como o Du fica na sua tela. Você pode mudar quando quiser.")
+                    .font(DuFont.mono(14))
+                    .foregroundStyle(Color.duFgMuted)
+                    .lineSpacing(2)
+                    .padding(.bottom, 32)
 
-    // MARK: - Conta
-
-    private var accountSection: some View {
-        Section("Conta") {
-            HStack(spacing: 12) {
-                initialsAvatar
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(displayName)
-                        .font(.subheadline.weight(.medium))
-
-                    if let email = user?.primaryEmailAddress?.emailAddress {
-                        Text(email)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                section(title: "Modo") {
+                    ForEach(AppMode.allCases) { mode in
+                        modeRow(mode)
                     }
                 }
-            }
+                .padding(.bottom, 32)
 
-            Button(role: .destructive) {
-                Task {
-                    try? await Clerk.shared.signOut()
+                section(title: "Paleta") {
+                    ForEach(DuPalette.allCases) { p in
+                        paletteRow(p)
+                    }
                 }
-            } label: {
-                Label("Sair da conta", systemImage: "rectangle.portrait.and.arrow.right")
+                .padding(.bottom, 32)
+
+                section(title: "Privacidade & Suporte") {
+                    Link(destination: URL(string: "https://due-rosy.vercel.app/privacy")!) {
+                        row(label: "Política de privacidade", sub: "Abre no Safari", active: false, swatch: nil)
+                    }
+                    Link(destination: URL(string: "https://due-rosy.vercel.app/support")!) {
+                        row(label: "Suporte", sub: "Abre no Safari", active: false, swatch: nil)
+                    }
+                    row(label: "Versão", sub: versionString, active: false, swatch: nil)
+                }
+                .padding(.bottom, 32)
+
+                section(title: "Dados") {
+                    Button {
+                        HapticManager.impact(.medium)
+                        showWipeAlert = true
+                    } label: {
+                        row(label: "Apagar todos os dados", sub: "Cartões, lançamentos, parcelas", active: false, swatch: nil)
+                    }
+                    .buttonStyle(.pressable)
+                }
+                .padding(.bottom, 32)
+
+                #if DEBUG
+                // Backend tier is auto-resolved in RELEASE; this picker is
+                // a dev override so we can force-test each tier and watch
+                // the resolver fallbacks behave when an unavailable choice
+                // is forced.
+                section(title: "Backend do chat (dev)") {
+                    ForEach(ChatBackendKind.allCases) { b in
+                        backendRow(b)
+                    }
+                }
+
+                Spacer().frame(height: 32)
+                section(title: "Dados (dev)") {
+                    devActionRow(
+                        label: "Popular com dados de exemplo",
+                        sub: "Cartão · 5 transações · 2 insights"
+                    ) {
+                        try? MockSeeder.seed(context: modelContext)
+                    }
+                    devActionRow(
+                        label: "Apagar tudo",
+                        sub: "Limpa o store local"
+                    ) {
+                        try? MockSeeder.wipe(context: modelContext)
+                    }
+                }
+                #endif
+            }
+            .padding(.horizontal, pad)
+            .padding(.top, 12)
+            .padding(.bottom, 40)
+        }
+        .background(Color.duBg.ignoresSafeArea())
+        .alert("Apagar todos os dados?", isPresented: $showWipeAlert) {
+            Button("Cancelar", role: .cancel) { }
+            Button("Apagar tudo", role: .destructive) {
+                try? MockSeeder.wipe(context: modelContext)
+                HapticManager.notification(.warning)
+            }
+        } message: {
+            Text("Cartões, lançamentos e parcelas serão removidos. Não tem como desfazer.")
+        }
+    }
+
+    #if DEBUG
+    private func devActionRow(label: String, sub: String, action: @escaping () -> Void) -> some View {
+        Button {
+            HapticManager.impact(.light)
+            action()
+        } label: {
+            row(label: label, sub: sub, active: false, swatch: nil)
+        }
+        .buttonStyle(.pressable)
+    }
+    #endif
+
+    // MARK: Header
+
+    private var header: some View {
+        HStack(spacing: 14) {
+            Button(action: onBack) {
+                Image(systemName: "arrow.left")
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundStyle(Color.duFg)
+                    .frame(width: 36, height: 36)
+            }
+            .buttonStyle(.pressable)
+            Text("Ajustes")
+                .font(DuFont.mono(11, weight: .medium))
+                .tracking(2.4)
+                .textCase(.uppercase)
+                .foregroundStyle(Color.duFgMuted)
+            Spacer()
+        }
+    }
+
+    private func section<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(title)
+                .font(DuFont.mono(11, weight: .medium))
+                .tracking(2.0)
+                .textCase(.uppercase)
+                .foregroundStyle(Color.duFgMuted)
+            VStack(spacing: 10) { content() }
+        }
+    }
+
+    private func modeRow(_ mode: AppMode) -> some View {
+        let active = theme.mode == mode
+        return Button {
+            theme.mode = mode
+        } label: {
+            row(label: mode.label, sub: mode.subtitle, active: active, swatch: nil)
+        }
+        .buttonStyle(.pressable)
+    }
+
+    private func paletteRow(_ palette: DuPalette) -> some View {
+        let active = theme.palette == palette
+        return Button {
+            theme.palette = palette
+        } label: {
+            row(label: palette.name, sub: palette.subtitle, active: active, swatch: palette)
+        }
+        .buttonStyle(.pressable)
+    }
+
+    private func backendRow(_ kind: ChatBackendKind) -> some View {
+        let active = theme.chatBackend == kind
+        return Button {
+            theme.chatBackend = kind
+        } label: {
+            row(label: kind.label, sub: kind.subtitle, active: active, swatch: nil)
+        }
+        .buttonStyle(.pressable)
+    }
+
+    private func row(label: String, sub: String, active: Bool, swatch: DuPalette?) -> some View {
+        HStack {
+            HStack(spacing: 12) {
+                if let swatch {
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(swatch.gradient)
+                        .frame(width: 22, height: 22)
+                        .overlay(
+                            Group {
+                                if active {
+                                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                        .stroke(swatch.primary, lineWidth: 1.5)
+                                        .padding(-3)
+                                }
+                            }
+                        )
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(label)
+                        .font(DuFont.mono(14, weight: .medium))
+                        .foregroundStyle(Color.duFg)
+                    Text(sub)
+                        .font(DuFont.mono(11, weight: .medium))
+                        .tracking(1.0)
+                        .foregroundStyle(Color.duFgFaint)
+                }
+            }
+            Spacer()
+            if active {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 20, height: 20)
+                    .background(theme.palette.primary, in: Circle())
             }
         }
-    }
-
-    // MARK: - Sobre
-
-    private var aboutSection: some View {
-        Section("Sobre") {
-            LabeledContent("Versão", value: appVersion)
-        }
-    }
-
-    // MARK: - Helpers
-
-    private var initialsAvatar: some View {
-        let initials = displayName
-            .split(separator: " ")
-            .prefix(2)
-            .compactMap { $0.first.map(String.init) }
-            .joined()
-
-        return Text(initials)
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(.white)
-            .frame(width: 36, height: 36)
-            .background(Color.duVioletAdaptive, in: Circle())
-    }
-
-    private var appVersion: String {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        return "\(version) (\(build))"
+        .padding(.horizontal, 16).padding(.vertical, 14)
+        .background(active ? Color.duSurfaceHi : Color.duSurface,
+                    in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(active ? Color.duBorderHi : Color.duBorder, lineWidth: 1)
+        )
     }
 }

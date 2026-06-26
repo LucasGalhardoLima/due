@@ -2,7 +2,10 @@ name: Du
 options:
   bundleIdPrefix: com.du
   deploymentTarget:
-    iOS: "17.0"
+    # iOS 26.0 is the floor: it's the first OS exposing the FoundationModels
+    # framework, which the AI chat tier (AppleFoundationModelsBackend) requires.
+    # A lower floor added nothing — the AI tier can't activate below 26.
+    iOS: "26.0"
   xcodeVersion: "16.0"
   generateEmptyDirectories: true
 
@@ -11,11 +14,6 @@ settings:
     SWIFT_VERSION: "6.0"
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: 1
-
-packages:
-  Clerk:
-    url: https://github.com/clerk/clerk-ios
-    from: "0.40.0"
 
 targets:
   Du:
@@ -38,12 +36,44 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         CFBundleDisplayName: "Du"
         CFBundleIconName: AppIcon
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        # App uses only HTTPS-free, standard Apple framework crypto — exempt.
+        ITSAppUsesNonExemptEncryption: false
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+        UIAppFonts:
+          - Geist-Regular.ttf
+          - Geist-Medium.ttf
+          - Geist-SemiBold.ttf
+          - Geist-Bold.ttf
+          - GeistMono-Regular.ttf
+          - GeistMono-Medium.ttf
+          - GeistMono-SemiBold.ttf
+          - GeistMono-Bold.ttf
     settings:
       base:
         SWIFT_STRICT_CONCURRENCY: complete
-        PRODUCT_BUNDLE_IDENTIFIER: com.du.app
+        PRODUCT_BUNDLE_IDENTIFIER: app.du.finance
+        CODE_SIGN_STYLE: Automatic
+    entitlements:
+      path: Due/Du.entitlements
+      properties: {}
+    scheme:
+      testTargets:
+        - DuTests
+      gatherCoverageData: false
+
+  DuTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        SWIFT_STRICT_CONCURRENCY: complete
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: app.du.finance.tests
     dependencies:
-      - package: Clerk
-        product: Clerk
+      - target: Du

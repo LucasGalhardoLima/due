@@ -1,143 +1,124 @@
 import SwiftUI
+import SwiftData
 
+// State machine for the redesigned app: Home is the root, everything else is
+// pushed via NavigationStack. No tabs. Du-access is the FAB on Home only.
 struct RootView: View {
-    @State private var selectedTab = 0
-    @State private var shouldStartQuickAdd = false
-    @AppStorage("appColorScheme") private var appColorScheme = "system"
+    @Environment(AppTheme.self) private var theme
+    @Environment(\.modelContext) private var modelContext
+    @State private var path: [AppDestination] = RootView.initialPath()
+    @State private var chatVM = ChatViewModel(initialBackend: AppTheme.persistedBackend())
 
-    private var resolvedColorScheme: ColorScheme? {
-        switch appColorScheme {
-        case "light": return .light
-        case "dark": return .dark
-        default: return nil
+    @Query private var cards: [Card]
+    @Query private var transactions: [Transaction]
+    @Query private var installments: [Installment]
+    @Query(sort: \Insight.createdAt, order: .reverse) private var insights: [Insight]
+
+    /// Debug helper. Pass `-startScreen chat|cartao|overview|notifications|settings`
+    /// (or set `du.startScreen` UserDefault) to skip Home and land on a screen for screenshots.
+    /// RELEASE always returns `[]` so a stray UserDefault can't reroute a shipped build.
+    private static func initialPath() -> [AppDestination] {
+        #if DEBUG
+        let args = CommandLine.arguments
+        if let i = args.firstIndex(of: "-startScreen"), i + 1 < args.count,
+           let dest = AppDestination(rawValue: args[i + 1]) {
+            return [dest]
         }
+        if let raw = UserDefaults.standard.string(forKey: "du.startScreen"),
+           let dest = AppDestination(rawValue: raw) {
+            return [dest]
+        }
+        #endif
+        return []
+    }
+
+    private var unreadCount: Int {
+        insights.filter { !$0.read }.count
     }
 
     var body: some View {
-        tabContent
-            .tint(Color.duVioletAdaptive)
-            .preferredColorScheme(resolvedColorScheme)
-            .onChange(of: selectedTab) {
-                HapticManager.selection()
+        NavigationStack(path: $path) {
+            HomeView(
+                unreadCount: unreadCount,
+                data: HomeViewModel.project(
+                    transactions: transactions,
+                    cards: cards,
+                    insights: insights
+                ),
+                onLogoTap: { /* future: open profile */ },
+                onBell: {
+                    // Bell-tap clears the dot AND jumps to the list. The
+                    // list reads from the same store, so the two surfaces
+                    // stay in sync.
+                    markAllInsightsRead()
+                    path.append(.notifications)
+                },
+                onSettings: { path.append(.settings) },
+                onChat: { path.append(.chat) },
+                onCartao: { path.append(.cartao) }
+            )
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(for: AppDestination.self) { dest in
+                destinationView(dest)
+                    .toolbar(.hidden, for: .navigationBar)
             }
+        }
+        .tint(theme.palette.primary)
+        .onAppear { chatVM.onNavigate = navigate(to:) }
+        .onChange(of: theme.chatBackend) { _, new in
+            chatVM.backendKind = new
+        }
     }
 
     @ViewBuilder
-    private var tabContent: some View {
-        if #available(iOS 26, *) {
-            ios26TabView
-        } else {
-            legacyTabView
+    private func destinationView(_ dest: AppDestination) -> some View {
+        switch dest {
+        case .chat:
+            ChatView(viewModel: chatVM, onBack: { path.removeLast() })
+        case .cartao:
+            CartaoView(
+                data: CartaoViewModel.project(
+                    cards: cards,
+                    transactions: transactions,
+                    installments: installments
+                ),
+                onBack: { path.removeLast() },
+                onChat: { navigate(to: .chat) }
+            )
+        case .overview:
+            OverviewView(
+                data: OverviewViewModel.project(transactions: transactions),
+                onBack: { path.removeLast() },
+                onChat: { _ in navigate(to: .chat) }
+            )
+        case .notifications:
+            NotificationsView(
+                groups: NotificationsViewModel.project(insights: insights),
+                onBack: { path.removeLast() },
+                onMarkAllRead: markAllInsightsRead
+            )
+        case .settings:
+            SettingsView(onBack: { path.removeLast() })
+        case .home, .onboarding:
+            EmptyView()
         }
     }
 
-    // MARK: - iOS 26+ (custom bar, no TabView)
-
-    @available(iOS 26, *)
-    private var ios26TabView: some View {
-        ZStack {
-            DashboardView()
-                .opacity(selectedTab == 0 ? 1 : 0)
-                .allowsHitTesting(selectedTab == 0)
-            ChatView(startInQuickAddMode: $shouldStartQuickAdd)
-                .opacity(selectedTab == 1 ? 1 : 0)
-                .allowsHitTesting(selectedTab == 1)
-        }
-        .safeAreaInset(edge: .bottom) {
-            customBottomBar
-        }
+    /// Navigate from any source. If we're already deep, replace the tail when
+    /// jumping to a sibling so we don't pile up screens.
+    private func navigate(to dest: AppDestination) {
+        if path.last == dest { return }
+        path.append(dest)
     }
 
-    @available(iOS 26, *)
-    private var customBottomBar: some View {
-        GlassEffectContainer {
-            HStack(spacing: 12) {
-                // Tab pills
-                HStack(spacing: 0) {
-                    tabBarButton("Início", icon: "house.fill", tag: 0)
-                    tabBarButton("Chat", icon: "bubble.left.and.text.bubble.right.fill", tag: 1)
-                }
-                .glassEffect(.regular, in: .capsule)
-
-                // FAB — opens Chat with quick-add context
-                Button {
-                    HapticManager.impact(.medium)
-                    shouldStartQuickAdd = true
-                    withAnimation(DuTheme.snappySpring) {
-                        selectedTab = 1
-                    }
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.title2.weight(.semibold))
-                        .foregroundStyle(Color.duTabAccent)
-                        .frame(width: 48, height: 48)
-                }
-                .glassEffect(.regular.interactive(), in: .circle)
-            }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 4)
+    /// Flips `read` to true on every unread insight + saves. The same
+    /// flow the bell-tap does on Home; both surfaces should leave the
+    /// store in the same state so the bell-dot and the Notifications
+    /// list agree on what's "new".
+    private func markAllInsightsRead() {
+        for ins in insights where !ins.read {
+            ins.read = true
         }
-    }
-
-    @available(iOS 26, *)
-    private func tabBarButton(_ title: String, icon: String, tag: Int) -> some View {
-        Button {
-            withAnimation(DuTheme.snappySpring) {
-                selectedTab = tag
-            }
-            HapticManager.selection()
-        } label: {
-            VStack(spacing: 2) {
-                Image(systemName: icon)
-                    .font(.system(size: 18, weight: selectedTab == tag ? .semibold : .regular))
-                Text(title)
-                    .font(.caption2.weight(selectedTab == tag ? .medium : .regular))
-            }
-            .foregroundStyle(selectedTab == tag ? Color.duTabAccent : .secondary)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-        }
-    }
-
-    // MARK: - iOS 17–25 Fallback (floating FAB)
-
-    private var legacyTabView: some View {
-        ZStack(alignment: .bottomTrailing) {
-            TabView(selection: $selectedTab) {
-                DashboardView()
-                    .tag(0)
-                    .tabItem {
-                        Label("Início", systemImage: "house.fill")
-                    }
-
-                ChatView(startInQuickAddMode: $shouldStartQuickAdd)
-                    .tag(1)
-                    .tabItem {
-                        Label("Chat", systemImage: "bubble.left.and.text.bubble.right.fill")
-                    }
-            }
-
-            fabButton
-                .padding(.trailing, 20)
-                .padding(.bottom, 70)
-        }
-    }
-
-    private var fabButton: some View {
-        Button {
-            HapticManager.impact(.medium)
-            shouldStartQuickAdd = true
-            withAnimation(DuTheme.snappySpring) {
-                selectedTab = 1
-            }
-        } label: {
-            Image(systemName: "plus")
-                .font(.title2.weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(width: 56, height: 56)
-                .background(Color.duVioletAdaptive, in: Circle())
-                .shadow(color: Color.duVioletAdaptive.opacity(0.4), radius: 8, y: 4)
-        }
-        .pressableStyle()
+        try? modelContext.save()
     }
 }

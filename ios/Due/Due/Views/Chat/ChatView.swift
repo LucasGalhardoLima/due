@@ -1,281 +1,167 @@
 import SwiftUI
 
 struct ChatView: View {
-    @State private var viewModel = ChatViewModel()
-    @State private var inputText = ""
-    @State private var isEditingExpense = false
-    @FocusState private var isInputFocused: Bool
+    @Environment(AppTheme.self) private var theme
+    @Environment(\.modelContext) private var modelContext
+    @Bindable var viewModel: ChatViewModel
+    var onBack: () -> Void
 
-    @Binding var startInQuickAddMode: Bool
-
-    init(startInQuickAddMode: Binding<Bool> = .constant(false)) {
-        self._startInQuickAddMode = startInQuickAddMode
-    }
+    @FocusState private var inputFocused: Bool
 
     var body: some View {
-        NavigationStack {
+        VStack(spacing: 0) {
+            header
+            Rectangle().fill(Color.duBorder).frame(height: 0.5)
+            thread
+        }
+        .background(Color.duBg.ignoresSafeArea())
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             VStack(spacing: 0) {
-                messageList
-
-                if !viewModel.hasMessages {
-                    suggestionChips
-                        .padding(.bottom, 8)
-                }
-
-                ChatInputBar(
-                    text: $inputText,
-                    isStreaming: viewModel.isStreaming,
-                    placeholder: quickAddPlaceholder,
-                    shouldFocus: viewModel.prefillMode == .quickAddExpense,
-                    onSend: sendMessage
-                )
+                Rectangle().fill(Color.duBorder).frame(height: 0.5)
+                composer
+                disclaimer
             }
-            .duNavigationGlass()
-            .duGradientBackground()
-            .navigationTitle("Chat")
-            .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                if startInQuickAddMode && viewModel.prefillMode == .normal {
-                    viewModel.enterQuickAddMode()
-                    startInQuickAddMode = false
-                }
-            }
-            .onChange(of: startInQuickAddMode) { _, newValue in
-                if newValue {
-                    viewModel.enterQuickAddMode()
-                    startInQuickAddMode = false
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if viewModel.hasMessages {
-                        Button {
-                            HapticManager.impact(.light)
-                            withAnimation(DuTheme.defaultSpring) {
-                                viewModel.clearChat()
-                            }
-                        } label: {
-                            Image(systemName: "trash")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-            }
+            .background(Color.duBg)
+        }
+        .onAppear {
+            inputFocused = true
+            viewModel.modelContext = modelContext
         }
     }
 
-    // MARK: - Message List
+    // MARK: Disclaimer
 
-    private var messageList: some View {
+    private var disclaimer: some View {
+        Text("Du não substitui aconselhamento financeiro profissional.")
+            .font(DuFont.mono(10))
+            .foregroundStyle(Color.duFgFaint)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
+    }
+
+    // MARK: Header
+
+    private var header: some View {
+        HStack(spacing: 12) {
+            Button(action: onBack) {
+                Image(systemName: "arrow.left")
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundStyle(Color.duFg)
+                    .frame(width: 36, height: 36)
+            }
+            .buttonStyle(.pressable)
+
+            Text("👋")
+                .font(.system(size: 22))
+                .frame(width: 28, height: 28)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Du")
+                    .font(DuFont.display(14, weight: .semibold))
+                    .kerning(-0.1)
+                    .foregroundStyle(Color.duFg)
+                Text("Coach financeiro")
+                    .font(DuFont.mono(10, weight: .medium))
+                    .tracking(2.0)
+                    .textCase(.uppercase)
+                    .foregroundStyle(Color.duFgFaint)
+            }
+
+            Spacer()
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 12)
+    }
+
+    // MARK: Thread
+
+    private var thread: some View {
         ScrollViewReader { proxy in
-            ScrollView {
-                if viewModel.hasMessages {
-                    LazyVStack(spacing: 12) {
-                        ForEach(Array(viewModel.messages.enumerated()), id: \.element.id) { index, message in
-                            ChatBubbleView(
-                                message: message,
-                                isStreaming: viewModel.isStreaming && index == viewModel.messages.count - 1,
-                                onCardAction: { action in
-                                    Task { await viewModel.handleCardAction(action) }
-                                },
-                                onCardTap: { card in
-                                    Task { await viewModel.handleCardTap(card) }
-                                }
-                            )
-                            .id(message.id)
-                            .staggeredAppearance(index: index)
-                        }
-
-                        // Show expense confirmation bubble if there's a pending expense
-                        if let expense = viewModel.pendingExpense, !isEditingExpense {
-                            ExpenseConfirmationBubble(
-                                expense: expense,
-                                onConfirm: {
-                                    await viewModel.saveExpense()
-                                },
-                                onEdit: {
-                                    handleEditExpense()
-                                },
-                                onUndo: expense.transactionId != nil ? {
-                                    await viewModel.undoExpense()
-                                } : nil
-                            )
-                        }
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVStack(alignment: .leading, spacing: 12) {
+                    ForEach(viewModel.thread) { message in
+                        ChatBubbleRow(
+                            message: message,
+                            palette: theme.palette,
+                            onSuggestion: { viewModel.suggestionTapped($0) },
+                            onConfirmExpense: { viewModel.confirmExpense(messageID: message.id) },
+                            onEditExpense: { viewModel.editExpense(messageID: message.id) },
+                            onInsightAction: { viewModel.insightActionTapped($0) }
+                        )
+                        .id(message.id)
                     }
-                    .padding(.vertical, 16)
-                } else {
-                    emptyState
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.top, 80)
                 }
-
-                if OfflineTransactionQueue.shared.pendingCount > 0 {
-                    offlineQueueBanner
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 4)
-                }
-
-                if let errorKind = viewModel.errorKind {
-                    errorBanner(errorKind)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 8)
-                }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 20)
             }
             .scrollDismissesKeyboard(.interactively)
-            .onChange(of: viewModel.messages.count) {
-                scrollToBottom(proxy: proxy)
-            }
-            .onChange(of: viewModel.messages.last?.content) {
-                scrollToBottom(proxy: proxy)
-            }
-            .onChange(of: viewModel.pendingExpense) {
-                scrollToBottom(proxy: proxy)
-            }
-        }
-    }
-
-    // MARK: - Empty State
-
-    private var emptyState: some View {
-        VStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.mint300, Color.mint500],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 64, height: 64)
-                Text("Du")
-                    .font(.title2.weight(.bold))
-                    .foregroundStyle(.white)
-            }
-
-            VStack(spacing: 6) {
-                Text("Converse com a Du")
-                    .font(.title3.weight(.semibold))
-                Text("Pergunte sobre seus gastos, orcamentos e parcelas")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-        }
-        .padding(.horizontal, 24)
-    }
-
-    // MARK: - Suggestion Chips
-
-    private var suggestionChips: some View {
-        SuggestionChipsView { suggestion in
-            inputText = suggestion
-            sendMessage()
-        }
-    }
-
-    // MARK: - Offline Queue Banner
-
-    private var offlineQueueBanner: some View {
-        let count = OfflineTransactionQueue.shared.pendingCount
-        return HStack(spacing: 8) {
-            Image(systemName: "arrow.triangle.2.circlepath.circle")
-                .foregroundStyle(Color.statusWarning)
-            Text(count == 1
-                 ? "1 gasto pendente será sincronizado quando a conexão voltar."
-                 : "\(count) gastos pendentes serão sincronizados quando a conexão voltar.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Spacer()
-        }
-        .padding(12)
-        .duGlass(in: RoundedRectangle(cornerRadius: DuTheme.radiusMedium))
-    }
-
-    // MARK: - Error Banner
-
-    private func errorBanner(_ kind: ErrorKind) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: kind.icon)
-                .foregroundStyle(Color.statusDanger)
-            Text(kind.message)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Button("Tentar") {
-                if let lastUserMessage = viewModel.messages.last(where: { $0.role == .user }) {
-                    inputText = lastUserMessage.content
-                    sendMessage()
+            .onChange(of: viewModel.thread.last?.id) { _, _ in
+                withAnimation(.easeOut(duration: 0.2)) {
+                    proxy.scrollTo(viewModel.thread.last?.id, anchor: .bottom)
                 }
             }
-            .font(.caption.weight(.medium))
-            .foregroundStyle(Color.duVioletAdaptive)
-        }
-        .padding(12)
-        .duGlass(in: RoundedRectangle(cornerRadius: DuTheme.radiusMedium))
-    }
-
-    // MARK: - Actions
-
-    private func sendMessage() {
-        let text = inputText
-        inputText = ""
-        Task {
-            await viewModel.send(text)
         }
     }
 
-    private func scrollToBottom(proxy: ScrollViewProxy) {
-        guard let lastId = viewModel.messages.last?.id else { return }
-        withAnimation(DuTheme.defaultSpring) {
-            proxy.scrollTo(lastId, anchor: .bottom)
+    // MARK: Composer
+
+    private var composer: some View {
+        @Bindable var vm = viewModel
+        return HStack(spacing: 10) {
+            Button { } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(Color.duFgMuted)
+                    .frame(width: 40, height: 40)
+                    .overlay(Circle().stroke(Color.duBorder, lineWidth: 1))
+            }
+            .buttonStyle(.pressable)
+
+            TextField(
+                "",
+                text: $vm.draft,
+                prompt: Text("Tipo \"iFood 47\" ou pergunta…")
+                    .foregroundStyle(Color.duFgMuted)
+            )
+            .focused($inputFocused)
+            .font(DuFont.mono(14))
+            .foregroundStyle(Color.duFg)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color.duSurface)
+            .overlay(Capsule().stroke(Color.duBorder, lineWidth: 1))
+            .clipShape(Capsule())
+            .submitLabel(.send)
+            .onSubmit { viewModel.send() }
+
+            Group {
+                if !viewModel.draft.trimmingCharacters(in: .whitespaces).isEmpty {
+                    Button {
+                        HapticManager.impact(.light)
+                        viewModel.send()
+                    } label: {
+                        Image(systemName: "paperplane.fill")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 40, height: 40)
+                            .background(theme.palette.primary, in: Circle())
+                    }
+                    .buttonStyle(.pressable)
+                } else {
+                    Button { } label: {
+                        Image(systemName: "mic")
+                            .font(.system(size: 16, weight: .regular))
+                            .foregroundStyle(Color.duFgMuted)
+                            .frame(width: 40, height: 40)
+                            .overlay(Circle().stroke(Color.duBorder, lineWidth: 1))
+                    }
+                    .buttonStyle(.pressable)
+                }
+            }
         }
-    }
-
-    private func handleEditExpense() {
-        guard let expense = viewModel.pendingExpense else { return }
-
-        // Pre-fill input with expense details for editing
-        inputText = "\(expense.description) R$\(Double(truncating: expense.amount as NSDecimalNumber)) \(formatDateForInput(expense.date))"
-        isEditingExpense = true
-
-        // Clear pending expense and re-enter quick-add mode
-        viewModel.clearPendingExpense()
-        viewModel.enterQuickAddMode()
-
-        // Focus input
-        isInputFocused = true
-    }
-
-    private func formatDateForInput(_ dateString: String) -> String {
-        let inputFormatter = ISO8601DateFormatter()
-        inputFormatter.formatOptions = [.withFullDate]
-
-        guard let date = inputFormatter.date(from: dateString) else {
-            return ""
-        }
-
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let expenseDate = calendar.startOfDay(for: date)
-
-        let daysDifference = calendar.dateComponents([.day], from: expenseDate, to: today).day ?? 0
-
-        if daysDifference == 0 {
-            return "hoje"
-        } else if daysDifference == 1 {
-            return "ontem"
-        } else {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "dd/MM"
-            return formatter.string(from: date)
-        }
-    }
-
-    // MARK: - Computed Properties
-
-    private var quickAddPlaceholder: String {
-        viewModel.prefillMode == .quickAddExpense ? "Adiciona gasto: Uber R$25 ontem" : "Pergunte algo..."
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
+        .padding(.bottom, 12)
     }
 }
