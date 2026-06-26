@@ -11,6 +11,7 @@ struct RootView: View {
 
     @Query private var cards: [Card]
     @Query private var transactions: [Transaction]
+    @Query private var installments: [Installment]
     @Query(sort: \Insight.createdAt, order: .reverse) private var insights: [Insight]
 
     /// Debug helper. Pass `-startScreen chat|cartao|overview|notifications|settings`
@@ -78,7 +79,8 @@ struct RootView: View {
             CartaoView(
                 data: CartaoViewModel.project(
                     cards: cards,
-                    transactions: transactions
+                    transactions: transactions,
+                    installments: installments
                 ),
                 onBack: { path.removeLast() },
                 onChat: { navigate(to: .chat) }

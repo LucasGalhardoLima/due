@@ -16,16 +16,18 @@ enum CartaoViewModel {
     static func project(
         now: Date = .now,
         cards: [Card],
-        transactions: [Transaction]
+        transactions: [Transaction],
+        installments: [Installment] = []
     ) -> CartaoData {
         let cal = Calendar.current
 
         guard let card = primaryCard(cards: cards, now: now, cal: cal) else {
-            return CartaoData(fatura: 0, limite: 0, fechaEm: 99, categorias: [], recent: [])
+            return CartaoData(fatura: 0, limite: 0, fechaEm: 99, categorias: [], recent: [], projecao: 0)
         }
 
         let cycleStart = mostRecentClose(card, from: now, cal: cal)
         let closesIn = daysToNextClose(card, from: now, cal: cal)
+        let closeDate = nextClose(card, from: now, cal: cal)
 
         // Open-invoice charges: expenses posted on this card after the
         // most recent closing date. Income on the card (refunds) is
@@ -44,13 +46,22 @@ enum CartaoViewModel {
 
         let categorias = categoryBreakdown(charges: openCharges, fatura: fatura)
         let recent = recentList(charges: openCharges, now: now, cal: cal)
+        let projecao = projectedTotal(
+            card: card,
+            transactions: transactions,
+            installments: installments,
+            cycleStart: cycleStart,
+            closeDate: closeDate,
+            cal: cal
+        )
 
         return CartaoData(
             fatura: fatura,
             limite: limite,
             fechaEm: closesIn,
             categorias: categorias,
-            recent: recent
+            recent: recent,
+            projecao: projecao
         )
     }
 
@@ -97,6 +108,78 @@ enum CartaoViewModel {
         if endOfThisMonthClose <= now { return endOfThisMonthClose }
         let prev = cal.date(byAdding: .month, value: -1, to: thisMonthClose) ?? thisMonthClose
         return cal.date(bySettingHour: 23, minute: 59, second: 59, of: prev) ?? prev
+    }
+
+    // MARK: - Projection
+
+    /// Estimates the total when the current open invoice closes.
+    ///
+    /// Two components:
+    /// 1. **Installments** — deterministic: for each Installment linked to this
+    ///    card, compute which installment number falls in the current billing
+    ///    cycle using the closing-day rule, and include the per-installment value
+    ///    when that number is within range.
+    /// 2. **Subscriptions** — heuristic: treat the previous closed cycle's
+    ///    "Assinatura" charges as a proxy for this cycle's subscription renewals.
+    ///
+    /// Returns 0 when there are no installments AND no prior subscription data,
+    /// so the view can hide the projection row rather than show a misleading zero.
+    private static func projectedTotal(
+        card: Card,
+        transactions: [Transaction],
+        installments: [Installment],
+        cycleStart: Date,
+        closeDate: Date,
+        cal: Calendar
+    ) -> Int {
+        // ── Installments ──────────────────────────────────────────────────
+        let closeMonthIdx = yearMonthIndex(of: closeDate, cal: cal)
+        var installmentSum = Decimal(0)
+        for inst in installments where inst.card?.id == card.id {
+            let firstIdx = firstPaymentMonthIndex(purchaseDate: inst.firstDate, closingDay: card.closingDay, cal: cal)
+            let n = closeMonthIdx - firstIdx + 1
+            if n >= 1 && n <= inst.installmentCount {
+                installmentSum += inst.totalAmount / Decimal(inst.installmentCount)
+            }
+        }
+
+        // ── Subscriptions from the previous closed cycle ───────────────────
+        // Subscriptions are monthly by definition, so last cycle's charges are
+        // the best estimate for this cycle before they actually post.
+        let oneDayBeforeCycleStart = cal.date(byAdding: .day, value: -1, to: cycleStart) ?? cycleStart
+        let prevCycleStart = mostRecentClose(card, from: oneDayBeforeCycleStart, cal: cal)
+        let subscriptionSum = transactions
+            .filter {
+                $0.card?.id == card.id
+                && $0.timestamp > prevCycleStart
+                && $0.timestamp <= cycleStart
+                && $0.amount < 0
+                && $0.category == "Assinatura"
+            }
+            .map { -$0.amount }
+            .reduce(Decimal(0), +)
+
+        let total = installmentSum + subscriptionSum
+        guard total > 0 else { return 0 }
+        return NSDecimalNumber(decimal: total).intValue
+    }
+
+    /// 1-based year×12+month index — stable across year boundaries for
+    /// simple difference arithmetic (no modular wrap-around).
+    private static func yearMonthIndex(of date: Date, cal: Calendar) -> Int {
+        cal.component(.year, from: date) * 12 + cal.component(.month, from: date)
+    }
+
+    /// Month index of the billing cycle in which installment #1 appears.
+    /// Purchases made AFTER the closing day roll into the NEXT month's cycle.
+    private static func firstPaymentMonthIndex(purchaseDate: Date, closingDay: Int, cal: Calendar) -> Int {
+        let day   = cal.component(.day,   from: purchaseDate)
+        let year  = cal.component(.year,  from: purchaseDate)
+        let month = cal.component(.month, from: purchaseDate)
+        if day > closingDay {
+            return month == 12 ? (year + 1) * 12 + 1 : year * 12 + (month + 1)
+        }
+        return year * 12 + month
     }
 
     // MARK: - Composition

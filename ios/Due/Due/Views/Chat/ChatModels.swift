@@ -1,14 +1,14 @@
 import Foundation
 
-struct ChatMessage: Identifiable {
+struct ChatMessage: Identifiable, Sendable {
     let id = UUID()
     let who: Sender
     var content: Content
     var confirmed: Bool = false   // expense cards only
 
-    enum Sender { case du, me }
+    enum Sender: Sendable { case du, me }
 
-    enum Content {
+    enum Content: Sendable {
         case text(String)
         case typing
         case suggestions([String])
@@ -21,7 +21,7 @@ struct ChatMessage: Identifiable {
 // surface (rules / Llama JSON / FoundationModels) was using Double; this
 // is now the source of truth and every emit/consume site is responsible
 // for staying in Decimal.
-struct ExpenseProposal {
+struct ExpenseProposal: Sendable {
     let merchant: String
     let amount: Decimal
     let category: String
@@ -29,13 +29,13 @@ struct ExpenseProposal {
     let time: String      // "HH:mm"
 }
 
-struct ChatInsight {
+struct ChatInsight: Sendable {
     let title: String
     let body: String
     let action: String?
     let navigateTo: AppDestination?    // optional deep-link
 }
 
-enum AppDestination: String {
+enum AppDestination: String, Sendable {
     case home, chat, cartao, overview, notifications, settings, onboarding
 }

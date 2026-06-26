@@ -89,6 +89,21 @@ struct CartaoView: View {
                 .font(DuFont.mono(14))
                 .foregroundStyle(Color.duFgMuted)
                 .lineSpacing(2)
+
+            if data.projecao > 0 {
+                HStack(spacing: 6) {
+                    Text("Previsão de fechamento")
+                        .font(DuFont.mono(12, weight: .medium))
+                        .foregroundStyle(Color.duFgMuted)
+                    Spacer()
+                    Text("~R$ \(integerString(data.projecao))")
+                        .font(DuFont.mono(12, weight: .semibold))
+                        .foregroundStyle(Color.duFgMuted)
+                }
+                .padding(.horizontal, 12).padding(.vertical, 8)
+                .background(Color.duSurface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Color.duBorder, lineWidth: 1))
+            }
         }
     }
 

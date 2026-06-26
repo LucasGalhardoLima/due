@@ -70,7 +70,12 @@ enum ChatBenchmarkLogger {
     }
 
     private static func makeLine(entry: Entry) -> String {
-        let modelId = LocalModelCatalog.config(for: entry.backend)?.id ?? "rules"
+        let modelId: String
+        switch entry.backend.family {
+        case .appleFoundationModels: modelId = "apple-foundation-models"
+        case .rules:                 modelId = "rules"
+        case .auto:                  modelId = "auto"
+        }
         var dict: [String: Any] = [
             "ts": iso.string(from: Date()),
             "family": entry.backend.family.rawValue,

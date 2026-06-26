@@ -11,13 +11,18 @@ struct ChatView: View {
     var body: some View {
         VStack(spacing: 0) {
             header
-            Divider().background(Color.duBorder)
+            Rectangle().fill(Color.duBorder).frame(height: 0.5)
             thread
-            Divider().background(Color.duBorder)
-            composer
-            disclaimer
         }
         .background(Color.duBg.ignoresSafeArea())
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            VStack(spacing: 0) {
+                Rectangle().fill(Color.duBorder).frame(height: 0.5)
+                composer
+                disclaimer
+            }
+            .background(Color.duBg)
+        }
         .onAppear {
             inputFocused = true
             viewModel.modelContext = modelContext
@@ -90,11 +95,10 @@ struct ChatView: View {
                 .padding(.horizontal, 18)
                 .padding(.vertical, 20)
             }
-            .onChange(of: viewModel.thread.count) { _, _ in
-                if let last = viewModel.thread.last {
-                    withAnimation(.easeOut(duration: 0.25)) {
-                        proxy.scrollTo(last.id, anchor: .bottom)
-                    }
+            .scrollDismissesKeyboard(.interactively)
+            .onChange(of: viewModel.thread.last?.id) { _, _ in
+                withAnimation(.easeOut(duration: 0.2)) {
+                    proxy.scrollTo(viewModel.thread.last?.id, anchor: .bottom)
                 }
             }
         }
@@ -158,6 +162,6 @@ struct ChatView: View {
         }
         .padding(.horizontal, 16)
         .padding(.top, 12)
-        .padding(.bottom, 18)
+        .padding(.bottom, 12)
     }
 }

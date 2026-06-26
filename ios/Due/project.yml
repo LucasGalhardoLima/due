@@ -15,33 +15,12 @@ settings:
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: 1
 
-packages:
-  # Consumed via local clone because the upstream package contains
-  # symlinks into a git submodule (`exclude/llama.cpp`) that SPM does
-  # not recurse when fetching from a remote URL — leaving the C target's
-  # source files dangling. Run `scripts/setup-vendor.sh` once to clone
-  # `Vendor/LocalLLMClient` with submodules. Tracked at upstream issue
-  # tattn/LocalLLMClient#94.
-  LocalLLMClient:
-    path: ../Vendor/LocalLLMClient
-
 targets:
   Du:
     type: application
     platform: iOS
     sources:
       - path: Due
-        excludes:
-          - "Resources/Models/**"
-      # Bundle GGUF weights as resources. Each `.gguf` lands at the .app
-      # bundle root (type: group, not folder) so
-      # `Bundle.main.url(forResource:withExtension:"gguf")` resolves
-      # without needing a subdirectory hint. `optional: true` keeps the
-      # project generating before `scripts/fetch-model.sh` has been run.
-      - path: Due/Resources/Models
-        type: group
-        optional: true
-        buildPhase: resources
     info:
       path: Due/Info.plist
       properties:
@@ -57,15 +36,9 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         CFBundleDisplayName: "Du"
         CFBundleIconName: AppIcon
-        # Drive version + build from project.yml's MARKETING_VERSION /
-        # CURRENT_PROJECT_VERSION so we have one source of truth and
-        # don't drift between project.yml and Info.plist.
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
-        # Apple's export-compliance question. App uses only HTTPS-free,
-        # standard Apple framework crypto (PDFKit password unlock and
-        # nothing else) — all exempt. Declaring `false` here skips the
-        # "Missing Compliance" status on every TestFlight upload.
+        # App uses only HTTPS-free, standard Apple framework crypto — exempt.
         ITSAppUsesNonExemptEncryption: false
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
@@ -82,49 +55,10 @@ targets:
       base:
         SWIFT_STRICT_CONCURRENCY: complete
         PRODUCT_BUNDLE_IDENTIFIER: app.du.finance
-        # Skip the bundled GGUFs from code-signing integrity checks
-        # (huge files; llama.cpp validates the model headers at load).
-        OTHER_CODE_SIGN_FLAGS: "--deep"
-        # Automatic signing for real-device install.
         CODE_SIGN_STYLE: Automatic
-        # Xcode 26's explicit-modules dep scanner doesn't pass --isysroot
-        # to subscan invocations of mixed C/C++ targets, breaking libc++
-        # header lookup for LocalLLMClientLlamaC (`<memory>` not found).
-        # Force the legacy module builder until the package or Xcode ships
-        # a fix.
-        SWIFT_ENABLE_EXPLICIT_MODULES: NO
-        _EXPERIMENTAL_SWIFT_EXPLICIT_MODULES: NO
-        CLANG_ENABLE_EXPLICIT_MODULES: NO
-        _EXPERIMENTAL_CLANG_EXPLICIT_MODULES: NO
-        # LocalLLMClientLlamaC.h trips a #error unless the consumer compiles
-        # in C++ interop mode. We import it transitively through
-        # `LocalLLMClientLlama`, so the flag has to be on Du itself.
-        SWIFT_OBJC_INTEROP_MODE: objcxx
-        OTHER_SWIFT_FLAGS: "-cxx-interoperability-mode=default"
-        # Larger heap budget for loading 1B-class models on real devices.
-        # Enabled via entitlement below; this just signals intent.
-        # DEVELOPMENT_TEAM: ""
     entitlements:
       path: Due/Du.entitlements
-      properties:
-        # Lets us hold the model + KV cache without iOS jetsamming the
-        # process under memory pressure. Recommended by LocalLLMClient.
-        com.apple.developer.kernel.increased-memory-limit: true
-    dependencies:
-      - package: LocalLLMClient
-        product: LocalLLMClient
-      - package: LocalLLMClient
-        product: LocalLLMClientLlama
-      # FoundationModels tier (iOS 26 + Apple Intelligence). The
-      # `LocalLLMClientFoundationModels` library guards everything with
-      # `#if canImport(FoundationModels)` so linking it on older
-      # toolchains is harmless. Runtime availability is checked via
-      # SystemLanguageModel.availability before we route to this tier.
-      - package: LocalLLMClient
-        product: LocalLLMClientFoundationModels
-    # Explicit shared scheme so it survives xcodegen regens and is
-    # readable by CI / Fastlane / scripted archive flows that look at
-    # xcshareddata/xcschemes/ instead of accepting an auto-scheme.
+      properties: {}
     scheme:
       testTargets:
         - DuTests
@@ -141,15 +75,5 @@ targets:
         SWIFT_STRICT_CONCURRENCY: complete
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: app.du.finance.tests
-        # @testable import Du transitively pulls LocalLLMClientLlamaC's
-        # C++ headers — must inherit the same explicit-modules + cxx
-        # interop workarounds the Du target uses or `<memory>` fails to
-        # resolve. See project.yml header for the upstream issue.
-        SWIFT_ENABLE_EXPLICIT_MODULES: NO
-        _EXPERIMENTAL_SWIFT_EXPLICIT_MODULES: NO
-        CLANG_ENABLE_EXPLICIT_MODULES: NO
-        _EXPERIMENTAL_CLANG_EXPLICIT_MODULES: NO
-        SWIFT_OBJC_INTEROP_MODE: objcxx
-        OTHER_SWIFT_FLAGS: "-cxx-interoperability-mode=default"
     dependencies:
       - target: Du

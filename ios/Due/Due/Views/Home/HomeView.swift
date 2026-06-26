@@ -29,13 +29,11 @@ struct HomeView: View {
 
                     insights
 
-                    if data.showsCardLine {
-                        Rectangle()
-                            .fill(Color.duBorder)
-                            .frame(height: 1)
-                            .padding(.vertical, sectionSpacing)
-                        cardLine
-                    }
+                    Rectangle()
+                        .fill(Color.duBorder)
+                        .frame(height: 1)
+                        .padding(.vertical, sectionSpacing)
+                    cardLine
                 }
                 .padding(.horizontal, pad)
                 .padding(.top, 12)
@@ -172,11 +170,12 @@ struct HomeView: View {
     private var cardLine: some View {
         Button(action: onCartao) {
             let urgent = data.cardLevel == .urgent
+            let hasCard = data.cardCloses != 99
             HStack(alignment: .lastTextBaseline) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(urgent
                          ? "⚠ Cartão · fecha em \(data.cardCloses) \(data.cardCloses == 1 ? "dia" : "dias")"
-                         : "Cartão · fecha em \(data.cardCloses) dias")
+                         : hasCard ? "Cartão · fecha em \(data.cardCloses) dias" : "Cartão")
                         .font(DuFont.mono(11, weight: .medium))
                         .tracking(2.0)
                         .textCase(.uppercase)

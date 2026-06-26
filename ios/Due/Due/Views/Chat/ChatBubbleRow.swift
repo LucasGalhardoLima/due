@@ -23,7 +23,10 @@ struct ChatBubbleRow: View {
         case .suggestions(let chips):
             VStack(alignment: .leading, spacing: 6) {
                 ForEach(chips, id: \.self) { chip in
-                    Button { onSuggestion(chip) } label: {
+                    Button {
+                        HapticManager.impact(.light)
+                        onSuggestion(chip)
+                    } label: {
                         Text(chip)
                             .font(DuFont.mono(13))
                             .foregroundStyle(Color.duFg)
@@ -33,6 +36,7 @@ struct ChatBubbleRow: View {
                             .clipShape(Capsule())
                     }
                     .buttonStyle(.pressable)
+                    .accessibilityHint("Toca para enviar")
                 }
             }
 
@@ -78,34 +82,40 @@ private struct TextBubble: View {
                     .strokeBorder(isMe ? Color.clear : Color.duBorder, lineWidth: 1)
             )
             .frame(maxWidth: 280, alignment: isMe ? .trailing : .leading)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(isMe ? "Você: \(text)" : "Du: \(text)")
     }
 }
 
 private struct TypingIndicator: View {
     @State private var phase = 0
+    @State private var animationTask: Task<Void, Never>?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 4) {
-            ForEach(0..<3) { i in
+            ForEach(0..<3, id: \.self) { i in
                 Circle()
                     .fill(Color.duFgMuted)
-                    .frame(width: 5, height: 5)
+                    .frame(width: 8, height: 8)
                     .opacity(phase == i ? 1.0 : 0.35)
             }
         }
         .padding(.horizontal, 16).padding(.vertical, 12)
         .background(Color.duSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .accessibilityLabel("Du está digitando")
+        .accessibilityAddTraits(.updatesFrequently)
         .onAppear {
-            withAnimation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true)) {
-                phase = 2
-            }
-            Task { @MainActor in
+            guard !reduceMotion else { return }
+            animationTask = Task { @MainActor in
                 while !Task.isCancelled {
                     try? await Task.sleep(for: .milliseconds(180))
-                    phase = (phase + 1) % 3
+                    guard !Task.isCancelled else { return }
+                    withAnimation(.easeInOut(duration: 0.12)) { phase = (phase + 1) % 3 }
                 }
             }
         }
+        .onDisappear { animationTask?.cancel() }
     }
 }
 
@@ -135,6 +145,8 @@ private struct ExpenseCard: View {
                     .font(DuFont.mono(22, weight: .bold))
                     .kerning(-0.5)
                     .foregroundStyle(Color.duFg)
+                    .minimumScaleFactor(0.8)
+                    .lineLimit(1)
             }
 
             Text("\(proposal.date) · \(proposal.time)")
@@ -159,7 +171,10 @@ private struct ExpenseCard: View {
                 }
             } else {
                 HStack(spacing: 8) {
-                    Button(action: onConfirm) {
+                    Button {
+                        HapticManager.notification(.success)
+                        onConfirm()
+                    } label: {
                         Text("Confirmar")
                             .font(DuFont.mono(13, weight: .semibold))
                             .foregroundStyle(.white)
@@ -168,6 +183,7 @@ private struct ExpenseCard: View {
                             .background(palette.primary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     }
                     .buttonStyle(.pressable)
+                    .accessibilityLabel("Confirmar \(proposal.merchant)")
 
                     Button(action: onEdit) {
                         Text("Editar")
@@ -212,9 +228,12 @@ private struct InsightCard: View {
                         Text("\(action) →")
                             .font(DuFont.mono(12, weight: .semibold))
                             .foregroundStyle(palette.primary)
+                            .frame(minHeight: 44, alignment: .leading)
+                            .contentShape(Rectangle())
                     }
                     .buttonStyle(.pressable)
                     .padding(.top, 4)
+                    .accessibilityLabel(action)
                 }
             }
         }

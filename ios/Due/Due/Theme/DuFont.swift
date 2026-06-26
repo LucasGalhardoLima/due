@@ -7,11 +7,11 @@ enum DuFont {
     static let monoName = "GeistMono"
 
     static func display(_ size: CGFloat, weight: Weight = .regular) -> Font {
-        .custom(name(for: weight, mono: false), fixedSize: size)
+        .custom(name(for: weight, mono: false), size: size, relativeTo: textStyle(for: size))
     }
 
     static func mono(_ size: CGFloat, weight: Weight = .regular) -> Font {
-        .custom(name(for: weight, mono: true), fixedSize: size)
+        .custom(name(for: weight, mono: true), size: size, relativeTo: textStyle(for: size))
     }
 
     static func displayRel(_ size: CGFloat, weight: Weight = .regular, relativeTo style: Font.TextStyle = .body) -> Font {
@@ -28,6 +28,20 @@ enum DuFont {
             case .semibold: return "SemiBold"
             case .bold: return "Bold"
             }
+        }
+    }
+
+    /// Maps a design-token point size to the closest UIKit TextStyle so
+    /// Dynamic Type scaling preserves the intended visual hierarchy.
+    static func textStyle(for size: CGFloat) -> Font.TextStyle {
+        switch size {
+        case ..<12:  return .caption2
+        case 12..<14: return .caption
+        case 14..<15: return .subheadline
+        case 15..<17: return .callout
+        case 17..<19: return .body
+        case 19..<22: return .title3
+        default:     return .title2
         }
     }
 

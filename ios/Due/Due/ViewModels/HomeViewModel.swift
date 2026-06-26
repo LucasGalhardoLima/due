@@ -97,7 +97,7 @@ enum HomeViewModel {
             daysToNextClose($0, from: now, cal: cal)
                 < daysToNextClose($1, from: now, cal: cal)
         }) else {
-            // No cards yet → cardLevel(.later) → showsCardLine is false.
+            // No cards yet → sentinel closesIn: 99 (keeps cardLevel at .later).
             return CardSnap(closesIn: 99, fatura: 0, pct: 0)
         }
 

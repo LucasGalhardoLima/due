@@ -38,7 +38,6 @@ struct HomeViewModelTests {
         )
         #expect(result.disponivel == 0)
         #expect(result.cardCloses == 99)
-        #expect(result.showsCardLine == false)
         #expect(result.recentes.isEmpty)
         #expect(result.insights.isEmpty)
         #expect(result.dia == 14)
@@ -135,6 +134,5 @@ struct HomeViewModelTests {
         )
         #expect(result.cardCloses == 6)
         #expect(result.cardFatura == 50)
-        #expect(result.showsCardLine == true)
     }
 }

@@ -87,7 +87,6 @@ struct HomeData {
         default: return .later
         }
     }
-    var showsCardLine: Bool { cardLevel != .later }
 }
 
 struct HomeInsight: Identifiable {
@@ -113,6 +112,8 @@ struct CartaoData {
     let fechaEm: Int
     let categorias: [CartaoCategory]
     let recent: [CartaoTxn]
+    // Estimated total when the open invoice closes. 0 = not enough data to project.
+    let projecao: Int
 
     // Guard against division-by-zero when there are no cards yet —
     // CartaoViewModel returns `limite: 0` in that case and computing
