@@ -142,4 +142,111 @@ struct CartaoViewModelTests {
         )
         #expect(result.fatura == 200)
     }
+
+    // MARK: - Projection (previsão de fechamento)
+
+    // Card closes day 20; now is May 14 → open cycle is Apr 20 → May 20.
+    // A 12× installment bought Mar 10 (≤ closing day, so installment #1
+    // lands in March's cycle) puts installment #3 in the open cycle:
+    // 1200 / 12 = 100 projected.
+    @Test
+    func projectionIncludesInstallmentFallingInCurrentCycle() {
+        let card = Card(name: "Nubank", limit: 25_000, closingDay: 20, dueDay: 27)
+        let plan = Installment(
+            merchant: "Magalu",
+            totalAmount: Decimal(1200),
+            installmentCount: 12,
+            firstDate: date("2026-03-10T10:00:00Z"),
+            card: card
+        )
+
+        let result = CartaoViewModel.project(
+            now: date("2026-05-14T12:00:00Z"),
+            cards: [card],
+            transactions: [],
+            installments: [plan]
+        )
+        #expect(result.projecao == 100)
+    }
+
+    // A plan whose last installment already billed before the open cycle
+    // contributes nothing — installment number 17 is out of a 3× plan's
+    // range, so the projection stays 0 and the view hides the row.
+    @Test
+    func projectionExcludesCompletedInstallment() {
+        let card = Card(name: "Nubank", limit: 25_000, closingDay: 20, dueDay: 27)
+        let finished = Installment(
+            merchant: "Old TV",
+            totalAmount: Decimal(300),
+            installmentCount: 3,
+            firstDate: date("2025-01-10T10:00:00Z"),
+            card: card
+        )
+
+        let result = CartaoViewModel.project(
+            now: date("2026-05-14T12:00:00Z"),
+            cards: [card],
+            transactions: [],
+            installments: [finished]
+        )
+        #expect(result.projecao == 0)
+    }
+
+    // Regression: the previous cycle's "Assinaturas" charges are the proxy
+    // for this cycle's renewals. The filter must match the canonical plural
+    // category string the rest of the app writes ("Assinaturas"), not the
+    // singular "Assinatura" — the singular form silently projected 0.
+    // Open cycle is Apr 20 → May 20, so the previous cycle is Mar 20 → Apr 20;
+    // a Spotify charge on Apr 5 falls in it and projects forward.
+    @Test
+    func projectionIncludesPreviousCycleSubscription() {
+        let card = Card(name: "Nubank", limit: 25_000, closingDay: 20, dueDay: 27)
+        let spotify = Transaction(
+            merchant: "Spotify",
+            amount: Decimal(-50),
+            category: "Assinaturas",
+            timestamp: date("2026-04-05T09:00:00Z"),
+            card: card
+        )
+
+        let result = CartaoViewModel.project(
+            now: date("2026-05-14T12:00:00Z"),
+            cards: [card],
+            transactions: [spotify],
+            installments: []
+        )
+        // Apr 5 is in the previous (closed) cycle, so it doesn't inflate the
+        // open fatura — only the projection.
+        #expect(result.fatura == 0)
+        #expect(result.projecao == 50)
+    }
+
+    // The two components add: an in-cycle installment (100) plus a prior
+    // subscription proxy (50) → 150.
+    @Test
+    func projectionSumsInstallmentsAndSubscriptions() {
+        let card = Card(name: "Nubank", limit: 25_000, closingDay: 20, dueDay: 27)
+        let plan = Installment(
+            merchant: "Magalu",
+            totalAmount: Decimal(1200),
+            installmentCount: 12,
+            firstDate: date("2026-03-10T10:00:00Z"),
+            card: card
+        )
+        let netflix = Transaction(
+            merchant: "Netflix",
+            amount: Decimal(-50),
+            category: "Assinaturas",
+            timestamp: date("2026-04-05T09:00:00Z"),
+            card: card
+        )
+
+        let result = CartaoViewModel.project(
+            now: date("2026-05-14T12:00:00Z"),
+            cards: [card],
+            transactions: [netflix],
+            installments: [plan]
+        )
+        #expect(result.projecao == 150)
+    }
 }
