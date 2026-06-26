@@ -43,8 +43,12 @@ enum NotificationsViewModel {
     // MARK: - Bucketing
 
     private static func bucketIndex(_ date: Date, now: Date, cal: Calendar) -> Int {
-        if cal.isDateInToday(date) { return 0 }
-        if cal.isDateInYesterday(date) { return 1 }
+        // Compare against the injected `now`, not the wall clock, so bucketing
+        // is deterministic in tests (isDateInToday/isYesterday read the real
+        // date). In production `now` is `.now`, so behavior is unchanged.
+        if cal.isDate(date, inSameDayAs: now) { return 0 }
+        if let yesterday = cal.date(byAdding: .day, value: -1, to: now),
+           cal.isDate(date, inSameDayAs: yesterday) { return 1 }
         let days = cal.dateComponents([.day], from: date, to: now).day ?? 0
         if days < 7 { return 2 }
         return 3
@@ -113,7 +117,9 @@ enum NotificationsViewModel {
     static func displayTime(for date: Date, now: Date, cal: Calendar) -> String {
         let mins = cal.dateComponents([.minute], from: date, to: now).minute ?? 0
         if mins < 60 { return "agora" }
-        if cal.isDateInToday(date) || cal.isDateInYesterday(date) {
+        let yesterday = cal.date(byAdding: .day, value: -1, to: now)
+        if cal.isDate(date, inSameDayAs: now)
+            || (yesterday.map { cal.isDate(date, inSameDayAs: $0) } ?? false) {
             return timeFmt.string(from: date)
         }
         let days = cal.dateComponents([.day], from: date, to: now).day ?? 0
