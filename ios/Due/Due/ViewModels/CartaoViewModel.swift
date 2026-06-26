@@ -120,7 +120,7 @@ enum CartaoViewModel {
     ///    cycle using the closing-day rule, and include the per-installment value
     ///    when that number is within range.
     /// 2. **Subscriptions** — heuristic: treat the previous closed cycle's
-    ///    "Assinatura" charges as a proxy for this cycle's subscription renewals.
+    ///    "Assinaturas" charges as a proxy for this cycle's subscription renewals.
     ///
     /// Returns 0 when there are no installments AND no prior subscription data,
     /// so the view can hide the projection row rather than show a misleading zero.
@@ -154,7 +154,7 @@ enum CartaoViewModel {
                 && $0.timestamp > prevCycleStart
                 && $0.timestamp <= cycleStart
                 && $0.amount < 0
-                && $0.category == "Assinatura"
+                && $0.category == "Assinaturas"
             }
             .map { -$0.amount }
             .reduce(Decimal(0), +)
