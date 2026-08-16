@@ -16,6 +16,7 @@ export interface TierLimits {
   projectionMonths: number
   // Monthly usage limits (null = unlimited)
   csvImportsPerMonth: number | null
+  pdfImportsPerMonth: number | null
   aiInsightsPerMonth: number | null
   simulationsPerMonth: number | null
   auditsPerMonth: number | null
@@ -40,6 +41,7 @@ export const TIER_LIMITS: Record<Tier, TierLimits> = {
     maxSavingsGoals: 0,
     projectionMonths: 3,
     csvImportsPerMonth: 1,
+    pdfImportsPerMonth: 1,
     aiInsightsPerMonth: 3,
     simulationsPerMonth: 0,
     auditsPerMonth: 0,
@@ -61,6 +63,7 @@ export const TIER_LIMITS: Record<Tier, TierLimits> = {
     maxSavingsGoals: 5,
     projectionMonths: 12,
     csvImportsPerMonth: null,
+    pdfImportsPerMonth: null,
     aiInsightsPerMonth: 15,
     simulationsPerMonth: 10,
     auditsPerMonth: 1,
@@ -82,6 +85,7 @@ export const TIER_LIMITS: Record<Tier, TierLimits> = {
     maxSavingsGoals: null,
     projectionMonths: 24,
     csvImportsPerMonth: null,
+    pdfImportsPerMonth: null,
     aiInsightsPerMonth: null,
     simulationsPerMonth: null,
     auditsPerMonth: null,

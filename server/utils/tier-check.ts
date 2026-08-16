@@ -61,6 +61,7 @@ export function checkCountLimit(tier: Tier, feature: CountFeature, currentCount:
 const USAGE_FEATURE_MAP: Record<string, keyof TierLimits> = {
   ai_insights: 'aiInsightsPerMonth',
   csv_imports: 'csvImportsPerMonth',
+  pdf_imports: 'pdfImportsPerMonth',
   simulations: 'simulationsPerMonth',
   audits: 'auditsPerMonth',
 }
